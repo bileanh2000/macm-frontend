@@ -1,5 +1,5 @@
-function News() {
-    return <h1>Quản lý tin tức</h1>;
+function Event() {
+    return <h1>Quản lý Sự Kiện</h1>;
 }
 
-export default News;
+export default Event;

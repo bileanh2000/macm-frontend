@@ -37,13 +37,63 @@ function Sidebar() {
                 <ListItemText primary="Quản Lý Người Dùng" />
             </ListItem>
             <Divider />
-            <ListItem button>
-                <ListItemText primary="abc" />
+            <ListItem button component={Link} to="/admin/facility">
+                <ListItemIcon>
+                    <PeopleAltRoundedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quản Lý Cơ Sở Vật Chất" />
             </ListItem>
-            <Divider light />
-            <ListItem button>
-                <ListItemText primary="Quản Lý Người Dùng" />
+            <Divider />
+            <ListItem button component={Link} to="/admin/trainingschedule">
+                <ListItemIcon>
+                    <PeopleAltRoundedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quản Lý Lịch Tập" />
             </ListItem>
+            <Divider />
+            <ListItem button component={Link} to="/admin/contact">
+                <ListItemIcon>
+                    <PeopleAltRoundedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Trang Liên Hệ" />
+            </ListItem>
+            <Divider />
+            <ListItem button component={Link} to="/admin/clubfee">
+                <ListItemIcon>
+                    <PeopleAltRoundedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quản Lý Chi Phí CLB" />
+            </ListItem>
+            <Divider />
+            <ListItem button component={Link} to="/admin/rules">
+                <ListItemIcon>
+                    <PeopleAltRoundedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quản Lý Nội Quy" />
+            </ListItem>
+            <Divider />
+
+            <ListItem button component={Link} to="/admin/tournament">
+                <ListItemIcon>
+                    <PeopleAltRoundedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quản Lý Giải Đấu" />
+            </ListItem>
+            <Divider />
+            <ListItem button component={Link} to="/admin/news">
+                <ListItemIcon>
+                    <PeopleAltRoundedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quản Lý Tin Tức" />
+            </ListItem>
+            <Divider />
+            <ListItem button component={Link} to="/admin/events">
+                <ListItemIcon>
+                    <PeopleAltRoundedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quản Lý Sự Kiện" />
+            </ListItem>
+            <Divider />
         </List>
 
         // <React.Fragment>
