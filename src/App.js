@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { privateRouters } from './router';
 import { DefaultLayout } from './Components/Layout';
+import * as React from 'react';
 
 function App() {
     return (
@@ -8,7 +9,13 @@ function App() {
             <Routes>
                 {privateRouters.map((route, index) => {
                     const Page = route.component;
-                    const Layout = DefaultLayout;
+                    let Layout = DefaultLayout;
+
+                    if (route.layout) {
+                        Layout = route.layout;
+                    } else if (route.layout === null) {
+                        Layout = React.Fragment;
+                    }
                     return (
                         <Route
                             key={index}
