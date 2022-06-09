@@ -1,7 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import { privateRouters } from './router';
 import { DefaultLayout } from './Components/Layout';
-import * as React from 'react';
+import { useEffect, useState, Fragment } from 'react';
+import productApi from './api/axiosClient';
 
 function App() {
     return (
@@ -14,7 +15,7 @@ function App() {
                     if (route.layout) {
                         Layout = route.layout;
                     } else if (route.layout === null) {
-                        Layout = React.Fragment;
+                        Layout = Fragment;
                     }
                     return (
                         <Route
