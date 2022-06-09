@@ -4,7 +4,7 @@ import axiosClient from './axiosClient';
 
 const productApi = {
     getAll: (params) => {
-        const url = '/products';
+        const url = '/rule/getallrule';
         return axiosClient.get(url, { params });
     },
 
