@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from 'react';
 import productApi from 'src/api/testApi';
+import { DataGrid } from '@mui/x-data-grid';
 
 function UserManagement() {
     const [productList, setProductList] = useState([]);
@@ -16,6 +17,21 @@ function UserManagement() {
         fetchProductList();
     }, []);
 
+    const columns = [
+        { field: 'id', headerName: 'ID', width: 70 },
+        { field: 'firstName', headerName: 'First name', width: 130 },
+        { field: 'lastName', headerName: 'Last name', width: 130 },
+        { field: 'age', headerName: 'Age', width: 90 },
+        {
+            field: 'fullName',
+            headerName: 'Full name',
+            description: 'This column has a value getter and is not sortable.',
+            sortable: false,
+            width: 160,
+            valueGetter: (params) => `${params.row.firstName || ''} ${params.row.lastName || ''}`,
+        },
+    ];
+
     return (
         <table>
             <thead>
@@ -31,8 +47,8 @@ function UserManagement() {
                     return (
                         <tr key={item.id}>
                             <td>{item.id}</td>
-                            <td>{item.title}</td>
-                            <td>{item.price}</td>
+                            <td>{item.description}</td>
+                            <td>{item.createdBy}</td>
                             <td>
                                 <img src={item.image} alt="" height={30} />
                             </td>
