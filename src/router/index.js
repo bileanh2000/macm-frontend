@@ -10,6 +10,8 @@ import News from '../Pages/Admin/News';
 import Rules from '../Pages/Admin/Rules';
 import TrainingSchedule from '../Pages/Admin/TrainingSchedule';
 import Tournament from '../Pages/Admin/Tournament';
+import CreateRule from '../Pages/Admin/Rules/CreateRule/CreateRule';
+import EditRule from '../Pages/Admin/Rules/EditRule/EditRule';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -19,7 +21,12 @@ const privateRouters = [
     { path: '/admin/trainingschedule', component: TrainingSchedule },
     { path: '/admin/contact', component: Contact },
     { path: '/admin/clubfee', component: ClubFee },
-    { path: '/admin/rules', component: Rules },
+
+    //Rule paths
+    { path: '/admin/rules/*', component: Rules },
+    { path: '/admin/rules/create', component: CreateRule },
+    { path: '/admin/rules/edit', component: EditRule },
+
     { path: '/admin/tournament', component: Tournament },
     { path: '/admin/news', component: News },
     { path: '/admin/events', component: Event },
