@@ -1,31 +1,38 @@
 import { Fragment, useEffect, useState, useCallback } from 'react';
 import userApi from 'src/api/userApi';
-import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
-// import { Button } from '@mui/material';
+import {
+    DataGrid,
+    GridActionsCellItem,
+    GridToolbarContainer,
+    GridToolbarExport,
+    GridToolbarQuickFilter,
+} from '@mui/x-data-grid';
+import { Box, Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SecurityIcon from '@mui/icons-material/Security';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { useNavigate } from 'react-router-dom';
-// import Link from '@mui/material/Link';
+import { Link } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Typography from '@mui/material/Typography';
 
 function MemberAndCollaborator() {
     const [userList, setUserList] = useState([]);
+    const [pageSize, setPageSize] = useState(10);
 
     useEffect(() => {
-        const fetchUserList = async () => {
-            try {
-                const response = await userApi.getAll();
-                console.log(response);
-                setUserList(response.data);
-            } catch (error) {
-                console.log('Failed to fetch user list: ', error);
-            }
-        };
         fetchUserList();
     }, []);
-
+    const fetchUserList = async () => {
+        try {
+            const response = await userApi.getAll();
+            console.log(response);
+            setUserList(response.data);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
     const columns = [
         { field: 'id', headerName: 'ID' },
         { field: 'name', headerName: 'Tên', width: 220 },
@@ -45,30 +52,17 @@ function MemberAndCollaborator() {
             type: 'actions',
             width: 80,
             getActions: (params) => [
-                <GridActionsCellItem
-                    icon={<EditIcon />}
-                    label="Delete"
-                    onClick={() => {
-                        alert('delete');
-                    }}
-                />,
+                <GridActionsCellItem icon={<EditIcon />} label="Chỉnh sửa" onClick={editUser(params.row.studentId)} />,
                 <GridActionsCellItem
                     icon={<SecurityIcon />}
                     label="Chuyển trạng thái"
-                    // onClick={toggleAdmin(params.id)}
-                    showInMenu
-                />,
-                <GridActionsCellItem
-                    icon={<DeleteIcon />}
-                    label="Xóa"
-                    // onClick={duplicateUser(params.id)}
-                    showInMenu
+                    onClick={toggleStatus(params.row.studentId)}
                 />,
             ],
         },
     ];
 
-    const rows = userList.map((item) => {
+    const rowsUser = userList.map((item) => {
         const container = {};
         container['id'] = item.id;
         container['name'] = item.name;
@@ -80,13 +74,38 @@ function MemberAndCollaborator() {
         return container;
     });
 
-    // const deleteUser = (ids) => {
-    //     const selectedIDs = new Set(ids);
-    //     const selectedRows = rows.filter((row) => selectedIDs.has(row.id));
+    // const [rows, setRows] = useState();
+    // setRows(rowsUser);
 
-    //     setSelectedRows(selectedRows);
-    //     console.log(selectedRows);
-    // };
+    const editUser = useCallback(
+        (studentId) => () => {
+            setTimeout(() => {
+                // setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+                console.log(studentId);
+                let path = `${studentId}/edit`;
+                navigate(path);
+            });
+        },
+        [],
+    );
+    const toggleStatus = useCallback(
+        (id) => () => {
+            // fetchUserList();
+            console.log(id.active);
+            const params = { studentId: id };
+            userApi.updateUserStatus(params).then((res) => {
+                console.log('1', res);
+                console.log('2', res.data);
+                if (res.data != null) {
+                    // setOpenSnackBar(true);
+                } else {
+                    console.log('huhu');
+                }
+            });
+            // console.log(id);
+        },
+        [],
+    );
 
     let navigate = useNavigate();
 
@@ -96,9 +115,18 @@ function MemberAndCollaborator() {
         navigate(path);
         alert('navigation');
     };
+
     function CustomToolbar() {
         return (
-            <GridToolbarContainer>
+            <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
+                <Box
+                    sx={{
+                        p: 0.5,
+                        pb: 0,
+                    }}
+                >
+                    <GridToolbarQuickFilter />
+                </Box>
                 <GridToolbarExport
                     csvOptions={{
                         fileName: 'Danh sách thành viên và cộng tác viên',
@@ -111,16 +139,22 @@ function MemberAndCollaborator() {
     }
     return (
         <Fragment>
-            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 5 }}>
+            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                 Quản lý Thành viên và Cộng tác viên
             </Typography>
-            <div style={{ height: 400, width: '100%' }}>
+            <Box sx={{ marginBottom: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                <Button variant="outlined" component={Link} to={'/admin/adduser'} startIcon={<AddCircleIcon />}>
+                    Thêm thành viên
+                </Button>
+            </Box>
+            <div style={{ height: '70vh', width: '100%' }}>
                 <DataGrid
                     disableSelectionOnClick={true}
-                    rows={rows}
+                    rows={rowsUser}
                     columns={columns}
-                    pageSize={10}
-                    rowsPerPageOptions={[5]}
+                    pageSize={pageSize}
+                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                    rowsPerPageOptions={[10, 20, 30]}
                     onCellDoubleClick={(param) => {
                         handleOnClick(param.row);
                     }}

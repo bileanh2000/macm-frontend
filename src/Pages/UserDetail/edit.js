@@ -6,13 +6,16 @@ import TextField from '@mui/material/TextField';
 import { Grid } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
+import { useForm, Controller } from 'react-hook-form';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+
 // import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 // import DateFnsUtils from '@date-io/date-fns';
 // import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -21,6 +24,32 @@ function UserDetailEdit() {
     let { userId } = useParams();
     const [userDetail, setUserDetail] = useState([]);
     const [age, setAge] = useState('');
+    const validationSchema = Yup.object().shape({
+        name: Yup.string().required('Không được để trống trường này'),
+        studentId: Yup.string()
+            .required('Không được để trống trường này')
+            .matches(/[A-Z]{2}\d{6}/, 'Nhập đúng định dạng'),
+
+        dateOfBirth: Yup.string().required('Không được để trống trường này'),
+        email: Yup.string()
+            .required('Không được để trống trường này')
+            .matches(/^[\w]+@(fpt.edu.vn)/, 'Nhập mail FPT'),
+        gender: Yup.string().required('Không được để trống trường này'),
+        phone: Yup.string()
+            .required('Không được để trống trường này')
+            .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/),
+        roleId: Yup.string().required('Không được để trống trường này'),
+    });
+
+    const {
+        register,
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+        mode: 'onBlur',
+    });
 
     const handleChange = (event) => {
         setAge(event.target.value);
@@ -42,10 +71,22 @@ function UserDetailEdit() {
     const Input = styled('input')({
         display: 'none',
     });
-    const [value, setValue] = useState(new Date('2014-08-18T21:11:54'));
+    const onSubmit = (data) => {
+        // await userApi.createUser(data).then((res) => {
+        //     console.log('1', res);
+        //     console.log('2', res.data);
+        //     if (res.data != null) {
+        //         // setOpenSnackBar(true);
+        //     } else {
+        //         console.log('huhu');
+        //     }
+        // });
+        console.log('form submit');
+        console.log('form submit', data);
+    };
     return userDetail.map((item) => {
         return (
-            <Fragment key={item.id}>
+            <Fragment key={userDetail[0].id}>
                 <Box component="div" sx={{ marginBottom: 12, position: 'relative' }}>
                     <Box component="div">
                         <img src="https://source.unsplash.com/random" alt="" width="100%" height="146px" />
@@ -56,6 +97,9 @@ function UserDetailEdit() {
                         />
                     </Box>
                 </Box>
+                <Typography variant="h5" component="div" sx={{ marginBottom: '16px', fontWeight: '700' }}>
+                    Chỉnh sửa thông tin thành viên
+                </Typography>
                 <Box
                     component="form"
                     sx={{
@@ -63,85 +107,111 @@ function UserDetailEdit() {
                     }}
                     noValidate
                     autoComplete="off"
+                    onSubmit={handleSubmit}
                 >
                     <Grid container spacing={6} columns={12}>
                         <Grid item xs={12} sm={6}>
                             <Typography variant="h6" component="div">
                                 Thông tin cá nhân
                             </Typography>
-                            <TextField id="outlined-disabled" label="Họ và Tên" defaultValue={item.name} fullWidth />
                             <TextField
+                                required
+                                id="outlined-disabled"
+                                label="Họ và Tên"
+                                defaultValue={item.name}
+                                fullWidth
+                                {...register('name')}
+                                error={errors.name ? true : false}
+                                helperText={errors.name?.message}
+                            />
+                            <TextField
+                                required
                                 id="outlined-disabled"
                                 label="Mã sinh viên"
                                 defaultValue={item.studentId}
                                 fullWidth
+                                {...register('studentId')}
+                                error={errors.studentId ? true : false}
+                                helperText={errors.studentId?.message}
                             />
                             <TextField
+                                required
                                 id="outlined-disabled"
                                 label="Ngày sinh"
                                 defaultValue={item.dateOfBirth}
                                 fullWidth
+                                {...register('dateOfBirth')}
+                                error={errors.dateOfBirth ? true : false}
+                                helperText={errors.dateOfBirth?.message}
                             />
 
-                            {/* <LocalizationProvider dateAdapter={DateFnsUtils}>
-                                <DesktopDatePicker
-                                    label="Date desktop"
-                                    inputFormat="MM/dd/yyyy"
-                                    value={value}
-                                    onChange={handleChange}
-                                    renderInput={(params) => <TextField {...params} />}
-                                />
-                            </LocalizationProvider> */}
                             <TextField
+                                required
+                                select
                                 id="outlined-disabled"
                                 label="Giới tính"
-                                defaultValue={item.gender ? 'Nam' : 'Nữ'}
+                                defaultValue={item.gender}
                                 fullWidth
-                            />
+                                {...register('gender')}
+                                error={errors.gender ? true : false}
+                                helperText={errors.gender?.message}
+                            >
+                                <MenuItem value={true}>Nam</MenuItem>
+                                <MenuItem value={false}>Nữ</MenuItem>
+                            </TextField>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <Typography variant="h6" component="div">
                                 Liên hệ
                             </Typography>
                             <FormControl fullWidth>
-                                <TextField id="outlined-disabled" label="Email" defaultValue={item.email} />
                                 <TextField
+                                    required
+                                    id="outlined-disabled"
+                                    label="Email"
+                                    defaultValue={item.email}
+                                    {...register('email')}
+                                    error={errors.email ? true : false}
+                                    helperText={errors.email?.message}
+                                />
+                                <TextField
+                                    required
                                     id="outlined-disabled"
                                     label="Số điện thoại"
                                     defaultValue={'0' + item.phone}
+                                    {...register('phone')}
+                                    error={errors.phone ? true : false}
+                                    helperText={errors.phone?.message}
                                 />
                                 <TextField
+                                    required
                                     id="outlined-disabled"
                                     label="Địa chỉ hiện tại"
                                     defaultValue={item.currentAddress}
+                                    {...register('currentAddress')}
                                 />
-                            </FormControl>
 
-                            <FormControl fullWidth sx={{ margin: '8px', width: '-webkit-fill-available' }}>
-                                <InputLabel id="demo-simple-select-label">Chức vụ</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={age}
-                                    label="Chức vụ"
-                                    onChange={handleChange}
-                                >
+                                <TextField select disabled value={age} label="Chức vụ" onChange={handleChange}>
                                     <MenuItem value={10}>Ten</MenuItem>
                                     <MenuItem value={20}>Twenty</MenuItem>
                                     <MenuItem value={30}>Thirty</MenuItem>
-                                </Select>
+                                </TextField>
                             </FormControl>
                         </Grid>
                     </Grid>
 
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '8px', mt: '8px' }}>
-                        <label htmlFor="contained-button-file">
-                            <Input type="submit" />
-                            <Button variant="contained" component="span">
-                                Xác nhận
-                            </Button>
-                        </label>
+                        <Button variant="contained" component="span" onClick={handleSubmit(onSubmit)}>
+                            Lưu lại
+                        </Button>
                     </Box>
+                    <button
+                        onClick={() => {
+                            alert('dmmmmm');
+                        }}
+                    >
+                        loz
+                    </button>
                 </Box>
             </Fragment>
         );
