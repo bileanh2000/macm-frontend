@@ -10,11 +10,20 @@ import News from '../Pages/Admin/News';
 import Rules from '../Pages/Admin/Rules';
 import TrainingSchedule from '../Pages/Admin/TrainingSchedule';
 import Tournament from '../Pages/Admin/Tournament';
+import MemberAndCollabPage from '../Pages/Admin/User-management/MemberAndCollaborator';
+import HeadOfDepartment from '../Pages/Admin/User-management/HeadOfDepartment';
+import UserDetailPage from '../Pages/UserDetail';
+import UserDetailEditPage from '../Pages/UserDetail/edit';
+import AddUserPage from '../Pages/Admin/addUser';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
     { path: '/admin', component: AdminHomePage },
-    { path: '/admin/users', component: UserManagementPage },
+    { path: '/admin/headofdepartment', component: HeadOfDepartment },
+    { path: '/admin/member', component: MemberAndCollabPage },
+    { path: '/admin/member/:userId', component: UserDetailPage },
+    { path: '/admin/member/:userId/edit', component: UserDetailEditPage },
+    { path: '/admin/addUser', component: AddUserPage },
     { path: '/admin/facility', component: Facility },
     { path: '/admin/trainingschedule', component: TrainingSchedule },
     { path: '/admin/contact', component: Contact },

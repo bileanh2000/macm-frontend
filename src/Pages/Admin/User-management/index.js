@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useState } from 'react';
-import productApi from 'src/api/testApi';
+import productApi from 'src/api/userApi';
 import { DataGrid } from '@mui/x-data-grid';
+import { Button } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 function UserManagement() {
     const [productList, setProductList] = useState([]);
@@ -9,7 +11,7 @@ function UserManagement() {
             try {
                 const response = await productApi.getAll();
                 console.log(response);
-                setProductList(response);
+                setProductList(response.data);
             } catch (error) {
                 console.log('Failed to fetch product list: ', error);
             }
@@ -33,30 +35,34 @@ function UserManagement() {
     ];
 
     return (
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Title</th>
-                    <th>Price</th>
-                    <th>Image</th>
-                </tr>
-            </thead>
-            <tbody>
-                {productList.map((item) => {
-                    return (
-                        <tr key={item.id}>
-                            <td>{item.id}</td>
-                            <td>{item.description}</td>
-                            <td>{item.createdBy}</td>
-                            <td>
-                                <img src={item.image} alt="" height={30} />
-                            </td>
-                        </tr>
-                    );
-                })}
-            </tbody>
-        </table>
+        <Button component={Link} to="/admin/users/member">
+            123
+        </Button>
+        // <table>
+        //     <thead>
+        //         <tr>
+        //             <th>No</th>
+        //             <th>Title</th>
+        //             <th>Price</th>
+        //             <th>Image</th>
+        //         </tr>
+        //     </thead>
+        //     <tbody>
+        //         {productList.map((item) => {
+        //             return (
+        //                 <tr key={item.id}>
+        //                     <td>{item.name}</td>
+        //                     <td>{item.gender ? <Fragment>Nam</Fragment> : <Fragment>Nữ</Fragment>}</td>
+        //                     <td>{item.studentId}</td>
+        //                     <td>{item.role.name}</td>
+        //                     <td>
+        //                         <img src={item.image} alt="" height={30} />
+        //                     </td>
+        //                 </tr>
+        //             );
+        //         })}
+        //     </tbody>
+        // </table>
     );
 }
 
