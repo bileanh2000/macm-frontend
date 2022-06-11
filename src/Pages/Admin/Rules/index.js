@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
 import { Button } from '@mui/material';
-import { BrowserRouter as Router, Link, Route, Routes } from "react-router-dom";
+import { Link } from "react-router-dom";
 import classNames from 'classnames/bind';
 
 import styles from '../Rules/ViewRule/ListRule.module.scss';

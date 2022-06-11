@@ -12,6 +12,7 @@ import TrainingSchedule from '../Pages/Admin/TrainingSchedule';
 import Tournament from '../Pages/Admin/Tournament';
 import CreateRule from '../Pages/Admin/Rules/CreateRule/CreateRule';
 import EditRule from '../Pages/Admin/Rules/EditRule/EditRule';
+import EditContact from '../Pages/Admin/Contact/EditContact/EditContact';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -19,7 +20,11 @@ const privateRouters = [
     { path: '/admin/users', component: UserManagementPage },
     { path: '/admin/facility', component: Facility },
     { path: '/admin/trainingschedule', component: TrainingSchedule },
+
+    //Contact paths
     { path: '/admin/contact', component: Contact },
+    { path: '/admin/contact/edit', component: EditContact },
+
     { path: '/admin/clubfee', component: ClubFee },
 
     //Rule paths
