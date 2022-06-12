@@ -15,6 +15,8 @@ import { styled } from '@mui/material/styles';
 import { useForm, Controller } from 'react-hook-form';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { yupResolver } from '@hookform/resolvers/yup';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import * as Yup from 'yup';
 
 // import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -25,6 +27,8 @@ function UserDetailEdit() {
     let { userId } = useParams();
     const [userDetail, setUserDetail] = useState([]);
     const [age, setAge] = useState('');
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    let snackBarStatus;
     const validationSchema = Yup.object().shape({
         name: Yup.string().required('Không được để trống trường này'),
         studentId: Yup.string()
@@ -71,14 +75,30 @@ function UserDetailEdit() {
     const Input = styled('input')({
         display: 'none',
     });
+    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
+    const dynamicAlert = (status) => {
+        console.log('status of dynamicAlert', status);
+        if (status) {
+            setCustomAlert({ severity: 'success', message: 'Cập nhật người dùng thành công' });
+        } else {
+            setCustomAlert({ severity: 'error', message: 'Lỗi khi cập nhật người dùng' });
+        }
+    };
     const onSubmit = async (data) => {
         await userApi.updateUser(data).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
-            if (res.data != null) {
-                // setOpenSnackBar(true);
+            if (res.data.length != 0) {
+                setOpenSnackBar(true);
+                // setSnackBarStatus(true);
+                snackBarStatus = true;
+                dynamicAlert(snackBarStatus);
             } else {
                 console.log('huhu');
+                setOpenSnackBar(true);
+                // setSnackBarStatus(false);
+                snackBarStatus = false;
+                dynamicAlert(snackBarStatus);
             }
         });
         console.log('form submit', data);
@@ -86,6 +106,21 @@ function UserDetailEdit() {
     return userDetail.map((item) => {
         return (
             <Fragment key={item.id}>
+                <Snackbar
+                    open={openSnackBar}
+                    autoHideDuration={5000}
+                    // onClose={handleCloseSnackBar}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                >
+                    <Alert
+                        // onClose={handleCloseSnackBar}
+                        variant="filled"
+                        severity={customAlert.severity || 'success'}
+                        sx={{ width: '100%' }}
+                    >
+                        {customAlert.message}
+                    </Alert>
+                </Snackbar>
                 <Box component="div" sx={{ marginBottom: 12, position: 'relative' }}>
                     <Box component="div">
                         <img src="https://source.unsplash.com/random" alt="" width="100%" height="146px" />
@@ -177,7 +212,7 @@ function UserDetailEdit() {
                                     required
                                     id="outlined-disabled"
                                     label="Số điện thoại"
-                                    defaultValue={'0' + item.phone}
+                                    defaultValue={item.phone}
                                     {...register('phone')}
                                     error={errors.phone ? true : false}
                                     helperText={errors.phone?.message}
@@ -190,11 +225,15 @@ function UserDetailEdit() {
                                     {...register('currentAddress')}
                                 />
 
-                                <TextField select disabled value={age} label="Chức vụ" onChange={handleChange}>
-                                    <MenuItem value={10}>Ten</MenuItem>
-                                    <MenuItem value={20}>Twenty</MenuItem>
-                                    <MenuItem value={30}>Thirty</MenuItem>
-                                </TextField>
+                                <TextField
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                    defaultValue={item.role.id}
+                                    label="Chức vụ"
+                                    // onChange={handleChange}
+                                    {...register('roleId')}
+                                ></TextField>
                             </FormControl>
                         </Grid>
                     </Grid>

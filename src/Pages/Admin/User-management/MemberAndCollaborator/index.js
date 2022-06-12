@@ -12,15 +12,30 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SecurityIcon from '@mui/icons-material/Security';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { useNavigate } from 'react-router-dom';
-// import { Link } from 'react-router-dom';
+import { Link as routerLink } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import EditIcon from '@mui/icons-material/Edit';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Typography from '@mui/material/Typography';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 function MemberAndCollaborator() {
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
+    const [openUploadFile, setOpenUploadFile] = useState(false);
+
+    const handleClickOpen = () => {
+        setOpenUploadFile(true);
+    };
+
+    const handleClose = () => {
+        setOpenUploadFile(false);
+    };
 
     useEffect(() => {
         fetchUserList();
@@ -37,19 +52,19 @@ function MemberAndCollaborator() {
     };
     const columns = [
         { field: 'id', headerName: 'ID', flex: 0.5 },
-        { field: 'name', headerName: 'Tên', flex: 2 },
+        { field: 'name', headerName: 'Tên', flex: 1 },
         {
             field: 'email',
             headerName: 'Email',
             width: 220,
             renderCell: (params) => <Link href={`mailto:${params.value}`}>{params.value.toString()}</Link>,
-            flex: 2,
+            flex: 1,
         },
 
-        { field: 'gender', headerName: 'Giới tính', flex: 1 },
+        { field: 'gender', headerName: 'Giới tính', flex: 0.5 },
         { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 1 },
-        { field: 'role', headerName: 'Vai trò', width: 200, flex: 1 },
-        { field: 'active', headerName: 'Trạng thái', flex: 1 },
+        { field: 'role', headerName: 'Vai trò', width: 200, flex: 1.5 },
+        { field: 'active', headerName: 'Trạng thái', flex: 0.5 },
         {
             field: 'actions',
             type: 'actions',
@@ -109,13 +124,7 @@ function MemberAndCollaborator() {
                 });
                 console.log('1', res);
                 console.log('2', res.data);
-                // if (res.data) {
-                //     // setOpenSnackBar(true);
-                // } else {
-                //     console.log('huhu');
-                // }
             });
-            // console.log(id);
         },
         [],
     );
@@ -143,7 +152,6 @@ function MemberAndCollaborator() {
                 <GridToolbarExport
                     csvOptions={{
                         fileName: 'Danh sách thành viên và cộng tác viên',
-                        delimiter: ';',
                         utf8WithBom: true,
                     }}
                 />
@@ -152,12 +160,34 @@ function MemberAndCollaborator() {
     }
     return (
         <Fragment>
+            <Dialog open={openUploadFile} onClose={handleClose} fullWidth maxWidth="lg">
+                <DialogTitle>Tải lên file CSV</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        To subscribe to this website, please enter your email address here. We will send updates
+                        occasionally.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={handleClose}>Subscribe</Button>
+                </DialogActions>
+            </Dialog>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                 Quản lý Thành viên và Cộng tác viên
             </Typography>
             <Box sx={{ marginBottom: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button variant="outlined" component={Link} to={'/admin/adduser'} startIcon={<AddCircleIcon />}>
+                <Button
+                    variant="outlined"
+                    sx={{ marginRight: 2 }}
+                    component={routerLink}
+                    to={'/admin/addUser'}
+                    startIcon={<AddCircleIcon />}
+                >
                     Thêm thành viên
+                </Button>
+                <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={handleClickOpen}>
+                    Thêm danh sách thành viên
                 </Button>
             </Box>
             <div style={{ height: '70vh', width: '100%' }}>
