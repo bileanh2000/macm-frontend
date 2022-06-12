@@ -24,6 +24,21 @@ const userApi = {
         const url = '/admin/hr/headclub/getalladmin';
         return axiosClient.get(url, { params });
     },
+    deleteAdmin: (id) => {
+        const url = `/admin/hr/deleteadmin/${id}`;
+        return axiosClient.put(url);
+    },
+    updateUser: (params) => {
+        const url = `/admin/hr/updateuser/${params.studentId}`;
+        return axiosClient.put(url, params);
+    },
+    updateUserStatus: (params) => {
+        const url = `/admin/hr/updatestatus?studentId=${params.studentId}`;
+        return axiosClient.put(url);
+    },
+    uploadCSV: (params) => {
+        const url = `/admin/hr/uploadfilemember`;
+        return axiosClient.post(url, params);
+    },
 };
-
 export default userApi;

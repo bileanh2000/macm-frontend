@@ -1,5 +1,11 @@
 import { Fragment, useEffect, useState, useCallback } from 'react';
 import userApi from 'src/api/userApi';
+import Box from '@mui/material/Box';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useNavigate } from 'react-router-dom';
+import Link from '@mui/material/Link';
+import EditIcon from '@mui/icons-material/Edit';
+import Typography from '@mui/material/Typography';
 import {
     DataGrid,
     GridActionsCellItem,
@@ -7,17 +13,25 @@ import {
     GridToolbarExport,
     GridToolbarQuickFilter,
 } from '@mui/x-data-grid';
-import Box from '@mui/material/Box';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SecurityIcon from '@mui/icons-material/Security';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import { useNavigate } from 'react-router-dom';
-// import Link from '@mui/material/Link';
-import EditIcon from '@mui/icons-material/Edit';
-import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
 
 function MemberAndCollaborator() {
+    let storageStudentId;
     const [userList, setUserList] = useState([]);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [stageStudentId, setStageStudentID] = useState({ studentId: '', name: '' });
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
+    };
 
     useEffect(() => {
         const fetchUserList = async () => {
@@ -32,23 +46,27 @@ function MemberAndCollaborator() {
         fetchUserList();
     }, []);
 
+    useEffect(() => {
+        console.log(stageStudentId);
+    }, [stageStudentId]);
     const columns = [
-        { field: 'id', headerName: 'ID' },
-        { field: 'name', headerName: 'Tên', width: 220 },
-        // {
-        //     field: 'id',
-        //     headerName: 'test link',
-        //     width: 220,
-        //     renderCell: (params) => <Link href={`/admin/member/${params.value}`}>{params.value.toString()}</Link>,
-        // },
+        { field: 'id', headerName: 'ID', flex: 0.5 },
+        { field: 'name', headerName: 'Tên', flex: 1 },
+        {
+            field: 'email',
+            headerName: 'Email',
+            width: 220,
+            renderCell: (params) => <Link href={`mailto:${params.value}`}>{params.value.toString()}</Link>,
+            flex: 2,
+        },
 
-        { field: 'gender', headerName: 'Giới tính' },
-        { field: 'studentId', headerName: 'Mã sinh viên', width: 150 },
-        { field: 'role', headerName: 'Vai trò', width: 200 },
+        { field: 'gender', headerName: 'Giới tính', flex: 1 },
+        { field: 'studentId', headerName: 'Mã sinh viên', flex: 1 },
+        { field: 'role', headerName: 'Vai trò', flex: 1 },
         {
             field: 'actions',
             type: 'actions',
-            width: 80,
+            flex: 1,
             getActions: (params) => [
                 <GridActionsCellItem
                     icon={<EditIcon />}
@@ -57,26 +75,24 @@ function MemberAndCollaborator() {
                         alert('delete');
                     }}
                 />,
-                <GridActionsCellItem
-                    icon={<SecurityIcon />}
-                    label="Chuyển trạng thái"
-                    // onClick={toggleAdmin(params.id)}
-                    showInMenu
-                />,
+
                 <GridActionsCellItem
                     icon={<DeleteIcon />}
                     label="Xóa"
-                    // onClick={duplicateUser(params.id)}
-                    showInMenu
+                    onClick={() => {
+                        handleOpenDialog();
+                        setStageStudentID({ studentId: params.row.studentId, name: params.row.name });
+                    }}
                 />,
             ],
         },
     ];
 
-    const rows = userList.map((item) => {
+    const rows = userList.map((item, index) => {
         const container = {};
-        container['id'] = item.id;
+        container['id'] = index + 1;
         container['name'] = item.name;
+        container['email'] = item.email;
         container['gender'] = item.gender ? 'Nam' : 'Nữ';
         container['studentId'] = item.studentId;
         container['role'] = item.role.name;
@@ -84,16 +100,20 @@ function MemberAndCollaborator() {
         return container;
     });
 
-    // const deleteUser = (ids) => {
-    //     const selectedIDs = new Set(ids);
-    //     const selectedRows = rows.filter((row) => selectedIDs.has(row.id));
-
-    //     setSelectedRows(selectedRows);
-    //     console.log(selectedRows);
-    // };
-
+    const deleteUser = useCallback(
+        (id) => () => {
+            handleCloseDialog();
+            setTimeout(() => {
+                userApi.deleteAdmin(id).then((res) => {
+                    setUserList((prevRows) => prevRows.filter((row) => row.studentId !== id));
+                    console.log('1', res);
+                    console.log('2', res.data);
+                });
+            });
+        },
+        [],
+    );
     let navigate = useNavigate();
-
     const handleOnClick = (rowData) => {
         console.log('push -> /roles/' + rowData.studentId);
         let path = `${rowData.studentId}`;
@@ -121,29 +141,44 @@ function MemberAndCollaborator() {
             </GridToolbarContainer>
         );
     }
-    // function QuickSearchToolbar() {
-    //     return (
 
-    //     );
-    // }
     return (
         <Fragment>
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa ${stageStudentId.name} khỏi Ban chủ nhiệm?`}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Khi xóa thành viên khỏi Ban chủ nhiệm, mặc định thành viên sẽ vào Ban chuyên môn
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>Từ chối</Button>
+                    <Button onClick={deleteUser(stageStudentId.studentId)} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 5 }}>
                 Quản lý Ban chủ nhiệm
             </Typography>
-            <div style={{ height: 400, width: '100%' }}>
+            <div style={{ height: '80vh', width: '100%' }}>
                 <DataGrid
+                    loading={!userList.length}
                     disableSelectionOnClick={true}
                     rows={rows}
                     columns={columns}
-                    pageSize={5}
+                    pageSize={15}
                     rowsPerPageOptions={[5]}
                     onCellDoubleClick={(param) => {
                         handleOnClick(param.row);
                     }}
                     components={{
                         Toolbar: CustomToolbar,
-                        // Toolbar: QuickSearchToolbar,
                     }}
                 />
             </div>

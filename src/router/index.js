@@ -28,8 +28,10 @@ const privateRouters = [
     { path: '/admin/headofdepartment', component: HeadOfDepartment },
     { path: '/admin/member', component: MemberAndCollabPage },
     { path: '/admin/member/:userId', component: UserDetailPage },
+    { path: '/admin/headofdepartment/:userId', component: UserDetailPage },
     { path: '/admin/member/:userId/edit', component: UserDetailEditPage },
-    { path: '/admin/addUser', component: AddUserPage },
+    { path: '/admin/headofdepartment/:userId/edit', component: UserDetailEditPage },
+    { path: '/admin/adduser', component: AddUserPage },
     { path: '/admin/facility', component: Facility },
     { path: '/admin/trainingschedule', component: TrainingSchedule },
 

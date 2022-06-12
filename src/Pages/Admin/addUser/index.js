@@ -20,7 +20,8 @@ import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 
 function AddUser() {
-    const [openSnackBar, setOpenSnackBar] = useState(true);
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    let snackBarStatus;
 
     const validationSchema = Yup.object().shape({
         name: Yup.string().required('Không được để trống trường này'),
@@ -55,29 +56,52 @@ function AddUser() {
 
         setOpenSnackBar(false);
     };
+
+    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
+    const dynamicAlert = (status) => {
+        console.log('status of dynamicAlert', status);
+        if (status) {
+            setCustomAlert({ severity: 'success', message: 'Thêm thành công người dùng' });
+        } else {
+            setCustomAlert({ severity: 'error', message: 'Lỗi khi thêm người dùng' });
+        }
+    };
     const onSubmit = async (data) => {
         await userApi.createUser(data).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
-            if (res.data != null) {
+            if (res.data.length != 0) {
                 setOpenSnackBar(true);
+                // setSnackBarStatus(true);
+                snackBarStatus = true;
+                dynamicAlert(snackBarStatus);
             } else {
                 console.log('huhu');
+                setOpenSnackBar(true);
+                // setSnackBarStatus(false);
+                snackBarStatus = false;
+                dynamicAlert(snackBarStatus);
             }
         });
 
-        console.log('submit', data);
+        console.log('form submit', data);
     };
+
     return (
         <Fragment>
             <Snackbar
                 open={openSnackBar}
                 autoHideDuration={5000}
                 onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             >
-                <Alert onClose={handleCloseSnackBar} severity="success" sx={{ width: '100%' }}>
-                    Thêm thành công người dùng
+                <Alert
+                    onClose={handleCloseSnackBar}
+                    variant="filled"
+                    severity={customAlert.severity || 'success'}
+                    sx={{ width: '100%' }}
+                >
+                    {customAlert.message}
                 </Alert>
             </Snackbar>
 
