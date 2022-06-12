@@ -1,5 +1,5 @@
 import { Button } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 
 import styles from '../CreateRule/CreateRule.module.scss';
@@ -12,6 +12,7 @@ function EditRule() {
 
     const location = useLocation()
     const _rule = location.state?.rule;
+    const history = useNavigate()
 
     const [rule, setRule] = useState(_rule.description)
 
@@ -23,6 +24,7 @@ function EditRule() {
                     description: rule,
                 });
             }
+            history('/admin/rules')
         } catch (error) {
             console.log("Error detected: " + error)
         }
@@ -49,7 +51,7 @@ function EditRule() {
             <textarea
                 className={cx('textArea')}
                 rows={10}
-                value={rule}
+                value={rule == null ? '' : rule}
                 onChange={e => setRule(e.target.value)}
                 required
             >

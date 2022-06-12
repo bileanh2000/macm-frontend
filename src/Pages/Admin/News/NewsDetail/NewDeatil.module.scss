@@ -3,17 +3,13 @@
     flex-direction: column;
     align-items: center;
 }
+
 .container {
-    width: 100%;
-}
-.header {
     width: 80%;
     padding: 20px 0px 50px 0px;
+    // margin-top: var(--default-layout-header-height);
+}
+.header {
     display: flex;
     justify-content: space-between;
-    margin: auto;
-}
-.slideshow {
-    width: 100%;
-    margin: auto;
 }

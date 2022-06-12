@@ -7,6 +7,9 @@ import Contact from '../Pages/Admin/Contact';
 import Event from '../Pages/Admin/Event';
 import Facility from '../Pages/Admin/Facility';
 import News from '../Pages/Admin/News';
+import NewsDetail from '../Pages/Admin/News/NewsDetail/NewsDetail';
+import EditNews from '../Pages/Admin/News/EditNews/EditNews';
+import CreateNews from '../Pages/Admin/News/CreateNews/CreateNews';
 import Rules from '../Pages/Admin/Rules';
 import TrainingSchedule from '../Pages/Admin/TrainingSchedule';
 import Tournament from '../Pages/Admin/Tournament';
@@ -42,7 +45,14 @@ const privateRouters = [
     { path: '/admin/rules/edit', component: EditRule },
 
     { path: '/admin/tournament', component: Tournament },
+
+    //News paths
     { path: '/admin/news', component: News },
+    { path: '/admin/news/create', component: CreateNews },
+    { path: '/admin/news/:newsId/edit', component: EditNews },
+    { path: '/admin/news/:newsId', component: NewsDetail },
+
+
     { path: '/admin/events', component: Event },
 ];
 
