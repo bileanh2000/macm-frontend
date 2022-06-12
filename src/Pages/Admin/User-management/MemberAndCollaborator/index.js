@@ -23,7 +23,48 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import styles from './MemberAndCollaborator.module.scss';
+import { FileUploader } from 'react-drag-drop-files';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { useForm } from 'react-hook-form';
 
+const fileTypes = ['CSV', 'JPG', 'png'];
+
+function DragDrop() {
+    const [aFile, setAFile] = useState(null);
+
+    const handleChange = async (file) => {
+        setAFile(file);
+        // await userApi.uploadCSV(aFile).then((res) => {
+        //     console.log('1', res);
+        //     console.log('2', res.data);
+        //     if (res.data.length != 0) {
+        //         // setSnackBarStatus(true);
+        //     } else {
+        //         console.log('huhu');
+        //         // setSnackBarStatus(false);
+        //     }
+        // });
+    };
+
+    useEffect(() => {
+        console.log(aFile);
+    }, [aFile]);
+
+    return (
+        <div className="dragdrop">
+            <FileUploader
+                multiple={true}
+                onTypeError={(err) => console.log(err)}
+                name="file"
+                types={fileTypes}
+                handleChange={handleChange}
+            />
+            <p>{aFile ? `File name: ${aFile[0].name}` : ''}</p>
+        </div>
+    );
+}
 function MemberAndCollaborator() {
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
@@ -138,6 +179,10 @@ function MemberAndCollaborator() {
         alert('navigation');
     };
 
+    const onSubmit = (data) => {
+        console.log(data);
+    };
+
     function CustomToolbar() {
         return (
             <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
@@ -160,18 +205,17 @@ function MemberAndCollaborator() {
     }
     return (
         <Fragment>
-            <Dialog open={openUploadFile} onClose={handleClose} fullWidth maxWidth="lg">
+            <Dialog open={openUploadFile} onClose={handleClose} fullWidth maxWidth="xs">
                 <DialogTitle>Tải lên file CSV</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        To subscribe to this website, please enter your email address here. We will send updates
-                        occasionally.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleClose}>Subscribe</Button>
-                </DialogActions>
+                <Box component="form">
+                    <DialogContent>
+                        <DragDrop />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>Từ chối</Button>
+                        <Button onClick={handleClose}>Đồng ý</Button>
+                    </DialogActions>
+                </Box>
             </Dialog>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                 Quản lý Thành viên và Cộng tác viên

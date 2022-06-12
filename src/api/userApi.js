@@ -36,5 +36,9 @@ const userApi = {
         const url = `/admin/hr/updatestatus?studentId=${params.studentId}`;
         return axiosClient.put(url);
     },
+    uploadCSV: (params) => {
+        const url = `/admin/hr/uploadfilemember`;
+        return axiosClient.post(url, params);
+    },
 };
 export default userApi;
