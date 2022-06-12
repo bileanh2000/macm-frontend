@@ -29,7 +29,7 @@ const userApi = {
         return axiosClient.put(url);
     },
     updateUser: (params) => {
-        const url = `/admin/hr/deleteadmin/${params.id}`;
+        const url = `/admin/hr/updateuser/${params.studentId}`;
         return axiosClient.put(url, params);
     },
     updateUserStatus: (params) => {

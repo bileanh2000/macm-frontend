@@ -12,7 +12,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SecurityIcon from '@mui/icons-material/Security';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
+import Link from '@mui/material/Link';
 import EditIcon from '@mui/icons-material/Edit';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Typography from '@mui/material/Typography';
@@ -24,6 +25,7 @@ function MemberAndCollaborator() {
     useEffect(() => {
         fetchUserList();
     }, []);
+
     const fetchUserList = async () => {
         try {
             const response = await userApi.getAll();
@@ -34,23 +36,24 @@ function MemberAndCollaborator() {
         }
     };
     const columns = [
-        { field: 'id', headerName: 'ID' },
-        { field: 'name', headerName: 'Tên', width: 220 },
-        // {
-        //     field: 'id',
-        //     headerName: 'test link',
-        //     width: 220,
-        //     renderCell: (params) => <Link href={`/admin/member/${params.value}`}>{params.value.toString()}</Link>,
-        // },
+        { field: 'id', headerName: 'ID', flex: 0.5 },
+        { field: 'name', headerName: 'Tên', flex: 2 },
+        {
+            field: 'email',
+            headerName: 'Email',
+            width: 220,
+            renderCell: (params) => <Link href={`mailto:${params.value}`}>{params.value.toString()}</Link>,
+            flex: 2,
+        },
 
-        { field: 'gender', headerName: 'Giới tính' },
-        { field: 'studentId', headerName: 'Mã sinh viên', width: 150 },
-        { field: 'role', headerName: 'Vai trò', width: 200 },
-        { field: 'active', headerName: 'Trạng thái' },
+        { field: 'gender', headerName: 'Giới tính', flex: 1 },
+        { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 1 },
+        { field: 'role', headerName: 'Vai trò', width: 200, flex: 1 },
+        { field: 'active', headerName: 'Trạng thái', flex: 1 },
         {
             field: 'actions',
             type: 'actions',
-            width: 80,
+            flex: 1,
             getActions: (params) => [
                 <GridActionsCellItem icon={<EditIcon />} label="Chỉnh sửa" onClick={editUser(params.row.studentId)} />,
                 <GridActionsCellItem
@@ -62,10 +65,11 @@ function MemberAndCollaborator() {
         },
     ];
 
-    const rowsUser = userList.map((item) => {
+    const rowsUser = userList.map((item, index) => {
         const container = {};
-        container['id'] = item.id;
+        container['id'] = index + 1;
         container['name'] = item.name;
+        container['email'] = item.email;
         container['gender'] = item.gender ? 'Nam' : 'Nữ';
         container['studentId'] = item.studentId;
         container['role'] = item.role.name;
@@ -94,13 +98,22 @@ function MemberAndCollaborator() {
             console.log(id.active);
             const params = { studentId: id };
             userApi.updateUserStatus(params).then((res) => {
+                setUserList((oldUserList) => {
+                    return oldUserList.map((user) => {
+                        if (user.studentId === id) {
+                            console.log(user.studentId, id);
+                            return { ...user, active: !user.active };
+                        }
+                        return user;
+                    });
+                });
                 console.log('1', res);
                 console.log('2', res.data);
-                if (res.data != null) {
-                    // setOpenSnackBar(true);
-                } else {
-                    console.log('huhu');
-                }
+                // if (res.data) {
+                //     // setOpenSnackBar(true);
+                // } else {
+                //     console.log('huhu');
+                // }
             });
             // console.log(id);
         },
@@ -149,6 +162,7 @@ function MemberAndCollaborator() {
             </Box>
             <div style={{ height: '70vh', width: '100%' }}>
                 <DataGrid
+                    loading={!userList.length}
                     disableSelectionOnClick={true}
                     rows={rowsUser}
                     columns={columns}

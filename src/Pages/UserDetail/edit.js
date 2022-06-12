@@ -6,6 +6,7 @@ import TextField from '@mui/material/TextField';
 import { Grid } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
+import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
@@ -38,7 +39,6 @@ function UserDetailEdit() {
         phone: Yup.string()
             .required('Không được để trống trường này')
             .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/),
-        roleId: Yup.string().required('Không được để trống trường này'),
     });
 
     const {
@@ -71,22 +71,21 @@ function UserDetailEdit() {
     const Input = styled('input')({
         display: 'none',
     });
-    const onSubmit = (data) => {
-        // await userApi.createUser(data).then((res) => {
-        //     console.log('1', res);
-        //     console.log('2', res.data);
-        //     if (res.data != null) {
-        //         // setOpenSnackBar(true);
-        //     } else {
-        //         console.log('huhu');
-        //     }
-        // });
-        console.log('form submit');
+    const onSubmit = async (data) => {
+        await userApi.updateUser(data).then((res) => {
+            console.log('1', res);
+            console.log('2', res.data);
+            if (res.data != null) {
+                // setOpenSnackBar(true);
+            } else {
+                console.log('huhu');
+            }
+        });
         console.log('form submit', data);
     };
     return userDetail.map((item) => {
         return (
-            <Fragment key={userDetail[0].id}>
+            <Fragment key={item.id}>
                 <Box component="div" sx={{ marginBottom: 12, position: 'relative' }}>
                     <Box component="div">
                         <img src="https://source.unsplash.com/random" alt="" width="100%" height="146px" />
@@ -205,13 +204,6 @@ function UserDetailEdit() {
                             Lưu lại
                         </Button>
                     </Box>
-                    <button
-                        onClick={() => {
-                            alert('dmmmmm');
-                        }}
-                    >
-                        loz
-                    </button>
                 </Box>
             </Fragment>
         );
