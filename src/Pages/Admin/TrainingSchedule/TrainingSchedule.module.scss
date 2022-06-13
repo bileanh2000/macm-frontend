@@ -1,10 +1,21 @@
-.test-css {
-    color: red !important;
-}
+#TrainingSchedule {
+    .test-css {
+        color: red !important;
+    }
 
-.fc-event-title {
-    color: red !important;
+    .fc-event-title {
+        color: red !important;
+    }
+    .haha {
+        color: red;
+    }
 }
-.haha {
-    color: red;
+.schedule-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+.schedule-content {
+    height: 100%;
+    width: 70%;
 }

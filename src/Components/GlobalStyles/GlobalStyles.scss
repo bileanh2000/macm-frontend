@@ -26,5 +26,15 @@
     background-color: red !important;
     border-radius: 10px;
 }
+.fc-toolbar-title {
+    font-size: 1.5rem !important;
+}
+.fc-toolbar-title::first-letter {
+    text-transform: capitalize;
+}
+
+.fc-toolbar {
+    align-items: flex-end !important;
+}
 
 //----------------------
