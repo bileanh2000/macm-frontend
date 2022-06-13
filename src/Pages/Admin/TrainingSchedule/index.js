@@ -39,6 +39,7 @@ function TrainingSchedule() {
 
     const scheduleData = scheduleList.map((item) => {
         const container = {};
+        container['id'] = item.id;
         container['date'] = item.date;
         container['title'] = item.startTime + ' - ' + item.finishTime;
         container['display'] = 'background';
@@ -55,8 +56,8 @@ function TrainingSchedule() {
         console.log('selected');
     };
     let navigate = useNavigate();
-    const navigateUpdate = (params) => {
-        let path = `${params}`;
+    const navigateToUpdate = (params) => {
+        let path = `${params}/edit`;
         navigate(path);
     };
     return (
@@ -74,18 +75,18 @@ function TrainingSchedule() {
                         height="60%"
                         plugins={[dayGridPlugin, interactionPlugin]}
                         initialView="dayGridMonth"
-                        events={[
-                            {
-                                id: 1,
-                                title: 'đi tập đi đmm',
-                                date: '2022-06-16',
-                                // display: 'background',
-                                // textColor: 'white',
-                                backgroundColor: '#5ba8f5',
-                                classNames: ['test-css'],
-                            },
-                        ]}
-                        // events={scheduleData}
+                        // events={[
+                        //     {
+                        //         id: 1,
+                        //         title: 'đi tập đi đmm',
+                        //         date: '2022-06-16',
+                        //         // display: 'background',
+                        //         // textColor: 'white',
+                        //         backgroundColor: '#5ba8f5',
+                        //         classNames: ['test-css'],
+                        //     },
+                        // ]}
+                        events={scheduleData}
                         weekends={true}
                         headerToolbar={{
                             left: 'title',
@@ -98,7 +99,7 @@ function TrainingSchedule() {
                             getMonthInCurrentTableView(dateInfo.start);
                         }}
                         eventClick={(args) => {
-                            navigateUpdate(args.event.id);
+                            navigateToUpdate(args.event.id);
                         }}
                         // dateClick={function (arg) {
                         //     swal({

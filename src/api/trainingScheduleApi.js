@@ -16,5 +16,9 @@ const trainingSchedule = {
             },
         });
     },
+    deleteSession: (params) => {
+        const url = `/trainingschedule/headtechnique/deletesession/${params}`;
+        return axiosClient.put(url);
+    },
 };
 export default trainingSchedule;
