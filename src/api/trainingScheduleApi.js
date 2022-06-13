@@ -1,9 +1,9 @@
 import axiosClient from './axiosClient';
 
 const trainingSchedule = {
-    getAllSchedule: (params) => {
-        const url = '/admin/hr/getallmemberandcollaborator?pageNo=0&pageSize=100';
-        return axiosClient.get(url, { params });
+    getAllSchedule: () => {
+        const url = '/trainingschedule/gettrainingschedule';
+        return axiosClient.get(url);
     },
     createSchedule: (params) => {
         const url = `trainingschedule/headtechnique/addnewschedule`;
