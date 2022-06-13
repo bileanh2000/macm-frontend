@@ -55,7 +55,7 @@ function AddSchedule() {
         },
         {
             label: 'Thứ tư',
-            value: 'WENESDAY',
+            value: 'WEDNESDAY',
         },
         {
             label: 'Thứ năm',
