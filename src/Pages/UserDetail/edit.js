@@ -75,13 +75,20 @@ function UserDetailEdit() {
     const Input = styled('input')({
         display: 'none',
     });
+    const handleCloseSnackBar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenSnackBar(false);
+    };
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    const dynamicAlert = (status) => {
+    const dynamicAlert = (status, message) => {
         console.log('status of dynamicAlert', status);
         if (status) {
-            setCustomAlert({ severity: 'success', message: 'Cập nhật người dùng thành công' });
+            setCustomAlert({ severity: 'success', message: message });
         } else {
-            setCustomAlert({ severity: 'error', message: 'Lỗi khi cập nhật người dùng' });
+            setCustomAlert({ severity: 'error', message: message });
         }
     };
     const onSubmit = async (data) => {
@@ -92,13 +99,13 @@ function UserDetailEdit() {
                 setOpenSnackBar(true);
                 // setSnackBarStatus(true);
                 snackBarStatus = true;
-                dynamicAlert(snackBarStatus);
+                dynamicAlert(snackBarStatus, res.message);
             } else {
                 console.log('huhu');
                 setOpenSnackBar(true);
                 // setSnackBarStatus(false);
                 snackBarStatus = false;
-                dynamicAlert(snackBarStatus);
+                dynamicAlert(snackBarStatus, res.message);
             }
         });
         console.log('form submit', data);
@@ -109,11 +116,11 @@ function UserDetailEdit() {
                 <Snackbar
                     open={openSnackBar}
                     autoHideDuration={5000}
-                    // onClose={handleCloseSnackBar}
+                    onClose={handleCloseSnackBar}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 >
                     <Alert
-                        // onClose={handleCloseSnackBar}
+                        onClose={handleCloseSnackBar}
                         variant="filled"
                         severity={customAlert.severity || 'success'}
                         sx={{ width: '100%' }}

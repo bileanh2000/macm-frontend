@@ -72,7 +72,7 @@ function Sidebar() {
                 <ListItemText primary="Quản Lý Cơ Sở Vật Chất" />
             </ListItem>
             <Divider />
-            <ListItem button component={Link} to="/admin/trainingschedule">
+            <ListItem button component={Link} to="/admin/trainingschedules">
                 <ListItemIcon>
                     <PeopleAltRoundedIcon />
                 </ListItemIcon>

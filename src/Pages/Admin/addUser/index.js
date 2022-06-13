@@ -58,12 +58,12 @@ function AddUser() {
     };
 
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    const dynamicAlert = (status) => {
+    const dynamicAlert = (status, message) => {
         console.log('status of dynamicAlert', status);
         if (status) {
-            setCustomAlert({ severity: 'success', message: 'Thêm thành công người dùng' });
+            setCustomAlert({ severity: 'success', message: message });
         } else {
-            setCustomAlert({ severity: 'error', message: 'Lỗi khi thêm người dùng' });
+            setCustomAlert({ severity: 'error', message: message });
         }
     };
     const onSubmit = async (data) => {
@@ -74,13 +74,13 @@ function AddUser() {
                 setOpenSnackBar(true);
                 // setSnackBarStatus(true);
                 snackBarStatus = true;
-                dynamicAlert(snackBarStatus);
+                dynamicAlert(snackBarStatus, res.message);
             } else {
                 console.log('huhu');
                 setOpenSnackBar(true);
                 // setSnackBarStatus(false);
                 snackBarStatus = false;
-                dynamicAlert(snackBarStatus);
+                dynamicAlert(snackBarStatus, res.message);
             }
         });
 

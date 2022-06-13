@@ -15,6 +15,7 @@ import HeadOfDepartment from '../Pages/Admin/User-management/HeadOfDepartment';
 import UserDetailPage from '../Pages/UserDetail';
 import UserDetailEditPage from '../Pages/UserDetail/edit';
 import AddUserPage from '../Pages/Admin/addUser';
+import AddTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/addSchedule';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -27,7 +28,8 @@ const privateRouters = [
     { path: '/admin/headofdepartment/:userId/edit', component: UserDetailEditPage },
     { path: '/admin/adduser', component: AddUserPage },
     { path: '/admin/facility', component: Facility },
-    { path: '/admin/trainingschedule', component: TrainingSchedule },
+    { path: '/admin/trainingschedules', component: TrainingSchedule },
+    { path: '/admin/trainingschedules/add', component: AddTrainingSchedulePage },
     { path: '/admin/contact', component: Contact },
     { path: '/admin/clubfee', component: ClubFee },
     { path: '/admin/rules', component: Rules },
