@@ -17,6 +17,8 @@ import UserDetailEditPage from '../Pages/UserDetail/edit';
 import AddUserPage from '../Pages/Admin/addUser';
 import AddTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/addSchedule';
 import UpdateTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/editSession';
+import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession'
+import { ko } from 'date-fns/locale';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -31,6 +33,7 @@ const privateRouters = [
     { path: '/admin/facility', component: Facility },
     { path: '/admin/trainingschedules', component: TrainingSchedule },
     { path: '/admin/trainingschedules/add', component: AddTrainingSchedulePage },
+    { path: '/admin/trainingschedules/addsession', component: addSessionPage },
     { path: '/admin/trainingschedules/:scheduleId/edit', component: UpdateTrainingSchedulePage },
     { path: '/admin/contact', component: Contact },
     { path: '/admin/clubfee', component: ClubFee },
