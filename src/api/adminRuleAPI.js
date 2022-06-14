@@ -2,9 +2,13 @@
 import axiosClient from './axiosClient';
 
 const adminRuleAPI = {
-    getAll: () => {
+    getAll: (data) => {
         const url = '/rule/getallrule';
-        return axiosClient.get(url);
+        return axiosClient.get(url, {
+            params: {
+                pageNo: data
+            }
+        });
     },
 
     create: (params) => {

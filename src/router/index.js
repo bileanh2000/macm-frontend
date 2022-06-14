@@ -7,19 +7,45 @@ import Contact from '../Pages/Admin/Contact';
 import Event from '../Pages/Admin/Event';
 import Facility from '../Pages/Admin/Facility';
 import News from '../Pages/Admin/News';
+import NewsDetail from '../Pages/Admin/News/NewsDetail/NewsDetail';
+import EditNews from '../Pages/Admin/News/EditNews/EditNews';
+import CreateNews from '../Pages/Admin/News/CreateNews/CreateNews';
 import Rules from '../Pages/Admin/Rules';
 import TrainingSchedule from '../Pages/Admin/TrainingSchedule';
 import Tournament from '../Pages/Admin/Tournament';
 import CreateRule from '../Pages/Admin/Rules/CreateRule/CreateRule';
 import EditRule from '../Pages/Admin/Rules/EditRule/EditRule';
+import EditContact from '../Pages/Admin/Contact/EditContact/EditContact';
+import MemberAndCollabPage from '../Pages/Admin/User-management/MemberAndCollaborator';
+import HeadOfDepartment from '../Pages/Admin/User-management/HeadOfDepartment';
+import UserDetailPage from '../Pages/UserDetail';
+import UserDetailEditPage from '../Pages/UserDetail/edit';
+import AddUserPage from '../Pages/Admin/addUser';
+import Home from '../Pages/Home/index'
+import AddTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/addSchedule';
+import UpdateTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/editSession';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
+    { path: '/home', component: Home, layout: HeaderOnly },
     { path: '/admin', component: AdminHomePage },
-    { path: '/admin/users', component: UserManagementPage },
+    { path: '/admin/headofdepartment', component: HeadOfDepartment },
+    { path: '/admin/member', component: MemberAndCollabPage },
+    { path: '/admin/member/:userId', component: UserDetailPage },
+    { path: '/admin/headofdepartment/:userId', component: UserDetailPage },
+    { path: '/admin/member/:userId/edit', component: UserDetailEditPage },
+    { path: '/admin/headofdepartment/:userId/edit', component: UserDetailEditPage },
+    { path: '/admin/adduser', component: AddUserPage },
     { path: '/admin/facility', component: Facility },
     { path: '/admin/trainingschedule', component: TrainingSchedule },
+
+    //Contact paths
+    { path: '/admin/trainingschedules', component: TrainingSchedule },
+    { path: '/admin/trainingschedules/add', component: AddTrainingSchedulePage },
+    { path: '/admin/trainingschedules/:scheduleId/edit', component: UpdateTrainingSchedulePage },
     { path: '/admin/contact', component: Contact },
+    { path: '/admin/contact/edit', component: EditContact },
+
     { path: '/admin/clubfee', component: ClubFee },
 
     //Rule paths
@@ -28,7 +54,14 @@ const privateRouters = [
     { path: '/admin/rules/edit', component: EditRule },
 
     { path: '/admin/tournament', component: Tournament },
+
+    //News paths
     { path: '/admin/news', component: News },
+    { path: '/admin/news/create', component: CreateNews },
+    { path: '/admin/news/:newsId/edit', component: EditNews },
+    { path: '/admin/news/:newsId', component: NewsDetail },
+
+
     { path: '/admin/events', component: Event },
 ];
 

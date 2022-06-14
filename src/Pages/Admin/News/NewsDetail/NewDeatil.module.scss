@@ -1,0 +1,21 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container {
+    width: 80%;
+    padding: 20px 0px 50px 0px;
+    // margin-top: var(--default-layout-header-height);
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 50px;
+
+    .header-button {
+        display: flex;
+        align-items: center;
+    }
+}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+// import { styled, useTheme } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -10,7 +10,13 @@ import classNames from 'classnames/bind';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded';
-import { Button } from '@mui/material';
+// import { Button } from '@mui/material';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import Collapse from '@mui/material/Collapse';
+
+import PsychologyIcon from '@mui/icons-material/Psychology';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 const cx = classNames.bind(styles);
 
@@ -21,6 +27,11 @@ const cx = classNames.bind(styles);
 // };
 
 function Sidebar() {
+    const [open, setOpen] = React.useState(false);
+
+    const handleClick = () => {
+        setOpen(!open);
+    };
     return (
         <List className={cx('wrapper')} component="nav" aria-label="mailbox folders">
             <ListItem button component={Link} to="/admin">
@@ -30,12 +41,29 @@ function Sidebar() {
                 <ListItemText primary="Trang Chủ" />
             </ListItem>
             <Divider />
-            <ListItem button component={Link} to="/admin/users">
+            <ListItem button onClick={handleClick}>
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <ManageAccountsIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Người Dùng" />
+                {open ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                    <ListItem button sx={{ pl: 4 }} component={Link} to="/admin/member">
+                        <ListItemIcon>
+                            <PeopleAltRoundedIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Thành viên và CTV" />
+                    </ListItem>
+                    <ListItem button sx={{ pl: 4 }} component={Link} to="/admin/headofdepartment">
+                        <ListItemIcon>
+                            <PsychologyIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Ban Chủ Nhiệm" />
+                    </ListItem>
+                </List>
+            </Collapse>
             <Divider />
             <ListItem button component={Link} to="/admin/facility">
                 <ListItemIcon>
@@ -44,7 +72,7 @@ function Sidebar() {
                 <ListItemText primary="Quản Lý Cơ Sở Vật Chất" />
             </ListItem>
             <Divider />
-            <ListItem button component={Link} to="/admin/trainingschedule">
+            <ListItem button component={Link} to="/admin/trainingschedules">
                 <ListItemIcon>
                     <PeopleAltRoundedIcon />
                 </ListItemIcon>
