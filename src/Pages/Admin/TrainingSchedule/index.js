@@ -1,5 +1,121 @@
+import { Button, Typography } from '@mui/material';
+import { Fragment, useEffect } from 'react';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import styles from './TrainingSchedule.module.scss';
+import classNames from 'classnames/bind';
+import { Link, useNavigate } from 'react-router-dom';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { useState } from 'react';
+import trainingSchedule from 'src/api/trainingScheduleApi';
+import interactionPlugin from '@fullcalendar/interaction';
+import swal from 'sweetalert';
+const cx = classNames.bind(styles);
 function TrainingSchedule() {
-    return <h1>Quản lý lịch tập</h1>;
+    const nowDate = new Date();
+    const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
+    const [scheduleList, setScheduleList] = useState([]);
+    const getMonthInCurrentTableView = (startDate) => {
+        const temp = new Date(startDate);
+        temp.setDate(temp.getDate() + 17);
+        const currentMonth = temp.getMonth() + 1;
+        const currentYear = temp.getFullYear();
+        setMonthAndYear({ month: currentMonth, year: currentYear });
+        console.log(currentMonth, currentYear);
+    };
+    useEffect(() => {
+        const fetchSchedule = async () => {
+            try {
+                const params = monthAndYear;
+                const response = await trainingSchedule.getAllSchedule();
+                console.log('Thanh cong roi: ', response);
+                setScheduleList(response.data);
+            } catch (error) {
+                console.log('That bai roi huhu ', error);
+            }
+        };
+        fetchSchedule();
+    }, []);
+
+    const scheduleData = scheduleList.map((item) => {
+        const container = {};
+        container['id'] = item.id;
+        container['date'] = item.date;
+        container['title'] = item.startTime + ' - ' + item.finishTime;
+        container['display'] = 'background';
+        container['backgroundColor'] = '#5ba8f5';
+
+        return container;
+    });
+
+    useEffect(() => {
+        console.log(scheduleData);
+    }, [scheduleData]);
+
+    const handleEventAdd = () => {
+        console.log('selected');
+    };
+    let navigate = useNavigate();
+    const navigateToUpdate = (params) => {
+        let path = `${params}/edit`;
+        navigate(path);
+    };
+    return (
+        <Fragment>
+            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                Theo dõi lịch tập
+            </Typography>
+            <Button component={Link} to="/admin/trainingschedules/add" startIcon={<AddCircleIcon />}>
+                Thêm lịch tập
+            </Button>
+            <div className={cx('schedule-container')}>
+                <div className={cx('schedule-content')}>
+                    <FullCalendar
+                        locale="vie"
+                        height="60%"
+                        plugins={[dayGridPlugin, interactionPlugin]}
+                        initialView="dayGridMonth"
+                        // events={[
+                        //     {
+                        //         id: 1,
+                        //         title: 'đi tập đi đmm',
+                        //         date: '2022-06-16',
+                        //         // display: 'background',
+                        //         // textColor: 'white',
+                        //         backgroundColor: '#5ba8f5',
+                        //         classNames: ['test-css'],
+                        //     },
+                        // ]}
+                        events={scheduleData}
+                        weekends={true}
+                        headerToolbar={{
+                            left: 'title',
+                            center: '',
+                            right: 'prev next today',
+                        }}
+                        // editable={true}
+                        // selectable={true}
+                        datesSet={(dateInfo) => {
+                            getMonthInCurrentTableView(dateInfo.start);
+                        }}
+                        eventClick={(args) => {
+                            navigateToUpdate(args.event.id);
+                        }}
+                        // dateClick={function (arg) {
+                        //     swal({
+                        //         title: 'Date',
+                        //         text: arg.dateStr,
+                        //         type: 'success',
+                        //     });
+                        // }}
+                        // selectable
+                        // select={handleEventAdd}
+                        // eventDrop={(e) => console.log(e)}
+                    />
+                </div>
+            </div>
+        </Fragment>
+    );
 }
 
 export default TrainingSchedule;
