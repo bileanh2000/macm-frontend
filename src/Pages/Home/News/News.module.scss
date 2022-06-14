@@ -1,0 +1,29 @@
+.news-container {
+    min-height: 500px;
+    border-radius: 15px;
+    border: 1px solid black;
+    padding: 20px;
+    .news-item {
+        padding: 20px;
+        border-top: 1px solid antiquewhite;
+        .news-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .news-tag {
+                display: inline-block;
+                background-color: aqua;
+                border-radius: 15px;
+                padding: 5px;
+                text-align: center;
+            }
+        }
+        .news-time {
+            padding: 10px;
+        }
+    }
+
+    .news-link {
+        float: right;
+    }
+}

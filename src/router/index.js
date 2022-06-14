@@ -21,9 +21,11 @@ import HeadOfDepartment from '../Pages/Admin/User-management/HeadOfDepartment';
 import UserDetailPage from '../Pages/UserDetail';
 import UserDetailEditPage from '../Pages/UserDetail/edit';
 import AddUserPage from '../Pages/Admin/addUser';
+import Home from '../Pages/Home/index'
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
+    { path: '/home', component: Home, layout: HeaderOnly },
     { path: '/admin', component: AdminHomePage },
     { path: '/admin/headofdepartment', component: HeadOfDepartment },
     { path: '/admin/member', component: MemberAndCollabPage },

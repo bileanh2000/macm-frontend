@@ -12,6 +12,17 @@
     justify-content: space-between;
 }
 
-.content {
-    flex: 1;
+.rule-container {
+    width: 80%;
+    .rule-item {
+        align-items: center;
+        padding: 20px;
+        margin-bottom: 5px;
+        border: 1px solid black;
+        min-height: 100px;
+        border-radius: 15px;
+    }
+    a {
+        color: #fff;
+    }
 }

@@ -76,7 +76,7 @@ function Footer() {
             </Grid>
             <Grid item xs={4}>
             </Grid>
-        </Grid >
+        </ Grid >
 
     );
 }
