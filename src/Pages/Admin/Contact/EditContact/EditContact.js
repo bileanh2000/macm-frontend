@@ -39,7 +39,7 @@ function EditContact() {
             .matches(/^[\w]+@(gmail.com)/, 'Nhập đúng định dạng mail'),
         clubPhoneNumber: Yup.string()
             .required('Không được để trống trường này')
-            .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/),
+            .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, 'Vui lòng nhập đúng định dạng số điện thoại'),
     });
 
     const {

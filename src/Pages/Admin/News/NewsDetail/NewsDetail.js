@@ -15,6 +15,8 @@ function NewsDetail() {
     const news = location.state?.news;
     const history = useNavigate()
 
+    console.log('detail', news)
+
     const [dialog, setDialog] = useState({
         message: "",
         isLoading: false,
@@ -103,7 +105,7 @@ function NewsDetail() {
                         <h1>{news.title}</h1>
                         <span className={cx('header-button')}>
                             <span style={{ marginRight: 20 }} onClick={() => handleUpdateStatusNews(news)}>
-                                {news.status = true ? <Visibility /> : <VisibilityOff />}
+                                {news.status === true ? <Visibility /> : <VisibilityOff />}
                             </span>
                             <span style={{ marginRight: 20 }}
                                 onClick={() => history(

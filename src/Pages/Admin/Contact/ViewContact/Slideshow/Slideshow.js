@@ -26,7 +26,7 @@ const cx = classNames.bind(styles)
 //         name: 'Phùng Văn D'
 //     },
 // ];
-const url = 'https://anhdep123.com/wp-content/uploads/2021/02/hinh-nen-gai-xinh-full-hd-cho-dien-thoai.jpg'
+const url = 'https://cdn.discordapp.com/attachments/981216469176180778/986325284724830288/unknown.png'
 
 const properties = {
     duration: 5000,
