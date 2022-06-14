@@ -12,4 +12,10 @@
 .header {
     display: flex;
     justify-content: space-between;
+    padding-bottom: 50px;
+
+    .header-button {
+        display: flex;
+        align-items: center;
+    }
 }

@@ -80,7 +80,7 @@ function List() {
 
 
     const handleDelete = params => {
-        handleDialog("Are you sure you want to delete?", true, params);
+        handleDialog("Bạn có chắc chắn muốn xóa không?", true, params);
     }
 
     const handleCloseSnackBar = (reason) => {
@@ -125,7 +125,6 @@ function List() {
                                 </Link>
                             </Grid>
                             <Grid item xs={1} onClick={() => handleDelete(row.id)}>
-                                {/* <Grid item xs={1} onClick={() => handleDelete(row.id)}> */}
                                 <DeleteForeverOutlined color="primary" />
                             </Grid>
                         </Grid>

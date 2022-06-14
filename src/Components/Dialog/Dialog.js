@@ -27,33 +27,35 @@ function DialogCommon({ message, onDialog, params }) {
                     borderRadius: "10px"
                 }}
             >
-                <h3 style={{ color: "#111", fontSize: "16px" }}>{message}</h3>
+                <h3 style={{ color: "#111", fontSize: "16px", margin: 20 }}>{message}</h3>
                 <div style={{ display: "flex", alignItems: "center" }}>
-                    <button
-                        onClick={() => onDialog(true, params)}
-                        style={{
-                            background: "red",
-                            color: "white",
-                            padding: "10px",
-                            marginRight: "4px",
-                            border: "none",
-                            cursor: "pointer"
-                        }}
-                    >
-                        Yes
-                    </button>
                     <button
                         onClick={() => onDialog(false, params)}
                         style={{
-                            background: "green",
-                            color: "white",
-                            padding: "10px",
-                            marginLeft: "4px",
-                            border: "none",
+                            background: "while",
+                            color: "black",
+                            padding: "20px",
+                            marginRight: "4px",
+                            border: "1px solid black",
+                            borderRadius: 5,
                             cursor: "pointer"
                         }}
                     >
-                        No
+                        Hủy
+                    </button>
+                    <button
+                        onClick={() => onDialog(true, params)}
+                        style={{
+                            background: "black",
+                            color: "white",
+                            padding: "20px",
+                            marginLeft: "4px",
+                            border: "1px solid black",
+                            borderRadius: 5,
+                            cursor: "pointer"
+                        }}
+                    >
+                        Có, tôi chắc chắn
                     </button>
                 </div>
             </div>

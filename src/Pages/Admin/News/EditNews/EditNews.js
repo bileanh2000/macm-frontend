@@ -17,8 +17,13 @@ const cx = classNames.bind(styles)
 function EditNews() {
 
     const location = useLocation();
-    const news = location.state?.news
+    let news = location.state?.news;
+    const id = location.state?.id;
+    const title = location.state?.title;
+    const description = location.state?.description;
     const history = useNavigate()
+
+    if (news == undefined) { news = { id, title, description } }
 
     const validationSchema = Yup.object().shape({
         title: Yup.string().required('Không được để trống trường này'),

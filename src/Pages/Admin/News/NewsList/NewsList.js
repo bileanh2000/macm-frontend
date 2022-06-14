@@ -4,6 +4,7 @@ import { TableContainer, Paper, Table, TableBody, TableRow, TableCell, TablePagi
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import adminNewsAPI from 'src/api/adminNewsAPI';
+import DialogCommon from "src/Components/Dialog/Dialog";
 
 
 function NewsList() {
@@ -18,6 +19,30 @@ function NewsList() {
     const _message = location.state?.message == null ? "" : location.state?.message
     const [success, setSuccess] = useState({ isSuccess: _isSuccess, message: _message })
     const [openSnackBar, setOpenSnackBar] = useState(_openSnackBar);
+    const [dialog, setDialog] = useState({
+        message: "",
+        isLoading: false,
+        params: -1
+    });
+    const handleDialog = (message, isLoading, params) => {
+        setDialog({
+            message,
+            isLoading,
+            params
+        });
+    };
+
+    const areUSureDelete = (choose) => {
+        if (choose) {
+            handleDeleteNews(dialog.params)
+            setSuccess({ isSuccess: true, message: "Xóa news thành công" })
+            setOpenSnackBar(true)
+            handleDialog("", false, -1);
+        } else {
+            console.log(dialog);
+            handleDialog("", false, -1);
+        }
+    };
 
     const fetchNewsList = async () => {
         try {
@@ -40,6 +65,7 @@ function NewsList() {
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
+
     const handleDeleteNews = async (id) => {
         try {
             await adminNewsAPI.deleteNews(id)
@@ -53,6 +79,11 @@ function NewsList() {
         }
         setOpenSnackBar(true)
     }
+
+    const handleDelete = params => {
+        handleDialog("Bạn có chắc chắn muốn xóa không?", true, params);
+    }
+
     const handleUpdateStatusNews = async (news) => {
         try {
             await adminNewsAPI.updateStatusNews({ ...news, status: !news.status })
@@ -66,6 +97,7 @@ function NewsList() {
         }
         setOpenSnackBar(true)
     }
+
     const handleCloseSnackBar = (reason) => {
         if (reason === 'clickaway') {
             return;
@@ -110,7 +142,7 @@ function NewsList() {
                                 }, { state: { news: news } })}>
                                     <Edit />
                                 </TableCell>
-                                <TableCell align="right" onClick={() => handleDeleteNews(news.id)}>
+                                <TableCell align="right" onClick={() => handleDelete(news.id)}>
                                     <Delete />
                                 </TableCell>
                             </TableRow>
@@ -127,7 +159,16 @@ function NewsList() {
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
+            {dialog.isLoading && (
+                <DialogCommon
+                    //Update
+                    onDialog={areUSureDelete}
+                    message={dialog.message}
+                    id={dialog.params}
+                />
+            )}
         </div>
+
     )
 }
 

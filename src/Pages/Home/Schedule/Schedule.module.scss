@@ -3,4 +3,23 @@
     border-radius: 15px;
     border: 1px solid black;
     padding: 20px;
+    justify-content: center;
+}
+#TrainingSchedule {
+    .test-css {
+        color: red !important;
+    }
+    .fc-event-title {
+        color: red !important;
+    }
+    .haha {
+        color: red;
+    }
+}
+// .schedule-container {
+//     height: 100%;
+// }
+.schedule-content {
+    height: 100%;
+    // width: 70%;
 }
