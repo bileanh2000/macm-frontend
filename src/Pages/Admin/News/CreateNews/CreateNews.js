@@ -16,6 +16,7 @@ function EditNews() {
 
     const history = useNavigate()
     const [check, setCheck] = useState(false)
+    const [isSubmit, setIsSubmit] = useState(false);
 
     const validationSchema = Yup.object().shape({
         title: Yup.string().required('Không được để trống trường này'),
@@ -33,6 +34,7 @@ function EditNews() {
 
 
     const onSubmit = async (data) => {
+        setIsSubmit(true)
         try {
             await adminNewsAPI.createNews({ ...data, isSendNotification: check })
             history(
@@ -113,6 +115,7 @@ function EditNews() {
                                 color="success"
                                 style={{ marginRight: 20 }}
                                 onClick={handleSubmit(onSubmit)}
+                                disabled={isSubmit}
                             >
                                 Đăng
                             </Button>

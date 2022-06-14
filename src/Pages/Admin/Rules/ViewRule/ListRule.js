@@ -63,6 +63,7 @@ function List() {
             console.log("Lấy dữ liệu rule thất bại", error);
         }
     }
+    console.log(rules)
 
     useEffect(() => {
         getListRules(page - 1)

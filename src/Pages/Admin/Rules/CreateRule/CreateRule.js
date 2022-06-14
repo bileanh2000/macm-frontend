@@ -15,6 +15,8 @@ function CreateRule() {
 
     const history = useNavigate()
     const [rule, setRule] = useState('')
+    const [isSubmit, setIsSubmit] = useState(false);
+
 
     const validationSchema = Yup.object().shape({
         description: Yup.string().required('Không được để trống trường này')
@@ -32,6 +34,7 @@ function CreateRule() {
 
 
     const handleCreateRule = async (data) => {
+        setIsSubmit(true)
         try {
             if (rule != null) {
                 await adminRuleAPI.create({
@@ -84,6 +87,7 @@ function CreateRule() {
                         color="success"
                         style={{ marginRight: 20 }}
                         onClick={handleSubmit(handleCreateRule)}
+                        disabled={isSubmit}
                     >
                         Xác nhận
                     </Button>
