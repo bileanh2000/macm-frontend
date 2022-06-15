@@ -10,11 +10,15 @@ import { useState } from 'react';
 import trainingSchedule from 'src/api/trainingScheduleApi';
 import interactionPlugin from '@fullcalendar/interaction';
 import swal from 'sweetalert';
+import moment from 'moment';
+
 const cx = classNames.bind(styles);
+
 function TrainingSchedule() {
     const nowDate = new Date();
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
     const [scheduleList, setScheduleList] = useState([]);
+    const [scheduleId, setScheduleId] = useState();
     const getMonthInCurrentTableView = (startDate) => {
         const temp = new Date(startDate);
         temp.setDate(temp.getDate() + 17);
@@ -41,7 +45,7 @@ function TrainingSchedule() {
         const container = {};
         container['id'] = item.id;
         container['date'] = item.date;
-        container['title'] = item.startTime + ' - ' + item.finishTime;
+        container['title'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
         container['backgroundColor'] = '#5ba8f5';
 
@@ -50,6 +54,7 @@ function TrainingSchedule() {
 
     useEffect(() => {
         console.log(scheduleData);
+        console.log(scheduleData.filter((item) => item.id === 6));
     }, [scheduleData]);
 
     const handleEventAdd = () => {
@@ -62,9 +67,12 @@ function TrainingSchedule() {
     };
     return (
         <Fragment>
-            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 700, marginBottom: 2 }}>
                 Theo dõi lịch tập
             </Typography>
+            <Button component={Link} to="/admin/trainingschedules/addsession" startIcon={<AddCircleIcon />}>
+                Thêm buổi tập
+            </Button>
             <Button component={Link} to="/admin/trainingschedules/add" startIcon={<AddCircleIcon />}>
                 Thêm lịch tập
             </Button>

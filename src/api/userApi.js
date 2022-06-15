@@ -29,16 +29,20 @@ const userApi = {
         return axiosClient.put(url);
     },
     updateUser: (params) => {
-        const url = `/admin/hr/updateuser/${params.studentId}`;
+        const url = `/admin/hr/updateuser/${params.setId}`;
         return axiosClient.put(url, params);
     },
     updateUserStatus: (params) => {
         const url = `/admin/hr/updatestatus?studentId=${params.studentId}`;
         return axiosClient.put(url);
     },
-    uploadCSV: (params) => {
-        const url = `/admin/hr/uploadfilemember`;
+    importListFromFile: (params) => {
+        const url = `/admin/hr/users/import`;
         return axiosClient.post(url, params);
+    },
+    exportUserListToExcel: (params) => {
+        const url = `/admin/hr/users/export`;
+        return axiosClient.get(url);
     },
 };
 export default userApi;

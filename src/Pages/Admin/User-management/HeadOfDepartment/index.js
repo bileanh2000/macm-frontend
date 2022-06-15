@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState, useCallback } from 'react';
 import userApi from 'src/api/userApi';
 import Box from '@mui/material/Box';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useHistory } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import EditIcon from '@mui/icons-material/Edit';
 import Typography from '@mui/material/Typography';
@@ -21,7 +21,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 
 function MemberAndCollaborator() {
-    let storageStudentId;
+    let navigate = useNavigate();
     const [userList, setUserList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [stageStudentId, setStageStudentID] = useState({ studentId: '', name: '' });
@@ -72,7 +72,7 @@ function MemberAndCollaborator() {
                     icon={<EditIcon />}
                     label="Delete"
                     onClick={() => {
-                        alert('delete');
+                        navigate(`${params.row.studentId}/edit`);
                     }}
                 />,
 
@@ -113,12 +113,12 @@ function MemberAndCollaborator() {
         },
         [],
     );
-    let navigate = useNavigate();
+
     const handleOnClick = (rowData) => {
-        console.log('push -> /roles/' + rowData.studentId);
+        // console.log('push -> /roles/' + rowData.studentId);
         let path = `${rowData.studentId}`;
         navigate(path);
-        alert('navigation');
+        // alert('navigation');
     };
     function CustomToolbar() {
         return (
@@ -131,13 +131,13 @@ function MemberAndCollaborator() {
                 >
                     <GridToolbarQuickFilter />
                 </Box>
-                <GridToolbarExport
+                {/* <GridToolbarExport
                     csvOptions={{
                         fileName: 'Danh sách thành viên và cộng tác viên',
                         delimiter: ';',
                         utf8WithBom: true,
                     }}
-                />
+                /> */}
             </GridToolbarContainer>
         );
     }
@@ -150,10 +150,10 @@ function MemberAndCollaborator() {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa ${stageStudentId.name} khỏi Ban chủ nhiệm?`}</DialogTitle>
+                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa "${stageStudentId.name}" khỏi Ban chủ nhiệm?`}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Khi xóa thành viên khỏi Ban chủ nhiệm, mặc định thành viên sẽ vào Ban chuyên môn
+                        "{stageStudentId.name}" sẽ trở thành thành viên bình thường
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -173,7 +173,7 @@ function MemberAndCollaborator() {
                     rows={rows}
                     columns={columns}
                     pageSize={15}
-                    rowsPerPageOptions={[5]}
+                    rowsPerPageOptions={[15]}
                     onCellDoubleClick={(param) => {
                         handleOnClick(param.row);
                     }}
