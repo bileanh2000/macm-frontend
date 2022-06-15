@@ -205,9 +205,6 @@ function AddUser() {
                                 <MenuItem value={10}>Ban truyền thông</MenuItem>
                                 <MenuItem value={11}>Ban văn hóa</MenuItem>
                                 <MenuItem value={12}>Ban chuyên môn</MenuItem>
-                                <MenuItem value={13}>CTV Ban truyền thông</MenuItem>
-                                <MenuItem value={14}>CTV Ban văn hóa</MenuItem>
-                                <MenuItem value={15}>CTV Ban chuyên môn</MenuItem>
                             </TextField>
                         </FormControl>
 
