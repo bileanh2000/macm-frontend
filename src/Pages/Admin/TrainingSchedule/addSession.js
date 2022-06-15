@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
     Alert,
     Box,
@@ -21,59 +20,25 @@ import moment from 'moment';
 import * as Yup from 'yup';
 import { useForm, Controller } from 'react-hook-form';
 
+import { useState } from 'react';
 import vi from 'date-fns/locale/vi';
+import { useEffect } from 'react';
 import { Paper } from '@mui/material';
 import trainingScheduleApi from 'src/api/trainingScheduleApi';
-
-function addSession() {
+function AddSchedule() {
     moment().locale('vi');
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
 
     const schema = Yup.object().shape({
-        startDate: Yup.string().nullable().required('Điền đi'),
-        endDate: Yup.string().nullable().required('Điền đi'),
+        date: Yup.string().nullable().required('Điền đi'),
         startTime: Yup.string().nullable().required('Điền đi'),
-        endTime: Yup.string().nullable().required('Điền đi'),
+        finishTime: Yup.string().nullable().required('Điền đi'),
     });
 
     const { control, handleSubmit } = useForm({
         resolver: yupResolver(schema),
         mode: 'onBlur',
-        defaultValues: {
-            dayOfWeek: [],
-        },
     });
-    const dayOfWeek = [
-        {
-            label: 'Thứ hai',
-            value: 'MONDAY',
-        },
-        {
-            label: 'Thứ ba',
-            value: 'TUESDAY',
-        },
-        {
-            label: 'Thứ tư',
-            value: 'WEDNESDAY',
-        },
-        {
-            label: 'Thứ năm',
-            value: 'THURSDAY',
-        },
-        {
-            label: 'Thứ sáu',
-            value: 'FRIDAY',
-        },
-        {
-            label: 'Thứ bảy',
-            value: 'SATURDAY',
-        },
-        {
-            label: 'Chủ nhật',
-            value: 'SUNDAY',
-        },
-    ];
+
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
     let snackBarStatus;
@@ -89,37 +54,35 @@ function addSession() {
         if (reason === 'clickaway') {
             return;
         }
-
         setOpenSnackBar(false);
     };
     const onSubmit = (data) => {
         // setSubmitData(moment(new Date(data.startDate)).format('yyyy-MM-DD'));
         const dataFormat = {
-            startDate: moment(new Date(data.startDate)).format('DD/MM/yyyy'),
-            endDate: moment(new Date(data.endDate)).format('DD/MM/yyyy'),
+            date: moment(new Date(data.date)).format('yyyy-MM-DD'),
             startTime: moment(new Date(data.startTime)).format('HH:mm:ss'),
-            endTime: moment(new Date(data.endTime)).format('HH:mm:ss'),
-            daysOfWeek: data.dayOfWeek,
+            finishTime: moment(new Date(data.finishTime)).format('HH:mm:ss'),
         };
-        // trainingScheduleApi.createSchedule(dataFormat).then((res) => {
-        //     console.log('1', res);
-        //     console.log('2', res.data);
-        //     if (res.data.length != 0) {
-        //         setOpenSnackBar(true);
-        //         // setSnackBarStatus(true);
-        //         snackBarStatus = true;
-        //         dynamicAlert(snackBarStatus, res.message);
-        //     } else {
-        //         console.log('huhu');
-        //         setOpenSnackBar(true);
-        //         // setSnackBarStatus(false);
-        //         snackBarStatus = false;
-        //         dynamicAlert(snackBarStatus, res.message);
-        //     }
-        // });
+        trainingScheduleApi.createSession(dataFormat).then((res) => {
+            console.log('1', res);
+            console.log('2', res.data);
+            if (res.data.length != 0) {
+                setOpenSnackBar(true);
+                // setSnackBarStatus(true);
+                snackBarStatus = true;
+                dynamicAlert(snackBarStatus, res.message);
+            } else {
+                console.log('huhu');
+                setOpenSnackBar(true);
+                // setSnackBarStatus(false);
+                snackBarStatus = false;
+                dynamicAlert(snackBarStatus, res.message);
+            }
+        });
         console.log('form submit', dataFormat);
     };
 
+    const [timePicked, setTimePicked] = useState(null);
     return (
         <Box>
             <Snackbar
@@ -139,11 +102,11 @@ function addSession() {
             </Snackbar>
             <form noValidate onSubmit={handleSubmit(onSubmit)} className="signup-form">
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                    <Typography variant="h5" component="div" sx={{ marginBottom: '16px', fontWeight: '700' }}>
-                        Tạo lịch tập
+                    <Typography variant="h4" component="div" sx={{ marginBottom: '16px', fontWeight: '700' }}>
+                        Tạo buổi tập
                     </Typography>
-                    <Grid container spacing={6} columns={12}>
-                        <Grid item xs={12} sm={6}>
+                    <Grid container spacing={3} columns={12}>
+                        <Grid item xs={12} sm={4}>
                             <Controller
                                 required
                                 name="date"
@@ -173,6 +136,8 @@ function addSession() {
                                     />
                                 )}
                             />
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
                             <Controller
                                 required
                                 name="startTime"
@@ -201,7 +166,8 @@ function addSession() {
                                 )}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sm={4}>
+                            {' '}
                             <Controller
                                 required
                                 name="finishTime"
@@ -232,14 +198,15 @@ function addSession() {
                         </Grid>
                     </Grid>
                 </LocalizationProvider>
+
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button color="primary" variant="contained" type="submit" sx={{ mt: 5 }}>
+                    <Button color="primary" variant="contained" type="submit" sx={{ mt: 2 }}>
                         Xác nhận
                     </Button>
                 </Box>
             </form>
         </Box>
-    )
+    );
 }
 
-export default addSession
+export default AddSchedule;

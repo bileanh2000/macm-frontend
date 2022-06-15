@@ -17,8 +17,7 @@ import UserDetailEditPage from '../Pages/UserDetail/edit';
 import AddUserPage from '../Pages/Admin/addUser';
 import AddTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/addSchedule';
 import UpdateTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/editSession';
-import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession'
-import { ko } from 'date-fns/locale';
+import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },

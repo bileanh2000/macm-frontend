@@ -89,7 +89,6 @@ function AddSchedule() {
         if (reason === 'clickaway') {
             return;
         }
-
         setOpenSnackBar(false);
     };
     const onSubmit = (data) => {
@@ -140,7 +139,7 @@ function AddSchedule() {
             </Snackbar>
             <form noValidate onSubmit={handleSubmit(onSubmit)} className="signup-form">
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                    <Typography variant="h5" component="div" sx={{ marginBottom: '16px', fontWeight: '700' }}>
+                    <Typography variant="h4" component="div" sx={{ marginBottom: '16px', fontWeight: '700' }}>
                         Tạo lịch tập
                     </Typography>
                     <Grid container spacing={6} columns={12}>
