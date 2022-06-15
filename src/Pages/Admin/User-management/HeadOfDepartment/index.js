@@ -131,13 +131,13 @@ function MemberAndCollaborator() {
                 >
                     <GridToolbarQuickFilter />
                 </Box>
-                <GridToolbarExport
+                {/* <GridToolbarExport
                     csvOptions={{
                         fileName: 'Danh sách thành viên và cộng tác viên',
                         delimiter: ';',
                         utf8WithBom: true,
                     }}
-                />
+                /> */}
             </GridToolbarContainer>
         );
     }
@@ -173,7 +173,7 @@ function MemberAndCollaborator() {
                     rows={rows}
                     columns={columns}
                     pageSize={15}
-                    rowsPerPageOptions={[5]}
+                    rowsPerPageOptions={[15]}
                     onCellDoubleClick={(param) => {
                         handleOnClick(param.row);
                     }}
