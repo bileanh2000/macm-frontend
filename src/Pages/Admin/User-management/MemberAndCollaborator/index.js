@@ -7,7 +7,7 @@ import {
     GridToolbarExport,
     GridToolbarQuickFilter,
 } from '@mui/x-data-grid';
-import { Alert, Box, Button, Snackbar, styled } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SecurityIcon from '@mui/icons-material/Security';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
@@ -28,14 +28,9 @@ import { FileUploader } from 'react-drag-drop-files';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import clsx from 'clsx';
-import axios from 'axios';
 
 const fileTypes = ['CSV', 'JPG', 'png'];
-const Input = styled('input')({
-    display: 'none',
-});
+
 function DragDrop() {
     const [aFile, setAFile] = useState(null);
 
@@ -70,7 +65,6 @@ function DragDrop() {
         </div>
     );
 }
-
 function MemberAndCollaborator() {
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
@@ -97,17 +91,9 @@ function MemberAndCollaborator() {
             console.log('Failed to fetch user list: ', error);
         }
     };
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        // resolver: yupResolver(validationSchema),
-        // mode: 'onBlur',
-    });
     const columns = [
         { field: 'id', headerName: 'ID', flex: 0.5 },
-        { field: 'name', headerName: 'Tên', flex: 0.8 },
+        { field: 'name', headerName: 'Tên', flex: 1 },
         {
             field: 'email',
             headerName: 'Email',
@@ -117,27 +103,13 @@ function MemberAndCollaborator() {
         },
 
         { field: 'gender', headerName: 'Giới tính', flex: 0.5 },
-        { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
-        { field: 'role', headerName: 'Vai trò', width: 200, flex: 1.2 },
-        {
-            field: 'active',
-            headerName: 'Trạng thái',
-            flex: 0.5,
-            cellClassName: (params) => {
-                if (params.value == null) {
-                    return '';
-                }
-
-                return clsx('status-rows', {
-                    active: params.value === 'Active',
-                    deactive: params.value === 'Deactive',
-                });
-            },
-        },
+        { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 1 },
+        { field: 'role', headerName: 'Vai trò', width: 200, flex: 1.5 },
+        { field: 'active', headerName: 'Trạng thái', flex: 0.5 },
         {
             field: 'actions',
             type: 'actions',
-            flex: 0.5,
+            flex: 1,
             getActions: (params) => [
                 <GridActionsCellItem icon={<EditIcon />} label="Chỉnh sửa" onClick={editUser(params.row.studentId)} />,
                 <GridActionsCellItem
@@ -204,77 +176,11 @@ function MemberAndCollaborator() {
         console.log('push -> /roles/' + rowData.studentId);
         let path = `${rowData.studentId}`;
         navigate(path);
-        // alert('navigation');
+        alert('navigation');
     };
-    const [openSnackBar, setOpenSnackBar] = useState(false);
-    let snackBarStatus;
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
 
-        setOpenSnackBar(false);
-    };
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
     const onSubmit = (data) => {
-        let formData = new FormData();
-        formData.append('file', data.file[0]);
-        axios
-            .post('https://capstone-project-macm.herokuapp.com/api/admin/hr/users/import', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            })
-            .then((res) => {
-                console.log(res);
-                if (res.data.length != 0) {
-                    setOpenSnackBar(true);
-                    // setSnackBarStatus(true);
-                    snackBarStatus = true;
-                    dynamicAlert(snackBarStatus, res.data.message);
-                } else {
-                    console.log('huhu');
-                    setOpenSnackBar(true);
-                    // setSnackBarStatus(false);
-                    snackBarStatus = false;
-                    dynamicAlert(snackBarStatus, res.data.message);
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
-
-    const exportExcel = () => {
-        console.log('exportExcel');
-        axios({
-            url: 'https://capstone-project-macm.herokuapp.com/api/admin/hr/users/export', //your url
-            method: 'GET',
-            responseType: 'blob', // important
-        }).then((response) => {
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', 'hahahaahahah.xlsx'); //or any other extension
-            document.body.appendChild(link);
-            link.click();
-        });
-        // userApi.exportUserListToExcel({ responseType: 'blob' }).then((res) => {
-        //     const url = window.URL.createObjectURL(new Blob([res.data]));
-        //     const link = document.createElement('a');
-        //     link.href = url;
-        //     link.setAttribute('download', 'users.xlsx'); //or any other extension
-        //     document.body.appendChild(link);
-        //     link.click();
-        // });
+        console.log(data);
     };
 
     function CustomToolbar() {
@@ -288,51 +194,26 @@ function MemberAndCollaborator() {
                 >
                     <GridToolbarQuickFilter />
                 </Box>
-                {/* <GridToolbarExport
+                <GridToolbarExport
                     csvOptions={{
                         fileName: 'Danh sách thành viên và cộng tác viên',
                         utf8WithBom: true,
                     }}
-                /> */}
+                />
             </GridToolbarContainer>
         );
     }
-
     return (
         <Fragment>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
             <Dialog open={openUploadFile} onClose={handleClose} fullWidth maxWidth="xs">
-                <DialogTitle>Tải lên file Excel</DialogTitle>
-                <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-                    <DialogContent sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Button variant="outlined" component="span" sx={{ mr: 1 }} onClick={exportExcel}>
-                            Tải File mẫu
-                        </Button>
-                        {/* <label htmlFor="contained-button-file">
-                            <Input accept=".xlsx" id="contained-button-file" multiple type="file" />
-                            <Button variant="contained" component="span">
-                                Upload
-                            </Button>
-                        </label> */}
-                        <input type="file" accept=".xlsx" {...register('file')} />
+                <DialogTitle>Tải lên file CSV</DialogTitle>
+                <Box component="form">
+                    <DialogContent>
+                        <DragDrop />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Từ chối</Button>
-                        <Button type="submit">Đồng ý</Button>
+                        <Button onClick={handleClose}>Đồng ý</Button>
                     </DialogActions>
                 </Box>
             </Dialog>
@@ -349,45 +230,11 @@ function MemberAndCollaborator() {
                 >
                     Thêm thành viên
                 </Button>
-                <Button
-                    variant="outlined"
-                    sx={{ marginRight: 2 }}
-                    startIcon={<UploadFileIcon />}
-                    onClick={handleClickOpen}
-                >
+                <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={handleClickOpen}>
                     Thêm danh sách thành viên
                 </Button>
-                <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} onClick={exportExcel}>
-                    Xuất File Excel
-                </Button>
             </Box>
-            {/* <div style={{ height: '70vh', width: '100%' }}> */}
-            <Box
-                sx={{
-                    height: '70vh',
-                    width: '100%',
-                    '& .status-rows': {
-                        justifyContent: 'center !important',
-                        minHeight: '0px !important',
-                        maxHeight: '35px !important',
-                        borderRadius: '100px',
-                        position: 'relative',
-                        top: '9px',
-                        minWidth: '104.143px !important',
-                    },
-                    '& .status-rows.active': {
-                        backgroundColor: '#56f000',
-                        color: '#fff',
-                        fontWeight: '600',
-                        textAlign: 'center',
-                    },
-                    '& .status-rows.deactive': {
-                        backgroundColor: '#ff3838',
-                        color: '#fff',
-                        fontWeight: '600',
-                    },
-                }}
-            >
+            <div style={{ height: '70vh', width: '100%' }}>
                 <DataGrid
                     loading={!userList.length}
                     disableSelectionOnClick={true}
@@ -403,8 +250,7 @@ function MemberAndCollaborator() {
                         Toolbar: CustomToolbar,
                     }}
                 />
-            </Box>
-            {/* </div> */}
+            </div>
         </Fragment>
     );
 }

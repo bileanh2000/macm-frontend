@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Fragment, useEffect, useState } from 'react';
 import userApi from 'src/api/userApi';
 import { Box } from '@mui/system';
@@ -44,68 +44,6 @@ function UserDetailEdit() {
             .required('Không được để trống trường này')
             .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/),
     });
-    const roleData = [
-        {
-            id: 1,
-            name: 'Chủ nhiệm',
-        },
-        {
-            id: 2,
-            name: 'Phó chủ nhiệm',
-        },
-        {
-            id: 3,
-            name: 'Thủ quỹ',
-        },
-        {
-            id: 4,
-            name: 'Trưởng ban văn hóa',
-        },
-        {
-            id: 5,
-            name: 'Phó ban văn hóa',
-        },
-        {
-            id: 6,
-            name: 'Trưởng ban truyền thông',
-        },
-        {
-            id: 7,
-            name: 'Phó ban truyền thông',
-        },
-        {
-            id: 8,
-            name: 'Trưởng ban chuyên môn',
-        },
-        {
-            id: 9,
-            name: 'Phó ban chuyên môn',
-        },
-        {
-            id: 10,
-            name: 'Thành viên ban truyền thông',
-        },
-        {
-            id: 11,
-            name: 'Thành viên ban văn hóa',
-        },
-        {
-            id: 12,
-            name: 'Thành viên ban chuyên môn',
-        },
-        {
-            id: 13,
-            name: 'CTV ban truyền thông',
-        },
-        {
-            id: 14,
-            name: 'CTV ban văn hóa',
-        },
-        {
-            id: 15,
-            name: 'CTV ban chuyên môn',
-        },
-    ];
 
     const {
         register,
@@ -153,24 +91,15 @@ function UserDetailEdit() {
             setCustomAlert({ severity: 'error', message: message });
         }
     };
-    let navigate = useNavigate();
-
     const onSubmit = async (data) => {
-        const roleId = roleData.filter((item) => item.name === data.roleName);
-        data = {
-            ...data,
-            setId: userId,
-            roleId: roleId[0].id,
-        };
         await userApi.updateUser(data).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
-            if (res.data.length !== 0) {
+            if (res.data.length != 0) {
                 setOpenSnackBar(true);
                 // setSnackBarStatus(true);
                 snackBarStatus = true;
                 dynamicAlert(snackBarStatus, res.message);
-                navigate(-1);
             } else {
                 console.log('huhu');
                 setOpenSnackBar(true);
@@ -188,7 +117,7 @@ function UserDetailEdit() {
                     open={openSnackBar}
                     autoHideDuration={5000}
                     onClose={handleCloseSnackBar}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 >
                     <Alert
                         onClose={handleCloseSnackBar}
@@ -307,11 +236,10 @@ function UserDetailEdit() {
                                     InputProps={{
                                         readOnly: true,
                                     }}
-                                    defaultValue={item.role.name}
-                                    // value={item.role.id}
+                                    defaultValue={item.role.id}
                                     label="Chức vụ"
                                     // onChange={handleChange}
-                                    {...register('roleName')}
+                                    {...register('roleId')}
                                 ></TextField>
                             </FormControl>
                         </Grid>
