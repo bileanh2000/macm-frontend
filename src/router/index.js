@@ -31,7 +31,6 @@ import UpdateTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/editSess
 import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession';
 import Attendance from 'src/Pages/Admin/Attendance';
 import TakeAttendance from 'src/Pages/Admin/Attendance/TakeAttendance';
-import EditAttendance from 'src/Pages/Admin/Attendance/EditAttendance';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -58,7 +57,6 @@ const privateRouters = [
     //Attendance paths
     { path: '/admin/attendance', component: Attendance },
     { path: '/admin/attendance/take', component: TakeAttendance },
-    { path: '/admin/attendance/edit', component: EditAttendance },
 
     //Club fee paths
     { path: '/admin/clubfee', component: ClubFee },
