@@ -2,48 +2,38 @@ import { Alert, Box, Button, FormControlLabel, Radio, RadioGroup, Snackbar, Typo
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
-import React, { Fragment, useCallback, useEffect, useState } from 'react'
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
-
-const _userList = [
-    {
-        name: 'Pham Minh Duc',
-        studentId: 'HE123456',
-        active: true
-    },
-    {
-        name: 'Duong Thanh Tung',
-        studentId: 'HE456789',
-        active: false
-    },
-    {
-        name: 'Dam Van Toan',
-        studentId: 'HE987654',
-        active: true
-    },
-    {
-        name: 'Le Hoang Nhat Linh',
-        studentId: 'HE654321',
-        active: false
-    },
-    {
-        name: 'Le Anh Tuan',
-        studentId: 'HE147258',
-        active: true
-    }
-
-]
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 
 function TakeAttendance() {
-    const [userList, setUserList] = useState(_userList);
+    const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    let attendance = userList.reduce((attendaceCount, user) => {
-        return user.active ? attendaceCount + 1 : attendaceCount
-    }, 0)
+    const location = useLocation();
+    const history = useNavigate();
 
+    const _trainingScheduleId = location.state?.id;
+    const _nowDate = location.state?.date;
+
+    let attendance = userList.reduce((attendaceCount, user) => {
+        return user.status ? attendaceCount + 1 : attendaceCount;
+    }, 0);
+
+    const getAttendanceByStudentId = async () => {
+        try {
+            const response = await adminAttendanceAPI.getAttendanceByStudentId(_trainingScheduleId);
+            setUserList(response.data);
+        } catch (error) {
+            console.log('Không thể lấy dữ liệu người dùng tham gia điểm danh. Error: ', error);
+        }
+    };
+
+    useEffect(() => {
+        getAttendanceByStudentId();
+    }, []);
 
     let snackBarStatus;
 
@@ -64,27 +54,12 @@ function TakeAttendance() {
         setOpenSnackBar(false);
     };
 
-    useEffect(() => {
-        //fetchUserList();
-    }, []);
-
-    // const fetchUserList = async () => {
-    //     try {
-    //         const response = await userApi.getAll();
-    //         console.log(response);
-    //         setUserList(response.data);
-    //     } catch (error) {
-    //         console.log('Failed to fetch user list: ', error);
-    //     }
-    // };
-
-
     const columns = [
-        { field: 'id', headerName: 'ID', flex: 0.5 },
+        { field: 'id', headerName: 'Số thứ tự', flex: 0.5 },
         { field: 'name', headerName: 'Tên', flex: 0.8 },
         { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
         {
-            field: 'active',
+            field: 'status',
             headerName: 'Trạng thái',
             flex: 0.5,
             cellClassName: (params) => {
@@ -94,9 +69,9 @@ function TakeAttendance() {
 
                 return clsx('status-rows', {
                     active: params.value === 'Có mặt',
-                    deactive: params.value === 'Vắng mặt'
+                    deactive: params.value === 'Vắng mặt',
                 });
-            }
+            },
         },
         {
             field: 'actions',
@@ -106,21 +81,21 @@ function TakeAttendance() {
             flex: 0.5,
             cellClassName: 'actions',
             getActions: (params) => {
-                if (params.row.active == 'Có mặt') {
+                if (params.row.status == 'Có mặt') {
                     return [
                         <GridActionsCellItem
                             icon={<RadioButtonChecked />}
                             label="Có mặt"
                             onClick={() => toggleStatus(params.row.studentId)}
                             color="primary"
-                            aria-details='Có mặt'
+                            aria-details="Có mặt"
                         />,
                         <GridActionsCellItem
                             icon={<RadioButtonUnchecked />}
                             label="Vắng mặt"
                             onClick={() => toggleStatus(params.row.studentId)}
                         />,
-                    ]
+                    ];
                 }
                 return [
                     <GridActionsCellItem
@@ -134,10 +109,9 @@ function TakeAttendance() {
                         onClick={() => toggleStatus(params.row.studentId)}
                         color="primary"
                     />,
-                ]
-
+                ];
             },
-        }
+        },
     ];
 
     const rowsUser = userList.map((item, index) => {
@@ -145,7 +119,7 @@ function TakeAttendance() {
         container['id'] = index + 1;
         container['name'] = item.name;
         container['studentId'] = item.studentId;
-        container['active'] = item.active ? 'Có mặt' : 'Vắng mặt';
+        container['status'] = item.status ? 'Có mặt' : 'Vắng mặt';
         return container;
     });
 
@@ -153,47 +127,28 @@ function TakeAttendance() {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm({
-        // resolver: yupResolver(validationSchema),
-        // mode: 'onBlur',
-    });
+    } = useForm({});
 
-    const onSubmit = (userList) => {
-        console.log(userList);
+    const onSubmit = () => {
+        history({ pathname: '/admin/attendance' }, { state: { id: _trainingScheduleId, date: _nowDate } });
     };
 
-    // const toggleStatus = useCallback(
-    //     (id) => () => {
-    //         // fetchUserList();
-    //         console.log(id.active);
-    //         const params = { studentId: id };
-    //         // userApi.updateUserStatus(params).then((res) => {
-    //         //     setUserList((oldUserList) => {
-    //         //         return oldUserList.map((user) => {
-    //         //             if (user.studentId === id) {
-    //         //                 console.log(user.studentId, id);
-    //         //                 return { ...user, active: !user.active };
-    //         //             }
-    //         //             return user;
-    //         //         });
-    //         //     });
-    //         //     console.log('1', res);
-    //         //     console.log('2', res.data);
-    //         // });
-    //         console.log(id)
-    //     },
-    //     [],
-    // );
+    const takeAttendance = async (id) => {
+        try {
+            await adminAttendanceAPI.takeAttendance(id);
+        } catch (error) {
+            console.log('Không thể điểm danh, error: ', error);
+        }
+    };
 
     const toggleStatus = (id) => {
-        console.log(id);
+        takeAttendance(id);
         const newUserList = userList.map((user) => {
-            return user.studentId === id ? { ...user, active: !user.active } : user
+            return user.studentId === id ? { ...user, status: !user.status } : user;
         });
         console.log(newUserList);
-        setUserList(newUserList)
-    }
-
+        setUserList(newUserList);
+    };
 
     function CustomToolbar() {
         return (
@@ -227,8 +182,10 @@ function TakeAttendance() {
                 </Alert>
             </Snackbar>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Trạng thái điểm danh ngày: 16/06/2022
-                <Typography variant='h6'>Số người tham gia hôm nay {attendance}/{userList.length}</Typography>
+                Trạng thái điểm danh ngày: {_nowDate.toLocaleDateString('vi-VN')}
+                <Typography variant="h6">
+                    Số người tham gia hôm nay {attendance}/{userList.length}
+                </Typography>
             </Typography>
             <Box component="form" onSubmit={handleSubmit(onSubmit)}>
                 <Box
@@ -242,7 +199,6 @@ function TakeAttendance() {
                             borderRadius: '100px',
                             position: 'relative',
                             top: '9px',
-                            //minWidth: '104.143px !important',
                         },
                         '& .status-rows.active': {
                             backgroundColor: '#56f000',
@@ -265,9 +221,6 @@ function TakeAttendance() {
                         pageSize={pageSize}
                         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                         rowsPerPageOptions={[10, 20, 30]}
-                        // onCellDoubleClick={(param) => {
-                        //     handleOnClick(param.row);
-                        // }}
                         components={{
                             Toolbar: CustomToolbar,
                         }}
@@ -276,7 +229,7 @@ function TakeAttendance() {
                 <Button type="submit">Đồng ý</Button>
             </Box>
         </Fragment>
-    )
+    );
 }
 
-export default TakeAttendance
+export default TakeAttendance;

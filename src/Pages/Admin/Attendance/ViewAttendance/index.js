@@ -1,50 +1,37 @@
 import { Alert, Box, Snackbar, Typography } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
-
-const userList = [
-    {
-        name: 'Pham Minh Duc',
-        studentId: 'HE123456',
-        active: true
-    },
-    {
-        name: 'Duong Thanh Tung',
-        studentId: 'HE123456',
-        active: false
-    },
-    {
-        name: 'Dam Van Toan',
-        studentId: 'HE123456',
-        active: true
-    },
-    {
-        name: 'Le Hoang Nhat Linh',
-        studentId: 'HE123456',
-        active: false
-    },
-    {
-        name: 'Le Anh Tuan',
-        studentId: 'HE123456',
-        active: true
-    }
-
-]
+import { Link, useLocation } from 'react-router-dom';
+import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 
 function ViewAttendance() {
-
-    //const [userList, setUserList] = useState([]);
+    const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
+    const [totalActive, setTotalActive] = useState();
+    const [totalResult, setTotalResult] = useState();
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    let attendance = userList.reduce((attendaceCount, user) => {
-        console.log(attendaceCount, user);
-        return user.active ? attendaceCount + 1 : attendaceCount
-    }, 0)
+    const location = useLocation();
 
+    const _trainingScheduleId = location.state?.id;
+    const _nowDate = location.state?.date;
+
+    const getAttendanceByStudentId = async () => {
+        try {
+            const response = await adminAttendanceAPI.getAttendanceByStudentId(_trainingScheduleId);
+            setUserList(response.data);
+            setTotalActive(response.totalActive);
+            setTotalResult(response.totalResult);
+        } catch (error) {
+            console.log('Không thể lấy dữ liệu người dùng tham gia điểm danh. Error: ', error);
+        }
+    };
+
+    useEffect(() => {
+        getAttendanceByStudentId();
+    }, []);
 
     let snackBarStatus;
 
@@ -61,38 +48,21 @@ function ViewAttendance() {
         if (reason === 'clickaway') {
             return;
         }
-
         setOpenSnackBar(false);
     };
 
-    useEffect(() => {
-        //fetchUserList();
-    }, []);
-
-    // const fetchUserList = async () => {
-    //     try {
-    //         const response = await userApi.getAll();
-    //         console.log(response);
-    //         setUserList(response.data);
-    //     } catch (error) {
-    //         console.log('Failed to fetch user list: ', error);
-    //     }
-    // };
-
-
     const columns = [
-        { field: 'id', headerName: 'ID', flex: 0.5 },
+        { field: 'id', headerName: 'Số thứ tự', flex: 0.5 },
         { field: 'name', headerName: 'Tên', flex: 0.8 },
         { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
         {
-            field: 'active',
+            field: 'status',
             headerName: 'Trạng thái',
             flex: 0.5,
             cellClassName: (params) => {
                 if (params.value == null) {
                     return '';
                 }
-
                 return clsx('status-rows', {
                     active: params.value === 'Có mặt',
                     deactive: params.value === 'Vắng mặt',
@@ -106,11 +76,9 @@ function ViewAttendance() {
         container['id'] = index + 1;
         container['name'] = item.name;
         container['studentId'] = item.studentId;
-        container['active'] = item.active ? 'Có mặt' : 'Vắng mặt';
+        container['status'] = item.status ? 'Có mặt' : 'Vắng mặt';
         return container;
     });
-
-
 
     function CustomToolbar() {
         return (
@@ -145,8 +113,10 @@ function ViewAttendance() {
                 </Alert>
             </Snackbar>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Trạng thái điểm danh ngày: 16/06/2022
-                <Typography variant='h6'>Số người tham gia hôm nay {attendance}/{userList.length}</Typography>
+                Trạng thái điểm danh ngày: {_nowDate.toLocaleDateString('vi-VN')}
+                <Typography variant="h6">
+                    Số người tham gia hôm nay {totalActive}/{totalResult}
+                </Typography>
             </Typography>
             <Box
                 sx={{
@@ -182,16 +152,13 @@ function ViewAttendance() {
                     pageSize={pageSize}
                     onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                     rowsPerPageOptions={[10, 20, 30]}
-                    // onCellDoubleClick={(param) => {
-                    //     handleOnClick(param.row);
-                    // }}
                     components={{
                         Toolbar: CustomToolbar,
                     }}
                 />
             </Box>
         </Fragment>
-    )
+    );
 }
 
-export default ViewAttendance
+export default ViewAttendance;
