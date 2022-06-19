@@ -33,7 +33,7 @@ function AddUser() {
     useEffect(() => {
         const fetchUserList = async () => {
             try {
-                const response = await userApi.getAll();
+                const response = await userApi.getAllMemberAndAdmin();
                 console.log(response);
                 let listStudentId = response.data.map((i) => i.studentId);
                 let listEmail = response.data.map((i) => i.email);

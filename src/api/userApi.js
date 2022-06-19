@@ -7,6 +7,10 @@ const userApi = {
         const url = '/admin/hr/getallmemberandcollaborator?pageNo=0&pageSize=100';
         return axiosClient.get(url, { params });
     },
+    getAllMemberAndAdmin: (params) => {
+        const url = '/admin/hr/viceheadclub/getallusers';
+        return axiosClient.get(url, { params });
+    },
 
     get: (id) => {
         const url = `/products/${id}`;
