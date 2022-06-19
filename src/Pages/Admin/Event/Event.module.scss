@@ -52,7 +52,7 @@
 }
 .event-title {
     // color: pink;
-    flex: 7;
+    flex: 6;
 }
 
 .event-date {
@@ -62,8 +62,8 @@
     // flex: 1;
     position: absolute;
     z-index: 1;
-    bottom: 20px;
-    left: 891px;
+    top: 19px;
+    right: 19px;
 }
 .create-event-button {
     display: flex;

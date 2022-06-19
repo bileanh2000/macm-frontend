@@ -5,9 +5,33 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import styles from './Event.module.scss';
 import classNames from 'classnames/bind';
 import { Link } from 'react-router-dom';
+import eventApi from 'src/api/eventApi';
+import { useEffect, useState } from 'react';
 
 const cx = classNames.bind(styles);
 function Event() {
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [events, setEvents] = useState();
+    const [pageSize, setPageSize] = useState(10);
+    const getListEvents = async (pageNo) => {
+        const params = {};
+        try {
+            const response = await eventApi.getAll(pageNo);
+            setEvents(response.data);
+            setTotal(response.totalPage);
+            setPageSize(response.pageSize);
+            console.log(response.data);
+        } catch (error) {
+            console.log('Lấy dữ liệu thất bại', error);
+        }
+    };
+    console.log(events);
+
+    useEffect(() => {
+        getListEvents(page - 1);
+        window.scrollTo({ behavior: 'smooth', top: '0px' });
+    }, [page]);
     return (
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -28,15 +52,41 @@ function Event() {
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Box sx={{ width: '80%' }}>
                     <ul>
-                        <li>
+                        {events &&
+                            events.map((item) => {
+                                return (
+                                    <li key={item.id}>
+                                        <div className={cx('events')}>
+                                            <Box component={Link} to={`${item.id}`}>
+                                                <div className={cx('event-list')}>
+                                                    <div className={cx('event-status')}>
+                                                        <p className={cx('upcoming')}>Upcoming</p>
+                                                    </div>
+                                                    <div className={cx('event-title')}>{item.name}</div>
+                                                    <div className={cx('event-date')}>29-01-2022</div>
+                                                </div>
+                                            </Box>
+                                            <div className={cx('event-action')}>
+                                                <IconButton aria-label="delete" onClick={() => console.log('a')}>
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                                <IconButton aria-label="edit">
+                                                    <EditIcon />
+                                                </IconButton>
+                                            </div>
+                                        </div>
+                                    </li>
+                                );
+                            })}
+                        {/* <li>
                             <div className={cx('events')}>
-                                <Box component={Link} to="/">
+                                <Box component={Link} to="admin/events">
                                     <div className={cx('event-list')}>
                                         <div className={cx('event-status')}>
                                             <p className={cx('upcoming')}>Upcoming</p>
                                         </div>
-                                        <div className={cx('event-title')}>Teambuilding Sapa 3 ngày 2 đêm</div>
-                                        <div className={cx('event-date')}>20/08/2022</div>
+                                        <div className={cx('event-title')}>hehe</div>
+                                        <div className={cx('event-date')}>29-01-2022</div>
                                     </div>
                                 </Box>
                                 <div className={cx('event-action')}>
@@ -48,7 +98,7 @@ function Event() {
                                     </IconButton>
                                 </div>
                             </div>
-                        </li>
+                        </li> */}
                     </ul>
                 </Box>
             </Box>

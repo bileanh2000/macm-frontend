@@ -6,7 +6,7 @@ import ClubFee from '../Pages/Admin/ClubFee';
 import Contact from '../Pages/Admin/Contact';
 import Event from '../Pages/Admin/Event';
 import AddEvent from '../Pages/Admin/Event/AddEvent';
-import EventDetails from '../Pages/Admin/Event/AddEvent';
+import EventDetails from '../Pages/Admin/Event/EventDetail';
 import Facility from '../Pages/Admin/Facility';
 import News from '../Pages/Admin/News';
 import NewsDetail from '../Pages/Admin/News/NewsDetail/NewsDetail';
