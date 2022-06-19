@@ -21,10 +21,11 @@ import HeadOfDepartment from '../Pages/Admin/User-management/HeadOfDepartment';
 import UserDetailPage from '../Pages/UserDetail';
 import UserDetailEditPage from '../Pages/UserDetail/edit';
 import AddUserPage from '../Pages/Admin/addUser';
-import Home from '../Pages/Home/index'
+import Home from '../Pages/Home/index';
 import AddTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/addSchedule';
 import UpdateTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/editSession';
 import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession';
+import addEvent from '../Pages/Admin/Event/addEvent';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -40,11 +41,12 @@ const privateRouters = [
     { path: '/admin/facility', component: Facility },
     { path: '/admin/trainingschedule', component: TrainingSchedule },
 
-    //Contact paths
     { path: '/admin/trainingschedules', component: TrainingSchedule },
     { path: '/admin/trainingschedules/add', component: AddTrainingSchedulePage },
     { path: '/admin/trainingschedules/addsession', component: addSessionPage },
     { path: '/admin/trainingschedules/:scheduleId/edit', component: UpdateTrainingSchedulePage },
+
+    //Contact paths
     { path: '/admin/contact', component: Contact },
     { path: '/admin/contact/edit', component: EditContact },
 
@@ -63,8 +65,9 @@ const privateRouters = [
     { path: '/admin/news/:newsId/edit', component: EditNews },
     { path: '/admin/news/:newsId', component: NewsDetail },
 
-
+    //Event
     { path: '/admin/events', component: Event },
+    { path: '/admin/events/add', component: addEvent },
 ];
 
 const publicRouters = [];
