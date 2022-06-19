@@ -3,6 +3,10 @@ import AdminHomePage from '../Pages/Admin/Home';
 import UserManagementPage from '../Pages/Admin/User-management';
 import LoginPage from '../Pages/Login';
 import ClubFee from '../Pages/Admin/ClubFee';
+import MembershipFee from '../Pages/Admin/ClubFee/MembershipFee';
+import FacilityFee from '../Pages/Admin/ClubFee/FacilityFee';
+import ListEventsFee from '../Pages/Admin/ClubFee/ListEventsFee';
+import EventFee from '../Pages/Admin/ClubFee/ListEventsFee/EventFee';
 import Contact from '../Pages/Admin/Contact';
 import Event from '../Pages/Admin/Event';
 import Facility from '../Pages/Admin/Facility';
@@ -21,10 +25,13 @@ import HeadOfDepartment from '../Pages/Admin/User-management/HeadOfDepartment';
 import UserDetailPage from '../Pages/UserDetail';
 import UserDetailEditPage from '../Pages/UserDetail/edit';
 import AddUserPage from '../Pages/Admin/addUser';
-import Home from '../Pages/Home/index'
+import Home from '../Pages/Home/index';
 import AddTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/addSchedule';
 import UpdateTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/editSession';
 import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession';
+import Attendance from 'src/Pages/Admin/Attendance';
+import TakeAttendance from 'src/Pages/Admin/Attendance/TakeAttendance';
+import EditAttendance from 'src/Pages/Admin/Attendance/EditAttendance';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -48,7 +55,17 @@ const privateRouters = [
     { path: '/admin/contact', component: Contact },
     { path: '/admin/contact/edit', component: EditContact },
 
+    //Attendance paths
+    { path: '/admin/attendance', component: Attendance },
+    { path: '/admin/attendance/take', component: TakeAttendance },
+    { path: '/admin/attendance/edit', component: EditAttendance },
+
+    //Club fee paths
     { path: '/admin/clubfee', component: ClubFee },
+    { path: '/admin/clubfee/membership', component: MembershipFee },
+    { path: '/admin/clubfee/event', component: ListEventsFee },
+    { path: '/admin/clubfee/event/:eventId', component: EventFee },
+    { path: '/admin/clubfee/facility', component: FacilityFee },
 
     //Rule paths
     { path: '/admin/rules/*', component: Rules },
@@ -62,7 +79,6 @@ const privateRouters = [
     { path: '/admin/news/create', component: CreateNews },
     { path: '/admin/news/:newsId/edit', component: EditNews },
     { path: '/admin/news/:newsId', component: NewsDetail },
-
 
     { path: '/admin/events', component: Event },
 ];

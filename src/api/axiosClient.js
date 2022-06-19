@@ -8,7 +8,7 @@ import queryString from 'query-string';
 const axiosClient = axios.create({
     baseURL: "https://capstone-project-macm.herokuapp.com/api",
     headers: {
-        'content-type': 'multipart/form-data',
+        'content-type': 'application/json',
     },
     paramsSerializer: (params) => queryString.stringify(params),
     body: (params) => JSON.stringify(params)
