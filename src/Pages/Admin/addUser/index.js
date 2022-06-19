@@ -240,15 +240,7 @@ function AddUser() {
                             error={errors.studentId ? true : false}
                             helperText={errors.studentId?.message}
                         />
-                        {/* <TextField
-                            required
-                            id="outlined-disabled"
-                            label="Ngày sinh"
-                            fullWidth
-                            {...register('dateOfBirth')}
-                            error={errors.dateOfBirth ? true : false}
-                            helperText={errors.dateOfBirth?.message}
-                        /> */}
+
                         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                             <Controller
                                 required

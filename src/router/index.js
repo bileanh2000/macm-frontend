@@ -5,6 +5,8 @@ import LoginPage from '../Pages/Login';
 import ClubFee from '../Pages/Admin/ClubFee';
 import Contact from '../Pages/Admin/Contact';
 import Event from '../Pages/Admin/Event';
+import AddEvent from '../Pages/Admin/Event/AddEvent';
+import EventDetails from '../Pages/Admin/Event/AddEvent';
 import Facility from '../Pages/Admin/Facility';
 import News from '../Pages/Admin/News';
 import NewsDetail from '../Pages/Admin/News/NewsDetail/NewsDetail';
@@ -25,7 +27,6 @@ import Home from '../Pages/Home/index';
 import AddTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/addSchedule';
 import UpdateTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/editSession';
 import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession';
-import addEvent from '../Pages/Admin/Event/addEvent';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -67,7 +68,8 @@ const privateRouters = [
 
     //Event
     { path: '/admin/events', component: Event },
-    { path: '/admin/events/add', component: addEvent },
+    { path: '/admin/events/add', component: AddEvent },
+    { path: '/admin/events/:id', component: EventDetails },
 ];
 
 const publicRouters = [];

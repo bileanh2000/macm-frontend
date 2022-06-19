@@ -1,3 +1,6 @@
+.events {
+    position: relative;
+}
 .event-list {
     display: flex;
     border: 1px solid #caced8;
@@ -7,11 +10,12 @@
     height: 80px;
     align-items: center;
     font-weight: 500;
-    justify-content: space-between;
+    // position: relative;
+    // justify-content: space-between;
 }
 
 .event-status {
-    flex: 1;
+    // flex: 1;
     color: black;
     // width: 130px;
     margin-right: 20px;
@@ -42,6 +46,10 @@
     background-color: #748998;
 }
 
+.event-link {
+    display: flex;
+    align-items: center;
+}
 .event-title {
     // color: pink;
     flex: 7;
@@ -52,6 +60,10 @@
 }
 .event-action {
     // flex: 1;
+    position: absolute;
+    z-index: 1;
+    bottom: 20px;
+    left: 891px;
 }
 .create-event-button {
     display: flex;

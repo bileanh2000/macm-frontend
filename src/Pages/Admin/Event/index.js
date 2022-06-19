@@ -29,48 +29,18 @@ function Event() {
                 <Box sx={{ width: '80%' }}>
                     <ul>
                         <li>
-                            <div className={cx('event-list')}>
-                                <div className={cx('event-status')}>
-                                    <p className={cx('upcoming')}>Upcoming</p>
-                                </div>
-                                <div className={cx('event-title')}>Teambuilding Sapa 3 ngày 2 đêm</div>
-                                <div className={cx('event-date')}>20/08/2022</div>
+                            <div className={cx('events')}>
+                                <Box component={Link} to="/">
+                                    <div className={cx('event-list')}>
+                                        <div className={cx('event-status')}>
+                                            <p className={cx('upcoming')}>Upcoming</p>
+                                        </div>
+                                        <div className={cx('event-title')}>Teambuilding Sapa 3 ngày 2 đêm</div>
+                                        <div className={cx('event-date')}>20/08/2022</div>
+                                    </div>
+                                </Box>
                                 <div className={cx('event-action')}>
-                                    <IconButton aria-label="delete">
-                                        <DeleteIcon />
-                                    </IconButton>
-                                    <IconButton aria-label="edit">
-                                        <EditIcon />
-                                    </IconButton>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div className={cx('event-list')}>
-                                <div className={cx('event-status')}>
-                                    <p className={cx('going-on')}>Going on</p>
-                                </div>
-                                <div className={cx('event-title')}>Teambuilding Sapa 3 ngày 2 đêm</div>
-                                <div className={cx('event-date')}>20/08/2022</div>
-                                <div className={cx('event-action')}>
-                                    <IconButton aria-label="delete">
-                                        <DeleteIcon />
-                                    </IconButton>
-                                    <IconButton aria-label="edit">
-                                        <EditIcon />
-                                    </IconButton>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div className={cx('event-list')}>
-                                <div className={cx('event-status')}>
-                                    <p className={cx('closed')}>Closed</p>
-                                </div>
-                                <div className={cx('event-title')}>Teambuilding Sapa 3 ngày 2 đêm</div>
-                                <div className={cx('event-date')}>20/08/2022</div>
-                                <div className={cx('event-action')}>
-                                    <IconButton aria-label="delete">
+                                    <IconButton aria-label="delete" onClick={() => console.log('a')}>
                                         <DeleteIcon />
                                     </IconButton>
                                     <IconButton aria-label="edit">
