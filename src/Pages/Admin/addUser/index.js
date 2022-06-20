@@ -127,6 +127,10 @@ function AddUser() {
         gender: Yup.string().required('Không được để trống trường này'),
         phone: Yup.mixed().uniquePhone(),
         roleId: Yup.string().required('Không được để trống trường này'),
+        generation: Yup.number()
+            .required('Không được để trống trường này')
+            .min(0, 'Vui lòng nhập lớn hơn 0')
+            .typeError('Không được để trống trường này'),
     });
 
     const {
@@ -165,6 +169,7 @@ function AddUser() {
             phone: data.phone,
             roleId: data.roleId,
             studentId: data.studentId,
+            generation: data.generation,
         };
         await userApi.createUser(dataFormat).then((res) => {
             console.log('1', res);
@@ -296,6 +301,16 @@ function AddUser() {
                             <MenuItem value={true}>Nam</MenuItem>
                             <MenuItem value={false}>Nữ</MenuItem>
                         </TextField>
+                        <TextField
+                            required
+                            type="number"
+                            id="outlined-disabled"
+                            label="Gen"
+                            fullWidth
+                            {...register('generation')}
+                            error={errors.generation ? true : false}
+                            helperText={errors.generation?.message}
+                        />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <Typography variant="h6" component="div">

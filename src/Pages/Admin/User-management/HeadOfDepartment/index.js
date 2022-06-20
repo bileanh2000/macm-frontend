@@ -9,8 +9,10 @@ import Typography from '@mui/material/Typography';
 import {
     DataGrid,
     GridActionsCellItem,
+    GridToolbarColumnsButton,
     GridToolbarContainer,
     GridToolbarExport,
+    GridToolbarFilterButton,
     GridToolbarQuickFilter,
 } from '@mui/x-data-grid';
 import Dialog from '@mui/material/Dialog';
@@ -19,12 +21,16 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
+import { MenuItem, TextField } from '@mui/material';
+import moment from 'moment';
 
 function MemberAndCollaborator() {
     let navigate = useNavigate();
     const [userList, setUserList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [stageStudentId, setStageStudentID] = useState({ studentId: '', name: '' });
+    const [semester, setSemester] = useState('Summer2022');
+    const [editable, setEditable] = useState(false);
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -33,19 +39,30 @@ function MemberAndCollaborator() {
         setOpenDialog(true);
     };
 
+    const fetchAdminListBySemester = async (params) => {
+        try {
+            const response = await userApi.getAllAdminBySemester(params);
+            console.log(response);
+            setUserList(response.data);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
     useEffect(() => {
-        const fetchUserList = async () => {
-            try {
-                const response = await userApi.getAllAdmin();
-                console.log(response);
-                setUserList(response.data);
-            } catch (error) {
-                console.log('Failed to fetch user list: ', error);
-            }
-        };
-        fetchUserList();
-    }, []);
+        fetchAdminListBySemester(semester);
+    }, [semester]);
 
+    const handleChange = (event) => {
+        console.log(event.target.value);
+        setSemester(event.target.value);
+        if (event.target.value != 'Summer2022') {
+            setEditable(true);
+        } else {
+            setEditable(false);
+        }
+        console.log(editable);
+        fetchAdminListBySemester(semester);
+    };
     useEffect(() => {
         console.log(stageStudentId);
     }, [stageStudentId]);
@@ -61,9 +78,14 @@ function MemberAndCollaborator() {
         },
 
         { field: 'gender', headerName: 'Giới tính', flex: 1 },
+        { field: 'dateOfBirth', headerName: 'Ngày sinh', flex: 1 },
+        { field: 'month', headerName: 'Tháng sinh', flex: 0.5, hide: true, hideable: false },
+        { field: 'generation', headerName: 'Gen', flex: 1 },
         { field: 'studentId', headerName: 'Mã sinh viên', flex: 1 },
         { field: 'role', headerName: 'Vai trò', flex: 1 },
         {
+            hideable: !editable,
+            hide: editable,
             field: 'actions',
             type: 'actions',
             flex: 1,
@@ -93,9 +115,12 @@ function MemberAndCollaborator() {
         container['id'] = index + 1;
         container['name'] = item.name;
         container['email'] = item.email;
+        container['generation'] = item.generation;
+        container['dateOfBirth'] = moment(new Date(item.dateOfBirth)).format('DD/MM/yyyy');
         container['gender'] = item.gender ? 'Nam' : 'Nữ';
         container['studentId'] = item.studentId;
-        container['role'] = item.role.name;
+        container['role'] = item.roleName;
+        container['month'] = new Date(item.dateOfBirth).getMonth() + 1;
 
         return container;
     });
@@ -122,22 +147,9 @@ function MemberAndCollaborator() {
     };
     function CustomToolbar() {
         return (
-            <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-                <Box
-                    sx={{
-                        p: 0.5,
-                        pb: 0,
-                    }}
-                >
-                    <GridToolbarQuickFilter />
-                </Box>
-                {/* <GridToolbarExport
-                    csvOptions={{
-                        fileName: 'Danh sách thành viên và cộng tác viên',
-                        delimiter: ';',
-                        utf8WithBom: true,
-                    }}
-                /> */}
+            <GridToolbarContainer>
+                <GridToolbarColumnsButton />
+                <GridToolbarFilterButton />
             </GridToolbarContainer>
         );
     }
@@ -163,9 +175,26 @@ function MemberAndCollaborator() {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 5 }}>
+            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                 Quản lý Ban chủ nhiệm
             </Typography>
+            <TextField
+                sx={{ mb: 2 }}
+                id="outlined-select-currency"
+                size="small"
+                select
+                label="Chọn kỳ"
+                value={semester}
+                onChange={handleChange}
+            >
+                {/* {currencies.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))} */}
+                <MenuItem value="Summer2022">Summer 2022</MenuItem>
+                <MenuItem value="Spring2022">Spring 2022</MenuItem>
+            </TextField>
             <div style={{ height: '80vh', width: '100%' }}>
                 <DataGrid
                     loading={!userList.length}
@@ -176,6 +205,10 @@ function MemberAndCollaborator() {
                     rowsPerPageOptions={[15]}
                     onCellDoubleClick={(param) => {
                         handleOnClick(param.row);
+                    }}
+                    localeText={{
+                        toolbarColumns: 'Cột',
+                        toolbarFilters: 'Bộ lọc tìm kiếm',
                     }}
                     components={{
                         Toolbar: CustomToolbar,
