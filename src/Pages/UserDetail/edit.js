@@ -272,9 +272,11 @@ function UserDetailEdit() {
     return userDetail.map((item) => {
         return (
             <Fragment key={item.id}>
-                {listPhone && listPhone.splice(listPhone.indexOf(item.phone), 1)}
-                {listEmail && listEmail.splice(listEmail.indexOf(item.email), 1)}
-                {listStudentId && listStudentId.splice(listStudentId.indexOf(item.studentId), 1)}
+                <Box sx={{ display: 'none' }}>
+                    {listPhone && listPhone.splice(listPhone.indexOf(item.phone), 1)}
+                    {listEmail && listEmail.splice(listEmail.indexOf(item.email), 1)}
+                    {listStudentId && listStudentId.splice(listStudentId.indexOf(item.studentId), 1)}
+                </Box>
                 <Snackbar
                     open={openSnackBar}
                     autoHideDuration={5000}

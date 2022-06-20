@@ -129,7 +129,8 @@ function MemberAndCollaborator() {
         (id) => () => {
             handleCloseDialog();
             setTimeout(() => {
-                userApi.deleteAdmin(id).then((res) => {
+                const params = { studentId: id, semester: semester };
+                userApi.deleteAdmin(params).then((res) => {
                     setUserList((prevRows) => prevRows.filter((row) => row.studentId !== id));
                     console.log('1', res);
                     console.log('2', res.data);

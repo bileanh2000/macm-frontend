@@ -36,8 +36,8 @@ const userApi = {
         const url = `/admin/hr/viceheadclub/getadmins/semester?semester=${params}`;
         return axiosClient.get(url);
     },
-    deleteAdmin: (id) => {
-        const url = `/admin/hr/deleteadmin/${id}`;
+    deleteAdmin: (params) => {
+        const url = `/admin/hr/deleteadmin/${params.studentId}?semester=${params.semester}`;
         return axiosClient.put(url);
     },
     updateUser: (params) => {
