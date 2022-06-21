@@ -7,41 +7,29 @@ const eventApi = {
         const url = '/event/geteventsbyname';
         return axiosClient.get(url, { params });
     },
-    get: (id) => {
-        const url = `/products/${id}`;
+    getEventBySemester: (params) => {
+        const url = `/event/geteventsbysemester/${params}`;
         return axiosClient.get(url);
     },
-    createUser: (params) => {
-        const url = `/admin/hr/adduser`;
+    createPreviewEvent: (params) => {
+        const url = '/eventschedule/headculture/createpreview/';
+        return axiosClient.post(url, null, {
+            params: {
+                eventName: params.name,
+                startDate: params.startDate,
+                finishDate: params.finishDate,
+                startTime: params.startTime,
+                finishTime: params.finishTime,
+            },
+        });
+    },
+    createEvent: (params) => {
+        const url = `/event/headculture/createevent`;
         return axiosClient.post(url, params);
     },
-    getUserbyId: (params) => {
-        const url = `/admin/hr/getbystudentid/${params}`;
-        return axiosClient.get(url);
-    },
-    getAllAdmin: (params) => {
-        const url = '/admin/hr/headclub/getalladmin';
-        return axiosClient.get(url, { params });
-    },
-    deleteAdmin: (id) => {
-        const url = `/admin/hr/deleteadmin/${id}`;
-        return axiosClient.put(url);
-    },
-    updateUser: (params) => {
-        const url = `/admin/hr/updateuser/${params.setId}`;
-        return axiosClient.put(url, params);
-    },
-    updateUserStatus: (params) => {
-        const url = `/admin/hr/updatestatus?studentId=${params.studentId}`;
-        return axiosClient.put(url);
-    },
-    importListFromFile: (params) => {
-        const url = `/admin/hr/users/import`;
+    createScheduleSession: (params, eventId) => {
+        const url = `/eventschedule/headculture/addnewschedule/${eventId}`;
         return axiosClient.post(url, params);
-    },
-    exportUserListToExcel: (params) => {
-        const url = `/admin/hr/users/export`;
-        return axiosClient.get(url);
     },
 };
 export default eventApi;

@@ -27,6 +27,7 @@ import Home from '../Pages/Home/index';
 import AddTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/addSchedule';
 import UpdateTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/editSession';
 import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession';
+import EditEvent from '../Pages/Admin/Event/EditEvent';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -70,6 +71,7 @@ const privateRouters = [
     { path: '/admin/events', component: Event },
     { path: '/admin/events/add', component: AddEvent },
     { path: '/admin/events/:id', component: EventDetails },
+    { path: '/admin/events/:id/edit', component: EditEvent },
 ];
 
 const publicRouters = [];

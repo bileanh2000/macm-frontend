@@ -114,14 +114,14 @@ function AddEvent() {
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
             .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
-        startTime: Yup.string().nullable().required('Không được để trống trường này'),
-        finishTime: Yup.string().nullable().required('Không được để trống trường này'),
+        // startTime: Yup.string().nullable().required('Không được để trống trường này'),
+        // finishTime: Yup.string().nullable().required('Không được để trống trường này'),
         cost: Yup.string().required('Không được để trống trường này'),
         ...(isChecked && {
             cash: Yup.string().required('Không được để trống trường này'),
         }),
-        startDate: Yup.string().nullable().required('Không được để trống trường này'),
-        finishDate: Yup.string().nullable().required('Không được để trống trường này'),
+        // startDate: Yup.string().nullable().required('Không được để trống trường này'),
+        // finishDate: Yup.string().nullable().required('Không được để trống trường này'),
         amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
     });
     const {
@@ -208,7 +208,7 @@ function AddEvent() {
     return (
         <Fragment>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Thêm sự kiện mới
+                Chỉnh sửa sự kiện
             </Typography>
             <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
                 <DialogTitle>Xem trước lịch sự kiện</DialogTitle>
@@ -307,7 +307,7 @@ function AddEvent() {
                     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                         <Grid container columns={12} spacing={2}>
                             <Grid item xs={6}>
-                                <Controller
+                                {/* <Controller
                                     required
                                     name="startDate"
                                     control={control}
@@ -338,8 +338,8 @@ function AddEvent() {
                                             )}
                                         />
                                     )}
-                                />
-                                <Controller
+                                /> */}
+                                {/* <Controller
                                     required
                                     name="startTime"
                                     control={control}
@@ -370,10 +370,10 @@ function AddEvent() {
                                             )}
                                         />
                                     )}
-                                />
+                                /> */}
                             </Grid>
                             <Grid item xs={6}>
-                                <Controller
+                                {/* <Controller
                                     required
                                     name="finishDate"
                                     control={control}
@@ -404,8 +404,8 @@ function AddEvent() {
                                             )}
                                         />
                                     )}
-                                />
-                                <Controller
+                                /> */}
+                                {/* <Controller
                                     required
                                     name="finishTime"
                                     control={control}
@@ -435,7 +435,7 @@ function AddEvent() {
                                             )}
                                         />
                                     )}
-                                />
+                                /> */}
                             </Grid>
                         </Grid>
                     </LocalizationProvider>
