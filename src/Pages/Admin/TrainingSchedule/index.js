@@ -11,6 +11,7 @@ import trainingSchedule from 'src/api/trainingScheduleApi';
 import interactionPlugin from '@fullcalendar/interaction';
 import swal from 'sweetalert';
 import moment from 'moment';
+import { getDate } from 'date-fns';
 
 const cx = classNames.bind(styles);
 
@@ -61,9 +62,21 @@ function TrainingSchedule() {
         console.log('selected');
     };
     let navigate = useNavigate();
-    const navigateToUpdate = (params) => {
-        let path = `${params}/edit`;
-        navigate(path);
+    const navigateToUpdate = (params, date) => {
+        console.log(date, nowDate);
+        if (
+            date.getMonth() === nowDate.getMonth() &&
+            date.getFullYear() === nowDate.getFullYear() &&
+            date.getDate() === nowDate.getDate()
+        ) {
+            console.log('dung ngay roi');
+            navigate({ pathname: '../admin/attendance' }, { state: { date: date, id: params } });
+        } else {
+            console.log('sai ngay roi');
+            console.log(params);
+            let path = `${params}/edit`;
+            navigate(path);
+        }
     };
     return (
         <Fragment>
@@ -107,7 +120,7 @@ function TrainingSchedule() {
                             getMonthInCurrentTableView(dateInfo.start);
                         }}
                         eventClick={(args) => {
-                            navigateToUpdate(args.event.id);
+                            navigateToUpdate(args.event.id, args.event.start);
                         }}
                         // dateClick={function (arg) {
                         //     swal({
