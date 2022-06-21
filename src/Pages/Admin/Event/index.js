@@ -29,7 +29,7 @@ function Event() {
             setEvents(response.data);
             // setTotal(response.totalPage);
             // setPageSize(response.pageSize);
-            console.log(response.data);
+            console.log('hahahaah', response.data);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }

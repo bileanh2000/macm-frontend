@@ -8,7 +8,7 @@ const eventApi = {
         return axiosClient.get(url, { params });
     },
     getEventBySemester: (params) => {
-        const url = `/event/geteventsbysemester/${params}`;
+        const url = `/event/geteventsbysemester?semester=${params}`;
         return axiosClient.get(url);
     },
     createPreviewEvent: (params) => {

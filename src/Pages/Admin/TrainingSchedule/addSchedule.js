@@ -3,6 +3,11 @@ import {
     Box,
     Button,
     Checkbox,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     FormControl,
     FormControlLabel,
     FormGroup,
@@ -25,10 +30,27 @@ import vi from 'date-fns/locale/vi';
 import { useEffect } from 'react';
 import { Paper } from '@mui/material';
 import trainingScheduleApi from 'src/api/trainingScheduleApi';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import { useNavigate } from 'react-router-dom';
+
 function AddSchedule() {
     moment().locale('vi');
+    const [open, setOpen] = useState(false);
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
+    const [submitData, setSubmitData] = useState();
+    const [previewData, setPreviewData] = useState();
+    let navigate = useNavigate();
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     const schema = Yup.object().shape({
         startDate: Yup.string().nullable().required('Điền đi'),
@@ -91,6 +113,13 @@ function AddSchedule() {
         }
         setOpenSnackBar(false);
     };
+    const deleteDate = (id) => {
+        console.log(id);
+        // delete previewData[id];
+        // previewData.splice(id, 1);
+        // setPreviewData(previewData);
+        // console.log(previewData);
+    };
     const onSubmit = (data) => {
         // setSubmitData(moment(new Date(data.startDate)).format('yyyy-MM-DD'));
         const dataFormat = {
@@ -100,14 +129,19 @@ function AddSchedule() {
             endTime: moment(new Date(data.endTime)).format('HH:mm:ss'),
             daysOfWeek: data.dayOfWeek,
         };
-        trainingScheduleApi.createSchedule(dataFormat).then((res) => {
+        setSubmitData(dataFormat);
+
+        trainingScheduleApi.previewSchedule(dataFormat).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
+
             if (res.data.length != 0) {
                 setOpenSnackBar(true);
                 // setSnackBarStatus(true);
                 snackBarStatus = true;
                 dynamicAlert(snackBarStatus, res.message);
+                setPreviewData(res.data);
+                setOpen(true);
             } else {
                 console.log('huhu');
                 setOpenSnackBar(true);
@@ -116,10 +150,42 @@ function AddSchedule() {
                 dynamicAlert(snackBarStatus, res.message);
             }
         });
-        console.log('form submit', dataFormat);
     };
+    const handleCreate = () => {
+        trainingScheduleApi.createSchedule(previewData).then((res) => {
+            console.log('1', res);
+            console.log('2', res.data);
 
-    const [timePicked, setTimePicked] = useState(null);
+            if (res.data.length != 0) {
+                setOpenSnackBar(true);
+                // setSnackBarStatus(true);
+                snackBarStatus = true;
+                dynamicAlert(snackBarStatus, res.message);
+                // setPreviewData(res.data);
+                // setOpen(true);
+                navigate(-1);
+            } else {
+                console.log('huhu');
+                setOpenSnackBar(true);
+                // setSnackBarStatus(false);
+                snackBarStatus = false;
+                dynamicAlert(snackBarStatus, res.message);
+            }
+        });
+    };
+    const scheduleData =
+        previewData &&
+        previewData.map((item, index) => {
+            const container = {};
+            container['id'] = index;
+            container['date'] = item.date;
+            container['title'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+            container['display'] = 'background';
+            container['backgroundColor'] = '#5ba8f5';
+
+            return container;
+        });
+
     return (
         <Box>
             <Snackbar
@@ -137,6 +203,58 @@ function AddSchedule() {
                     {customAlert.message}
                 </Alert>
             </Snackbar>
+
+            <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
+                <DialogTitle>Xem trước lịch tập</DialogTitle>
+                <DialogContent sx={{ height: '590px' }}>
+                    <FullCalendar
+                        locale="vie"
+                        height="100%"
+                        plugins={[dayGridPlugin, interactionPlugin]}
+                        initialView="dayGridMonth"
+                        // events={[
+                        //     {
+                        //         id: 1,
+                        //         title: 'đi tập đi đmm',
+                        //         date: '2022-06-16',
+                        //         // display: 'background',
+                        //         // textColor: 'white',
+                        //         backgroundColor: '#5ba8f5',
+                        //         classNames: ['test-css'],
+                        //     },
+                        // ]}
+                        events={scheduleData && scheduleData}
+                        weekends={true}
+                        headerToolbar={{
+                            left: 'title',
+                            center: '',
+                            right: 'prev next today',
+                        }}
+                        // editable={true}
+                        // selectable={true}
+                        // datesSet={(dateInfo) => {
+                        //     getMonthInCurrentTableView(dateInfo.start);
+                        // }}
+                        eventClick={(args) => {
+                            deleteDate(args.event.id);
+                        }}
+                        // dateClick={function (arg) {
+                        //     swal({
+                        //         title: 'Date',
+                        //         text: arg.dateStr,
+                        //         type: 'success',
+                        //     });
+                        // }}
+                        // selectable
+                        // select={handleEventAdd}
+                        // eventDrop={(e) => console.log(e)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Quay lại</Button>
+                    <Button onClick={handleCreate}>Đồng ý</Button>
+                </DialogActions>
+            </Dialog>
             <form noValidate onSubmit={handleSubmit(onSubmit)} className="signup-form">
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                     <Typography variant="h4" component="div" sx={{ marginBottom: '16px', fontWeight: '700' }}>
@@ -317,8 +435,8 @@ function AddSchedule() {
                     </Paper>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button color="primary" variant="contained" type="submit" sx={{ mt: 5 }}>
-                        Xác nhận
+                    <Button color="primary" variant="contained" onClick={handleSubmit(onSubmit)} sx={{ mt: 5 }}>
+                        Xem trước
                     </Button>
                 </Box>
             </form>

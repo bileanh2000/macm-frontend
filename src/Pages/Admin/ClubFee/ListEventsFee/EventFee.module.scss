@@ -1,0 +1,16 @@
+.event-container {
+    width: 90%;
+    margin: auto;
+    .event-header {
+        float: left;
+        padding-bottom: 20px;
+    }
+    .event-item {
+        align-items: center;
+        padding: 20px;
+        margin-bottom: 5px;
+        border: 1px solid black;
+        min-height: 100px;
+        border-radius: 15px;
+    }
+}

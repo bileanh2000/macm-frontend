@@ -9,8 +9,13 @@ import {
     GridToolbar,
     GridToolbarColumnsButton,
     GridToolbarFilterButton,
+    useGridApiContext,
+    useGridSelector,
+    gridPageSelector,
+    gridPageCountSelector,
+    gridPageSizeSelector,
 } from '@mui/x-data-grid';
-import { Alert, Box, Button, Snackbar, styled } from '@mui/material';
+import { Alert, Box, Button, MenuItem, Pagination, Snackbar, styled, TablePagination, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SecurityIcon from '@mui/icons-material/Security';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
@@ -38,6 +43,8 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
+import moment from 'moment';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 
 const fileTypes = ['CSV', 'JPG', 'png'];
 const Input = styled('input')({
@@ -48,16 +55,6 @@ function DragDrop() {
 
     const handleChange = async (file) => {
         setAFile(file);
-        // await userApi.uploadCSV(aFile).then((res) => {
-        //     console.log('1', res);
-        //     console.log('2', res.data);
-        //     if (res.data.length != 0) {
-        //         // setSnackBarStatus(true);
-        //     } else {
-        //         console.log('huhu');
-        //         // setSnackBarStatus(false);
-        //     }
-        // });
     };
 
     useEffect(() => {
@@ -77,12 +74,14 @@ function DragDrop() {
         </div>
     );
 }
-
+// bat onchange lay api theo ky, day stage de disable field action
 function MemberAndCollaborator() {
     let navigate = useNavigate();
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
     const [openUploadFile, setOpenUploadFile] = useState(false);
+    const [semester, setSemester] = useState('Summer2022');
+    const [editable, setEditable] = useState(false);
 
     const handleClickOpen = () => {
         setOpenUploadFile(true);
@@ -92,19 +91,41 @@ function MemberAndCollaborator() {
         setOpenUploadFile(false);
     };
 
-    useEffect(() => {
-        fetchUserList();
-    }, []);
-
-    const fetchUserList = async () => {
+    const fetchUserListBySemester = async (params) => {
         try {
-            const response = await userApi.getAll();
+            const response = await userApi.getAllUserBySemester(params);
             console.log(response);
             setUserList(response.data);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
     };
+    const handleChange = (event) => {
+        console.log(event.target.value);
+        setSemester(event.target.value);
+        if (event.target.value != 'Summer2022') {
+            setEditable(true);
+        } else {
+            setEditable(false);
+        }
+        console.log(editable);
+        fetchUserListBySemester(semester);
+    };
+
+    useEffect(() => {
+        // fetchUserList();
+        fetchUserListBySemester(semester);
+    }, [semester]);
+
+    // const fetchUserList = async () => {
+    //     try {
+    //         const response = await userApi.getAll();
+    //         console.log(response);
+    //         setUserList(response.data);
+    //     } catch (error) {
+    //         console.log('Failed to fetch user list: ', error);
+    //     }
+    // };
     const {
         register,
         handleSubmit,
@@ -114,7 +135,7 @@ function MemberAndCollaborator() {
         // mode: 'onBlur',
     });
     const columns = [
-        { field: 'id', headerName: 'ID', flex: 0.5 },
+        { field: 'id', headerName: 'ID', flex: 0.5, hide: true },
         { field: 'name', headerName: 'Tên', flex: 0.8 },
         {
             field: 'email',
@@ -125,8 +146,11 @@ function MemberAndCollaborator() {
         },
 
         { field: 'gender', headerName: 'Giới tính', flex: 0.5 },
-        { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
-        { field: 'role', headerName: 'Vai trò', width: 200, flex: 1.2 },
+        { field: 'dateOfBirth', headerName: 'Ngày sinh', flex: 0.5 },
+        { field: 'month', headerName: 'Tháng sinh', flex: 0.5, hide: true, hideable: false },
+        { field: 'generation', headerName: 'Gen', flex: 0.5 },
+        { field: 'studentId', headerName: 'Mã sinh viên', flex: 0.6 },
+        { field: 'role', headerName: 'Vai trò', flex: 1.2 },
         {
             field: 'active',
             headerName: 'Trạng thái',
@@ -143,35 +167,41 @@ function MemberAndCollaborator() {
             },
         },
         {
+            hideable: !editable,
+            hide: editable,
             field: 'actions',
             type: 'actions',
             flex: 0.5,
             getActions: (params) => [
                 <GridActionsCellItem icon={<EditIcon />} label="Chỉnh sửa" onClick={editUser(params.row.studentId)} />,
                 <GridActionsCellItem
-                    icon={<SecurityIcon />}
+                    icon={<ChangeCircleIcon />}
                     label="Chuyển trạng thái"
                     onClick={toggleStatus(params.row.studentId)}
                 />,
             ],
         },
     ];
+    const countActive = userList.filter((item) => {
+        return item.active === true;
+    }).length;
 
+    console.log(countActive);
     const rowsUser = userList.map((item, index) => {
         const container = {};
         container['id'] = index + 1;
         container['name'] = item.name;
         container['email'] = item.email;
         container['gender'] = item.gender ? 'Nam' : 'Nữ';
+        container['dateOfBirth'] = moment(new Date(item.dateOfBirth)).format('DD/MM/yyyy');
+        container['generation'] = item.generation;
+        container['month'] = new Date(item.dateOfBirth).getMonth() + 1;
         container['studentId'] = item.studentId;
-        container['role'] = item.role.name;
+        container['role'] = item.roleName;
         container['active'] = item.active ? 'Active' : 'Deactive';
 
         return container;
     });
-
-    // const [rows, setRows] = useState();
-    // setRows(rowsUser);
 
     const editUser = useCallback(
         (studentId) => () => {
@@ -188,7 +218,7 @@ function MemberAndCollaborator() {
         (id) => () => {
             // fetchUserList();
             console.log(id.active);
-            const params = { studentId: id };
+            const params = { semester: semester, studentId: id };
             userApi.updateUserStatus(params).then((res) => {
                 setUserList((oldUserList) => {
                     return oldUserList.map((user) => {
@@ -275,160 +305,24 @@ function MemberAndCollaborator() {
         });
     };
 
-    // function CustomToolbar() {
-    //     return (
-    //         <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-    //             <Box
-    //                 sx={{
-    //                     p: 0.5,
-    //                     pb: 0,
-    //                 }}
-    //             >
-    //                 <GridToolbarQuickFilter />
-    //             </Box>
-    //             {/* <GridToolbarExport
-    //                 csvOptions={{
-    //                     fileName: 'Danh sách thành viên và cộng tác viên',
-    //                     utf8WithBom: true,
-    //                 }}
-    //             /> */}
-    //         </GridToolbarContainer>
-    //     );
-    // }
     function CustomToolbar() {
         return (
-            <GridToolbarContainer>
-                <GridToolbarColumnsButton />
-                <GridToolbarFilterButton />
-            </GridToolbarContainer>
+            <Fragment>
+                <GridToolbarContainer>
+                    <Box>
+                        <GridToolbarColumnsButton />
+                        <GridToolbarFilterButton />
+                    </Box>
+                    <Typography variant="button" color="initial" sx={{ marginLeft: 'auto', marginRight: '1rem' }}>
+                        Tổng thành viên Active: {countActive}/{userList.length}
+                    </Typography>
+                </GridToolbarContainer>
+                {/* <Box>
+                </Box> */}
+            </Fragment>
         );
     }
-    const top100Films = [
-        { title: 'The Shawshank Redemption', year: 1994 },
-        { title: 'The Godfather', year: 1972 },
-        { title: 'The Godfather: Part II', year: 1974 },
-        { title: 'The Dark Knight', year: 2008 },
-        { title: '12 Angry Men', year: 1957 },
-        { title: "Schindler's List", year: 1993 },
-        { title: 'Pulp Fiction', year: 1994 },
-        {
-            title: 'The Lord of the Rings: The Return of the King',
-            year: 2003,
-        },
-        { title: 'The Good, the Bad and the Ugly', year: 1966 },
-        { title: 'Fight Club', year: 1999 },
-        {
-            title: 'The Lord of the Rings: The Fellowship of the Ring',
-            year: 2001,
-        },
-        {
-            title: 'Star Wars: Episode V - The Empire Strikes Back',
-            year: 1980,
-        },
-        { title: 'Forrest Gump', year: 1994 },
-        { title: 'Inception', year: 2010 },
-        {
-            title: 'The Lord of the Rings: The Two Towers',
-            year: 2002,
-        },
-        { title: "One Flew Over the Cuckoo's Nest", year: 1975 },
-        { title: 'Goodfellas', year: 1990 },
-        { title: 'The Matrix', year: 1999 },
-        { title: 'Seven Samurai', year: 1954 },
-        {
-            title: 'Star Wars: Episode IV - A New Hope',
-            year: 1977,
-        },
-        { title: 'City of God', year: 2002 },
-        { title: 'Se7en', year: 1995 },
-        { title: 'The Silence of the Lambs', year: 1991 },
-        { title: "It's a Wonderful Life", year: 1946 },
-        { title: 'Life Is Beautiful', year: 1997 },
-        { title: 'The Usual Suspects', year: 1995 },
-        { title: 'Léon: The Professional', year: 1994 },
-        { title: 'Spirited Away', year: 2001 },
-        { title: 'Saving Private Ryan', year: 1998 },
-        { title: 'Once Upon a Time in the West', year: 1968 },
-        { title: 'American History X', year: 1998 },
-        { title: 'Interstellar', year: 2014 },
-        { title: 'Casablanca', year: 1942 },
-        { title: 'City Lights', year: 1931 },
-        { title: 'Psycho', year: 1960 },
-        { title: 'The Green Mile', year: 1999 },
-        { title: 'The Intouchables', year: 2011 },
-        { title: 'Modern Times', year: 1936 },
-        { title: 'Raiders of the Lost Ark', year: 1981 },
-        { title: 'Rear Window', year: 1954 },
-        { title: 'The Pianist', year: 2002 },
-        { title: 'The Departed', year: 2006 },
-        { title: 'Terminator 2: Judgment Day', year: 1991 },
-        { title: 'Back to the Future', year: 1985 },
-        { title: 'Whiplash', year: 2014 },
-        { title: 'Gladiator', year: 2000 },
-        { title: 'Memento', year: 2000 },
-        { title: 'The Prestige', year: 2006 },
-        { title: 'The Lion King', year: 1994 },
-        { title: 'Apocalypse Now', year: 1979 },
-        { title: 'Alien', year: 1979 },
-        { title: 'Sunset Boulevard', year: 1950 },
-        {
-            title: 'Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb',
-            year: 1964,
-        },
-        { title: 'The Great Dictator', year: 1940 },
-        { title: 'Cinema Paradiso', year: 1988 },
-        { title: 'The Lives of Others', year: 2006 },
-        { title: 'Grave of the Fireflies', year: 1988 },
-        { title: 'Paths of Glory', year: 1957 },
-        { title: 'Django Unchained', year: 2012 },
-        { title: 'The Shining', year: 1980 },
-        { title: 'WALL·E', year: 2008 },
-        { title: 'American Beauty', year: 1999 },
-        { title: 'The Dark Knight Rises', year: 2012 },
-        { title: 'Princess Mononoke', year: 1997 },
-        { title: 'Aliens', year: 1986 },
-        { title: 'Oldboy', year: 2003 },
-        { title: 'Once Upon a Time in America', year: 1984 },
-        { title: 'Witness for the Prosecution', year: 1957 },
-        { title: 'Das Boot', year: 1981 },
-        { title: 'Citizen Kane', year: 1941 },
-        { title: 'North by Northwest', year: 1959 },
-        { title: 'Vertigo', year: 1958 },
-        {
-            title: 'Star Wars: Episode VI - Return of the Jedi',
-            year: 1983,
-        },
-        { title: 'Reservoir Dogs', year: 1992 },
-        { title: 'Braveheart', year: 1995 },
-        { title: 'M', year: 1931 },
-        { title: 'Requiem for a Dream', year: 2000 },
-        { title: 'Amélie', year: 2001 },
-        { title: 'A Clockwork Orange', year: 1971 },
-        { title: 'Like Stars on Earth', year: 2007 },
-        { title: 'Taxi Driver', year: 1976 },
-        { title: 'Lawrence of Arabia', year: 1962 },
-        { title: 'Double Indemnity', year: 1944 },
-        {
-            title: 'Eternal Sunshine of the Spotless Mind',
-            year: 2004,
-        },
-        { title: 'Amadeus', year: 1984 },
-        { title: 'To Kill a Mockingbird', year: 1962 },
-        { title: 'Toy Story 3', year: 2010 },
-        { title: 'Logan', year: 2017 },
-        { title: 'Full Metal Jacket', year: 1987 },
-        { title: 'Dangal', year: 2016 },
-        { title: 'The Sting', year: 1973 },
-        { title: '2001: A Space Odyssey', year: 1968 },
-        { title: "Singin' in the Rain", year: 1952 },
-        { title: 'Toy Story', year: 1995 },
-        { title: 'Bicycle Thieves', year: 1948 },
-        { title: 'The Kid', year: 1921 },
-        { title: 'Inglourious Basterds', year: 2009 },
-        { title: 'Snatch', year: 2000 },
-        { title: '3 Idiots', year: 2009 },
-        { title: 'Monty Python and the Holy Grail', year: 1975 },
-    ];
+
     return (
         <Fragment>
             <Snackbar
@@ -461,39 +355,27 @@ function MemberAndCollaborator() {
                     </DialogActions>
                 </Box>
             </Dialog>
-            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                 Quản lý Thành viên và Cộng tác viên
             </Typography>
-            <Box sx={{ marginBottom: 2, display: 'flex', justifyContent: 'flex-end' }}>
+            <Box sx={{ marginBottom: 2, display: 'flex', justifyContent: 'space-between' }}>
                 <Box>
-                    {/* <Autocomplete
-                        id="highlights-demo"
-                        sx={{ width: 300, height: 60 }}
-                        options={top100Films}
-                        getOptionLabel={(option) => option.title}
-                        renderInput={(params) => <TextField {...params} label="Highlights" margin="normal" />}
-                        renderOption={(props, option, { inputValue }) => {
-                            const matches = match(option.title, inputValue);
-                            const parts = parse(option.title, matches);
-
-                            return (
-                                <li {...props}>
-                                    <div>
-                                        {parts.map((part, index) => (
-                                            <span
-                                                key={index}
-                                                style={{
-                                                    fontWeight: part.highlight ? 700 : 400,
-                                                }}
-                                            >
-                                                {part.text}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </li>
-                            );
-                        }}
-                    /> */}
+                    <TextField
+                        id="outlined-select-currency"
+                        size="small"
+                        select
+                        label="Chọn kỳ"
+                        value={semester}
+                        onChange={handleChange}
+                    >
+                        {/* {currencies.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))} */}
+                        <MenuItem value="Summer2022">Summer 2022</MenuItem>
+                        <MenuItem value="Spring2022">Spring 2022</MenuItem>
+                    </TextField>
                 </Box>
                 <Box>
                     <Button
@@ -507,11 +389,14 @@ function MemberAndCollaborator() {
                     </Button>
                     <Button
                         variant="outlined"
-                        // sx={{ marginRight: 2 }}
+                        sx={{ marginRight: 2 }}
                         startIcon={<UploadFileIcon />}
                         onClick={handleClickOpen}
                     >
                         Thêm danh sách thành viên
+                    </Button>
+                    <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} onClick={exportExcel}>
+                        Xuất File Excel
                     </Button>
                 </Box>
             </Box>
@@ -559,11 +444,9 @@ function MemberAndCollaborator() {
                     }}
                     components={{
                         Toolbar: CustomToolbar,
+                        // Pagination: CustomPagination,
                     }}
                 />
-                <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} onClick={exportExcel}>
-                    Xuất File Excel
-                </Button>
             </Box>
             {/* </div> */}
         </Fragment>
