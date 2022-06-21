@@ -11,8 +11,8 @@ function Attendance() {
     return (
         <Fragment>
             <ViewAttendance />
-            <Button>
-                <Link to="./take" state={{ id: _trainingScheduleId, date: _nowDate }}>
+            <Button variant="outlined" sx={{ color: 'black' }}>
+                <Link sx={{ color: 'black' }} to="./take" state={{ id: _trainingScheduleId, date: _nowDate }}>
                     Điểm danh
                 </Link>
             </Button>

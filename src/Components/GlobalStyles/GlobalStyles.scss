@@ -7,9 +7,9 @@
     font-family: 'Roboto';
     text-decoration: none;
 }
-a {
-    color: #fff;
-}
+// a {
+//     color: #fff;
+// }
 //----------- OVERRIDE FULLCALENDAR STYLE -----------
 .fc-bg-event {
     opacity: 1 !important;
@@ -38,6 +38,9 @@ a {
 
 .fc-toolbar {
     align-items: flex-end !important;
+}
+.fc-event-past {
+    background-color: rgb(187, 187, 187) !important;
 }
 
 //----------------------

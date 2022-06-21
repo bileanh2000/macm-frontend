@@ -12,6 +12,16 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
 function UpdateSchedule() {
+    const currentDate = new Date();
+
+    const [open, setOpen] = useState(false);
+    const { scheduleId } = useParams();
+    const [scheduleList, setScheduleList] = useState([]);
+
+    const [value, setValue] = useState(scheduleList);
+    const [selectedDate, setSelectedDate] = useState();
+    const [dateValue, setDateValue] = useState();
+
     const schema = Yup.object().shape({
         date: Yup.string()
             .nullable()
@@ -26,14 +36,9 @@ function UpdateSchedule() {
             .required('Không để để trống trường này')
             .matches(/(\d{2}):(\d{2}):(\d{2})/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
     });
-    const [open, setOpen] = useState(false);
-    const { scheduleId } = useParams();
-    const [scheduleList, setScheduleList] = useState([]);
-
-    const [value, setValue] = useState(scheduleList);
-    const [dateValue, setDateValue] = useState();
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         const fetchSchedule = async () => {
             try {
                 const response = await trainingSchedule.getAllSchedule();
@@ -41,11 +46,12 @@ function UpdateSchedule() {
                     'Thanh cong roi: ',
                     response.data.filter((item) => item.id === parseInt(scheduleId)),
                 );
-                let selectedSchedule = response.data.filter((item) => item.id === parseInt(scheduleId));
-                setDateValue(selectedSchedule[0].date);
 
-                console.log('1', scheduleId);
-                setScheduleList(selectedSchedule);
+                console.log('scheduleId ', scheduleId);
+                let dataSelected = response.data.filter((item) => item.id === parseInt(scheduleId));
+                let dateSelected = dataSelected[0].date;
+                setScheduleList(dataSelected);
+                setSelectedDate(new Date(dateSelected));
             } catch (error) {
                 console.log('That bai roi huhu ', error);
             }
@@ -166,9 +172,13 @@ function UpdateSchedule() {
                 <Typography variant="h4" color="initial" sx={{ marginBottom: '16px', fontWeight: '700' }}>
                     Cập nhật buổi tập
                 </Typography>
-                <Button variant="outlined" startIcon={<DeleteIcon />} color="error" onClick={handleClickOpen}>
-                    Xóa buổi tập
-                </Button>
+                {selectedDate <= currentDate ? (
+                    ''
+                ) : (
+                    <Button variant="outlined" startIcon={<DeleteIcon />} color="error" onClick={handleClickOpen}>
+                        Xóa buổi tập
+                    </Button>
+                )}
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
