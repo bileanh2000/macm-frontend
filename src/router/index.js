@@ -9,6 +9,9 @@ import ListEventsFee from '../Pages/Admin/ClubFee/ListEventsFee';
 import EventFee from '../Pages/Admin/ClubFee/ListEventsFee/EventFee';
 import Contact from '../Pages/Admin/Contact';
 import Event from '../Pages/Admin/Event';
+
+import AddEvent from '../Pages/Admin/Event/AddEvent';
+import EventDetails from '../Pages/Admin/Event/EventDetail';
 import MemberEvent from '../Pages/Admin/Event/MenberEvent';
 import MemberCancelEvent from '../Pages/Admin/Event/MenberEvent/MemberCancelEvent';
 import AddToAdmin from '../Pages/Admin/Event/MenberEvent/AddMemberToAdminEvent';
@@ -32,6 +35,8 @@ import Home from '../Pages/Home/index';
 import AddTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/addSchedule';
 import UpdateTrainingSchedulePage from '../Pages/Admin/TrainingSchedule/editSession';
 import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession';
+import EditEvent from '../Pages/Admin/Event/EditEvent';
+
 import Attendance from 'src/Pages/Admin/Attendance';
 import TakeAttendance from 'src/Pages/Admin/Attendance/TakeAttendance';
 
@@ -49,11 +54,12 @@ const privateRouters = [
     { path: '/admin/facility', component: Facility },
     { path: '/admin/trainingschedule', component: TrainingSchedule },
 
-    //Contact paths
     { path: '/admin/trainingschedules', component: TrainingSchedule },
     { path: '/admin/trainingschedules/add', component: AddTrainingSchedulePage },
     { path: '/admin/trainingschedules/addsession', component: addSessionPage },
     { path: '/admin/trainingschedules/:scheduleId/edit', component: UpdateTrainingSchedulePage },
+
+    //Contact paths
     { path: '/admin/contact', component: Contact },
     { path: '/admin/contact/edit', component: EditContact },
 
@@ -81,8 +87,11 @@ const privateRouters = [
     { path: '/admin/news/:newsId/edit', component: EditNews },
     { path: '/admin/news/:newsId', component: NewsDetail },
 
-    //Event path
+    //Event
     { path: '/admin/events', component: Event },
+    { path: '/admin/events/add', component: AddEvent },
+    { path: '/admin/events/:id', component: EventDetails },
+    { path: '/admin/events/:id/edit', component: EditEvent },
     { path: '/admin/events/member', component: MemberEvent },
     { path: '/admin/events/member/membercancel', component: MemberCancelEvent },
     { path: '/admin/events/member/addtoadmin', component: AddToAdmin },

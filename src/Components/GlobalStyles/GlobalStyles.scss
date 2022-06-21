@@ -7,9 +7,12 @@
     font-family: 'Roboto';
     text-decoration: none;
 }
-// a {
-//     color: #fff;
-// }
+
+ul,
+li {
+    list-style-type: none;
+}
+
 //----------- OVERRIDE FULLCALENDAR STYLE -----------
 .fc-bg-event {
     opacity: 1 !important;
