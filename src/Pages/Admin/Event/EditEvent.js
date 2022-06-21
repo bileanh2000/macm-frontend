@@ -17,7 +17,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { forwardRef, Fragment, useState } from 'react';
+import { forwardRef, Fragment, useEffect, useState } from 'react';
 import { DatePicker, DateTimePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import styles from './Event.module.scss';
 import classNames from 'classnames/bind';
@@ -30,7 +30,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import eventApi from 'src/api/eventApi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
@@ -44,6 +44,7 @@ function AddEvent() {
     const [open, setOpen] = useState(false);
     const [previewData, setPreviewData] = useState([]);
     const [eventId, setEventId] = useState();
+    const [events, setEvents] = useState([]);
     let navigator = useNavigate();
 
     const handleClickOpen = () => {
@@ -104,6 +105,23 @@ function AddEvent() {
         setOpen(false);
     };
 
+    useEffect(() => {
+        const getListEventsBySemester = async () => {
+            try {
+                const response = await eventApi.getEventBySemester('Summer2022');
+                let selectedEvent = response.data.filter((item) => item.id === parseInt(id));
+                console.log(selectedEvent.name);
+                console.log(selectedEvent);
+                setEvents(selectedEvent);
+                console.log(response.data);
+            } catch (error) {
+                console.log('Lấy dữ liệu thất bại', error);
+            }
+        };
+
+        getListEventsBySemester();
+    }, []);
+    // console.log(events);
     const validationSchema = Yup.object().shape({
         name: Yup.string().required('Không được để trống trường này'),
         maxQuantityComitee: Yup.number()
@@ -134,6 +152,8 @@ function AddEvent() {
         mode: 'onBlur',
     });
 
+    const { id } = useParams();
+
     const onSubmit = (data) => {
         let dataSubmit = {
             maxQuantityComitee: data.maxQuantityComitee,
@@ -150,25 +170,25 @@ function AddEvent() {
         };
         setSubmitData(dataSubmit);
 
-        eventApi.createPreviewEvent(dataSubmit).then((res) => {
-            console.log('1', res);
-            console.log('2', res.data);
+        // eventApi.createPreviewEvent(dataSubmit).then((res) => {
+        //     console.log('1', res);
+        //     console.log('2', res.data);
 
-            if (res.data.length != 0) {
-                // setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                // snackBarStatus = true;
-                // dynamicAlert(snackBarStatus, res.message);
-                setPreviewData(res.data);
-                setOpen(true);
-            } else {
-                console.log('huhu');
-                // setOpenSnackBar(true);
-                // setSnackBarStatus(false);
-                // snackBarStatus = false;
-                // dynamicAlert(snackBarStatus, res.message);
-            }
-        });
+        //     if (res.data.length != 0) {
+        //         // setOpenSnackBar(true);
+        //         // setSnackBarStatus(true);
+        //         // snackBarStatus = true;
+        //         // dynamicAlert(snackBarStatus, res.message);
+        //         setPreviewData(res.data);
+        //         setOpen(true);
+        //     } else {
+        //         console.log('huhu');
+        //         // setOpenSnackBar(true);
+        //         // setSnackBarStatus(false);
+        //         // snackBarStatus = false;
+        //         // dynamicAlert(snackBarStatus, res.message);
+        //     }
+        // });
         console.log(dataSubmit);
     };
     const EventSchedule = previewData.map((item, index) => {
@@ -181,6 +201,18 @@ function AddEvent() {
 
         return container;
     });
+
+    const EventInitial = events.map((item, index) => {
+        const container = {};
+        container['id'] = item.id;
+        container['name'] = item.name;
+        container['amountPerMemberRegister'] = item.amountPerMemberRegister;
+        container['maxQuantityComitee'] = item.maxQuantityComitee;
+        container['totalAmount'] = item.totalAmount;
+
+        return container;
+    });
+
     const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
         const { onChange, ...other } = props;
 
@@ -269,11 +301,13 @@ function AddEvent() {
                 onSubmit={handleSubmit}
             >
                 <Box sx={{ width: '50%' }}>
+                    {/* {event.map((item, index)=>{})} */}
                     <TextField
                         id="outlined-basic"
                         label="Tên sự kiện"
                         variant="outlined"
                         fullWidth
+                        defaultValue={EventInitial.name}
                         {...register('name')}
                         error={errors.name ? true : false}
                         helperText={errors.name?.message}
@@ -306,137 +340,8 @@ function AddEvent() {
                     </Grid>
                     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                         <Grid container columns={12} spacing={2}>
-                            <Grid item xs={6}>
-                                {/* <Controller
-                                    required
-                                    name="startDate"
-                                    control={control}
-                                    defaultValue={null}
-                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                        <DatePicker
-                                            label="Ngày bắt đầu"
-                                            disablePast
-                                            ampm={false}
-                                            value={value}
-                                            onChange={(value) => onChange(value)}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    sx={{
-                                                        marginTop: '0px !important',
-                                                        marginBottom: '16px !important',
-                                                    }}
-                                                    {...params}
-                                                    required
-                                                    id="outlined-disabled"
-                                                    error={invalid}
-                                                    helperText={invalid ? error.message : null}
-                                                    // id="startDate"
-                                                    variant="outlined"
-                                                    margin="dense"
-                                                    fullWidth
-                                                />
-                                            )}
-                                        />
-                                    )}
-                                /> */}
-                                {/* <Controller
-                                    required
-                                    name="startTime"
-                                    control={control}
-                                    defaultValue={null}
-                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                        <TimePicker
-                                            label="Thời gian bắt đầu"
-                                            // disablePast
-                                            ampm={false}
-                                            value={value}
-                                            onChange={(value) => onChange(value)}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    sx={{
-                                                        marginTop: '0px !important',
-                                                        marginBottom: '16px !important',
-                                                    }}
-                                                    {...params}
-                                                    required
-                                                    id="outlined-disabled"
-                                                    error={invalid}
-                                                    helperText={invalid ? error.message : null}
-                                                    // id="startDate"
-                                                    variant="outlined"
-                                                    margin="dense"
-                                                    fullWidth
-                                                />
-                                            )}
-                                        />
-                                    )}
-                                /> */}
-                            </Grid>
-                            <Grid item xs={6}>
-                                {/* <Controller
-                                    required
-                                    name="finishDate"
-                                    control={control}
-                                    defaultValue={null}
-                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                        <DatePicker
-                                            label="Ngày kết thúc"
-                                            disablePast
-                                            ampm={false}
-                                            value={value}
-                                            onChange={(value) => onChange(value)}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    sx={{
-                                                        marginTop: '0px !important',
-                                                        marginBottom: '16px !important',
-                                                    }}
-                                                    {...params}
-                                                    required
-                                                    id="outlined-disabled"
-                                                    error={invalid}
-                                                    helperText={invalid ? error.message : null}
-                                                    // id="startDate"
-                                                    variant="outlined"
-                                                    margin="dense"
-                                                    fullWidth
-                                                />
-                                            )}
-                                        />
-                                    )}
-                                /> */}
-                                {/* <Controller
-                                    required
-                                    name="finishTime"
-                                    control={control}
-                                    defaultValue={null}
-                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                        <TimePicker
-                                            label="Thời gian kết thúc"
-                                            ampm={false}
-                                            value={value}
-                                            onChange={(value) => onChange(value)}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    sx={{
-                                                        marginTop: '0px !important',
-                                                        marginBottom: '16px !important',
-                                                    }}
-                                                    {...params}
-                                                    required
-                                                    id="outlined-disabled"
-                                                    error={invalid}
-                                                    helperText={invalid ? error.message : null}
-                                                    // id="startDate"
-                                                    variant="outlined"
-                                                    margin="dense"
-                                                    fullWidth
-                                                />
-                                            )}
-                                        />
-                                    )}
-                                /> */}
-                            </Grid>
+                            <Grid item xs={6}></Grid>
+                            <Grid item xs={6}></Grid>
                         </Grid>
                     </LocalizationProvider>
 
