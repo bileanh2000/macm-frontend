@@ -7,6 +7,14 @@ const userApi = {
         const url = '/admin/hr/getallmemberandcollaborator?pageNo=0&pageSize=100';
         return axiosClient.get(url, { params });
     },
+    getAllMemberAndAdmin: (params) => {
+        const url = '/admin/hr/viceheadclub/getallusers';
+        return axiosClient.get(url, { params });
+    },
+    getAllUserBySemester: (params) => {
+        const url = `/admin/hr/viceheadclub/getmembers/semester?semester=${params}`;
+        return axiosClient.get(url);
+    },
 
     get: (id) => {
         const url = `/products/${id}`;
@@ -24,8 +32,12 @@ const userApi = {
         const url = '/admin/hr/headclub/getalladmin';
         return axiosClient.get(url, { params });
     },
-    deleteAdmin: (id) => {
-        const url = `/admin/hr/deleteadmin/${id}`;
+    getAllAdminBySemester: (params) => {
+        const url = `/admin/hr/viceheadclub/getadmins/semester?semester=${params}`;
+        return axiosClient.get(url);
+    },
+    deleteAdmin: (params) => {
+        const url = `/admin/hr/deleteadmin/${params.studentId}?semester=${params.semester}`;
         return axiosClient.put(url);
     },
     updateUser: (params) => {
@@ -33,7 +45,8 @@ const userApi = {
         return axiosClient.put(url, params);
     },
     updateUserStatus: (params) => {
-        const url = `/admin/hr/updatestatus?studentId=${params.studentId}`;
+        const url = `/admin/hr/updatestatus?semester=${params.semester}&studentId=${params.studentId}`;
+        // const url = `/admin/hr/updatestatus`;
         return axiosClient.put(url);
     },
     importListFromFile: (params) => {

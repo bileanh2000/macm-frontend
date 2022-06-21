@@ -20,6 +20,7 @@ function UpdateSchedule() {
 
     const [value, setValue] = useState(scheduleList);
     const [selectedDate, setSelectedDate] = useState();
+    const [dateValue, setDateValue] = useState();
 
     const schema = Yup.object().shape({
         date: Yup.string()
@@ -35,6 +36,7 @@ function UpdateSchedule() {
             .required('Không để để trống trường này')
             .matches(/(\d{2}):(\d{2}):(\d{2})/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
     });
+
     useEffect(() => {
         window.scrollTo(0, 0);
         const fetchSchedule = async () => {
@@ -44,6 +46,7 @@ function UpdateSchedule() {
                     'Thanh cong roi: ',
                     response.data.filter((item) => item.id === parseInt(scheduleId)),
                 );
+
                 console.log('scheduleId ', scheduleId);
                 let dataSelected = response.data.filter((item) => item.id === parseInt(scheduleId));
                 let dateSelected = dataSelected[0].date;
@@ -105,7 +108,7 @@ function UpdateSchedule() {
     const onSubmit = async (data) => {
         data = {
             id: parseInt(scheduleId, 10),
-            date: data.date,
+            date: moment(dateValue).format('yyyy-MM-DD'),
             startTime: data.startTime,
             finishTime: data.finishTime,
         };
@@ -131,7 +134,6 @@ function UpdateSchedule() {
     // const onSubmit = (data) => {
     //     console.log('form submit', data);
     // };
-    const [dateValue, setDateValue] = useState(new Date());
     return (
         <Box>
             <Snackbar
@@ -215,8 +217,11 @@ function UpdateSchedule() {
                                                     ampm={false}
                                                     defaultValue={new Date()}
                                                     inputFormat="yyyy-MM-dd"
-                                                    value={item.date && value}
-                                                    onChange={(value = '2022-06-17') => onChange(value)}
+                                                    value={dateValue}
+                                                    onChange={(e) => {
+                                                        console.log(e);
+                                                        setDateValue(e);
+                                                    }}
                                                     renderInput={(params) => (
                                                         <TextField
                                                             {...params}
