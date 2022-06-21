@@ -9,6 +9,7 @@ import eventApi from 'src/api/eventApi';
 import { useEffect, useState } from 'react';
 
 const cx = classNames.bind(styles);
+
 function Event() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
