@@ -6,12 +6,12 @@ import queryString from 'query-string';
 // Please have a look at here `https://github.com/axios/axios#request-config` for the full list of configs
 
 const axiosClient = axios.create({
-    baseURL: "https://capstone-project-macm.herokuapp.com/api",
+    baseURL: 'https://capstone-project-macm.herokuapp.com/api',
     headers: {
         'content-type': 'application/json',
     },
     paramsSerializer: (params) => queryString.stringify(params),
-    body: (params) => JSON.stringify(params)
+    body: (params) => JSON.stringify(params),
 });
 axiosClient.interceptors.request.use(async (config) => {
     // Handle token here ...

@@ -6,8 +6,16 @@ import {
     GridToolbarContainer,
     GridToolbarExport,
     GridToolbarQuickFilter,
+    GridToolbar,
+    GridToolbarColumnsButton,
+    GridToolbarFilterButton,
+    useGridApiContext,
+    useGridSelector,
+    gridPageSelector,
+    gridPageCountSelector,
+    gridPageSizeSelector,
 } from '@mui/x-data-grid';
-import { Alert, Box, Button, Snackbar, styled } from '@mui/material';
+import { Alert, Box, Button, MenuItem, Pagination, Snackbar, styled, TablePagination, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SecurityIcon from '@mui/icons-material/Security';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
@@ -31,6 +39,12 @@ import { useForm } from 'react-hook-form';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import clsx from 'clsx';
 import axios from 'axios';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+import parse from 'autosuggest-highlight/parse';
+import match from 'autosuggest-highlight/match';
+import moment from 'moment';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 
 const fileTypes = ['CSV', 'JPG', 'png'];
 const Input = styled('input')({
@@ -41,16 +55,6 @@ function DragDrop() {
 
     const handleChange = async (file) => {
         setAFile(file);
-        // await userApi.uploadCSV(aFile).then((res) => {
-        //     console.log('1', res);
-        //     console.log('2', res.data);
-        //     if (res.data.length != 0) {
-        //         // setSnackBarStatus(true);
-        //     } else {
-        //         console.log('huhu');
-        //         // setSnackBarStatus(false);
-        //     }
-        // });
     };
 
     useEffect(() => {
@@ -70,11 +74,14 @@ function DragDrop() {
         </div>
     );
 }
-
+// bat onchange lay api theo ky, day stage de disable field action
 function MemberAndCollaborator() {
+    let navigate = useNavigate();
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
     const [openUploadFile, setOpenUploadFile] = useState(false);
+    const [semester, setSemester] = useState('Summer2022');
+    const [editable, setEditable] = useState(false);
 
     const handleClickOpen = () => {
         setOpenUploadFile(true);
@@ -84,19 +91,41 @@ function MemberAndCollaborator() {
         setOpenUploadFile(false);
     };
 
-    useEffect(() => {
-        fetchUserList();
-    }, []);
-
-    const fetchUserList = async () => {
+    const fetchUserListBySemester = async (params) => {
         try {
-            const response = await userApi.getAll();
+            const response = await userApi.getAllUserBySemester(params);
             console.log(response);
             setUserList(response.data);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
     };
+    const handleChange = (event) => {
+        console.log(event.target.value);
+        setSemester(event.target.value);
+        if (event.target.value != 'Summer2022') {
+            setEditable(true);
+        } else {
+            setEditable(false);
+        }
+        console.log(editable);
+        fetchUserListBySemester(semester);
+    };
+
+    useEffect(() => {
+        // fetchUserList();
+        fetchUserListBySemester(semester);
+    }, [semester]);
+
+    // const fetchUserList = async () => {
+    //     try {
+    //         const response = await userApi.getAll();
+    //         console.log(response);
+    //         setUserList(response.data);
+    //     } catch (error) {
+    //         console.log('Failed to fetch user list: ', error);
+    //     }
+    // };
     const {
         register,
         handleSubmit,
@@ -106,7 +135,7 @@ function MemberAndCollaborator() {
         // mode: 'onBlur',
     });
     const columns = [
-        { field: 'id', headerName: 'ID', flex: 0.5 },
+        { field: 'id', headerName: 'ID', flex: 0.5, hide: true },
         { field: 'name', headerName: 'Tên', flex: 0.8 },
         {
             field: 'email',
@@ -117,8 +146,11 @@ function MemberAndCollaborator() {
         },
 
         { field: 'gender', headerName: 'Giới tính', flex: 0.5 },
-        { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
-        { field: 'role', headerName: 'Vai trò', width: 200, flex: 1.2 },
+        { field: 'dateOfBirth', headerName: 'Ngày sinh', flex: 0.5 },
+        { field: 'month', headerName: 'Tháng sinh', flex: 0.5, hide: true, hideable: false },
+        { field: 'generation', headerName: 'Gen', flex: 0.5 },
+        { field: 'studentId', headerName: 'Mã sinh viên', flex: 0.6 },
+        { field: 'role', headerName: 'Vai trò', flex: 1.2 },
         {
             field: 'active',
             headerName: 'Trạng thái',
@@ -135,35 +167,41 @@ function MemberAndCollaborator() {
             },
         },
         {
+            hideable: !editable,
+            hide: editable,
             field: 'actions',
             type: 'actions',
             flex: 0.5,
             getActions: (params) => [
                 <GridActionsCellItem icon={<EditIcon />} label="Chỉnh sửa" onClick={editUser(params.row.studentId)} />,
                 <GridActionsCellItem
-                    icon={<SecurityIcon />}
+                    icon={<ChangeCircleIcon />}
                     label="Chuyển trạng thái"
                     onClick={toggleStatus(params.row.studentId)}
                 />,
             ],
         },
     ];
+    const countActive = userList.filter((item) => {
+        return item.active === true;
+    }).length;
 
+    console.log(countActive);
     const rowsUser = userList.map((item, index) => {
         const container = {};
         container['id'] = index + 1;
         container['name'] = item.name;
         container['email'] = item.email;
         container['gender'] = item.gender ? 'Nam' : 'Nữ';
+        container['dateOfBirth'] = moment(new Date(item.dateOfBirth)).format('DD/MM/yyyy');
+        container['generation'] = item.generation;
+        container['month'] = new Date(item.dateOfBirth).getMonth() + 1;
         container['studentId'] = item.studentId;
-        container['role'] = item.role.name;
+        container['role'] = item.roleName;
         container['active'] = item.active ? 'Active' : 'Deactive';
 
         return container;
     });
-
-    // const [rows, setRows] = useState();
-    // setRows(rowsUser);
 
     const editUser = useCallback(
         (studentId) => () => {
@@ -180,7 +218,7 @@ function MemberAndCollaborator() {
         (id) => () => {
             // fetchUserList();
             console.log(id.active);
-            const params = { studentId: id };
+            const params = { semester: semester, studentId: id };
             userApi.updateUserStatus(params).then((res) => {
                 setUserList((oldUserList) => {
                     return oldUserList.map((user) => {
@@ -197,8 +235,6 @@ function MemberAndCollaborator() {
         },
         [],
     );
-
-    let navigate = useNavigate();
 
     const handleOnClick = (rowData) => {
         console.log('push -> /roles/' + rowData.studentId);
@@ -267,34 +303,23 @@ function MemberAndCollaborator() {
             document.body.appendChild(link);
             link.click();
         });
-        // userApi.exportUserListToExcel({ responseType: 'blob' }).then((res) => {
-        //     const url = window.URL.createObjectURL(new Blob([res.data]));
-        //     const link = document.createElement('a');
-        //     link.href = url;
-        //     link.setAttribute('download', 'users.xlsx'); //or any other extension
-        //     document.body.appendChild(link);
-        //     link.click();
-        // });
     };
 
     function CustomToolbar() {
         return (
-            <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-                <Box
-                    sx={{
-                        p: 0.5,
-                        pb: 0,
-                    }}
-                >
-                    <GridToolbarQuickFilter />
-                </Box>
-                {/* <GridToolbarExport
-                    csvOptions={{
-                        fileName: 'Danh sách thành viên và cộng tác viên',
-                        utf8WithBom: true,
-                    }}
-                /> */}
-            </GridToolbarContainer>
+            <Fragment>
+                <GridToolbarContainer>
+                    <Box>
+                        <GridToolbarColumnsButton />
+                        <GridToolbarFilterButton />
+                    </Box>
+                    <Typography variant="button" color="initial" sx={{ marginLeft: 'auto', marginRight: '1rem' }}>
+                        Tổng thành viên Active: {countActive}/{userList.length}
+                    </Typography>
+                </GridToolbarContainer>
+                {/* <Box>
+                </Box> */}
+            </Fragment>
         );
     }
 
@@ -322,12 +347,6 @@ function MemberAndCollaborator() {
                         <Button variant="outlined" component="span" sx={{ mr: 1 }} onClick={exportExcel}>
                             Tải File mẫu
                         </Button>
-                        {/* <label htmlFor="contained-button-file">
-                            <Input accept=".xlsx" id="contained-button-file" multiple type="file" />
-                            <Button variant="contained" component="span">
-                                Upload
-                            </Button>
-                        </label> */}
                         <input type="file" accept=".xlsx" {...register('file')} />
                     </DialogContent>
                     <DialogActions>
@@ -336,30 +355,50 @@ function MemberAndCollaborator() {
                     </DialogActions>
                 </Box>
             </Dialog>
-            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                 Quản lý Thành viên và Cộng tác viên
             </Typography>
-            <Box sx={{ marginBottom: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                    variant="outlined"
-                    sx={{ marginRight: 2 }}
-                    component={routerLink}
-                    to={'/admin/addUser'}
-                    startIcon={<AddCircleIcon />}
-                >
-                    Thêm thành viên
-                </Button>
-                <Button
-                    variant="outlined"
-                    sx={{ marginRight: 2 }}
-                    startIcon={<UploadFileIcon />}
-                    onClick={handleClickOpen}
-                >
-                    Thêm danh sách thành viên
-                </Button>
-                <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} onClick={exportExcel}>
-                    Xuất File Excel
-                </Button>
+            <Box sx={{ marginBottom: 2, display: 'flex', justifyContent: 'space-between' }}>
+                <Box>
+                    <TextField
+                        id="outlined-select-currency"
+                        size="small"
+                        select
+                        label="Chọn kỳ"
+                        value={semester}
+                        onChange={handleChange}
+                    >
+                        {/* {currencies.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))} */}
+                        <MenuItem value="Summer2022">Summer 2022</MenuItem>
+                        <MenuItem value="Spring2022">Spring 2022</MenuItem>
+                    </TextField>
+                </Box>
+                <Box>
+                    <Button
+                        variant="outlined"
+                        sx={{ marginRight: 2 }}
+                        component={routerLink}
+                        to={'/admin/addUser'}
+                        startIcon={<AddCircleIcon />}
+                    >
+                        Thêm thành viên
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        sx={{ marginRight: 2 }}
+                        startIcon={<UploadFileIcon />}
+                        onClick={handleClickOpen}
+                    >
+                        Thêm danh sách thành viên
+                    </Button>
+                    <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} onClick={exportExcel}>
+                        Xuất File Excel
+                    </Button>
+                </Box>
             </Box>
             {/* <div style={{ height: '70vh', width: '100%' }}> */}
             <Box
@@ -399,8 +438,13 @@ function MemberAndCollaborator() {
                     onCellDoubleClick={(param) => {
                         handleOnClick(param.row);
                     }}
+                    localeText={{
+                        toolbarColumns: 'Cột',
+                        toolbarFilters: 'Bộ lọc tìm kiếm',
+                    }}
                     components={{
                         Toolbar: CustomToolbar,
+                        // Pagination: CustomPagination,
                     }}
                 />
             </Box>
