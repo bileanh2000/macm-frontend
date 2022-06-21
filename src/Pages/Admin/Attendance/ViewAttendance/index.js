@@ -21,6 +21,7 @@ function ViewAttendance() {
     const getAttendanceByStudentId = async () => {
         try {
             const response = await adminAttendanceAPI.getAttendanceByStudentId(_trainingScheduleId);
+            console.log(response);
             setUserList(response.data);
             setTotalActive(response.totalActive);
             setTotalResult(response.totalResult);
