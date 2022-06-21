@@ -17,7 +17,6 @@ const cx = classNames.bind(styles);
 
 function TrainingSchedule() {
     const nowDate = new Date();
-    // const nowDate = new Date(2022, 5, 21);
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
     const [scheduleList, setScheduleList] = useState([]);
     const [scheduleId, setScheduleId] = useState();
