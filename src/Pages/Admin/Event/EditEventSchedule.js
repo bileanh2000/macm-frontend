@@ -11,13 +11,11 @@ import moment from 'moment';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
-import eventApi from 'src/api/eventApi';
-function UpdateSchedule() {
+function EditEventSchedule() {
     const currentDate = new Date();
-    const { eventScheduleId } = useParams();
 
     const [open, setOpen] = useState(false);
-    // const { scheduleId } = useParams();
+    const { scheduleId } = useParams();
     const [scheduleList, setScheduleList] = useState([]);
 
     const [value, setValue] = useState(scheduleList);
@@ -43,14 +41,14 @@ function UpdateSchedule() {
         window.scrollTo(0, 0);
         const fetchSchedule = async () => {
             try {
-                const response = await eventApi.getEventScheduleByEvent(eventScheduleId);
+                const response = await trainingSchedule.getAllSchedule();
                 console.log(
                     'Thanh cong roi: ',
-                    response.data.filter((item) => item.id === parseInt(eventScheduleId)),
+                    response.data.filter((item) => item.id === parseInt(scheduleId)),
                 );
 
-                console.log('scheduleId ', eventScheduleId);
-                let dataSelected = response.data.filter((item) => item.id === parseInt(eventScheduleId));
+                console.log('scheduleId ', scheduleId);
+                let dataSelected = response.data.filter((item) => item.id === parseInt(scheduleId));
                 let dateSelected = dataSelected[0].date;
                 setScheduleList(dataSelected);
                 setSelectedDate(new Date(dateSelected));
@@ -71,7 +69,7 @@ function UpdateSchedule() {
 
     const handleConfirmDialog = async () => {
         setOpen(false);
-        await trainingSchedule.deleteSession(eventScheduleId).then((res) => {
+        await trainingSchedule.deleteSession(scheduleId).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
             console.log('3', res.message);
@@ -109,7 +107,7 @@ function UpdateSchedule() {
     let navigate = useNavigate();
     const onSubmit = async (data) => {
         data = {
-            id: parseInt(eventScheduleId, 10),
+            id: parseInt(scheduleId, 10),
             date: moment(dateValue).format('yyyy-MM-DD'),
             startTime: data.startTime,
             finishTime: data.finishTime,
@@ -161,7 +159,7 @@ function UpdateSchedule() {
             >
                 <DialogTitle id="alert-dialog-title">{'Xác nhận xóa!'}</DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description">Bạn muốn xóa buổi tập này?</DialogContentText>
+                    <DialogContentText id="alert-dialog-description">Bạn muốn xóa buổi sự kiện này?</DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Từ chối</Button>
@@ -172,13 +170,13 @@ function UpdateSchedule() {
             </Dialog>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" color="initial" sx={{ marginBottom: '16px', fontWeight: '700' }}>
-                    Cập nhật buổi tập {eventScheduleId}
+                    Cập nhật buổi tập
                 </Typography>
                 {selectedDate <= currentDate ? (
                     ''
                 ) : (
                     <Button variant="outlined" startIcon={<DeleteIcon />} color="error" onClick={handleClickOpen}>
-                        Xóa buổi tập
+                        Xóa buổi sự kiện
                     </Button>
                 )}
             </Box>
@@ -205,41 +203,6 @@ function UpdateSchedule() {
                                             error={errors.date ? true : false}
                                             helperText={errors.date?.message}
                                         />
-                                        {/* <Controller
-                                            required
-                                            name="startDate"
-                                            control={control}
-                                            defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <DatePicker
-                                                    label="Ngày bắt đầu"
-                                                    ampm={false}
-                                                    defaultValue={new Date()}
-                                                    inputFormat="yyyy-MM-dd"
-                                                    value={dateValue}
-                                                    onChange={(e) => {
-                                                        console.log(e);
-                                                        setDateValue(e);
-                                                    }}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        /> */}
                                     </Grid>
                                     <Grid item sm={4}>
                                         <TextField
@@ -252,35 +215,6 @@ function UpdateSchedule() {
                                             error={errors.startTime ? true : false}
                                             helperText={errors.startTime?.message}
                                         />
-                                        {/* <Controller
-                                            name="startTime"
-                                            control={control}
-                                            defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <TimePicker
-                                                    label="Thời gian bắt đầu"
-                                                    ampm={false}
-                                                    value={moment(new Date(item.startTime)).format('hh:mm') || value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        /> */}
                                     </Grid>
                                     <Grid item sm={4}>
                                         <TextField
@@ -293,36 +227,6 @@ function UpdateSchedule() {
                                             error={errors.finishTime ? true : false}
                                             helperText={errors.finishTime?.message}
                                         />
-                                        {/* <Controller
-                                            required
-                                            name="endTime"
-                                            control={control}
-                                            defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <TimePicker
-                                                    label="Thời gian kết thúc"
-                                                    ampm={false}
-                                                    value={item.finishTime || value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        /> */}
                                     </Grid>
                                 </Grid>
                             );
@@ -339,4 +243,4 @@ function UpdateSchedule() {
     );
 }
 
-export default UpdateSchedule;
+export default EditEventSchedule;

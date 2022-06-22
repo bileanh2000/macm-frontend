@@ -39,6 +39,8 @@ import EditEvent from '../Pages/Admin/Event/EditEvent';
 
 import Attendance from 'src/Pages/Admin/Attendance';
 import TakeAttendance from 'src/Pages/Admin/Attendance/TakeAttendance';
+import ViewEventSchedule from 'src/Pages/Admin/Event/ViewEventSchedule';
+import EditEventSchedule from 'src/Pages/Admin/Event/EditEventSchedule';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -87,11 +89,13 @@ const privateRouters = [
     { path: '/admin/news/:newsId/edit', component: EditNews },
     { path: '/admin/news/:newsId', component: NewsDetail },
 
-    //Event
+    //Event paths
     { path: '/admin/events', component: Event },
     { path: '/admin/events/add', component: AddEvent },
     { path: '/admin/events/:id', component: EventDetails },
     { path: '/admin/events/:id/edit', component: EditEvent },
+    { path: '/admin/events/:id/eventschedule', component: ViewEventSchedule },
+    { path: '/admin/events/:id/eventschedule/:eventScheduleId/edit', component: EditEventSchedule },
     { path: '/admin/events/member', component: MemberEvent },
     { path: '/admin/events/member/membercancel', component: MemberCancelEvent },
     { path: '/admin/events/member/addtoadmin', component: AddToAdmin },
