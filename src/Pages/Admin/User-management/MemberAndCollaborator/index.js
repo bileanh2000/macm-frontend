@@ -116,16 +116,6 @@ function MemberAndCollaborator() {
         // fetchUserList();
         fetchUserListBySemester(semester);
     }, [semester]);
-
-    // const fetchUserList = async () => {
-    //     try {
-    //         const response = await userApi.getAll();
-    //         console.log(response);
-    //         setUserList(response.data);
-    //     } catch (error) {
-    //         console.log('Failed to fetch user list: ', error);
-    //     }
-    // };
     const {
         register,
         handleSubmit,
@@ -134,6 +124,23 @@ function MemberAndCollaborator() {
         // resolver: yupResolver(validationSchema),
         // mode: 'onBlur',
     });
+    const handleUpdateStatus = (id) => {
+        console.log(id);
+        const params = { semester: semester, studentId: id };
+        userApi.updateUserStatus(params).then((res) => {
+            setUserList((oldUserList) => {
+                return oldUserList.map((user) => {
+                    if (user.studentId === id) {
+                        console.log(user.studentId, id);
+                        return { ...user, active: !user.active };
+                    }
+                    return user;
+                });
+            });
+            console.log('1', res);
+            console.log('2', res.data);
+        });
+    };
     const columns = [
         { field: 'id', headerName: 'ID', flex: 0.5, hide: true },
         { field: 'name', headerName: 'Tên', flex: 0.8 },
@@ -154,16 +161,49 @@ function MemberAndCollaborator() {
         {
             field: 'active',
             headerName: 'Trạng thái',
-            flex: 0.5,
-            cellClassName: (params) => {
-                if (params.value == null) {
-                    return '';
-                }
-
-                return clsx('status-rows', {
-                    active: params.value === 'Active',
-                    deactive: params.value === 'Deactive',
-                });
+            renderCell: (cellValues) => {
+                return (
+                    <Button
+                        sx={{
+                            // borderRadius: '5px',
+                            ...(cellValues.row.active === 'Active'
+                                ? {
+                                      backgroundColor: '#00AD31',
+                                      boxShadow: 'none',
+                                      '&:hover': {
+                                          backgroundColor: '#008a27',
+                                          boxShadow: 'none',
+                                      },
+                                      '&:active': {
+                                          boxShadow: 'none',
+                                          backgroundColor: '#008a27',
+                                      },
+                                  }
+                                : {
+                                      backgroundColor: '#ff3838',
+                                      boxShadow: 'none',
+                                      '&:hover': {
+                                          backgroundColor: '#e53232',
+                                          boxShadow: 'none',
+                                      },
+                                      '&:active': {
+                                          boxShadow: 'none',
+                                          backgroundColor: '#e53232',
+                                      },
+                                  }),
+                        }}
+                        variant="contained"
+                        color="primary"
+                        onClick={(event) => {
+                            handleUpdateStatus(cellValues.row.studentId);
+                        }}
+                        // onClick={(event) => {
+                        //     toggleStatus(cellValues.row.studentId);
+                        // }}
+                    >
+                        {cellValues.row.active}
+                    </Button>
+                );
             },
         },
         {
@@ -174,11 +214,6 @@ function MemberAndCollaborator() {
             flex: 0.5,
             getActions: (params) => [
                 <GridActionsCellItem icon={<EditIcon />} label="Chỉnh sửa" onClick={editUser(params.row.studentId)} />,
-                <GridActionsCellItem
-                    icon={<ChangeCircleIcon />}
-                    label="Chuyển trạng thái"
-                    onClick={toggleStatus(params.row.studentId)}
-                />,
             ],
         },
     ];
@@ -210,27 +245,6 @@ function MemberAndCollaborator() {
                 console.log(studentId);
                 let path = `${studentId}/edit`;
                 navigate(path);
-            });
-        },
-        [],
-    );
-    const toggleStatus = useCallback(
-        (id) => () => {
-            // fetchUserList();
-            console.log(id.active);
-            const params = { semester: semester, studentId: id };
-            userApi.updateUserStatus(params).then((res) => {
-                setUserList((oldUserList) => {
-                    return oldUserList.map((user) => {
-                        if (user.studentId === id) {
-                            console.log(user.studentId, id);
-                            return { ...user, active: !user.active };
-                        }
-                        return user;
-                    });
-                });
-                console.log('1', res);
-                console.log('2', res.data);
             });
         },
         [],
