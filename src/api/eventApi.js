@@ -4,43 +4,39 @@ import axiosClient from './axiosClient';
 
 const eventApi = {
     getAll: (params) => {
-        const url = '/event/geteventsbyname';
-        return axiosClient.get(url, { params });
-    },
-    get: (id) => {
-        const url = `/products/${id}`;
+        const url = '/event/geteventsbysemester';
         return axiosClient.get(url);
     },
-    createUser: (params) => {
-        const url = `/admin/hr/adduser`;
+    getEventBySemester: (params) => {
+        const url = `/event/geteventsbysemester?semester=${params}`;
+        return axiosClient.get(url);
+    },
+    createPreviewEvent: (params) => {
+        const url = '/eventschedule/headculture/createpreview/';
+        return axiosClient.post(url, null, {
+            params: {
+                eventName: params.name,
+                startDate: params.startDate,
+                finishDate: params.finishDate,
+                startTime: params.startTime,
+                finishTime: params.finishTime,
+            },
+        });
+    },
+    createEvent: (params) => {
+        const url = `/event/headculture/createevent`;
         return axiosClient.post(url, params);
     },
-    getUserbyId: (params) => {
-        const url = `/admin/hr/getbystudentid/${params}`;
-        return axiosClient.get(url);
+    createScheduleSession: (params, eventId) => {
+        const url = `/eventschedule/headculture/addnewschedule/${eventId}`;
+        return axiosClient.post(url, params);
     },
-    getAllAdmin: (params) => {
-        const url = '/admin/hr/headclub/getalladmin';
-        return axiosClient.get(url, { params });
-    },
-    deleteAdmin: (id) => {
-        const url = `/admin/hr/deleteadmin/${id}`;
-        return axiosClient.put(url);
-    },
-    updateUser: (params) => {
-        const url = `/admin/hr/updateuser/${params.setId}`;
+    updateEvent: (params, eventId) => {
+        const url = `/event/headculture/updateevent/${eventId}`;
         return axiosClient.put(url, params);
     },
-    updateUserStatus: (params) => {
-        const url = `/admin/hr/updatestatus?studentId=${params.studentId}`;
-        return axiosClient.put(url);
-    },
-    importListFromFile: (params) => {
-        const url = `/admin/hr/users/import`;
-        return axiosClient.post(url, params);
-    },
-    exportUserListToExcel: (params) => {
-        const url = `/admin/hr/users/export`;
+    getEventScheduleByEvent: (params) => {
+        const url = `/eventschedule/geteventschedulebyevent/${params}`;
         return axiosClient.get(url);
     },
 };

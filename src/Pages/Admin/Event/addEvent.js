@@ -9,12 +9,16 @@ import {
     Button,
     InputAdornment,
     InputLabel,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { forwardRef, Fragment, useState } from 'react';
-import { DatePicker, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { DatePicker, DateTimePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import styles from './Event.module.scss';
 import classNames from 'classnames/bind';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -22,14 +26,83 @@ import vi from 'date-fns/locale/vi';
 import moment from 'moment';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import eventApi from 'src/api/eventApi';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
 function AddEvent() {
     const [isChecked, setIsChecked] = useState(false);
     const [description, setDescription] = useState('');
+    const [submitData, setSubmitData] = useState([]);
+    const [event, setEvent] = useState([]);
     const [cost, setCost] = useState();
     const [cash, setCash] = useState();
+    const [open, setOpen] = useState(false);
+    const [previewData, setPreviewData] = useState([]);
+    const [eventId, setEventId] = useState();
+    let navigator = useNavigate();
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleCreate = () => {
+        const params = {
+            name: submitData.name,
+            amount_per_register: submitData.amountPerRegister,
+            description: submitData.description,
+            maxQuantityComitee: submitData.maxQuantityComitee,
+            totalAmount: submitData.cost,
+        };
+
+        eventApi.createEvent(params).then((response) => {
+            console.log('create event', response);
+            console.log('create event', response.data);
+            console.log('create event id', response.data[0].id);
+            setEventId(response.data[0].id);
+            setEvent(response.data);
+
+            if (response.data.length != 0) {
+                // setOpenSnackBar(true);
+                // setSnackBarStatus(true);
+                // snackBarStatus = true;
+                // dynamicAlert(snackBarStatus, res.message);
+                eventApi.createScheduleSession(previewData, response.data[0].id).then((res) => {
+                    console.log('create event schedule', res);
+                    console.log('create event schedule', res.data);
+
+                    if (res.data.length != 0) {
+                        // setOpenSnackBar(true);
+                        // setSnackBarStatus(true);
+                        // snackBarStatus = true;
+                        // dynamicAlert(snackBarStatus, res.message);
+                        // setEvent(res.data);
+                        navigator(-1);
+                    } else {
+                        console.log('huhu');
+                        // setOpenSnackBar(true);
+                        // setSnackBarStatus(false);
+                        // snackBarStatus = false;
+                        // dynamicAlert(snackBarStatus, res.message);
+                    }
+                });
+            } else {
+                console.log('huhu');
+                // setOpenSnackBar(true);
+                // setSnackBarStatus(false);
+                // snackBarStatus = false;
+                // dynamicAlert(snackBarStatus, res.message);
+            }
+        });
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     const validationSchema = Yup.object().shape({
         name: Yup.string().required('Không được để trống trường này'),
@@ -47,6 +120,9 @@ function AddEvent() {
         ...(isChecked && {
             cash: Yup.string().required('Không được để trống trường này'),
         }),
+        startDate: Yup.string().nullable().required('Không được để trống trường này'),
+        finishDate: Yup.string().nullable().required('Không được để trống trường này'),
+        amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
     });
     const {
         register,
@@ -57,19 +133,54 @@ function AddEvent() {
         resolver: yupResolver(validationSchema),
         mode: 'onBlur',
     });
+
     const onSubmit = (data) => {
         let dataSubmit = {
             maxQuantityComitee: data.maxQuantityComitee,
             description: description,
-            finishTime: moment(new Date(data.finishTime)).format('YYYY-MM-DD[T]HH:mm:ss'),
+            finishTime: moment(new Date(data.finishTime)).format('HH:mm:ss'),
+            startTime: moment(new Date(data.startTime)).format('HH:mm:ss'),
+            startDate: moment(new Date(data.startDate)).format('DD/MM/yyyy'),
+            finishDate: moment(new Date(data.finishDate)).format('DD/MM/yyyy'),
             numOfParticipants: data.numOfParticipants,
             name: data.name,
-            startTime: moment(new Date(data.startTime)).format('YYYY-MM-DD[T]HH:mm:ss'),
             cash: data.cash,
             cost: data.cost,
+            amountPerRegister: data.amountPerRegister,
         };
+        setSubmitData(dataSubmit);
+
+        eventApi.createPreviewEvent(dataSubmit).then((res) => {
+            console.log('1', res);
+            console.log('2', res.data);
+
+            if (res.data.length != 0) {
+                // setOpenSnackBar(true);
+                // setSnackBarStatus(true);
+                // snackBarStatus = true;
+                // dynamicAlert(snackBarStatus, res.message);
+                setPreviewData(res.data);
+                setOpen(true);
+            } else {
+                console.log('huhu');
+                // setOpenSnackBar(true);
+                // setSnackBarStatus(false);
+                // snackBarStatus = false;
+                // dynamicAlert(snackBarStatus, res.message);
+            }
+        });
         console.log(dataSubmit);
     };
+    const EventSchedule = previewData.map((item, index) => {
+        const container = {};
+        container['id'] = index;
+        container['date'] = item.date;
+        container['title'] = item.title + '-' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['display'] = 'background';
+        container['backgroundColor'] = '#5ba8f5';
+
+        return container;
+    });
     const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
         const { onChange, ...other } = props;
 
@@ -99,6 +210,53 @@ function AddEvent() {
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                 Thêm sự kiện mới
             </Typography>
+            <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
+                <DialogTitle>Xem trước lịch sự kiện</DialogTitle>
+                <DialogContent sx={{ height: '590px' }}>
+                    <FullCalendar
+                        locale="vie"
+                        height="100%"
+                        plugins={[dayGridPlugin, interactionPlugin]}
+                        initialView="dayGridMonth"
+                        // events={[
+                        //     {
+                        //         id: 1,
+                        //         title: 'đi tập đi đmm',
+                        //         date: '2022-06-16',
+                        //         // display: 'background',
+                        //         // textColor: 'white',
+                        //         backgroundColor: '#5ba8f5',
+                        //         classNames: ['test-css'],
+                        //     },
+                        // ]}
+                        events={EventSchedule}
+                        weekends={true}
+                        headerToolbar={{
+                            left: 'title',
+                            center: '',
+                            right: 'prev next today',
+                        }}
+
+                        // eventClick={(args) => {
+                        //     deleteDate(args.event.id);
+                        // }}
+                        // dateClick={function (arg) {
+                        //     swal({
+                        //         title: 'Date',
+                        //         text: arg.dateStr,
+                        //         type: 'success',
+                        //     });
+                        // }}
+                        // selectable
+                        // select={handleEventAdd}
+                        // eventDrop={(e) => console.log(e)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Quay lại</Button>
+                    <Button onClick={handleCreate}>Đồng ý</Button>
+                </DialogActions>
+            </Dialog>
             <Box
                 component="form"
                 sx={{
@@ -151,13 +309,45 @@ function AddEvent() {
                             <Grid item xs={6}>
                                 <Controller
                                     required
+                                    name="startDate"
+                                    control={control}
+                                    defaultValue={null}
+                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        <DatePicker
+                                            label="Ngày bắt đầu"
+                                            disablePast
+                                            ampm={false}
+                                            value={value}
+                                            onChange={(value) => onChange(value)}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    sx={{
+                                                        marginTop: '0px !important',
+                                                        marginBottom: '16px !important',
+                                                    }}
+                                                    {...params}
+                                                    required
+                                                    id="outlined-disabled"
+                                                    error={invalid}
+                                                    helperText={invalid ? error.message : null}
+                                                    // id="startDate"
+                                                    variant="outlined"
+                                                    margin="dense"
+                                                    fullWidth
+                                                />
+                                            )}
+                                        />
+                                    )}
+                                />
+                                <Controller
+                                    required
                                     name="startTime"
                                     control={control}
                                     defaultValue={null}
                                     render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                        <DateTimePicker
+                                        <TimePicker
                                             label="Thời gian bắt đầu"
-                                            disableFuture
+                                            // disablePast
                                             ampm={false}
                                             value={value}
                                             onChange={(value) => onChange(value)}
@@ -185,13 +375,44 @@ function AddEvent() {
                             <Grid item xs={6}>
                                 <Controller
                                     required
+                                    name="finishDate"
+                                    control={control}
+                                    defaultValue={null}
+                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        <DatePicker
+                                            label="Ngày kết thúc"
+                                            disablePast
+                                            ampm={false}
+                                            value={value}
+                                            onChange={(value) => onChange(value)}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    sx={{
+                                                        marginTop: '0px !important',
+                                                        marginBottom: '16px !important',
+                                                    }}
+                                                    {...params}
+                                                    required
+                                                    id="outlined-disabled"
+                                                    error={invalid}
+                                                    helperText={invalid ? error.message : null}
+                                                    // id="startDate"
+                                                    variant="outlined"
+                                                    margin="dense"
+                                                    fullWidth
+                                                />
+                                            )}
+                                        />
+                                    )}
+                                />
+                                <Controller
+                                    required
                                     name="finishTime"
                                     control={control}
                                     defaultValue={null}
                                     render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                        <DateTimePicker
+                                        <TimePicker
                                             label="Thời gian kết thúc"
-                                            disableFuture
                                             ampm={false}
                                             value={value}
                                             onChange={(value) => onChange(value)}
@@ -218,37 +439,7 @@ function AddEvent() {
                             </Grid>
                         </Grid>
                     </LocalizationProvider>
-                    {/* <Controller as={NumberFormat} thousandSeparator name="price" control={control} /> */}
-                    {/* <TextField
-                        id="outlined-basic"
-                        label="Tổng chi phí tổ chức"
-                        variant="outlined"
-                        fullWidth
-                        {...register('cost')}
-                        error={errors.cost ? true : false}
-                        helperText={errors.cost?.message}
-                        InputProps={{
-                            inputComponent: NumberFormatCustom,
-                            endAdornment: <InputAdornment position="start">vnđ</InputAdornment>,
-                        }}
-                    /> */}
-                    {/* <NumberFormat
-                        name="cost"
-                        label="Tổng chi phí tổ chức"
-                        customInput={TextField}
-                        variant="outlined"
-                        thousandSeparator={true}
-                        autoComplete="off"
-                        fullWidth
-                        // value={cost}
-                        value="123,123,123"
-                        onChange={(e) => setCost(e.target.value)}
-                        InputProps={{
-                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                        }}
-                        error={errors.cost ? true : false}
-                        helperText={errors.cost?.message}
-                    /> */}
+
                     <Controller
                         name="cost"
                         variant="outlined"
@@ -314,6 +505,32 @@ function AddEvent() {
                     <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
                         Dự kiến mỗi người phải đóng: 160k
                     </Typography>
+                    <Controller
+                        name="amountPerRegister"
+                        variant="outlined"
+                        defaultValue=""
+                        control={control}
+                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                            <NumberFormat
+                                name="amountPerRegister"
+                                customInput={TextField}
+                                label="Số tiền mỗi người cần phải đóng"
+                                thousandSeparator={true}
+                                variant="outlined"
+                                defaultValue=""
+                                value={value}
+                                onValueChange={(v) => {
+                                    onChange(Number(v.value));
+                                }}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                }}
+                                error={invalid}
+                                helperText={invalid ? error.message : null}
+                                fullWidth
+                            />
+                        )}
+                    />
                     <TextField
                         id="outlined-multiline-flexible"
                         name="description"
