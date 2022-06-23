@@ -4,8 +4,8 @@ import axiosClient from './axiosClient';
 
 const eventApi = {
     getAll: (params) => {
-        const url = '/event/geteventsbyname';
-        return axiosClient.get(url, { params });
+        const url = '/event/geteventsbysemester';
+        return axiosClient.get(url);
     },
     getEventBySemester: (params) => {
         const url = `/event/geteventsbysemester?semester=${params}`;
@@ -30,6 +30,14 @@ const eventApi = {
     createScheduleSession: (params, eventId) => {
         const url = `/eventschedule/headculture/addnewschedule/${eventId}`;
         return axiosClient.post(url, params);
+    },
+    updateEvent: (params, eventId) => {
+        const url = `/event/headculture/updateevent/${eventId}`;
+        return axiosClient.put(url, params);
+    },
+    getEventScheduleByEvent: (params) => {
+        const url = `/eventschedule/geteventschedulebyevent/${params}`;
+        return axiosClient.get(url);
     },
 };
 export default eventApi;

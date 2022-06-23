@@ -58,7 +58,7 @@ function Event() {
     return (
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                     Danh sách sự kiện
                 </Typography>
                 <Button

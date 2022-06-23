@@ -33,6 +33,8 @@ function RenderSelectEditCell(props) {
             const editProps = {
                 value: Number(event.target.value),
             };
+            console.log(event.target.value);
+            setIdRole(event.target.value);
             api.commitCellChange({ id, field, props: editProps });
             api.setCellMode(id, field, 'view');
             event.stopPropagation();
@@ -42,12 +44,7 @@ function RenderSelectEditCell(props) {
 
     return (
         <FormControl className={classes.formControl}>
-            <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={props.row.id}
-                onChange={handleChange}
-            >
+            <Select labelId="demo-simple-select-label" id="demo-simple-select" value={value} onChange={handleChange}>
                 {/* {roles.map((role, index) => (
                     <MenuItem value={role.roleId} key={index}>
                         {role.roleName}

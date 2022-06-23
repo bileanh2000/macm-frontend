@@ -71,7 +71,7 @@ function AddEvent() {
                 // setSnackBarStatus(true);
                 // snackBarStatus = true;
                 // dynamicAlert(snackBarStatus, res.message);
-                eventApi.createScheduleSession(previewData, eventId).then((res) => {
+                eventApi.createScheduleSession(previewData, response.data[0].id).then((res) => {
                     console.log('create event schedule', res);
                     console.log('create event schedule', res.data);
 

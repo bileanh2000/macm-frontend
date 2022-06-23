@@ -7,14 +7,17 @@ import MembershipFee from '../Pages/Admin/ClubFee/MembershipFee';
 import FacilityFee from '../Pages/Admin/ClubFee/FacilityFee';
 import ListEventsFee from '../Pages/Admin/ClubFee/ListEventsFee';
 import EventFee from '../Pages/Admin/ClubFee/ListEventsFee/EventFee';
+import ReportMembership from '../Pages/Admin/ClubFee/MembershipFee/ReportMembership';
+import Report from '../Pages/Admin/ClubFee/Report';
 import Contact from '../Pages/Admin/Contact';
 import Event from '../Pages/Admin/Event';
 
-import AddEvent from '../Pages/Admin/Event/AddEvent';
+import AddEvent from '../Pages/Admin/Event/addEvent';
 import EventDetails from '../Pages/Admin/Event/EventDetail';
 import MemberEvent from '../Pages/Admin/Event/MenberEvent';
 import MemberCancelEvent from '../Pages/Admin/Event/MenberEvent/MemberCancelEvent';
 import AddToAdmin from '../Pages/Admin/Event/MenberEvent/AddMemberToAdminEvent';
+
 import Facility from '../Pages/Admin/Facility';
 import News from '../Pages/Admin/News';
 import NewsDetail from '../Pages/Admin/News/NewsDetail/NewsDetail';
@@ -39,6 +42,8 @@ import EditEvent from '../Pages/Admin/Event/EditEvent';
 
 import Attendance from 'src/Pages/Admin/Attendance';
 import TakeAttendance from 'src/Pages/Admin/Attendance/TakeAttendance';
+import ViewEventSchedule from 'src/Pages/Admin/Event/ViewEventSchedule';
+import EditEventSchedule from 'src/Pages/Admin/Event/EditEventSchedule';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -73,6 +78,7 @@ const privateRouters = [
     { path: '/admin/clubfee/event', component: ListEventsFee },
     { path: '/admin/clubfee/event/:eventId', component: EventFee },
     { path: '/admin/clubfee/facility', component: FacilityFee },
+    { path: '/admin/clubfee/membership/report', component: ReportMembership },
 
     //Rule paths
     { path: '/admin/rules/*', component: Rules },
@@ -87,11 +93,15 @@ const privateRouters = [
     { path: '/admin/news/:newsId/edit', component: EditNews },
     { path: '/admin/news/:newsId', component: NewsDetail },
 
-    //Event
+    //Event path
     { path: '/admin/events', component: Event },
     { path: '/admin/events/add', component: AddEvent },
     { path: '/admin/events/:id', component: EventDetails },
+    { path: '/admin/events', component: Event },
+    //Event paths
     { path: '/admin/events/:id/edit', component: EditEvent },
+    { path: '/admin/events/:id/eventschedule', component: ViewEventSchedule },
+    { path: '/admin/events/:id/eventschedule/:eventScheduleId/edit', component: EditEventSchedule },
     { path: '/admin/events/member', component: MemberEvent },
     { path: '/admin/events/member/membercancel', component: MemberCancelEvent },
     { path: '/admin/events/member/addtoadmin', component: AddToAdmin },

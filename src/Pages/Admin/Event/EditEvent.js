@@ -13,6 +13,8 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    Snackbar,
+    Alert,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -30,11 +32,11 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import eventApi from 'src/api/eventApi';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
-function AddEvent() {
+function EditEvent() {
     const [isChecked, setIsChecked] = useState(false);
     const [description, setDescription] = useState('');
     const [submitData, setSubmitData] = useState([]);
@@ -45,6 +47,10 @@ function AddEvent() {
     const [previewData, setPreviewData] = useState([]);
     const [eventId, setEventId] = useState();
     const [events, setEvents] = useState([]);
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    let snackBarStatus;
+    const { id } = useParams();
+
     let navigator = useNavigate();
 
     const handleClickOpen = () => {
@@ -104,13 +110,19 @@ function AddEvent() {
     const handleClose = () => {
         setOpen(false);
     };
+    const handleCloseSnackBar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
 
+        setOpenSnackBar(false);
+    };
     useEffect(() => {
         const getListEventsBySemester = async () => {
             try {
-                const response = await eventApi.getEventBySemester('Summer2022');
+                const response = await eventApi.getAll();
                 let selectedEvent = response.data.filter((item) => item.id === parseInt(id));
-                console.log(selectedEvent.name);
+                // console.log(selectedEvent.name);
                 console.log(selectedEvent);
                 setEvents(selectedEvent);
                 console.log(response.data);
@@ -128,10 +140,10 @@ function AddEvent() {
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
             .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
-        numOfParticipants: Yup.number()
-            .required('Không được để trống trường này')
-            .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+        // numOfParticipants: Yup.number()
+        //     .required('Không được để trống trường này')
+        //     .typeError('Vui lòng nhập số')
+        //     .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
         // startTime: Yup.string().nullable().required('Không được để trống trường này'),
         // finishTime: Yup.string().nullable().required('Không được để trống trường này'),
         cost: Yup.string().required('Không được để trống trường này'),
@@ -152,45 +164,44 @@ function AddEvent() {
         mode: 'onBlur',
     });
 
-    const { id } = useParams();
-
-    const onSubmit = (data) => {
+    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
+    const dynamicAlert = (status, message) => {
+        console.log('status of dynamicAlert', status);
+        if (status) {
+            setCustomAlert({ severity: 'success', message: message });
+        } else {
+            setCustomAlert({ severity: 'error', message: message });
+        }
+    };
+    const onSubmit = async (data) => {
         let dataSubmit = {
+            name: data.name,
+            amount_per_register: data.amountPerRegister,
             maxQuantityComitee: data.maxQuantityComitee,
             description: description,
-            finishTime: moment(new Date(data.finishTime)).format('HH:mm:ss'),
-            startTime: moment(new Date(data.startTime)).format('HH:mm:ss'),
-            startDate: moment(new Date(data.startDate)).format('DD/MM/yyyy'),
-            finishDate: moment(new Date(data.finishDate)).format('DD/MM/yyyy'),
-            numOfParticipants: data.numOfParticipants,
-            name: data.name,
-            cash: data.cash,
-            cost: data.cost,
-            amountPerRegister: data.amountPerRegister,
+            totalAmount: data.totalAmount,
         };
+        await eventApi.updateEvent(dataSubmit, id).then((res) => {
+            console.log('1', res);
+            console.log('2', res.data);
+            if (res.data.length !== 0) {
+                setOpenSnackBar(true);
+                // setSnackBarStatus(true);
+                snackBarStatus = true;
+                dynamicAlert(snackBarStatus, res.message);
+            } else {
+                console.log('huhu');
+                setOpenSnackBar(true);
+                // setSnackBarStatus(false);
+                snackBarStatus = false;
+                dynamicAlert(snackBarStatus, res.message);
+            }
+        });
         setSubmitData(dataSubmit);
 
-        // eventApi.createPreviewEvent(dataSubmit).then((res) => {
-        //     console.log('1', res);
-        //     console.log('2', res.data);
-
-        //     if (res.data.length != 0) {
-        //         // setOpenSnackBar(true);
-        //         // setSnackBarStatus(true);
-        //         // snackBarStatus = true;
-        //         // dynamicAlert(snackBarStatus, res.message);
-        //         setPreviewData(res.data);
-        //         setOpen(true);
-        //     } else {
-        //         console.log('huhu');
-        //         // setOpenSnackBar(true);
-        //         // setSnackBarStatus(false);
-        //         // snackBarStatus = false;
-        //         // dynamicAlert(snackBarStatus, res.message);
-        //     }
-        // });
         console.log(dataSubmit);
     };
+
     const EventSchedule = previewData.map((item, index) => {
         const container = {};
         container['id'] = index;
@@ -198,17 +209,6 @@ function AddEvent() {
         container['title'] = item.title + '-' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
         container['backgroundColor'] = '#5ba8f5';
-
-        return container;
-    });
-
-    const EventInitial = events.map((item, index) => {
-        const container = {};
-        container['id'] = item.id;
-        container['name'] = item.name;
-        container['amountPerMemberRegister'] = item.amountPerMemberRegister;
-        container['maxQuantityComitee'] = item.maxQuantityComitee;
-        container['totalAmount'] = item.totalAmount;
 
         return container;
     });
@@ -239,9 +239,29 @@ function AddEvent() {
     };
     return (
         <Fragment>
-            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Chỉnh sửa sự kiện
-            </Typography>
+            <Snackbar
+                open={openSnackBar}
+                autoHideDuration={5000}
+                onClose={handleCloseSnackBar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={handleCloseSnackBar}
+                    variant="filled"
+                    severity={customAlert.severity || 'success'}
+                    sx={{ width: '100%' }}
+                >
+                    {customAlert.message}
+                </Alert>
+            </Snackbar>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <Typography variant="h4" component="div" sx={{ fontWeight: 500 }}>
+                    Chỉnh sửa thông tin sự kiện
+                </Typography>
+                <Button variant="contained" size="medium" component={Link} to={`../admin/events/${id}/eventschedule`}>
+                    Chỉnh sửa lịch sự kiện
+                </Button>
+            </Box>
             <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
                 <DialogTitle>Xem trước lịch sự kiện</DialogTitle>
                 <DialogContent sx={{ height: '590px' }}>
@@ -300,163 +320,167 @@ function AddEvent() {
                 autoComplete="off"
                 onSubmit={handleSubmit}
             >
-                <Box sx={{ width: '50%' }}>
-                    {/* {event.map((item, index)=>{})} */}
-                    <TextField
-                        id="outlined-basic"
-                        label="Tên sự kiện"
-                        variant="outlined"
-                        fullWidth
-                        defaultValue={EventInitial.name}
-                        {...register('name')}
-                        error={errors.name ? true : false}
-                        helperText={errors.name?.message}
-                    />
-                    <Grid container columns={12} spacing={2}>
-                        <Grid item xs={6}>
+                {events.map((item, index) => {
+                    return (
+                        <Box sx={{ width: '50%' }} key={index}>
                             <TextField
-                                type="number"
                                 id="outlined-basic"
-                                label="Dự kiến số người tham gia"
+                                label="Tên sự kiện"
                                 variant="outlined"
                                 fullWidth
-                                {...register('numOfParticipants')}
-                                error={errors.numOfParticipants ? true : false}
-                                helperText={errors.numOfParticipants?.message}
+                                defaultValue={item.name}
+                                {...register('name')}
+                                error={errors.name ? true : false}
+                                helperText={errors.name?.message}
                             />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                type="number"
-                                id="outlined-basic"
-                                label="Số người ban tổ chức"
-                                variant="outlined"
-                                fullWidth
-                                {...register('maxQuantityComitee')}
-                                error={errors.maxQuantityComitee ? true : false}
-                                helperText={errors.maxQuantityComitee?.message}
-                            />
-                        </Grid>
-                    </Grid>
-                    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                        <Grid container columns={12} spacing={2}>
-                            <Grid item xs={6}></Grid>
-                            <Grid item xs={6}></Grid>
-                        </Grid>
-                    </LocalizationProvider>
+                            <Grid container columns={12} spacing={2}>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        type="number"
+                                        id="outlined-basic"
+                                        label="Dự kiến số người tham gia"
+                                        variant="outlined"
+                                        fullWidth
+                                        {...register('numOfParticipants')}
+                                        error={errors.numOfParticipants ? true : false}
+                                        helperText={errors.numOfParticipants?.message}
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        type="number"
+                                        id="outlined-basic"
+                                        label="Số người ban tổ chức"
+                                        defaultValue={item.maxQuantityComitee}
+                                        variant="outlined"
+                                        fullWidth
+                                        {...register('maxQuantityComitee')}
+                                        error={errors.maxQuantityComitee ? true : false}
+                                        helperText={errors.maxQuantityComitee?.message}
+                                    />
+                                </Grid>
+                            </Grid>
+                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                                <Grid container columns={12} spacing={2}>
+                                    <Grid item xs={6}></Grid>
+                                    <Grid item xs={6}></Grid>
+                                </Grid>
+                            </LocalizationProvider>
 
-                    <Controller
-                        name="cost"
-                        variant="outlined"
-                        defaultValue=""
-                        control={control}
-                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                            <NumberFormat
+                            <Controller
                                 name="cost"
-                                customInput={TextField}
-                                label="Tổng chi phí tổ chức"
-                                thousandSeparator={true}
                                 variant="outlined"
-                                defaultValue=""
-                                value={value}
-                                onValueChange={(v) => {
-                                    onChange(Number(v.value));
-                                }}
-                                InputProps={{
-                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                }}
-                                error={invalid}
-                                helperText={invalid ? error.message : null}
-                                fullWidth
+                                defaultValue={item.totalAmount}
+                                control={control}
+                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                    <NumberFormat
+                                        name="totalAmount"
+                                        customInput={TextField}
+                                        label="Tổng chi phí tổ chức"
+                                        thousandSeparator={true}
+                                        variant="outlined"
+                                        defaultValue={item.totalAmount}
+                                        value={value}
+                                        onValueChange={(v) => {
+                                            onChange(Number(v.value));
+                                        }}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                        }}
+                                        error={invalid}
+                                        helperText={invalid ? error.message : null}
+                                        fullWidth
+                                    />
+                                )}
                             />
-                        )}
-                    />
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                        <FormControlLabel
-                            sx={{ marginLeft: '1px' }}
-                            control={<Switch checked={isChecked} onChange={() => setIsChecked(!isChecked)} />}
-                            label="Sử dụng tiền quỹ"
-                        />
-                        <Typography>Tổng tiền quỹ: 2.000.000 vnđ</Typography>
-                    </Box>
-                    <Collapse in={isChecked}>
-                        <Controller
-                            name="cash"
-                            variant="outlined"
-                            defaultValue=""
-                            control={control}
-                            render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                <NumberFormat
-                                    name="cost"
-                                    customInput={TextField}
-                                    label="Dùng quỹ CLB"
-                                    thousandSeparator={true}
-                                    onValueChange={(v) => {
-                                        onChange(Number(v.value));
-                                    }}
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                <FormControlLabel
+                                    sx={{ marginLeft: '1px' }}
+                                    control={<Switch checked={isChecked} onChange={() => setIsChecked(!isChecked)} />}
+                                    label="Sử dụng tiền quỹ"
+                                />
+                                <Typography>Tổng tiền quỹ: 2.000.000 vnđ</Typography>
+                            </Box>
+                            <Collapse in={isChecked}>
+                                <Controller
+                                    name="cash"
                                     variant="outlined"
                                     defaultValue=""
-                                    value={value}
-                                    InputProps={{
-                                        endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                    }}
-                                    error={invalid}
-                                    helperText={invalid ? error.message : null}
-                                    fullWidth
+                                    control={control}
+                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        <NumberFormat
+                                            name="cost"
+                                            customInput={TextField}
+                                            label="Dùng quỹ CLB"
+                                            thousandSeparator={true}
+                                            onValueChange={(v) => {
+                                                onChange(Number(v.value));
+                                            }}
+                                            variant="outlined"
+                                            defaultValue=""
+                                            value={value}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                            }}
+                                            error={invalid}
+                                            helperText={invalid ? error.message : null}
+                                            fullWidth
+                                        />
+                                    )}
                                 />
-                            )}
-                        />
-                    </Collapse>
-                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
-                        Dự kiến mỗi người phải đóng: 160k
-                    </Typography>
-                    <Controller
-                        name="amountPerRegister"
-                        variant="outlined"
-                        defaultValue=""
-                        control={control}
-                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                            <NumberFormat
+                            </Collapse>
+                            <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                                Dự kiến mỗi người phải đóng: 160k
+                            </Typography>
+                            <Controller
                                 name="amountPerRegister"
-                                customInput={TextField}
-                                label="Số tiền mỗi người cần phải đóng"
-                                thousandSeparator={true}
                                 variant="outlined"
-                                defaultValue=""
-                                value={value}
-                                onValueChange={(v) => {
-                                    onChange(Number(v.value));
-                                }}
-                                InputProps={{
-                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                }}
-                                error={invalid}
-                                helperText={invalid ? error.message : null}
-                                fullWidth
+                                defaultValue={item.amountPerMemberRegister}
+                                control={control}
+                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                    <NumberFormat
+                                        name="amountPerRegister"
+                                        customInput={TextField}
+                                        label="Số tiền mỗi người cần phải đóng"
+                                        thousandSeparator={true}
+                                        variant="outlined"
+                                        defaultValue={item.amountPerMemberRegister}
+                                        value={value}
+                                        onValueChange={(v) => {
+                                            onChange(Number(v.value));
+                                        }}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                        }}
+                                        error={invalid}
+                                        helperText={invalid ? error.message : null}
+                                        fullWidth
+                                    />
+                                )}
                             />
-                        )}
-                    />
-                    <TextField
-                        id="outlined-multiline-flexible"
-                        name="description"
-                        control={control}
-                        label="Nội dung"
-                        multiline
-                        maxRows={4}
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        fullWidth
-                        // {...register('content')}
-                    />
-                    <div className={cx('create-event-button')}>
-                        <Button variant="contained" onClick={handleSubmit(onSubmit)}>
-                            Tạo sự kiện
-                        </Button>
-                    </div>
-                </Box>
+                            <TextField
+                                id="outlined-multiline-flexible"
+                                name="description"
+                                control={control}
+                                label="Nội dung"
+                                multiline
+                                maxRows={4}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                fullWidth
+                                // {...register('content')}
+                            />
+                            <div className={cx('create-event-button')}>
+                                <Button variant="contained" onClick={handleSubmit(onSubmit)}>
+                                    Cập nhật thông tin
+                                </Button>
+                            </div>
+                        </Box>
+                    );
+                })}
             </Box>
         </Fragment>
     );
 }
 
-export default AddEvent;
+export default EditEvent;
