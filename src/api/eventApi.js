@@ -39,5 +39,9 @@ const eventApi = {
         const url = `/eventschedule/geteventschedulebyevent/${params}`;
         return axiosClient.get(url);
     },
+    deleteEvent: (params) => {
+        const url = `/event/headculture/deleteevent/${params}`;
+        return axiosClient.put(url);
+    },
 };
 export default eventApi;

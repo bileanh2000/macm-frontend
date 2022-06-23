@@ -7,7 +7,7 @@ import eventApi from 'src/api/eventApi';
 
 function EventDetail() {
     let { id } = useParams();
-    const [event, setEvent] = useState();
+    const [event, setEvent] = useState([]);
     const [eventName, setEventName] = useState();
     const getListEvents = async () => {
         try {
@@ -30,19 +30,35 @@ function EventDetail() {
 
     return (
         <Fragment>
-            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Thông tin sự kiện {id}
-            </Typography>
-            {event &&
-                event.map((item) => {
-                    return (
-                        <div key={item.id}>
-                            <p>{item.name}</p>
+            {event.map((item) => {
+                return (
+                    <Fragment key={item.id}>
+                        <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                            Thông tin sự kiện "{item.name}"
+                        </Typography>
+                        <div>
+                            {/* <p>{item.name}</p> */}
                             <p>{item.description}</p>
-                            <p>Số thành viên ban tổ chức: {item.maxQuantityComitee}</p>
+                            <div>
+                                <Typography variant="subtitle1">
+                                    <strong>Số thành viên ban tổ chức:</strong> {item.maxQuantityComitee}
+                                </Typography>
+                            </div>
+                            <div>
+                                <Typography>
+                                    <strong>Tổng chi phí: </strong> {item.totalAmount.toLocaleString('en-US')} vnđ
+                                </Typography>
+                            </div>
+                            <div>
+                                <Typography>
+                                    <strong>Số tiền mỗi người phải đóng: </strong>
+                                    {item.amountPerMemberRegister.toLocaleString('en-US')} vnđ
+                                </Typography>
+                            </div>
                         </div>
-                    );
-                })}
+                    </Fragment>
+                );
+            })}
         </Fragment>
     );
 }

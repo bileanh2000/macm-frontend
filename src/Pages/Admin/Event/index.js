@@ -1,4 +1,16 @@
-import { Box, Button, IconButton, MenuItem, TextField, Typography } from '@mui/material';
+import {
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    IconButton,
+    MenuItem,
+    TextField,
+    Typography,
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -6,7 +18,7 @@ import styles from './Event.module.scss';
 import classNames from 'classnames/bind';
 import { Link } from 'react-router-dom';
 import eventApi from 'src/api/eventApi';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import semesterApi from 'src/api/semesterApi';
 import moment from 'moment';
 
@@ -19,9 +31,17 @@ function Event() {
     const [pageSize, setPageSize] = useState(10);
     const [semester, setSemester] = useState('Summer2022');
     const [semesterList, setSemesterList] = useState([]);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [eventOnclick, SetEventOnclick] = useState({ name: '', id: '' });
 
     const handleChange = (event) => {
         setSemester(event.target.value);
+    };
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
     };
     const getListEventsBySemester = async (params) => {
         try {
@@ -55,8 +75,42 @@ function Event() {
     useEffect(() => {
         getListEventsBySemester(semester);
     }, [semester]);
+
+    const handleDelete = useCallback(
+        (id) => () => {
+            handleCloseDialog();
+            setTimeout(() => {
+                // const params = { studentId: id, semester: semester };
+                eventApi.deleteEvent(id).then((res) => {
+                    setEvents((prev) => prev.filter((item) => item.id !== id));
+                    console.log('delete', res);
+                    console.log('delete', res.data);
+                });
+            });
+        },
+        [],
+    );
     return (
         <Box>
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa sự kiện "${eventOnclick.name}"?`}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        "{eventOnclick.name}" sẽ được xóa khỏi danh sách sự kiện!
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>Từ chối</Button>
+                    <Button onClick={handleDelete(eventOnclick.id)} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                     Danh sách sự kiện
@@ -114,7 +168,14 @@ function Event() {
                                                 </div>
                                             </Box>
                                             <div className={cx('event-action')}>
-                                                <IconButton aria-label="delete" onClick={() => console.log('a')}>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    onClick={() => {
+                                                        handleOpenDialog();
+                                                        SetEventOnclick({ name: item.name, id: item.id });
+                                                        // handleDelete(item.id);
+                                                    }}
+                                                >
                                                     <DeleteIcon />
                                                 </IconButton>
                                                 <IconButton aria-label="edit" component={Link} to={`${item.id}/edit`}>
