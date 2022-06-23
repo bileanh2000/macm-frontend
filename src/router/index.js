@@ -12,7 +12,7 @@ import Report from '../Pages/Admin/ClubFee/Report';
 import Contact from '../Pages/Admin/Contact';
 import Event from '../Pages/Admin/Event';
 
-import AddEvent from '../Pages/Admin/Event/addEvent';
+import AddEvent from '../Pages/Admin/Event/AddEvent';
 import EventDetails from '../Pages/Admin/Event/EventDetail';
 import MemberEvent from '../Pages/Admin/Event/MenberEvent';
 import MemberCancelEvent from '../Pages/Admin/Event/MenberEvent/MemberCancelEvent';
