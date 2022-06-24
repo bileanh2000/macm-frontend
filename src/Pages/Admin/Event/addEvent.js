@@ -57,6 +57,7 @@ function AddEvent() {
             description: submitData.description,
             maxQuantityComitee: submitData.maxQuantityComitee,
             totalAmount: submitData.cost,
+            IsContinuous: submitData.IsContinuous,
         };
 
         eventApi.createEvent(params).then((response) => {
@@ -118,11 +119,10 @@ function AddEvent() {
         finishTime: Yup.string().nullable().required('Không được để trống trường này'),
         cost: Yup.string().required('Không được để trống trường này'),
         ...(isChecked && {
-            cash: Yup.string().required('Không được để trống trường này'),
+            amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
         }),
         startDate: Yup.string().nullable().required('Không được để trống trường này'),
         finishDate: Yup.string().nullable().required('Không được để trống trường này'),
-        amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
     });
     const {
         register,
@@ -147,6 +147,7 @@ function AddEvent() {
             cash: data.cash,
             cost: data.cost,
             amountPerRegister: data.amountPerRegister,
+            IsContinuous: isChecked,
         };
         setSubmitData(dataSubmit);
 
@@ -470,30 +471,30 @@ function AddEvent() {
                         <FormControlLabel
                             sx={{ marginLeft: '1px' }}
                             control={<Switch checked={isChecked} onChange={() => setIsChecked(!isChecked)} />}
-                            label="Sử dụng tiền quỹ"
+                            label="Yêu cầu thành viên đóng tiền"
                         />
-                        <Typography>Tổng tiền quỹ: 2.000.000 vnđ</Typography>
+                        {/* <Typography>Tổng tiền quỹ: 2.000.000 vnđ</Typography> */}
                     </Box>
                     <Collapse in={isChecked}>
                         <Controller
-                            name="cash"
+                            name="amountPerRegister"
                             variant="outlined"
                             defaultValue=""
                             control={control}
                             render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                 <NumberFormat
-                                    name="cost"
+                                    name="amountPerRegister"
                                     customInput={TextField}
-                                    label="Dùng quỹ CLB"
+                                    label="Số tiền mỗi người cần phải đóng"
                                     thousandSeparator={true}
-                                    onValueChange={(v) => {
-                                        onChange(Number(v.value));
-                                    }}
                                     variant="outlined"
                                     defaultValue=""
                                     value={value}
+                                    onValueChange={(v) => {
+                                        onChange(Number(v.value));
+                                    }}
                                     InputProps={{
-                                        endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                        endAdornment: <InputAdornment position="end">VND</InputAdornment>,
                                     }}
                                     error={invalid}
                                     helperText={invalid ? error.message : null}
@@ -502,35 +503,10 @@ function AddEvent() {
                             )}
                         />
                     </Collapse>
-                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                    {/* <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
                         Dự kiến mỗi người phải đóng: 160k
-                    </Typography>
-                    <Controller
-                        name="amountPerRegister"
-                        variant="outlined"
-                        defaultValue=""
-                        control={control}
-                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                            <NumberFormat
-                                name="amountPerRegister"
-                                customInput={TextField}
-                                label="Số tiền mỗi người cần phải đóng"
-                                thousandSeparator={true}
-                                variant="outlined"
-                                defaultValue=""
-                                value={value}
-                                onValueChange={(v) => {
-                                    onChange(Number(v.value));
-                                }}
-                                InputProps={{
-                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                }}
-                                error={invalid}
-                                helperText={invalid ? error.message : null}
-                                fullWidth
-                            />
-                        )}
-                    />
+                    </Typography> */}
+
                     <TextField
                         id="outlined-multiline-flexible"
                         name="description"

@@ -11,6 +11,7 @@ import {
     FormControl,
     FormControlLabel,
     FormGroup,
+    FormHelperText,
     FormLabel,
     Grid,
     Snackbar,
@@ -38,7 +39,7 @@ import { useNavigate } from 'react-router-dom';
 function AddSchedule() {
     moment().locale('vi');
     const [open, setOpen] = useState(false);
-    const [startDate, setStartDate] = useState(new Date());
+    const [startDate, setStartDate] = useState();
     const [endDate, setEndDate] = useState(new Date());
     const [submitData, setSubmitData] = useState();
     const [previewData, setPreviewData] = useState();
@@ -53,13 +54,25 @@ function AddSchedule() {
     };
 
     const schema = Yup.object().shape({
-        startDate: Yup.string().nullable().required('Điền đi'),
-        endDate: Yup.string().nullable().required('Điền đi'),
-        startTime: Yup.string().nullable().required('Điền đi'),
-        endTime: Yup.string().nullable().required('Điền đi'),
+        startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
+        endDate: Yup.date()
+            .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được bé hơn ngày bắt đầu`)
+            .typeError('Vui lòng không để trống trường này'),
+        startTime: Yup.date().typeError('Vui lòng không để trống trường này'),
+        endTime: Yup.date()
+            .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được bé hơn thời gian bắt đầu`)
+            .typeError('Vui lòng không để trống trường này'),
+        dayOfWeek: Yup.array()
+            .min(1)
+            .of(Yup.string().required('Vui lòng chọn ít nhất một ngày'))
+            .required('Vui lòng chọn ít nhất một ngày'),
     });
 
-    const { control, handleSubmit } = useForm({
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
         resolver: yupResolver(schema),
         mode: 'onBlur',
         defaultValues: {
@@ -251,7 +264,7 @@ function AddSchedule() {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Quay lại</Button>
+                    <Button onClick={handleClose}>Hủy bỏ</Button>
                     <Button onClick={handleCreate}>Đồng ý</Button>
                 </DialogActions>
             </Dialog>
@@ -298,10 +311,14 @@ function AddSchedule() {
                                 defaultValue={null}
                                 render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                     <TimePicker
-                                        label="Thời gian bắt đầu"
+                                        label="Thời gian bắt đầu mỗi buổi"
                                         ampm={false}
                                         value={value}
-                                        onChange={(value) => onChange(value)}
+                                        onChange={(value) => {
+                                            setStartDate(value);
+                                            console.log(value);
+                                            onChange(value);
+                                        }}
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
@@ -329,9 +346,9 @@ function AddSchedule() {
                                 render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                     <DatePicker
                                         label="Ngày kết thúc"
-                                        // minDate={new Date('2022-06-14')}
-                                        // minDate={startDate}
-                                        disablePast
+                                        // minDate={new Date('2022-06-29')}
+                                        minDate={startDate}
+                                        // disablePast
                                         disableFuture={false}
                                         inputFormat="dd/MM/yyyy"
                                         value={value}
@@ -363,7 +380,7 @@ function AddSchedule() {
                                 defaultValue={null}
                                 render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                     <TimePicker
-                                        label="Thời gian kết thúc"
+                                        label="Thời gian kết thúc mỗi buổi"
                                         ampm={false}
                                         value={value}
                                         onChange={(value) => onChange(value)}
@@ -394,14 +411,14 @@ function AddSchedule() {
                                 <Controller
                                     name="dayOfWeek"
                                     control={control}
-                                    render={({ field }) => (
+                                    render={({ field, fieldState: { error, invalid } }) => (
                                         <>
                                             {dayOfWeek.map((item) => (
                                                 <FormControlLabel
                                                     required={true}
                                                     key={item.value}
                                                     label={item.label}
-                                                    labelPlacement="end"
+                                                    error={invalid}
                                                     control={
                                                         <Checkbox
                                                             required
@@ -431,6 +448,9 @@ function AddSchedule() {
                                     )}
                                 />
                             </FormGroup>
+                            <FormHelperText>{errors.maxQuantityComitee ? true : false}</FormHelperText>
+                            {/* error={errors.maxQuantityComitee ? true : false}
+                                helperText={errors.maxQuantityComitee?.message} */}
                         </FormControl>
                     </Paper>
                 </Box>
