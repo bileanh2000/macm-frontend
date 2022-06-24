@@ -17,6 +17,7 @@ import Collapse from '@mui/material/Collapse';
 
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import InventoryIcon from '@mui/icons-material/Inventory';
 
 const cx = classNames.bind(styles);
 
@@ -67,7 +68,7 @@ function Sidebar() {
             <Divider />
             <ListItem button component={Link} to="/admin/facility">
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <InventoryIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Cơ Sở Vật Chất" />
             </ListItem>
