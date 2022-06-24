@@ -144,6 +144,13 @@ function Event() {
 
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Box sx={{ width: '80%' }}>
+                    {events && events.length === 0 ? (
+                        <Typography variant="h5" sx={{ textAlign: 'center', mt: 3 }}>
+                            KHÔNG CÓ SỰ KIỆN NÀO TRONG KỲ
+                        </Typography>
+                    ) : (
+                        ''
+                    )}
                     <ul>
                         {events &&
                             events.map((item) => {
@@ -153,13 +160,14 @@ function Event() {
                                             <Box component={Link} to={`${item.id}`}>
                                                 <div className={cx('event-list')}>
                                                     <div className={cx('event-status')}>
-                                                        <p className={cx('upcoming')}>
-                                                            {item.status === 'Chưa diễn ra'
-                                                                ? 'Sắp diễn ra'
-                                                                : item.status === 'Đang diễn ra'
-                                                                ? 'Đang diễn ra'
-                                                                : 'Đã kết thúc'}
-                                                        </p>
+                                                        {/* <p className={cx('upcoming')}> */}
+                                                        {item.status === 'Chưa diễn ra' ? (
+                                                            <p className={cx('upcoming')}>Sắp diễn ra</p>
+                                                        ) : item.status === 'Đang diễn ra' ? (
+                                                            <p className={cx('going-on')}>Đang diễn ra</p>
+                                                        ) : (
+                                                            <p className={cx('closed')}>Đã kết thúc</p>
+                                                        )}
                                                     </div>
                                                     <div className={cx('event-title')}>{item.name}</div>
                                                     <div className={cx('event-date')}>
@@ -168,16 +176,21 @@ function Event() {
                                                 </div>
                                             </Box>
                                             <div className={cx('event-action')}>
-                                                <IconButton
-                                                    aria-label="delete"
-                                                    onClick={() => {
-                                                        handleOpenDialog();
-                                                        SetEventOnclick({ name: item.name, id: item.id });
-                                                        // handleDelete(item.id);
-                                                    }}
-                                                >
-                                                    <DeleteIcon />
-                                                </IconButton>
+                                                {item.status === 'Chưa diễn ra' ? (
+                                                    <IconButton
+                                                        aria-label="delete"
+                                                        onClick={() => {
+                                                            handleOpenDialog();
+                                                            SetEventOnclick({ name: item.name, id: item.id });
+                                                            // handleDelete(item.id);
+                                                        }}
+                                                    >
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                ) : (
+                                                    ''
+                                                )}
+
                                                 <IconButton aria-label="edit" component={Link} to={`${item.id}/edit`}>
                                                     <EditIcon />
                                                 </IconButton>

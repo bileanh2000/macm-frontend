@@ -102,9 +102,9 @@ const privateRouters = [
     { path: '/admin/events/:id/edit', component: EditEvent },
     { path: '/admin/events/:id/eventschedule', component: ViewEventSchedule },
     { path: '/admin/events/:id/eventschedule/:eventScheduleId/edit', component: EditEventSchedule },
-    { path: '/admin/events/member', component: MemberEvent },
-    { path: '/admin/events/member/membercancel', component: MemberCancelEvent },
-    { path: '/admin/events/member/addtoadmin', component: AddToAdmin },
+    { path: '/admin/events/:id/members', component: MemberEvent },
+    { path: '/admin/events/:id/membercancel', component: MemberCancelEvent },
+    { path: '/admin/events/:id/member/addtoadmin', component: AddToAdmin },
 ];
 
 const publicRouters = [];
