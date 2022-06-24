@@ -1,85 +1,66 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
-import clsx from 'clsx';
-import { useLocation } from 'react-router-dom';
 import { Typography } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 import moment from 'moment';
 
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 
-function ReportMembership() {
-    const [pageSize, setPageSize] = useState(10);
-    const [membershipReport, setMembershipReport] = useState([]);
-    const location = useLocation();
-    const semester = location.state?.semester;
+function EventFeeReport() {
     moment().locale('vi');
+    const location = useLocation();
+    const event = location.state?.event;
+    const [pageSize, setPageSize] = useState(10);
+    const [userPaymentReport, setUserPaymentReport] = useState([]);
 
-    const getReportMembership = async () => {
+    console.log(event);
+
+    const getReportEvent = async () => {
         try {
-            const response = await adminClubFeeAPI.getReportMembership(semester.id);
-            setMembershipReport(response.data);
-            console.log(response.data);
+            if (event) {
+                const response = await adminClubFeeAPI.getReportEvent(event.id);
+                setUserPaymentReport(response.data);
+                console.log(response.data);
+            }
         } catch (error) {
-            console.log('khong lay duoc roi dm');
+            console.log('Không thể lấy dữ liệu');
         }
     };
 
     useEffect(() => {
-        getReportMembership();
+        getReportEvent();
     }, []);
 
     const columns = [
         { field: 'date', type: 'date', headerName: 'Ngày chỉnh sửa', flex: 0.5 },
-        { field: 'time', headerName: 'Thời gian chỉnh sửa', flex: 0.8 },
-        { field: 'note', headerName: 'Nội dung chỉnh sửa', flex: 1.5 },
-        //{ field: 'studentName', headerName: 'Tên người bị sửa', flex: 0.8 },
-
+        { field: 'time', headerName: 'Thời gian chỉnh sửa', flex: 0.5 },
+        { field: 'note', headerName: 'Nội dung chỉnh sửa', flex: 1 },
+        { field: 'studentName', headerName: 'Tên', flex: 0.8 },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
             width: 150,
-            flex: 0.5,
-        },
-        {
-            field: 'fundChange',
-            headerName: 'Số tiền',
-            flex: 0.5,
-            cellClassName: (params) => {
-                if (params.value == null) {
-                    return '';
-                }
-                return clsx('status-rows', {
-                    active: params.row.paymentStatus === true,
-                    deactive: params.row.paymentStatus === false,
-                });
-            },
+            flex: 0.6,
         },
         {
             field: 'updatedBy',
             headerName: 'Chỉnh sửa bởi',
             width: 150,
-            flex: 0.5,
+            flex: 0.6,
         },
-        { field: 'fundBalance', headerName: 'Số dư', flex: 0.5 },
     ];
-    const rowsUser = membershipReport.map((item, index) => {
+
+    const rowsUser = userPaymentReport.map((item, index) => {
         const container = {};
         container['id'] = item.id;
         container['date'] = moment(new Date(item.createdOn)).format('DD-MM-yyyy');
         container['time'] = moment(new Date(item.createdOn)).format('HH:mm:ss');
         container['studentName'] = item.userName;
         container['studentId'] = item.userStudentId;
-        container['paymentStatus'] = item.paymentStatus;
         container['note'] =
-            item.paymentStatus == true
-                ? `Cập nhật thành viên "${item.userName}" đã đóng tiền `
-                : `Cập nhật thành viên "${item.userName}" chưa đóng tiền`;
-        container['fundChange'] =
-            item.fundChange > 0
-                ? '+' + item.fundChange.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-                : item.fundChange.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
-        container['fundBalance'] = item.fundBalance.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+            item.fundChange == true ? 'Thay đổi trạng thái thành đã đóng' : 'Thay đổi trạng thái thành chưa đóng';
+        container['fundChange'] = item.fundChange;
         container['updatedBy'] = item.createdBy;
         return container;
     });
@@ -100,15 +81,24 @@ function ReportMembership() {
     }
     return (
         <div>
-            {semester && (
+            {event && (
                 <Box>
-                    <Typography variant="h3">Lịch sử thay đổi chi phí câu lạc bộ</Typography>
-                    <Typography variant="h5">Học kì: {semester.name}</Typography>
+                    <Typography variant="h3">Lịch sử thay đổi sự kiện</Typography>
+                    <Typography variant="h5">{event.name}</Typography>
                 </Box>
             )}
             <Box
                 sx={{
                     height: '70vh',
+                    width: '100%',
+                    '& .status-rows': {
+                        justifyContent: 'center !important',
+                        minHeight: '0px !important',
+                        maxHeight: '35px !important',
+                        borderRadius: '100px',
+                        position: 'relative',
+                        top: '9px',
+                    },
                     '& .status-rows.active': {
                         backgroundColor: '#56f000',
                         color: '#fff',
@@ -123,7 +113,7 @@ function ReportMembership() {
                 }}
             >
                 <DataGrid
-                    loading={!membershipReport.length}
+                    loading={!userPaymentReport.length}
                     disableSelectionOnClick={true}
                     rows={rowsUser}
                     columns={columns}
@@ -139,4 +129,4 @@ function ReportMembership() {
     );
 }
 
-export default ReportMembership;
+export default EventFeeReport;

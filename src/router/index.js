@@ -8,6 +8,7 @@ import FacilityFee from '../Pages/Admin/ClubFee/FacilityFee';
 import ListEventsFee from '../Pages/Admin/ClubFee/ListEventsFee';
 import EventFee from '../Pages/Admin/ClubFee/ListEventsFee/EventFee';
 import ReportMembership from '../Pages/Admin/ClubFee/MembershipFee/ReportMembership';
+import ReportEvent from '../Pages/Admin/ClubFee/ListEventsFee/EventFeeReport';
 import Report from '../Pages/Admin/ClubFee/Report';
 import Contact from '../Pages/Admin/Contact';
 import Event from '../Pages/Admin/Event';
@@ -77,6 +78,7 @@ const privateRouters = [
     { path: '/admin/clubfee/membership', component: MembershipFee },
     { path: '/admin/clubfee/event', component: ListEventsFee },
     { path: '/admin/clubfee/event/:eventId', component: EventFee },
+    { path: '/admin/clubfee/event/:eventId/report', component: ReportEvent },
     { path: '/admin/clubfee/facility', component: FacilityFee },
     { path: '/admin/clubfee/membership/report', component: ReportMembership },
 
