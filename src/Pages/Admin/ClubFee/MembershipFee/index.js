@@ -4,7 +4,7 @@ import { Alert, Box, Button, FormControl, Grid, MenuItem, Select, Snackbar, Typo
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import React, { Fragment, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 import EditFee from '../EditFee/EditFee';
 
@@ -15,6 +15,7 @@ function MembershipFee() {
     const [pageSize, setPageSize] = useState(10);
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [semesterId, setSemesterId] = useState();
+    const [semesterName, setSemesterName] = useState();
     const [currentSemester, setCurrentSemester] = useState({});
     const history = useNavigate();
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
@@ -48,6 +49,7 @@ function MembershipFee() {
             const response = await adminClubFeeAPI.getSemester();
             const array = response.data;
             setSemesterId(Math.max(...array.map((o) => o.id)));
+            setSemesterName(array.find((semester) => semester.id == Math.max(...array.map((o) => o.id))).name);
             setSemesterList(response.data);
         } catch (error) {
             console.log('Không thể lấy được dữ liệu các kì, error: ', error);
@@ -83,6 +85,7 @@ function MembershipFee() {
     const handleChangeSemester = (e) => {
         console.log(e.target.value);
         setSemesterId(e.target.value);
+        setSemesterName(semesterList.find((semester) => semester.id == e.target.value).name);
         getListMemberShip(e.target.value);
         getAmount(semesterList.find((semester) => semester.id == e.target.value).name);
     };
@@ -297,6 +300,22 @@ function MembershipFee() {
                 </Grid>
                 <Grid item xs={4}>
                     <Typography variant="h6" sx={{ float: 'right' }}>
+                        {semesterList && (
+                            <Button variant="contained" color="success">
+                                <Link
+                                    to="./report"
+                                    state={{
+                                        semester: {
+                                            id: semesterId,
+                                            name: semesterName,
+                                        },
+                                    }}
+                                    style={{ color: 'white' }}
+                                >
+                                    Lịch sử chỉnh sửa
+                                </Link>
+                            </Button>
+                        )}
                         {/* Đã đóng: {totalActive}/{totalResult} */}
                     </Typography>
                 </Grid>

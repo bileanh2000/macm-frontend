@@ -79,6 +79,13 @@ function Sidebar() {
                 <ListItemText primary="Quản Lý Lịch Tập" />
             </ListItem>
             <Divider />
+            <ListItem button component={Link} to="/admin/attendance">
+                <ListItemIcon>
+                    <PeopleAltRoundedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Quản Lý Điểm danh" />
+            </ListItem>
+            <Divider />
             <ListItem button component={Link} to="/admin/contact">
                 <ListItemIcon>
                     <PeopleAltRoundedIcon />

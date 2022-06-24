@@ -183,7 +183,7 @@ function TakeAttendance() {
                 </Alert>
             </Snackbar>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Trạng thái điểm danh ngày: {_nowDate.toLocaleDateString('vi-VN')}
+                Trạng thái điểm danh ngày: {_nowDate}
                 <Typography variant="h6">
                     Số người tham gia hôm nay {attendance}/{userList.length}
                 </Typography>
