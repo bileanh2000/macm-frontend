@@ -14,7 +14,7 @@ import { useForm, Controller } from 'react-hook-form';
 import eventApi from 'src/api/eventApi';
 function UpdateSchedule() {
     const currentDate = new Date();
-    const { eventScheduleId } = useParams();
+    const { scheduleId } = useParams();
 
     const [open, setOpen] = useState(false);
     // const { scheduleId } = useParams();
@@ -43,14 +43,14 @@ function UpdateSchedule() {
         window.scrollTo(0, 0);
         const fetchSchedule = async () => {
             try {
-                const response = await eventApi.getEventScheduleByEvent(eventScheduleId);
+                const response = await trainingSchedule.getAllSchedule();
                 console.log(
                     'Thanh cong roi: ',
-                    response.data.filter((item) => item.id === parseInt(eventScheduleId)),
+                    response.data.filter((item) => item.id === parseInt(scheduleId)),
                 );
 
-                console.log('scheduleId ', eventScheduleId);
-                let dataSelected = response.data.filter((item) => item.id === parseInt(eventScheduleId));
+                console.log('scheduleId ', scheduleId);
+                let dataSelected = response.data.filter((item) => item.id === parseInt(scheduleId));
                 let dateSelected = dataSelected[0].date;
                 setScheduleList(dataSelected);
                 setSelectedDate(new Date(dateSelected));
@@ -71,7 +71,7 @@ function UpdateSchedule() {
 
     const handleConfirmDialog = async () => {
         setOpen(false);
-        await trainingSchedule.deleteSession(eventScheduleId).then((res) => {
+        await trainingSchedule.deleteSession(scheduleId).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
             console.log('3', res.message);
@@ -109,7 +109,7 @@ function UpdateSchedule() {
     let navigate = useNavigate();
     const onSubmit = async (data) => {
         data = {
-            id: parseInt(eventScheduleId, 10),
+            id: parseInt(scheduleId, 10),
             date: moment(dateValue).format('yyyy-MM-DD'),
             startTime: data.startTime,
             finishTime: data.finishTime,
@@ -172,7 +172,7 @@ function UpdateSchedule() {
             </Dialog>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" color="initial" sx={{ marginBottom: '16px', fontWeight: '700' }}>
-                    Cập nhật buổi tập {eventScheduleId}
+                    Cập nhật buổi tập {scheduleId}
                 </Typography>
                 {selectedDate <= currentDate ? (
                     ''
