@@ -105,16 +105,6 @@ function ViewEventSchedule() {
                         eventClick={(args) => {
                             navigateToUpdate(args.event.id);
                         }}
-                        // dateClick={function (arg) {
-                        //     swal({
-                        //         title: 'Date',
-                        //         text: arg.dateStr,
-                        //         type: 'success',
-                        //     });
-                        // }}
-                        // selectable
-                        // select={handleEventAdd}
-                        // eventDrop={(e) => console.log(e)}
                     />
                 </div>
             </div>

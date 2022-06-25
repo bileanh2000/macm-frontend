@@ -133,11 +133,12 @@ function TrainingSchedule() {
                         // events={[
                         //     {
                         //         id: 1,
-                        //         title: 'đi tập đi đmm',
-                        //         date: '2022-06-16',
+                        //         title: 'Teambuiding Tam đảo 18:00-19:00',
+                        //         start: '2022-06-24',
+                        //         end: '2022-06-27',
                         //         // display: 'background',
                         //         // textColor: 'white',
-                        //         backgroundColor: '#5ba8f5',
+                        //         // backgroundColor: '#5ba8f5',
                         //         classNames: ['test-css'],
                         //     },
                         // ]}

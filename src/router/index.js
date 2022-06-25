@@ -13,7 +13,7 @@ import Report from '../Pages/Admin/ClubFee/Report';
 import Contact from '../Pages/Admin/Contact';
 import Event from '../Pages/Admin/Event';
 
-import AddEvent from '../Pages/Admin/Event/addEvent';
+import AddEvent from '../Pages/Admin/Event/AddEvent';
 import EventDetails from '../Pages/Admin/Event/EventDetail';
 import MemberEvent from '../Pages/Admin/Event/MenberEvent';
 import MemberCancelEvent from '../Pages/Admin/Event/MenberEvent/MemberCancelEvent';
@@ -106,12 +106,13 @@ const privateRouters = [
     { path: '/admin/events/:id', component: EventDetails },
     { path: '/admin/events', component: Event },
     //Event paths
+    { path: '/admin/events/add', component: AddEvent },
     { path: '/admin/events/:id/edit', component: EditEvent },
     { path: '/admin/events/:id/eventschedule', component: ViewEventSchedule },
     { path: '/admin/events/:id/eventschedule/:eventScheduleId/edit', component: EditEventSchedule },
-    { path: '/admin/events/member', component: MemberEvent },
-    { path: '/admin/events/member/membercancel', component: MemberCancelEvent },
-    { path: '/admin/events/member/addtoadmin', component: AddToAdmin },
+    { path: '/admin/events/:id/members', component: MemberEvent },
+    { path: '/admin/events/:id/membercancel', component: MemberCancelEvent },
+    { path: '/admin/events/:id/member/addtoadmin', component: AddToAdmin },
 ];
 
 const publicRouters = [];
