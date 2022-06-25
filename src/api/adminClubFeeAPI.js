@@ -48,12 +48,12 @@ const adminClubFeeAPI = {
     },
 
     getUserJoinEvent: (eventId) => {
-        const url = `/event/headculture/getallmemberevent/${eventId}`;
+        const url = `/event/headculture/getmemberjoinevent/${eventId}`;
         return axiosClient.get(url);
     },
 
     updateUserPayment: (id) => {
-        const url = `/event/treasurer/updateusereventpaymentstatus/${id}`;
+        const url = `/event/treasurer/updatemembereventpaymentstatus/${id}`;
         return axiosClient.put(url);
     },
 

@@ -1,0 +1,13 @@
+.tournament-container {
+    width: 90%;
+    border: 1px solid black;
+    margin: auto;
+    padding: 3rem;
+    border-radius: 1rem;
+    .tournament-title {
+        padding-bottom: 1em;
+    }
+    .tournament-actions {
+        float: right;
+    }
+}

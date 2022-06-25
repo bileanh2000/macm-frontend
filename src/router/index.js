@@ -26,7 +26,10 @@ import EditNews from '../Pages/Admin/News/EditNews/EditNews';
 import CreateNews from '../Pages/Admin/News/CreateNews/CreateNews';
 import Rules from '../Pages/Admin/Rules';
 import TrainingSchedule from '../Pages/Admin/TrainingSchedule';
+
 import Tournament from '../Pages/Admin/Tournament';
+import CreateTourament from '../Pages/Admin/Tournament/CreateTournament';
+
 import CreateRule from '../Pages/Admin/Rules/CreateRule/CreateRule';
 import EditRule from '../Pages/Admin/Rules/EditRule/EditRule';
 import EditContact from '../Pages/Admin/Contact/EditContact/EditContact';
@@ -87,7 +90,9 @@ const privateRouters = [
     { path: '/admin/rules/create', component: CreateRule },
     { path: '/admin/rules/edit', component: EditRule },
 
+    //Tournament
     { path: '/admin/tournament', component: Tournament },
+    { path: '/admin/tournament/create', component: CreateTourament },
 
     //News paths
     { path: '/admin/news', component: News },

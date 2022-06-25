@@ -106,13 +106,11 @@ function EventFee() {
                             onClick={() => toggleStatus(params.row.id)}
                             color="primary"
                             aria-details="Đã đóng"
-                            disabled={true}
                         />,
                         <GridActionsCellItem
                             icon={<RadioButtonUnchecked />}
                             label="Chưa đóng"
                             onClick={() => toggleStatus(params.row.id)}
-                            disabled={true}
                         />,
                     ];
                 }

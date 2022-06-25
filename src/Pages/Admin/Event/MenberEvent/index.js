@@ -1,7 +1,6 @@
 import { Button, FormControl, Grid, MenuItem, Select, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Header from './Header';
 import MemberList from './MemberList';
 
 const _memberList = [
