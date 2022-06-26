@@ -46,11 +46,13 @@ const adminTournament = {
         const url = `/tournamentschedule/headclub/addnewschedule/${tournamentId}`;
         return axiosClient.post(url, params, { params: { isOverwritten: true } });
     },
-    ///////////////////////////
-    getEventScheduleByEvent: (params) => {
-        const url = `/eventschedule/geteventschedulebyevent/${params}`;
+
+    getTournamentSchedule: (params) => {
+        const url = `/tournamentschedule/headclub/tournamentschedule/${params}`;
         return axiosClient.get(url);
     },
+    ///////////////////////////
+
     deleteEvent: (params) => {
         const url = `/event/headculture/deleteevent/${params}`;
         return axiosClient.put(url);

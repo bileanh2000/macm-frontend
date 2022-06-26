@@ -106,36 +106,34 @@ function UpdateTournament() {
     };
 
     const onUpdateTournament = (data) => {
-        // let dataSubmit = {
-        //     description: data.description,
-        //     // totalAmount: data.totalAmount,
-        //     amount_per_register: data.amountPerRegister,
-        //     competitiveTypes: datasFightingCompetition,
-        //     description: data.description,
-        //     exhibitionTypes: datasPerformanceCompetition,
-        //     maxQuantityComitee: data.numOfParticipants,
-        //     totalAmount: data.cost,
-        //     name: data.tournamentName,
-        // };
-        console.log('loz');
-        console.log(data);
+        let dataSubmit = {
+            description: data.description,
+            // totalAmount: data.totalAmount,
+            amount_per_register: data.amountPerRegister,
+            competitiveTypesDto: datasFightingCompetition,
+            description: data.description,
+            exhibitionTypesDto: datasPerformanceCompetition,
+            maxQuantityComitee: data.numOfParticipants,
+            totalAmount: data.cost,
+            name: data.tournamentName,
+        };
 
-        // adminTournament.updateTournament(dataSubmit, tournamentId).then((res) => {
-        //     console.log('1', res);
-        //     console.log('2', res.data);
-        //     if (res.data.length !== 0) {
-        //         setOpenSnackBar(true);
-        //         // setSnackBarStatus(true);
-        //         snackBarStatus = true;
-        //         dynamicAlert(snackBarStatus, res.message);
-        //     } else {
-        //         console.log('huhu');
-        //         setOpenSnackBar(true);
-        //         // setSnackBarStatus(false);
-        //         snackBarStatus = false;
-        //         dynamicAlert(snackBarStatus, res.message);
-        //     }
-        // });
+        adminTournament.updateTournament(dataSubmit, tournamentId).then((res) => {
+            console.log('1', res);
+            console.log('2', res.data);
+            if (res.data.length !== 0) {
+                setOpenSnackBar(true);
+                // setSnackBarStatus(true);
+                snackBarStatus = true;
+                dynamicAlert(snackBarStatus, res.message);
+            } else {
+                console.log('huhu');
+                setOpenSnackBar(true);
+                // setSnackBarStatus(false);
+                snackBarStatus = false;
+                dynamicAlert(snackBarStatus, res.message);
+            }
+        });
     };
 
     const handleCloseSnackBar = (event, reason) => {
@@ -179,7 +177,7 @@ function UpdateTournament() {
                     variant="contained"
                     size="medium"
                     component={Link}
-                    to={`../admin/events/${tournamentId}/eventschedule`}
+                    to={`../admin/tournament/${tournamentId}/tournamentschedule`}
                 >
                     Chỉnh sửa lịch giải đấu
                 </Button>
