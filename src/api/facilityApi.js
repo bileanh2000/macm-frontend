@@ -26,8 +26,12 @@ const facilityApi = {
         return axiosClient.put(url, data);
     },
 
-    getAllFacilityReport: () => {
-        const url = `/facility/headtechnique/getfacilityreport`;
+    getAllFacilityReport: (select) => {
+        const url = `/facility/headtechnique/getfacilityreport?filterIndex=${select}`;
+        return axiosClient.get(url);
+    },
+    getAllRequest: () => {
+        const url = `/facility/treasurer/getallrequesttobuyfacility?pageNo=0&pageSize=10000&sortBy=id`;
         return axiosClient.get(url);
     },
 
