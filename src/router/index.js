@@ -28,7 +28,14 @@ import Rules from '../Pages/Admin/Rules';
 import TrainingSchedule from '../Pages/Admin/TrainingSchedule';
 
 import Tournament from '../Pages/Admin/Tournament';
+import DetailTournament from '../Pages/Admin/Tournament/DetailTournament';
 import CreateTourament from '../Pages/Admin/Tournament/CreateTournament';
+import UpdateTournament from '../Pages/Admin/Tournament/UpdateTournament';
+import TournamentSchedule from '../Pages/Admin/Tournament/TournamentSchedule';
+import UpdateTouramentSchedule from '../Pages/Admin/Tournament/TournamentSchedule/UpdateTouramentSchedule';
+import AdminTournament from '../Pages/Admin/Tournament/AdminTournament';
+import AddAdminTourament from '../Pages/Admin/Tournament/AdminTournament/AddAdminTourament';
+import MemberTournament from '../Pages/Admin/Tournament/MemberTournament';
 
 import CreateRule from '../Pages/Admin/Rules/CreateRule/CreateRule';
 import EditRule from '../Pages/Admin/Rules/EditRule/EditRule';
@@ -92,7 +99,14 @@ const privateRouters = [
 
     //Tournament
     { path: '/admin/tournament', component: Tournament },
+    { path: '/admin/tournament/:tournamentId', component: DetailTournament },
     { path: '/admin/tournament/create', component: CreateTourament },
+    { path: '/admin/tournament/:tournamentId/update', component: UpdateTournament },
+    { path: '/admin/tournament/:tournamentId/tournamentschedule', component: TournamentSchedule },
+    { path: '/admin/tournament/:tournamentId/tournamentschedule/:update', component: UpdateTouramentSchedule },
+    { path: '/admin/tournament/:tournamentId/admin', component: AdminTournament },
+    { path: '/admin/tournament/:tournamentId/addadmin', component: AddAdminTourament },
+    { path: '/admin/tournament/:tournamentId/members', component: MemberTournament },
 
     //News paths
     { path: '/admin/news', component: News },
@@ -102,10 +116,7 @@ const privateRouters = [
 
     //Event path
     { path: '/admin/events', component: Event },
-    { path: '/admin/events/add', component: AddEvent },
     { path: '/admin/events/:id', component: EventDetails },
-    { path: '/admin/events', component: Event },
-    //Event paths
     { path: '/admin/events/add', component: AddEvent },
     { path: '/admin/events/:id/edit', component: EditEvent },
     { path: '/admin/events/:id/eventschedule', component: ViewEventSchedule },

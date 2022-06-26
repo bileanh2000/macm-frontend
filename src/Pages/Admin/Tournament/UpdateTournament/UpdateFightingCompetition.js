@@ -16,24 +16,44 @@ import {
     TableRow,
     TextField,
 } from '@mui/material';
-import React, { useState } from 'react';
-import { Add } from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
+import { Add, DataArray } from '@mui/icons-material';
 import { Delete } from '@mui/icons-material';
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
-function FightingCompetition(props) {
+function UpdateFightingCompetition(props) {
     const [datas, setDatas] = useState(props.data);
     const [isChecked, setIsChecked] = useState(false);
     const [gender, setGender] = useState(1);
-    //const [weightText, setWeightText] = useState(weightMale[0].weight);
+
     const [weightRangeMale, setWeightRangeMale] = useState([]);
     const [weightRangeFemale, setWeightRangeFemale] = useState([]);
 
     const handleChange = (event) => {
+        console.log(event.target.value);
         setGender(event.target.value);
     };
+
+    const getData = (datas) => {
+        datas &&
+            datas.map((data) => {
+                let newWeightRange = [];
+                let i;
+                for (i = data.weightMin; i < data.weightMax; i = i + 0.5) {
+                    newWeightRange.push(i);
+                }
+                if (data.gender === 0) {
+                    setWeightRangeFemale(weightRangeFemale.concat(newWeightRange));
+                } else {
+                    setWeightRangeMale(weightRangeMale.concat(newWeightRange));
+                }
+            });
+    };
+    useEffect(() => {
+        getData(props.data);
+    }, []);
 
     function checkContain(arr1, arr2) {
         return arr1.some((item) => arr2.includes(item));
@@ -79,9 +99,11 @@ function FightingCompetition(props) {
             });
         } else {
             if (checkWeight(gender, data.weightMin, data.weightMax)) {
+                console.log('female', weightRangeFemale, 'male', weightRangeMale);
                 const newData = [...datas, { ...data, gender, id: Math.random() }];
                 setDatas(newData);
                 props.onAddFightingCompetition(newData);
+                console.log(newData);
                 setIsChecked(!isChecked);
                 reset({
                     weightMin: '',
@@ -236,4 +258,4 @@ function FightingCompetition(props) {
         </Paper>
     );
 }
-export default FightingCompetition;
+export default UpdateFightingCompetition;

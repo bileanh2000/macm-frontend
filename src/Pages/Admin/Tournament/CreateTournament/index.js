@@ -27,35 +27,29 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import classNames from 'classnames/bind';
 import moment from 'moment';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import styles from './CreateTournament.module.scss';
 import FightingCompetition from './FightingCompetition';
 import PerformanceCompetition from './PerformanceCompetition';
+import PreviewData from './PreviewData';
+import adminTournamentAPI from 'src/api/adminTournamentAPI';
 
 const cx = classNames.bind(styles);
 
-const _datas = [
-    { gender: 'Nam', weight: ['42-45 kg', '45-48 kg'] },
-    { gender: 'Nữ', weight: ['39-42 kg', '42-45 kg'] },
-];
-
-const _datas1 = [
-    { id: 0, name: 'Long hổ quyền', male: 3, female: 0 },
-    { id: 1, name: 'Ngũ môn quyền', male: 1, female: 0 },
-    { id: 2, name: 'Tinh hoa lưỡng nghi kiếm pháp', male: 0, female: 1 },
-    { id: 3, name: 'Tự vệ nữ', male: 1, female: 1 },
-];
-
 function CreateTourament() {
-    const [datasFightingCompetition, setDataFightingCompetition] = useState(_datas);
-    const [datasPerformanceCompetition, setDataPerformanceCompetition] = useState(_datas1);
+    const [datasFightingCompetition, setDataFightingCompetition] = useState([]);
+    const [datasPerformanceCompetition, setDataPerformanceCompetition] = useState([]);
     const [open, setOpen] = useState(false);
+    const [submitData, setSubmitData] = useState([]);
     const [isChecked, setIsChecked] = useState(false);
+    const [isOverride, setIsOverride] = useState(-1);
     const [description, setDescription] = useState('');
+    const [touramentId, setTouramentId] = useState();
+    const [tourament, setTourament] = useState([]);
     const [previewTournament, setPreviewTournament] = useState([]);
-
-    console.log(datasFightingCompetition, datasPerformanceCompetition);
+    const [checked, setChecked] = React.useState(false);
+    let navigator = useNavigate();
 
     const AddFightingCompetitionHandler = (FightingCompetition) => {
         setDataFightingCompetition(FightingCompetition);
@@ -77,64 +71,119 @@ function CreateTourament() {
         startDate: Yup.string().nullable().required('Không được để trống trường này'),
         finishDate: Yup.string().nullable().required('Không được để trống trường này'),
         amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
+        amountPerAdmin: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
     });
 
     const handleClose = () => {
+        adminTournamentAPI.deleteTournament(touramentId).then((res) => {
+            console.log('delete tournamen id: ', touramentId);
+            console.log('delete tournament, response: ', res.data);
+
+            if (res.data.length != 0) {
+                navigator(-1);
+            } else {
+                console.log('huhu');
+            }
+        });
         setOpen(false);
     };
 
+    const handleChangeOverride = (event) => {
+        setChecked(event.target.checked);
+        if (event.target.checked) {
+            setIsOverride(-1);
+        }
+    };
+
     const handleCreate = () => {
-        console.log('create');
-    };
+        adminTournamentAPI.createTournamentSchedule(previewTournament, touramentId).then((res) => {
+            console.log('create tournament schedule', res);
+            console.log('create tournament schedule', res.data);
 
+            if (res.data.length != 0) {
+                navigator(-1);
+            } else {
+                console.log('huhu');
+            }
+        });
+    };
+    const createTourament = async (data) => {
+        const params = {
+            amount_per_register: data.amountPerRegister,
+            competitiveTypes: datasFightingCompetition,
+            description: data.description,
+            exhibitionTypes: datasPerformanceCompetition,
+            maxQuantityComitee: data.numOfParticipants,
+            totalAmount: data.cost,
+            name: data.tournamentName,
+        };
+        console.log(params);
+        await adminTournamentAPI.createTournament(params).then((response) => {
+            console.log('create event', response);
+            console.log('create event', response.data);
+            console.log('create event id', response.data[0].id);
+            setTouramentId(response.data[0].id);
+            setTourament(response.data);
+        });
+    };
     const onSubmit = (data) => {
-        // let dataSubmit = {
-        //     maxQuantityComitee: data.maxQuantityComitee,
-        //     description: description,
-        //     finishTime: moment(new Date(data.finishTime)).format('HH:mm:ss'),
-        //     startTime: moment(new Date(data.startTime)).format('HH:mm:ss'),
-        //     startDate: moment(new Date(data.startDate)).format('DD/MM/yyyy'),
-        //     finishDate: moment(new Date(data.finishDate)).format('DD/MM/yyyy'),
-        //     numOfParticipants: data.numOfParticipants,
-        //     name: data.name,
-        //     cash: data.cash,
-        //     cost: data.cost,
-        //     amountPerRegister: data.amountPerRegister,
-        // };
-        // setSubmitData(dataSubmit);
-        // eventApi.createPreviewEvent(dataSubmit).then((res) => {
-        //     console.log('1', res);
-        //     console.log('2', res.data);
-        //     if (res.data.length != 0) {
-        //         // setOpenSnackBar(true);
-        //         // setSnackBarStatus(true);
-        //         // snackBarStatus = true;
-        //         // dynamicAlert(snackBarStatus, res.message);
-        console.log(data);
-        setPreviewTournament(data);
-        setOpen(true);
-        //     } else {
-        //         console.log('huhu');
-        //         // setOpenSnackBar(true);
-        //         // setSnackBarStatus(false);
-        //         // snackBarStatus = false;
-        //         // dynamicAlert(snackBarStatus, res.message);
-        //     }
-        // });
-        console.log(data, datasFightingCompetition, datasPerformanceCompetition);
+        let dataSubmit = {
+            numOfParticipants: data.numOfParticipants,
+            description: description,
+            finishTime: moment(new Date(2022, 5, 21, 20, 0, 0)).format('HH:mm:ss'),
+            startTime: moment(new Date(2022, 5, 20, 8, 0, 0)).format('HH:mm:ss'),
+            startDate: moment(new Date(data.startDate)).format('DD/MM/yyyy'),
+            finishDate: moment(new Date(data.finishDate)).format('DD/MM/yyyy'),
+            tournamentName: data.tournamentName,
+            cash: data.cash,
+            cost: data.cost,
+            amountPerRegister: data.amountPerRegister,
+        };
+        setSubmitData(dataSubmit);
+        createTourament(dataSubmit);
+        adminTournamentAPI.createPreviewTournamentSchedule(dataSubmit).then((res) => {
+            console.log('1', res);
+            console.log('2', res.data);
+            if (res.data.length != 0) {
+                console.log(res.data);
+                setPreviewTournament(res.data);
+                checkOveride(res.data);
+                setOpen(true);
+            } else {
+                console.log('huhu');
+            }
+        });
+        setOpen(false);
     };
 
-    const TournamentSchedule = [
-        {
-            id: 0,
-            date: moment(new Date(previewTournament.startDate)).format('yyyy-MM-DD'),
-            title: previewTournament.tournamentName,
-            display: 'background',
-            backgroundColor: '#5ba8f5',
-        },
-    ];
+    const TournamentSchedule = previewTournament.map((item, index) => {
+        const container = {};
+        container['id'] = index;
+        container['date'] = item.date;
+        container['title'] = item.title + '-' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['display'] = 'background';
+        container['backgroundColor'] = isOverride === -1 ? '#5ba8f5' : '#ff3d00';
+        //container['isOverride'] = item.title.contain('Trùng với') ? true : false;
+        return container;
+    });
 
     console.log(TournamentSchedule);
+
+    const checkOveride = (TournamentSchedule) => {
+        TournamentSchedule.map((item) => {
+            if (item.title.toString().includes('Trùng với lịch tập')) {
+                setIsOverride(0);
+                return 0;
+            } else if (item.title.toString().includes('Trùng với')) {
+                setIsOverride(1);
+                return 1;
+            } else {
+                setIsOverride(-1);
+                return -1;
+            }
+        });
+    };
+
     const {
         register,
         control,
@@ -150,30 +199,44 @@ function CreateTourament() {
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                 Tạo giải đấu
             </Typography>
-            <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
+            <Dialog fullWidth maxWidth="lg" open={open}>
                 <DialogTitle>Xem trước thông tin giải đấu</DialogTitle>
-                <DialogContent sx={{ height: '590px' }}>
-                    <FullCalendar
-                        locale="vie"
-                        height="100%"
-                        plugins={[dayGridPlugin, interactionPlugin]}
-                        initialView="dayGridMonth"
-                        events={TournamentSchedule}
-                        // events={[
-                        //     { title: 'event 1', date: '29-06-2022' },
-                        //     { title: 'event 2', date: '2022-06-29' },
-                        //]}
-                        weekends={true}
-                        headerToolbar={{
-                            left: 'title',
-                            center: '',
-                            right: 'prev next today',
-                        }}
-                    />
-                </DialogContent>
+                <Grid container spacing={2}>
+                    <Grid item xs={8}>
+                        <DialogContent sx={{ height: '500px' }}>
+                            <FullCalendar
+                                locale="vie"
+                                height="100%"
+                                plugins={[dayGridPlugin, interactionPlugin]}
+                                initialView="dayGridMonth"
+                                events={TournamentSchedule}
+                                weekends={true}
+                                headerToolbar={{
+                                    left: 'title',
+                                    center: '',
+                                    right: 'prev next today',
+                                }}
+                            />
+                            {isOverride !== 1 && (
+                                <Switch
+                                    hidden={isOverride === 1}
+                                    checked={checked}
+                                    onChange={handleChangeOverride}
+                                    inputProps={{ 'aria-label': 'controlled' }}
+                                />
+                            )}
+                        </DialogContent>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <PreviewData data={previewTournament} />
+                    </Grid>
+                </Grid>
+
                 <DialogActions>
                     <Button onClick={handleClose}>Quay lại</Button>
-                    <Button onClick={handleCreate}>Đồng ý</Button>
+                    <Button onClick={handleCreate} disabled={isOverride !== -1}>
+                        Đồng ý
+                    </Button>
                 </DialogActions>
             </Dialog>
             <Box
@@ -196,6 +259,18 @@ function CreateTourament() {
                         {...register('tournamentName')}
                         error={errors.tournamentName ? true : false}
                         helperText={errors.tournamentName?.message}
+                    />
+                    <TextField
+                        id="outlined-multiline-flexible"
+                        name="description"
+                        control={control}
+                        label="Nội dung"
+                        multiline
+                        maxRows={4}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        fullWidth
+                        // {...register('content')}
                     />
                     <Grid container columns={12} spacing={2}>
                         <Grid item xs={6}>
@@ -359,9 +434,35 @@ function CreateTourament() {
                     </Collapse>
                     <Grid container spacing={2} sx={{ alignItems: 'center' }}>
                         <Grid item xs={6}>
-                            <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                            {/* <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
                                 Dự kiến mỗi người phải đóng: 160k
-                            </Typography>
+                            </Typography> */}
+                            <Controller
+                                name="amountPerAdmin"
+                                variant="outlined"
+                                defaultValue=""
+                                control={control}
+                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                    <NumberFormat
+                                        name="amountPerAdmin"
+                                        customInput={TextField}
+                                        label="Số tiền thành viên ban tổ chức cần phải đóng"
+                                        thousandSeparator={true}
+                                        variant="outlined"
+                                        defaultValue=""
+                                        value={value}
+                                        onValueChange={(v) => {
+                                            onChange(Number(v.value));
+                                        }}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                        }}
+                                        error={invalid}
+                                        helperText={invalid ? error.message : null}
+                                        fullWidth
+                                    />
+                                )}
+                            />
                         </Grid>
                         <Grid item xs={6}>
                             <Controller
@@ -373,7 +474,7 @@ function CreateTourament() {
                                     <NumberFormat
                                         name="amountPerRegister"
                                         customInput={TextField}
-                                        label="Số tiền mỗi người cần phải đóng"
+                                        label="Số tiền thành viên tham dự cần phải đóng"
                                         thousandSeparator={true}
                                         variant="outlined"
                                         defaultValue=""
@@ -422,7 +523,7 @@ function CreateTourament() {
                     </Grid>
                     <div className={cx('create-event-button')}>
                         <Button variant="contained" onClick={handleSubmit(onSubmit)}>
-                            Tạo sự kiện
+                            Tạo giải đấu
                         </Button>
                     </div>
                 </Box>

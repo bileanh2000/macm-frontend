@@ -52,7 +52,7 @@ function PerformanceCompetition(props) {
     });
 
     const handleAddCompetition = (data) => {
-        if (data.numberMale == 0 && data.numberFemale == 0) {
+        if (data.numberFemale == 0 && data.numberMale == 0) {
             setFocus('numberMale', { shouldSelect: true });
             setError('numberMale', { message: 'Số lượng nam và nữ không được bằng 0' });
             setError('numberFemale', { message: 'Số lượng nam và nữ không được bằng 0' });
@@ -60,7 +60,7 @@ function PerformanceCompetition(props) {
             const newInput = { ...data, id: Math.random() };
             const newData = [...datas, newInput];
             setDatas(newData);
-            props.onAddPerformanceCompetition(newData);
+            props.onAddPerformanceCompetition(datas);
             setIsChecked(!isChecked);
             reset({
                 name: '',
@@ -83,7 +83,7 @@ function PerformanceCompetition(props) {
             return data.id !== id;
         });
         setDatas(newData);
-        props.onAddFightingCompetition(newData);
+        props.onAddPerformanceCompetition(newData);
     };
 
     return (
@@ -142,7 +142,7 @@ function PerformanceCompetition(props) {
                         label="Số lượng nam"
                         variant="outlined"
                         {...register('numberMale')}
-                        error={errors.male ? true : false}
+                        error={errors.numberMale ? true : false}
                         helperText={errors.numberMale?.message}
                     />
                     <TextField
@@ -151,7 +151,7 @@ function PerformanceCompetition(props) {
                         label="Số lượng nữ"
                         variant="outlined"
                         {...register('numberFemale')}
-                        error={errors.female ? true : false}
+                        error={errors.numberFemale ? true : false}
                         helperText={errors.numberFemale?.message}
                         fullWidth
                     />

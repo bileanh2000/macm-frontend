@@ -14,7 +14,7 @@ import {
 import clsx from 'clsx';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { Box } from '@mui/system';
-import { renderSelectEditCell } from './RenderSelectEditCell';
+// import { renderSelectEditCell } from './RenderSelectEditCell';
 import { useForm } from 'react-hook-form';
 import eventApi from 'src/api/eventApi';
 import { useEffect } from 'react';
@@ -57,7 +57,7 @@ const roles = [
     { roleId: 3, roleName: 'Thành viên ban hậu cần' },
 ];
 
-function AddMemberToAdminEvent() {
+function AddAdminTourament() {
     const [pageSize, setPageSize] = useState(10);
     const [newList, setNewList] = useState([]);
     const [userList, setUserList] = useState([]);
@@ -284,4 +284,4 @@ function AddMemberToAdminEvent() {
     );
 }
 
-export default AddMemberToAdminEvent;
+export default AddAdminTourament;
