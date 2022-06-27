@@ -59,10 +59,17 @@ const userApi = {
     },
     searchByMultipleField: (params, data) => {
         const url = `/admin/hr/viceheadclub/member/search`;
-        return axiosClient.get(url, data, {
+        return axiosClient.post(url, data, {
             params: {
-                dateFrom: params.startDate,
-                dateTo: params.endDate,
+                // ...(params.dateFrom ? { dateFrom: params.dateFrom } : null),
+                // ...(params.dateTo ? { dateTo: params.dateTo } : null),
+                // ...(params.gender ? { gender: params.gender } : null),
+                // ...(params.generation ? { generation: params.generation } : null),
+                // ...(params.isActive ? { isActive: params.isActive } : null),
+                // ...(params.roleId ? { roleId: params.roleId } : null),
+
+                dateTo: params.dateTo,
+                dateFrom: params.dateFrom,
                 email: params.email,
                 gender: params.gender,
                 generation: params.generation,
