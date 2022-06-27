@@ -24,6 +24,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import NumberFormat from 'react-number-format';
 import facilityApi from 'src/api/facilityApi';
 import HistoryIcon from '@mui/icons-material/History';
+import ViewRequestFacility from './ViewRequestFacility';
 let snackBarStatus;
 
 const ImageUpload = () => {
@@ -78,7 +79,7 @@ const RequestFacilityDialog = ({ title, children, isOpen, handleClose, onSucess 
     const [categoryId, setCategoryId] = useState(1);
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [submittedData, setSubmitedData] = useState([]);
-    // const [closeDialog, setCloseDialog] = useState(handleClose);
+    const [openViewRequest, setOpenViewRequest] = useState(false);
 
     const handleChangeCategory = (event) => {
         setCategoryId(event.target.value);
@@ -190,6 +191,15 @@ const RequestFacilityDialog = ({ title, children, isOpen, handleClose, onSucess 
     }, [formState, submittedData, reset]);
     return (
         <Fragment>
+            {openViewRequest && (
+                <ViewRequestFacility
+                    isOpen={openViewRequest}
+                    title="Xem lịch sử đề xuất"
+                    handleClose={() => {
+                        setOpenViewRequest(false);
+                    }}
+                />
+            )}
             <Snackbar
                 open={openSnackBar}
                 autoHideDuration={3000}
@@ -215,7 +225,13 @@ const RequestFacilityDialog = ({ title, children, isOpen, handleClose, onSucess 
             >
                 <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     {title}
-                    <Button size="medium" startIcon={<HistoryIcon />}>
+                    <Button
+                        size="medium"
+                        startIcon={<HistoryIcon />}
+                        onClick={() => {
+                            setOpenViewRequest(true);
+                        }}
+                    >
                         Xem lịch sử đề xuất
                     </Button>
                 </DialogTitle>
