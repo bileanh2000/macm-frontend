@@ -2,20 +2,30 @@ import {
     Alert,
     Box,
     Button,
+    Collapse,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Fab,
     Grid,
     IconButton,
     Input,
     InputAdornment,
+    InputLabel,
     MenuItem,
+    Select,
     Snackbar,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     TextField,
 } from '@mui/material';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import { styled } from '@mui/material/styles';
 import * as Yup from 'yup';
@@ -23,14 +33,19 @@ import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import NumberFormat from 'react-number-format';
 import facilityApi from 'src/api/facilityApi';
+import { Add, Delete } from '@mui/icons-material';
 let snackBarStatus;
 
-const UpdateCategoryDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
+const UpdateCategoryDialog = ({ title, children, isOpen, handleClose, onSucess, onDelete }) => {
     const [categoryList, setCategoryList] = useState([]);
     const [facilityList, setFacilityList] = useState([]);
     const [categoryId, setCategoryId] = useState(1);
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [submittedData, setSubmitedData] = useState([]);
+    const [isChecked, setIsChecked] = useState(false);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState({});
+
     // const [closeDialog, setCloseDialog] = useState(handleClose);
 
     const handleChangeCategory = (event) => {
@@ -52,14 +67,6 @@ const UpdateCategoryDialog = ({ title, children, isOpen, handleClose, onSucess }
 
     const validationSchema = Yup.object().shape({
         name: Yup.string().required('Không được để trống trường này'),
-        // category: Yup.string().required('Không được để trống trường này'),
-        quantityUsable: Yup.number()
-            .required('Không được để trống trường này')
-            .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
-        // quantityUsable: Yup.string()
-        //     // .min(0, 'Vui lòng nhập giá trị lớn hơn 0')
-        //     .required('Vui lòng không để trống trường này'),
     });
 
     const fetchFacilityCategory = async () => {
@@ -107,33 +114,72 @@ const UpdateCategoryDialog = ({ title, children, isOpen, handleClose, onSucess }
         mode: 'onBlur',
     });
 
-    const onSubmit = (data) => {
-        console.log('data', data);
-        setSubmitedData(data);
-        const submitData = {
-            facilityCategory: { id: categoryId },
-            name: data.name,
-            quantityUsable: data.quantityUsable,
-        };
-        console.log(submitData);
-        facilityApi.createNewFacility(submitData).then((res) => {
-            console.log(res);
-            if (res.data.length != 0) {
-                setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
-                onSucess && onSucess(res.data[0]);
-            } else {
-                console.log('huhu');
-                setOpenSnackBar(true);
-                // setSnackBarStatus(false);
-                snackBarStatus = false;
-                dynamicAlert(snackBarStatus, 'Thêm CSVC thất bại, vui lòng thử lại');
-            }
+    // const onSubmit = (data) => {
+    //     console.log('data', data);
+    //     setSubmitedData(data);
+    //     const submitData = {
+    //         facilityCategory: { id: categoryId },
+    //         name: data.name,
+    //         quantityUsable: data.quantityUsable,
+    //     };
+    //     console.log(submitData);
+    //     facilityApi.createNewFacility(submitData).then((res) => {
+    //         console.log(res);
+    //         if (res.data.length != 0) {
+    //             setOpenSnackBar(true);
+    //             // setSnackBarStatus(true);
+    //             snackBarStatus = true;
+    //             dynamicAlert(snackBarStatus, res.message);
+    //             onSucess && onSucess(res.data[0]);
+    //         } else {
+    //             console.log('huhu');
+    //             setOpenSnackBar(true);
+    //             // setSnackBarStatus(false);
+    //             snackBarStatus = false;
+    //             dynamicAlert(snackBarStatus, 'Thêm CSVC thất bại, vui lòng thử lại');
+    //         }
+    //     });
+    // };
+
+    const handleAddCategory = (data) => {
+        console.log(data);
+        // setCategoryList((oldData) => {
+        //     return [...oldData, data];
+        // });
+        facilityApi.createNewCategory(data).then((res) => {
+            console.log(res.data);
+            // categoryList && setCategoryList(...categoryList, res.data[0]);
+            setCategoryList((prev) => {
+                return [...prev, res.data[0]];
+            });
+            onSucess && onSucess(res.data[0]);
+            reset({
+                name: '',
+            });
         });
     };
 
+    const handleCancel = () => {
+        setIsChecked(!isChecked);
+        reset({
+            name: '',
+        });
+    };
+
+    const deleteCategory = useCallback(
+        (id) => () => {
+            setOpenConfirmDialog(false);
+            setTimeout(() => {
+                facilityApi.deleteCategory(id).then((res) => {
+                    setCategoryList((prev) => prev.filter((row) => row.id !== id));
+                    console.log('deleteCategory', res);
+                    console.log('deleteCategory data', res.data);
+                    onDelete && onDelete(id);
+                });
+            });
+        },
+        [],
+    );
     useEffect(() => {
         if (formState.isSubmitSuccessful) {
             // reset({ name: '', quantity: '' });
@@ -141,6 +187,27 @@ const UpdateCategoryDialog = ({ title, children, isOpen, handleClose, onSucess }
     }, [formState, submittedData, reset]);
     return (
         <Fragment>
+            <Dialog
+                open={openConfirmDialog}
+                onClose={() => {
+                    setOpenConfirmDialog(false);
+                }}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Xác nhận xóa cơ sở vật chất</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Bạn muốn xóa "{selectedCategory.name}" ra khỏi danh sách cơ sở vật chất ?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Từ chối</Button>
+                    <Button onClick={deleteCategory(selectedCategory.id)} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <Snackbar
                 open={openSnackBar}
                 autoHideDuration={3000}
@@ -158,7 +225,7 @@ const UpdateCategoryDialog = ({ title, children, isOpen, handleClose, onSucess }
             </Snackbar>
             <Dialog
                 fullWidth
-                maxWidth="md"
+                maxWidth="xs"
                 open={!!isOpen}
                 onClose={handleClose}
                 aria-labelledby="alert-dialog-title"
@@ -166,13 +233,71 @@ const UpdateCategoryDialog = ({ title, children, isOpen, handleClose, onSucess }
             >
                 <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
                 <DialogContent>
-                    {/* <DialogContentText id="alert-dialog-description">{children}</DialogContentText> */}
+                    <TableContainer sx={{ maxHeight: 440, overflow: 'auto' }}>
+                        <Table stickyHeader aria-label="sticky table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="left">Hạng mục</TableCell>
+                                    <TableCell align="left"></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {categoryList.map((item, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{item.name}</TableCell>
+                                        <TableCell>
+                                            <IconButton
+                                                aria-label="delete"
+                                                onClick={() => {
+                                                    setOpenConfirmDialog(true);
+                                                    setSelectedCategory({ id: item.id, name: item.name });
+                                                }}
+                                            >
+                                                <Delete />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <Collapse in={isChecked}>
+                        <TextField
+                            fullWidth
+                            autoFocus
+                            sx={{ mt: 2, mb: 2 }}
+                            size="small"
+                            id="category"
+                            label="Thêm danh mục"
+                            variant="standard"
+                            {...register('name')}
+                            error={errors.name ? true : false}
+                            helperText={errors.name?.message}
+                        />
+
+                        <Button
+                            sx={{ mr: 2 }}
+                            variant="contained"
+                            color="success"
+                            onClick={handleSubmit(handleAddCategory)}
+                        >
+                            Thêm
+                        </Button>
+                        <Button variant="contained" color="error" onClick={handleCancel}>
+                            Hủy
+                        </Button>
+                    </Collapse>
+                    <Collapse in={!isChecked} sx={{ mt: 2 }}>
+                        <Fab color="primary" aria-label="add" onClick={() => setIsChecked(!isChecked)} size="small">
+                            <Add />
+                        </Fab>
+                    </Collapse>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Hủy</Button>
-                    <Button onClick={handleSubmit(onSubmit)} autoFocus>
+                    <Button onClick={handleClose}>Quay lại</Button>
+                    {/* <Button onClick={handleSubmit(onSubmit)} autoFocus>
                         Xác nhận
-                    </Button>
+                    </Button> */}
                 </DialogActions>
             </Dialog>
         </Fragment>

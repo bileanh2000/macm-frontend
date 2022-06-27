@@ -142,6 +142,9 @@ function Facility() {
             ],
         },
     ];
+    useEffect(() => {
+        console.log('categoryList', categoryList);
+    }, [categoryList]);
 
     function CustomToolbar() {
         return (
@@ -169,10 +172,17 @@ function Facility() {
     return (
         <Fragment>
             <UpdateCategoryDialog
-                title="Chỉnh sửa danh mục cơ sở vật chất"
+                title="Cập nhật danh mục cơ sở vật chất"
                 isOpen={openUpdateCategory}
                 handleClose={() => {
                     setOpenUpdateCategory(false);
+                }}
+                onDelete={(deletedId) => {
+                    console.log(deletedId);
+                    categoryList && setCategoryList((prev) => prev.filter((item) => item.id !== deletedId));
+                }}
+                onSucess={(newCategory) => {
+                    categoryList && setCategoryList([...categoryList, newCategory]);
                 }}
             />
 
@@ -257,8 +267,13 @@ function Facility() {
                     >
                         Thêm cơ sở vật chất
                     </Button>
-                    <Button variant="outlined" startIcon={<EditIcon />} sx={{ ml: 1 }}>
-                        Chỉnh sửa danh mục
+                    <Button
+                        variant="outlined"
+                        startIcon={<EditIcon />}
+                        sx={{ ml: 1 }}
+                        onClick={() => setOpenUpdateCategory(true)}
+                    >
+                        Cập nhật danh mục
                     </Button>
                 </Box>
             </Box>
@@ -272,6 +287,7 @@ function Facility() {
                     onChange={handleChangeCategory}
                 >
                     <MenuItem value={0}>Tất cả</MenuItem>
+
                     {categoryList.map((item) => {
                         return (
                             <MenuItem key={item.id} value={item.id}>
@@ -279,10 +295,6 @@ function Facility() {
                             </MenuItem>
                         );
                     })}
-                    {/* <MenuItem value={1}>Áo chống đạn</MenuItem>
-                    <MenuItem value={2}>Súng trường</MenuItem>
-                    <MenuItem value={3}>Súng lục</MenuItem>
-                    <MenuItem value={4}>Cận chiến</MenuItem> */}
                 </TextField>
             </Box>
             <Box

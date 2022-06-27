@@ -87,7 +87,7 @@ function ReportFacility() {
                     id="outlined-select-currency"
                     size="small"
                     select
-                    label="Danh mục"
+                    label="Tình trạng"
                     value={categoryId}
                     onChange={handleChangeCategory}
                 >

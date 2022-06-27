@@ -34,7 +34,15 @@ const facilityApi = {
         const url = `/facility/treasurer/getallrequesttobuyfacility?pageNo=0&pageSize=10000&sortBy=id`;
         return axiosClient.get(url);
     },
+    createNewCategory: (params) => {
+        const url = `/facilitycategory/headtechnique/addnewcategories`;
+        return axiosClient.post(url, [params]);
+    },
 
+    deleteCategory: (id) => {
+        const url = `/facilitycategory/headtechnique/delete/${id}`;
+        return axiosClient.put(url);
+    },
     // createPreviewEvent: (params) => {
     //     const url = '/facility/headtechnique/createnewfacility';
     //     return axiosClient.post(url, null, {

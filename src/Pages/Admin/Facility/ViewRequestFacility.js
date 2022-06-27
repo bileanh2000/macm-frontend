@@ -150,7 +150,7 @@ const ViewRequestFacility = ({ title, children, isOpen, handleClose, onSucess })
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Trở lại</Button>
+                    <Button onClick={handleClose}>Quay lại</Button>
                     {/* <Button onClick={handleSubmit(onSubmit)} autoFocus>
                         Xác nhận
                     </Button> */}
