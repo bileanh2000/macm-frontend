@@ -57,5 +57,21 @@ const userApi = {
         const url = `/admin/hr/users/export`;
         return axiosClient.get(url);
     },
+    searchByMultipleField: (params, data) => {
+        const url = `/admin/hr/viceheadclub/member/search`;
+        return axiosClient.get(url, data, {
+            params: {
+                dateFrom: params.startDate,
+                dateTo: params.endDate,
+                email: params.email,
+                gender: params.gender,
+                generation: params.generation,
+                isActive: params.isActive,
+                name: params.name,
+                roleId: params.roleId,
+                studentId: params.studentId,
+            },
+        });
+    },
 };
 export default userApi;
