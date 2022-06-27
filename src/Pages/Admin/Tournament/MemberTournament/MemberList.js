@@ -24,6 +24,7 @@ function MemberList({ data, type }) {
             },
             { field: 'playerGender', headerName: 'Giới tính', width: 150, flex: 1 },
             { field: 'role', headerName: 'Vai trò', width: 150, flex: 1 },
+            { field: 'exhibitionTypeName', headerName: 'Nội dung biểu diến', width: 150, flex: 1 },
         ];
 
         const newRowsPlayer =
@@ -37,6 +38,7 @@ function MemberList({ data, type }) {
                     container['studentId'] = i.playerStudentId;
                     container['playerGender'] = i.playerGender ? 'Nam' : 'Nữ';
                     container['role'] = i.roleInTeam ? 'Trưởng nhóm' : 'Thành viên';
+                    container['exhibitionTypeName'] = item.exhibitionTypeName;
                     return container;
                 });
             });
@@ -51,7 +53,8 @@ function MemberList({ data, type }) {
                 flex: 0.6,
             },
             { field: 'playerGender', headerName: 'Giới tính', width: 150, flex: 1 },
-            { field: 'weight', headerName: 'Hạng cân', width: 150, flex: 1 },
+            { field: 'weight', headerName: 'Cân nặng', width: 150, flex: 1 },
+            { field: 'weightRange', headerName: 'Hạng cân thi đấu', width: 150, flex: 1 },
         ];
 
         rowsPlayer =
@@ -60,9 +63,10 @@ function MemberList({ data, type }) {
                 const container = {};
                 container['id'] = index + 1;
                 container['studentName'] = item.playerName;
-                container['weight'] = item.weight;
+                container['weight'] = item.weight + 'Kg';
                 container['studentId'] = item.playerStudentId;
                 container['playerGender'] = item.playerGender ? 'Nam' : 'Nữ';
+                container['weightRange'] = item.weightMin + ' - ' + item.weightMax + 'Kg';
                 return container;
             });
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Alert,
     Button,
@@ -14,55 +14,23 @@ import {
 import clsx from 'clsx';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { Box } from '@mui/system';
-// import { renderSelectEditCell } from './RenderSelectEditCell';
 import { useForm } from 'react-hook-form';
-import eventApi from 'src/api/eventApi';
-import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
+import adminTournamentAPI from 'src/api/adminTournamentAPI';
+
 let snackBarStatus;
 
-// const _memberList = [
-//     {
-//         id: 10,
-//         studentName: 'Duong Thanh Tung',
-//         studentId: 'HE123456',
-//         attendanceStatus: true,
-//         role: { roleId: 2, roleName: 'Thành viên ban văn hóa' },
-//         paymentStatus: true,
-//     },
-//     {
-//         id: 20,
-//         studentName: 'Pham Minh Duc',
-//         studentId: 'HE456789',
-//         attendanceStatus: true,
-//         role: { roleId: 1, roleName: 'Thành viên ban truyền thông' },
-//         paymentStatus: true,
-//     },
-//     {
-//         id: 30,
-//         studentName: 'Dam Van Toan',
-//         studentId: 'HE987654',
-//         attendanceStatus: true,
-//         role: { roleId: 3, roleName: 'Thành viên ban hậu cần' },
-//         paymentStatus: true,
-//     },
-// ];
-
-const roles = [
-    {
-        roleId: 1,
-        roleName: 'Thành viên ban truyền thông',
-    },
-    { roleId: 2, roleName: 'Thành viên ban văn hóa' },
-    { roleId: 3, roleName: 'Thành viên ban hậu cần' },
-];
-
 function AddAdminTourament() {
+    let { tournamentId } = useParams();
     const [pageSize, setPageSize] = useState(10);
-    const [newList, setNewList] = useState([]);
     const [userList, setUserList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [openSnackBar, setOpenSnackBar] = useState(false);
+    const [isApprove, setIsApprove] = useState(false);
+    const [idUpdate, setIdUpdate] = useState(0);
+    const [active, setActive] = useState(-1);
+    const [total, setTotal] = useState(-1);
 
     let navigate = useNavigate();
     const handleCloseSnackBar = (event, reason) => {
@@ -76,101 +44,99 @@ function AddAdminTourament() {
     const handleCloseDialog = () => {
         setOpenDialog(false);
     };
-    const handleOpenDialog = () => {
+    const handleOpenDialog = (id, isApprove) => {
+        setIsApprove(isApprove);
+        setIdUpdate(id);
         setOpenDialog(true);
     };
 
-    let { id } = useParams();
-
-    const fetchUserInEvent = async (params) => {
-        // try {
-        //     const response = await eventApi.getListMemberToUpdate(params);
-        //     console.log(response);
-        //     setUserList(response.data);
-        // } catch (error) {
-        //     console.log('Failed to fetch user list: ', error);
-        // }
+    const fetchAdminInTournament = async (params) => {
+        try {
+            const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
+            console.log(response);
+            setActive(response.totalActive);
+            setTotal(response.totalResult);
+            const newUser = response.data.filter((user) => user.registerStatus === 'Đang chờ duyệt');
+            console.log(newUser);
+            setUserList(newUser);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
     };
 
     useEffect(() => {
-        fetchUserInEvent(id);
-    }, [id]);
+        fetchAdminInTournament(tournamentId);
+    }, [tournamentId]);
 
     const columns = [
-        { field: 'studentName', headerName: 'Tên', flex: 0.8 },
-        {
-            field: 'userMail',
-            headerName: 'Email',
-            width: 150,
-            flex: 0.6,
-        },
+        { field: 'studentName', headerName: 'Tên', flex: 0.5 },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
             width: 150,
-            flex: 0.6,
+            flex: 0.5,
         },
         {
-            field: 'roleInClub',
-            headerName: 'Vai trò trong CLB',
+            field: 'roleInTournament',
+            headerName: 'Vai trò mong muốn trong ban tổ chức',
             width: 150,
-            flex: 0.6,
+            flex: 0.8,
         },
 
-        // <MenuItem value={1}>Thành viên tham gia</MenuItem>
-        //         <MenuItem value={2}>Thành viên ban truyền thông</MenuItem>
-        //         <MenuItem value={3}>Thành viên ban hậu cần</MenuItem>
-        //         <MenuItem value={4}>Thành viên ban văn hóa</MenuItem>
         {
-            field: 'role',
-            headerName: `Vai trò trong sự kiện ${1 + 1 + 2}`,
+            field: 'registerStatus',
+            headerName: `Trạng thái`,
             width: 150,
-            flex: 0.6,
-            editable: true,
-            type: 'singleSelect',
-            // valueOptions: roles.map((role) => role.roleName),
-            valueOptions: [
-                { label: 'Thành viên tham gia', value: 1 },
-                { label: 'Thành viên ban truyền thông', value: 2 },
-                { label: 'Thành viên ban hậu cần', value: 3 },
-                { label: 'Thành viên ban văn hóa', value: 4 },
-            ],
-            cellClassName: (params) => {
-                if (params.value == null) {
-                    return '';
-                }
-
-                return clsx('role-edit');
+            flex: 0.5,
+        },
+        {
+            field: 'actions',
+            type: 'actions',
+            width: 100,
+            flex: 0.5,
+            cellClassName: 'actions',
+            getActions: (params) => {
+                return [
+                    <Button
+                        component="button"
+                        label="Đã đóng"
+                        onClick={() => handleOpenDialog(params.row.id, true)}
+                        style={{ backgroundColor: 'aquamarine' }}
+                    >
+                        Chấp nhận
+                    </Button>,
+                    <Button
+                        component="button"
+                        label="Đã đóng"
+                        onClick={() => handleOpenDialog(params.row.id, false)}
+                        style={{ backgroundColor: 'lightcoral' }}
+                    >
+                        Từ chối
+                    </Button>,
+                ];
             },
+            hide: active === 10,
         },
     ];
+
+    // const toggleStatus = (id, flag) => {
+    //     console.log(id, flag);
+    //     // const newUserList = facilityList.map((facility) => {
+    //     //     return facility.studentId === id ? { ...facility, active: !facility.active } : facility;
+    //     // });
+    //     // console.log(newUserList);
+    //     // setFacilityList(newUserList);
+    // };
 
     const rowsUser = userList.map((item, index) => {
         const container = {};
         container['id'] = item.id;
         container['studentName'] = item.userName;
         container['studentId'] = item.userStudentId;
-        container['userMail'] = item.userMail;
-        container['attendanceStatus'] = item.attendanceStatus ? 'Đã đăng kí' : 'Đã hủy';
-        container['role'] = item.roleEventDto.name;
-        container['roleInClub'] = item.roleInClub;
-        container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
+        container['roleInTournament'] = item.roleTournamentDto.name;
+        container['registerStatus'] = item.registerStatus;
         return container;
     });
-
-    const { handleSubmit } = useForm({});
-
-    const handleRowEditCommit = React.useCallback((params) => {
-        const id = params.id;
-        const key = params.field;
-        const value = params.value;
-        console.log(id, key, value, params);
-        const newRole = roles.find((role) => role.roleName == value);
-        console.log(newRole);
-        console.log(userList);
-        const newMemberList = userList.map((member) => (member.id === id ? { ...member, role: newRole } : member));
-        setNewList(newMemberList);
-    }, []);
 
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
 
@@ -182,19 +148,47 @@ function AddAdminTourament() {
             setCustomAlert({ severity: 'error', message: message });
         }
     };
+
+    const acceptRequestToJoinOrganizingCommittee = async (organizingCommitteeId) => {
+        try {
+            const response = await adminTournamentAPI.acceptRequestToJoinOrganizingCommittee(organizingCommitteeId);
+            setOpenSnackBar(true);
+            snackBarStatus = true;
+            dynamicAlert(snackBarStatus, response.message);
+        } catch (error) {
+            console.log('Khong the chap thuan yeu cau nay, loi:', error);
+            setOpenSnackBar(true);
+            snackBarStatus = true;
+            dynamicAlert(snackBarStatus, 'Khong the chap thuan yeu cau nay');
+        }
+    };
+
+    const declineRequestToJoinOrganizingCommittee = async (organizingCommitteeId) => {
+        try {
+            const response = await adminTournamentAPI.declineRequestToJoinOrganizingCommittee(organizingCommitteeId);
+            setOpenSnackBar(true);
+            snackBarStatus = true;
+            dynamicAlert(snackBarStatus, response.message);
+        } catch (error) {
+            console.log('Khong the chap thuan yeu cau nay, loi:', error);
+            setOpenSnackBar(true);
+            snackBarStatus = true;
+            dynamicAlert(snackBarStatus, 'Khong the chap thuan yeu cau nay');
+        }
+    };
     const handleUpdate = () => {
-        console.log('submit', newList);
-        eventApi.updateMemberRole(newList).then((res) => {
-            console.log(res);
-            console.log(res.data);
-            if (res.message === 'Cập nhật chức vụ cho thành viên trong sự kiện thành công') {
-                setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
-                setTimeout(navigate(-1), 3000);
-            }
-        });
+        console.log(idUpdate, isApprove);
+        if (isApprove) {
+            acceptRequestToJoinOrganizingCommittee(idUpdate);
+            setActive((prev) => prev + 1);
+        } else {
+            declineRequestToJoinOrganizingCommittee(idUpdate);
+        }
+
+        const newUser = userList.filter((user) => user.id !== idUpdate);
+        setUserList(newUser);
+
+        handleCloseDialog();
     };
     const CustomToolbar = () => {
         return (
@@ -246,17 +240,20 @@ function AddAdminTourament() {
                 </Alert>
             </Snackbar>
             <Typography variant="h4" sx={{ mb: 3 }}>
-                Cập nhật vai trò thành viên trong giải đấu
+                Xét duyệt thành viên vào ban tổ chức giải đấu
             </Typography>
+            {active > 0 && total > 0 && (
+                <Typography variant="body1" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                    Số lượng thành viên trong ban tổ chức: {active}/{total}
+                </Typography>
+            )}
             <p></p>
             <Box
                 sx={{
                     height: '70vh',
                     width: '100%',
                     '& .role-edit::before': {
-                        // backgroundColor: 'red !important',
                         content: "'\\270E'",
-                        // color: 'red',
                         fontSize: '1.2rem',
                     },
                 }}
@@ -272,13 +269,7 @@ function AddAdminTourament() {
                     components={{
                         Toolbar: CustomToolbar,
                     }}
-                    onCellEditCommit={handleRowEditCommit}
                 />
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button variant="contained" onClick={handleOpenDialog} sx={{ mt: 3 }}>
-                    Lưu lại
-                </Button>
             </Box>
         </div>
     );

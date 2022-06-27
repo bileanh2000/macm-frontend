@@ -14,7 +14,7 @@ function Attendance() {
 
     const [trainingScheduleId, setTrainingScheduleId] = useState(_trainingScheduleId);
 
-    const nowDate = new Date(2022, 5, 22);
+    const nowDate = new Date();
     if (!_nowDate) _nowDate = nowDate;
     const date = moment(new Date(_nowDate)).format('DD/MM/yyyy');
 

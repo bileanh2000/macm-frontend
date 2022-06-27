@@ -48,7 +48,7 @@ function CreateTourament() {
     const [touramentId, setTouramentId] = useState();
     const [tourament, setTourament] = useState([]);
     const [previewTournament, setPreviewTournament] = useState([]);
-    const [checked, setChecked] = React.useState(false);
+    const [checked, setChecked] = useState(false);
     let navigator = useNavigate();
 
     const AddFightingCompetitionHandler = (FightingCompetition) => {
@@ -92,6 +92,8 @@ function CreateTourament() {
         setChecked(event.target.checked);
         if (event.target.checked) {
             setIsOverride(-1);
+        } else {
+            setIsOverride(0);
         }
     };
 
@@ -162,7 +164,8 @@ function CreateTourament() {
         container['date'] = item.date;
         container['title'] = item.title + '-' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
-        container['backgroundColor'] = isOverride === -1 ? '#5ba8f5' : '#ff3d00';
+        console.log(isOverride);
+        container['backgroundColor'] = isOverride === -1 || isOverride === 0 ? '#5ba8f5' : '#ff3d00';
         //container['isOverride'] = item.title.contain('Trùng với') ? true : false;
         return container;
     });
@@ -171,7 +174,7 @@ function CreateTourament() {
 
     const checkOveride = (TournamentSchedule) => {
         TournamentSchedule.map((item) => {
-            if (item.title.toString().includes('Trùng với lịch tập')) {
+            if (item.title.toString() === 'Trùng với Lịch tập') {
                 setIsOverride(0);
                 return 0;
             } else if (item.title.toString().includes('Trùng với')) {
@@ -217,24 +220,31 @@ function CreateTourament() {
                                     right: 'prev next today',
                                 }}
                             />
-                            {isOverride !== 1 && (
-                                <Switch
-                                    hidden={isOverride === 1}
-                                    checked={checked}
-                                    onChange={handleChangeOverride}
-                                    inputProps={{ 'aria-label': 'controlled' }}
+                            {(isOverride === 0 || isOverride === -1) && (
+                                <FormControlLabel
+                                    sx={{ marginLeft: '1px' }}
+                                    control={
+                                        <Switch
+                                            hidden={isOverride === 1}
+                                            checked={checked}
+                                            onChange={handleChangeOverride}
+                                        />
+                                    }
+                                    label="Lịch đang trùng với lịch tập, bạn có muốn tạo không"
                                 />
                             )}
                         </DialogContent>
                     </Grid>
-                    <Grid item xs={4}>
-                        <PreviewData data={previewTournament} />
-                    </Grid>
+                    {previewTournament && (
+                        <Grid item xs={4}>
+                            <PreviewData data={previewTournament} />
+                        </Grid>
+                    )}
                 </Grid>
 
                 <DialogActions>
                     <Button onClick={handleClose}>Quay lại</Button>
-                    <Button onClick={handleCreate} disabled={isOverride !== -1}>
+                    <Button onClick={handleCreate} disabled={isOverride === 1 || isOverride === 0}>
                         Đồng ý
                     </Button>
                 </DialogActions>
