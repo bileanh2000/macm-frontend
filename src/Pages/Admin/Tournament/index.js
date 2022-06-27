@@ -125,43 +125,60 @@ function Tournament() {
                         return (
                             <li key={tournament.id}>
                                 <div className={cx('tournaments')}>
-                                    <Box component={Link} to={`${tournament.id}`}>
-                                        <div className={cx('tournament-list')}>
-                                            <div className={cx('tournament-status')}>
-                                                {/* <p className={cx('upcoming')}> */}
-                                                {tournament.status === 'Chưa diễn ra' ? (
-                                                    <p className={cx('upcoming')}>Sắp diễn ra</p>
-                                                ) : tournament.status === 'Đang diễn ra' ? (
-                                                    <p className={cx('going-on')}>Đang diễn ra</p>
-                                                ) : (
-                                                    <p className={cx('closed')}>Đã kết thúc</p>
-                                                )}
+                                    <div>
+                                        <Box component={Link} to={`${tournament.id}`}>
+                                            <div className={cx('tournament-list')}>
+                                                <div className={cx('tournament-status')}>
+                                                    {/* <p className={cx('upcoming')}> */}
+                                                    {tournament.status === 'Chưa diễn ra' ? (
+                                                        <p className={cx('upcoming')}>Sắp diễn ra</p>
+                                                    ) : tournament.status === 'Đang diễn ra' ? (
+                                                        <p className={cx('going-on')}>Đang diễn ra</p>
+                                                    ) : (
+                                                        <p className={cx('closed')}>Đã kết thúc</p>
+                                                    )}
+                                                </div>
+                                                <div className={cx('tournament-title')}>{tournament.name}</div>
+                                                <div className={cx('tournament-date')}>
+                                                    {moment(new Date(tournament.startDate)).format('DD/MM/yyyy')}
+                                                </div>
                                             </div>
-                                            <div className={cx('tournament-title')}>{tournament.name}</div>
-                                            <div className={cx('tournament-date')}>
-                                                {moment(new Date(tournament.startDate)).format('DD/MM/yyyy')}
-                                            </div>
-                                        </div>
-                                    </Box>
-                                    <div className={cx('tournament-action')}>
-                                        {tournament.status === 'Chưa diễn ra' ? (
-                                            <IconButton
-                                                aria-label="delete"
-                                                onClick={() => {
-                                                    handleOpenDialog();
-                                                    setTournamentOnclick({ name: tournament.name, id: tournament.id });
-                                                    // handleDelete(item.id);
-                                                }}
-                                            >
-                                                <Delete />
-                                            </IconButton>
-                                        ) : (
-                                            ''
-                                        )}
+                                        </Box>
+                                        <div className={cx('tournament-action')}>
+                                            {tournament.status === 'Chưa diễn ra' ? (
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    onClick={() => {
+                                                        handleOpenDialog();
+                                                        setTournamentOnclick({
+                                                            name: tournament.name,
+                                                            id: tournament.id,
+                                                        });
+                                                        // handleDelete(item.id);
+                                                    }}
+                                                >
+                                                    <Delete />
+                                                </IconButton>
+                                            ) : (
+                                                ''
+                                            )}
 
-                                        <IconButton aria-label="edit" component={Link} to={`${tournament.id}/update`}>
-                                            <Edit />
-                                        </IconButton>
+                                            <IconButton
+                                                aria-label="edit"
+                                                component={Link}
+                                                to={`${tournament.id}/update`}
+                                            >
+                                                <Edit />
+                                            </IconButton>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <Button component={Link} to={`${tournament.id}/admin`}>
+                                            Danh sách ban tổ chức
+                                        </Button>
+                                        <Button component={Link} to={`${tournament.id}/members`}>
+                                            Danh sách vận động viên
+                                        </Button>
                                     </div>
                                 </div>
                             </li>

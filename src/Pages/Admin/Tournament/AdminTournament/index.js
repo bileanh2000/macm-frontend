@@ -2,10 +2,8 @@ import { Box, Button, FormControl, Grid, MenuItem, Select, Typography } from '@m
 import React, { Fragment, useState } from 'react';
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import eventApi from 'src/api/eventApi';
+import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import AdminList from './AdminList';
-// import Header from './Header';
-// import MemberList from './MemberList';
 
 const _memberList = [
     {
@@ -32,39 +30,34 @@ const _memberList = [
 ];
 
 function AdminTournament() {
-    let { id } = useParams();
-    const [type, setType] = useState(0);
+    let { tournamentId } = useParams();
     const [adminList, setAdminList] = useState([]);
 
-    const handleChangeType = (event) => {
-        setType(event.target.value);
-    };
-
-    const fetchUserInEvent = async (params, index) => {
-        // try {
-        //     const response = await eventApi.getAllMemberEvent(params, index);
-        //     console.log(response);
-        //     setUserList(response.data);
-        // } catch (error) {
-        //     console.log('Failed to fetch user list: ', error);
-        // }
+    const fetchAdminInTournament = async (params) => {
+        try {
+            const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
+            console.log(response);
+            setAdminList(response.data);
+        } catch (error) {
+            console.log('Failed to fetch admin list: ', error);
+        }
     };
 
     useEffect(() => {
-        fetchUserInEvent(id, type);
-    }, [id, type]);
+        fetchAdminInTournament(tournamentId);
+    }, [tournamentId]);
 
     return (
         <Fragment>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                    Danh sách thành viên tham gia
+                    Danh sách thành viên ban tổ chức
                 </Typography>
                 <Box>
                     <Button
                         variant="outlined"
                         component={Link}
-                        to={`/admin/events/${id}/member/addtoadmin`}
+                        to={`/admin/tournament/${tournamentId}/admin/addadmin`}
                         sx={{ mr: 2 }}
                     >
                         Cập nhật thành viên ban tổ chức

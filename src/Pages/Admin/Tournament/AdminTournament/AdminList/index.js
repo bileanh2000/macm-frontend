@@ -9,69 +9,17 @@ function AdminList({ data }) {
     const [pageSize, setPageSize] = useState(10);
 
     console.log(data);
+
     const columns = [
         { field: 'studentName', headerName: 'Tên', flex: 0.8 },
-        { field: 'email', headerName: 'Email', flex: 1 },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
             width: 150,
             flex: 0.6,
         },
-        { field: 'roleInClub', headerName: 'Vai trò trong CLB', width: 150, flex: 1 },
         { field: 'role', headerName: 'Vai trò trong sự kiện', width: 150, flex: 1 },
-        // {
-        //     field: 'attendanceStatus',
-        //     headerName: 'Trạng thái',
-        //     flex: 0.5,
-        //     renderCell: (cellValues) => {
-        //         return (
-        //             <Button
-        //                 Continue
-        //                 sx={{
-        //                     // borderRadius: '5px',
-        //                     ...(cellValues.row.attendanceStatus === 'Đã đăng kí'
-        //                         ? {
-        //                               backgroundColor: '#00AD31',
-        //                               boxShadow: 'none',
-        //                               width: '112px',
-        //                               '&:hover': {
-        //                                   backgroundColor: '#00AD31',
-        //                                   boxShadow: 'none',
-        //                               },
-        //                               '&:active': {
-        //                                   boxShadow: 'none',
-        //                                   backgroundColor: '#00AD31',
-        //                               },
-        //                           }
-        //                         : {
-        //                               backgroundColor: '#ff3838',
-        //                               boxShadow: 'none',
-        //                               width: '112px',
-        //                               '&:hover': {
-        //                                   backgroundColor: '#ff3838',
-        //                                   boxShadow: 'none',
-        //                               },
-        //                               '&:active': {
-        //                                   boxShadow: 'none',
-        //                                   backgroundColor: '#ff3838',
-        //                               },
-        //                           }),
-        //                 }}
-        //                 variant="contained"
-        //                 color="primary"
-        //                 // onClick={(event) => {
-        //                 //     handleUpdateStatus(cellValues.row.studentId);
-        //                 // }}
-        //                 // onClick={(event) => {
-        //                 //     toggleStatus(cellValues.row.studentId);
-        //                 // }}
-        //             >
-        //                 {cellValues.row.attendanceStatus}
-        //             </Button>
-        //         );
-        //     },
-        // },
+        { field: 'registerStatus', headerName: 'Trạng thái', width: 150, flex: 1 },
         {
             field: 'paymentStatus',
             headerName: 'Đóng tiền',
@@ -80,7 +28,6 @@ function AdminList({ data }) {
                 return (
                     <Button
                         sx={{
-                            // borderRadius: '5px',
                             ...(cellValues.row.paymentStatus === 'Đã đóng'
                                 ? {
                                       backgroundColor: '#00AD31',
@@ -123,13 +70,11 @@ function AdminList({ data }) {
         data &&
         data.map((item, index) => {
             const container = {};
-            container['id'] = index + 1;
+            container['id'] = item.id;
             container['studentName'] = item.userName;
-            container['email'] = item.userMail;
             container['studentId'] = item.userStudentId;
-            container['attendanceStatus'] = item.attendanceStatus ? 'Đã đăng kí' : 'Đã hủy';
-            container['role'] = item.roleEventDto.name;
-            container['roleInClub'] = item.roleInClub;
+            container['role'] = item.roleTournamentDto.name;
+            container['registerStatus'] = item.registerStatus;
             container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
             return container;
         });

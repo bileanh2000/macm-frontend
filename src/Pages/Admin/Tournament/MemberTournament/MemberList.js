@@ -5,134 +5,67 @@ import clsx from 'clsx';
 import { styled } from '@mui/material/styles';
 import { Button } from '@mui/material';
 
-function MemberList({ data }) {
+function MemberList({ data, type }) {
     const [pageSize, setPageSize] = useState(10);
 
-    console.log(data);
-    const columns = [
-        { field: 'studentName', headerName: 'Tên', flex: 0.8 },
-        { field: 'email', headerName: 'Email', flex: 1 },
-        {
-            field: 'studentId',
-            headerName: 'Mã sinh viên',
-            width: 150,
-            flex: 0.6,
-        },
-        { field: 'roleInClub', headerName: 'Vai trò trong CLB', width: 150, flex: 1 },
-        { field: 'role', headerName: 'Vai trò trong sự kiện', width: 150, flex: 1 },
-        // {
-        //     field: 'attendanceStatus',
-        //     headerName: 'Trạng thái',
-        //     flex: 0.5,
-        //     renderCell: (cellValues) => {
-        //         return (
-        //             <Button
-        //                 Continue
-        //                 sx={{
-        //                     // borderRadius: '5px',
-        //                     ...(cellValues.row.attendanceStatus === 'Đã đăng kí'
-        //                         ? {
-        //                               backgroundColor: '#00AD31',
-        //                               boxShadow: 'none',
-        //                               width: '112px',
-        //                               '&:hover': {
-        //                                   backgroundColor: '#00AD31',
-        //                                   boxShadow: 'none',
-        //                               },
-        //                               '&:active': {
-        //                                   boxShadow: 'none',
-        //                                   backgroundColor: '#00AD31',
-        //                               },
-        //                           }
-        //                         : {
-        //                               backgroundColor: '#ff3838',
-        //                               boxShadow: 'none',
-        //                               width: '112px',
-        //                               '&:hover': {
-        //                                   backgroundColor: '#ff3838',
-        //                                   boxShadow: 'none',
-        //                               },
-        //                               '&:active': {
-        //                                   boxShadow: 'none',
-        //                                   backgroundColor: '#ff3838',
-        //                               },
-        //                           }),
-        //                 }}
-        //                 variant="contained"
-        //                 color="primary"
-        //                 // onClick={(event) => {
-        //                 //     handleUpdateStatus(cellValues.row.studentId);
-        //                 // }}
-        //                 // onClick={(event) => {
-        //                 //     toggleStatus(cellValues.row.studentId);
-        //                 // }}
-        //             >
-        //                 {cellValues.row.attendanceStatus}
-        //             </Button>
-        //         );
-        //     },
-        // },
-        {
-            field: 'paymentStatus',
-            headerName: 'Đóng tiền',
-            flex: 0.5,
-            renderCell: (cellValues) => {
-                return (
-                    <Button
-                        sx={{
-                            // borderRadius: '5px',
-                            ...(cellValues.row.paymentStatus === 'Đã đóng'
-                                ? {
-                                      backgroundColor: '#00AD31',
-                                      boxShadow: 'none',
-                                      width: '112px',
-                                      '&:hover': {
-                                          backgroundColor: '#00AD31',
-                                          boxShadow: 'none',
-                                      },
-                                      '&:active': {
-                                          boxShadow: 'none',
-                                          backgroundColor: '#00AD31',
-                                      },
-                                  }
-                                : {
-                                      backgroundColor: '#ff3838',
-                                      boxShadow: 'none',
-                                      width: '112px',
-                                      '&:hover': {
-                                          backgroundColor: '#ff3838',
-                                          boxShadow: 'none',
-                                      },
-                                      '&:active': {
-                                          boxShadow: 'none',
-                                          backgroundColor: '#ff3838',
-                                      },
-                                  }),
-                        }}
-                        variant="contained"
-                        color="primary"
-                    >
-                        {cellValues.row.paymentStatus}
-                    </Button>
-                );
-            },
-        },
-    ];
+    let columns;
+    let rowsPlayer;
 
-    const rowsUser =
-        data &&
-        data.map((item, index) => {
-            const container = {};
-            container['id'] = index + 1;
-            container['studentName'] = item.userName;
-            container['email'] = item.userMail;
-            container['studentId'] = item.userStudentId;
-            container['attendanceStatus'] = item.attendanceStatus ? 'Đã đăng kí' : 'Đã hủy';
-            container['role'] = item.roleEventDto.name;
-            container['roleInClub'] = item.roleInClub;
-            container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
-            return container;
-        });
+    if (type === 2) {
+        columns = [
+            { field: 'id', headerName: 'ID', flex: 0.8, hide: true },
+            { field: 'teamName', headerName: 'Tên nhóm', flex: 0.8 },
+            { field: 'playerName', headerName: 'Tên thành viên', flex: 0.8 },
+            {
+                field: 'studentId',
+                headerName: 'Mã sinh viên',
+                width: 150,
+                flex: 0.6,
+            },
+            { field: 'playerGender', headerName: 'Giới tính', width: 150, flex: 1 },
+            { field: 'role', headerName: 'Vai trò', width: 150, flex: 1 },
+        ];
+
+        const newRowsPlayer =
+            data &&
+            data.map((item, index) => {
+                return item.exhibitionPlayersDto.map((i) => {
+                    const container = {};
+                    container['id'] = i.id;
+                    container['teamName'] = item.teamName;
+                    container['playerName'] = i.playerName;
+                    container['studentId'] = i.playerStudentId;
+                    container['playerGender'] = i.playerGender ? 'Nam' : 'Nữ';
+                    container['role'] = i.roleInTeam ? 'Trưởng nhóm' : 'Thành viên';
+                    return container;
+                });
+            });
+        rowsPlayer = [].concat(...newRowsPlayer);
+    } else {
+        columns = [
+            { field: 'studentName', headerName: 'Tên', flex: 0.8 },
+            {
+                field: 'studentId',
+                headerName: 'Mã sinh viên',
+                width: 150,
+                flex: 0.6,
+            },
+            { field: 'playerGender', headerName: 'Giới tính', width: 150, flex: 1 },
+            { field: 'weight', headerName: 'Hạng cân', width: 150, flex: 1 },
+        ];
+
+        rowsPlayer =
+            data &&
+            data.map((item, index) => {
+                const container = {};
+                container['id'] = index + 1;
+                container['studentName'] = item.playerName;
+                container['weight'] = item.weight;
+                container['studentId'] = item.playerStudentId;
+                container['playerGender'] = item.playerGender ? 'Nam' : 'Nữ';
+                return container;
+            });
+    }
 
     function CustomToolbar() {
         return (
@@ -236,7 +169,7 @@ function MemberList({ data }) {
             <DataGrid
                 loading={data.length === 0}
                 disableSelectionOnClick={true}
-                rows={rowsUser}
+                rows={rowsPlayer}
                 columns={columns}
                 pageSize={pageSize}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

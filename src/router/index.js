@@ -108,7 +108,7 @@ const privateRouters = [
         component: UpdateTouramentSchedule,
     },
     { path: '/admin/tournament/:tournamentId/admin', component: AdminTournament },
-    { path: '/admin/tournament/:tournamentId/addadmin', component: AddAdminTourament },
+    { path: '/admin/tournament/:tournamentId/admin/addadmin', component: AddAdminTourament },
     { path: '/admin/tournament/:tournamentId/members', component: MemberTournament },
 
     //News paths

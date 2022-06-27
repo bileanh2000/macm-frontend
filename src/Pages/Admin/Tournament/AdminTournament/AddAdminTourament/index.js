@@ -246,7 +246,7 @@ function AddAdminTourament() {
                 </Alert>
             </Snackbar>
             <Typography variant="h4" sx={{ mb: 3 }}>
-                Cập nhật vai trò thành viên trong sự kiện
+                Cập nhật vai trò thành viên trong giải đấu
             </Typography>
             <p></p>
             <Box

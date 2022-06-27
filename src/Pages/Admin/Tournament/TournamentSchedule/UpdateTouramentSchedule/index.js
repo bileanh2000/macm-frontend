@@ -14,9 +14,10 @@ import { useForm, Controller } from 'react-hook-form';
 
 function UpdateTouramentSchedule() {
     const currentDate = new Date();
+    const { tournamentScheduleId } = useParams();
 
     const [open, setOpen] = useState(false);
-    const { scheduleId } = useParams();
+    // const { tournamentScheduleId } = useParams();
     const [scheduleList, setScheduleList] = useState([]);
 
     const [value, setValue] = useState(scheduleList);
@@ -43,13 +44,14 @@ function UpdateTouramentSchedule() {
         const fetchSchedule = async () => {
             try {
                 const response = await trainingSchedule.getAllSchedule();
+                console.log(response);
                 console.log(
                     'Thanh cong roi: ',
-                    response.data.filter((item) => item.id === parseInt(scheduleId)),
+                    response.data.filter((item) => item.id === parseInt(tournamentScheduleId)),
                 );
 
-                console.log('scheduleId ', scheduleId);
-                let dataSelected = response.data.filter((item) => item.id === parseInt(scheduleId));
+                console.log('tournamentScheduleId ', tournamentScheduleId);
+                let dataSelected = response.data.filter((item) => item.id === parseInt(tournamentScheduleId));
                 let dateSelected = dataSelected[0].date;
                 setScheduleList(dataSelected);
                 setSelectedDate(new Date(dateSelected));
@@ -70,7 +72,7 @@ function UpdateTouramentSchedule() {
 
     const handleConfirmDialog = async () => {
         setOpen(false);
-        await trainingSchedule.deleteSession(scheduleId).then((res) => {
+        await trainingSchedule.deleteSession(tournamentScheduleId).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
             console.log('3', res.message);
@@ -108,7 +110,7 @@ function UpdateTouramentSchedule() {
     let navigate = useNavigate();
     const onSubmit = async (data) => {
         data = {
-            id: parseInt(scheduleId, 10),
+            id: parseInt(tournamentScheduleId, 10),
             date: moment(dateValue).format('yyyy-MM-DD'),
             startTime: data.startTime,
             finishTime: data.finishTime,
@@ -132,9 +134,6 @@ function UpdateTouramentSchedule() {
         });
         console.log('form submit', data);
     };
-    // const onSubmit = (data) => {
-    //     console.log('form submit', data);
-    // };
     return (
         <Box>
             <Snackbar
@@ -160,7 +159,7 @@ function UpdateTouramentSchedule() {
             >
                 <DialogTitle id="alert-dialog-title">{'Xác nhận xóa!'}</DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description">Bạn muốn xóa buổi sự kiện này?</DialogContentText>
+                    <DialogContentText id="alert-dialog-description">Bạn muốn xóa buổi tập này?</DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Từ chối</Button>
@@ -171,13 +170,13 @@ function UpdateTouramentSchedule() {
             </Dialog>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" color="initial" sx={{ marginBottom: '16px', fontWeight: '700' }}>
-                    Cập nhật buổi tập
+                    Cập nhật lịch thi đấu {tournamentScheduleId}
                 </Typography>
                 {selectedDate <= currentDate ? (
                     ''
                 ) : (
                     <Button variant="outlined" startIcon={<DeleteIcon />} color="error" onClick={handleClickOpen}>
-                        Xóa buổi sự kiện
+                        Xóa lịch thi đấu
                     </Button>
                 )}
             </Box>

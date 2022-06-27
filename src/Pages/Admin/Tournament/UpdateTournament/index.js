@@ -29,7 +29,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import classNames from 'classnames/bind';
 import moment from 'moment';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import styles from '../CreateTournament/CreateTournament.module.scss';
 import UpdatePerformanceCompetition from './UpdatePerformanceCompetition';
@@ -48,6 +48,7 @@ function UpdateTournament() {
     const [previewTournament, setPreviewTournament] = useState([]);
     const { tournamentId } = useParams();
     const [openSnackBar, setOpenSnackBar] = useState(false);
+    let navigator = useNavigate();
     let snackBarStatus;
 
     const getListTournamentsBySemester = async () => {
@@ -113,7 +114,7 @@ function UpdateTournament() {
             competitiveTypesDto: datasFightingCompetition,
             description: data.description,
             exhibitionTypesDto: datasPerformanceCompetition,
-            maxQuantityComitee: data.numOfParticipants,
+            maxQuantityComitee: data.maxQuantityComitee,
             totalAmount: data.cost,
             name: data.tournamentName,
         };
@@ -126,6 +127,7 @@ function UpdateTournament() {
                 // setSnackBarStatus(true);
                 snackBarStatus = true;
                 dynamicAlert(snackBarStatus, res.message);
+                navigator(-1);
             } else {
                 console.log('huhu');
                 setOpenSnackBar(true);
