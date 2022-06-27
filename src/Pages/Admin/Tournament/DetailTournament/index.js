@@ -6,6 +6,12 @@ import {
     DialogContentText,
     DialogTitle,
     Grid,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     Typography,
 } from '@mui/material';
 import { Box } from '@mui/system';
@@ -158,9 +164,15 @@ function DetailTournament() {
                                     )}
                                 </Box>
                             </Box>
-                            <Grid container columns={12} sx={{ mt: 2 }}>
+                            <Grid container columns={12} sx={{ mt: 2 }} spacing={2}>
                                 <Grid item xs={4}>
                                     <Box sx={{ marginTop: '16px' }}>
+                                        <div>
+                                            <Typography variant="h6">
+                                                <strong>Nội dung: </strong>
+                                                <p>{item.description}</p>
+                                            </Typography>
+                                        </div>
                                         <div>
                                             <Typography variant="h6">
                                                 <strong>Số thành viên ban tổ chức:</strong> {item.maxQuantityComitee}
@@ -178,11 +190,66 @@ function DetailTournament() {
                                                 {item.amount_per_register.toLocaleString('en-US')} vnđ
                                             </Typography>
                                         </div>
+
                                         <div>
-                                            <Typography variant="h6">
-                                                <strong>Nội dung: </strong>
-                                                <p>{item.description}</p>
-                                            </Typography>
+                                            {item.competitiveTypes.length > 0 && (
+                                                <TableContainer sx={{ maxHeight: 440 }}>
+                                                    <Typography variant="h6">
+                                                        <strong>Thi đấu đối kháng: </strong>
+                                                    </Typography>
+                                                    <Table stickyHeader aria-label="sticky table">
+                                                        <TableHead>
+                                                            <TableRow>
+                                                                <TableCell align="center">Giới tính</TableCell>
+                                                                <TableCell align="center">Hạng cân</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {item.competitiveTypes.map((data) => (
+                                                                <TableRow key={data.id}>
+                                                                    <TableCell>
+                                                                        {data.gender == 1 ? 'Nam' : 'Nữ'}
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        {data.weightMin} - {data.weightMax} Kg
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
+                                            )}
+                                        </div>
+                                        <div>
+                                            {item.exhibitionTypes.length > 0 && (
+                                                <TableContainer sx={{ maxHeight: 440 }}>
+                                                    <Typography variant="h6">
+                                                        <strong>Thi đấu biểu diễn: </strong>
+                                                    </Typography>
+                                                    <Table stickyHeader aria-label="sticky table">
+                                                        <TableHead>
+                                                            <TableRow>
+                                                                <TableCell align="center">Nội dung thi đấu</TableCell>
+                                                                <TableCell align="center">Số lượng nữ</TableCell>
+                                                                <TableCell align="center">Số lượng nam</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {item.exhibitionTypes.map((data) => (
+                                                                <TableRow key={data.id}>
+                                                                    <TableCell>{data.name}</TableCell>
+                                                                    <TableCell align="center">
+                                                                        {data.numberFemale}
+                                                                    </TableCell>
+                                                                    <TableCell align="center">
+                                                                        {data.numberMale}
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
+                                            )}
                                         </div>
                                     </Box>
                                 </Grid>

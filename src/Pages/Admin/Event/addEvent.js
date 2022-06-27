@@ -44,6 +44,8 @@ function AddEvent() {
     const [open, setOpen] = useState(false);
     const [previewData, setPreviewData] = useState([]);
     const [eventId, setEventId] = useState();
+    const [checked, setChecked] = useState(false);
+    const [isOverride, setIsOverride] = useState(-1);
     let navigator = useNavigate();
 
     const handleClickOpen = () => {
@@ -124,6 +126,7 @@ function AddEvent() {
         startDate: Yup.string().nullable().required('Không được để trống trường này'),
         finishDate: Yup.string().nullable().required('Không được để trống trường này'),
     });
+
     const {
         register,
         control,
@@ -160,6 +163,7 @@ function AddEvent() {
                 // setSnackBarStatus(true);
                 // snackBarStatus = true;
                 // dynamicAlert(snackBarStatus, res.message);
+                checkOveride(res.data);
                 setPreviewData(res.data);
                 setOpen(true);
             } else {
@@ -178,10 +182,34 @@ function AddEvent() {
         container['date'] = item.date;
         container['title'] = item.title + '-' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
-        container['backgroundColor'] = '#5ba8f5';
+        container['backgroundColor'] = isOverride === -1 || isOverride === 0 ? '#5ba8f5' : '#ff3d00';
 
         return container;
     });
+
+    const handleChangeOverride = (event) => {
+        setChecked(event.target.checked);
+        if (event.target.checked) {
+            setIsOverride(-1);
+        } else {
+            setIsOverride(0);
+        }
+    };
+
+    const checkOveride = (EventSchedule) => {
+        EventSchedule.map((item) => {
+            if (item.title.toString() === 'Trùng với Lịch tập') {
+                setIsOverride(0);
+                return 0;
+            } else if (item.title.toString().includes('Trùng với')) {
+                setIsOverride(1);
+                return 1;
+            } else {
+                setIsOverride(-1);
+                return -1;
+            }
+        });
+    };
     const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
         const { onChange, ...other } = props;
 
@@ -211,7 +239,7 @@ function AddEvent() {
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                 Thêm sự kiện mới
             </Typography>
-            <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
+            <Dialog fullWidth maxWidth="lg" open={open}>
                 <DialogTitle>Xem trước lịch sự kiện</DialogTitle>
                 <DialogContent sx={{ height: '590px' }}>
                     <FullCalendar
@@ -252,10 +280,21 @@ function AddEvent() {
                         // select={handleEventAdd}
                         // eventDrop={(e) => console.log(e)}
                     />
+                    {(isOverride === 0 || isOverride === -1) && (
+                        <FormControlLabel
+                            sx={{ marginLeft: '1px' }}
+                            control={
+                                <Switch hidden={isOverride === 1} checked={checked} onChange={handleChangeOverride} />
+                            }
+                            label="Lịch đang trùng với lịch tập, bạn có muốn tạo không"
+                        />
+                    )}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Quay lại</Button>
-                    <Button onClick={handleCreate}>Đồng ý</Button>
+                    <Button onClick={handleCreate} disabled={isOverride === 1 || isOverride === 0}>
+                        Đồng ý
+                    </Button>
                 </DialogActions>
             </Dialog>
             <Box

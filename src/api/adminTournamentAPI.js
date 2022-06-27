@@ -88,6 +88,25 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
+    getAllOrginizingCommitteeRole: () => {
+        const url = `/tournament/headclub/getallorganizingcommitteerole`;
+        return axiosClient.get(url);
+    },
+
+    declineRequestToJoinOrganizingCommittee: (organizingCommitteeId) => {
+        const url = `/tournament/headclub/declinerequesttojoinorganizingcommittee/${organizingCommitteeId}`;
+        return axiosClient.put(url);
+    },
+
+    acceptRequestToJoinOrganizingCommittee: (organizingCommitteeId) => {
+        const url = `/tournament/headclub/acceptrequesttojoinorganizingcommittee/${organizingCommitteeId}`;
+        return axiosClient.put(url);
+    },
+
+    updateTournamentOrganizingCommitteeRole: (params) => {
+        const url = '/tournament/headclub/updatetournamentorganizingcommitteerole';
+        return axiosClient.put(url, params);
+    },
     ///////////////////////////
 
     // getAllMemberEvent: (params, index) => {

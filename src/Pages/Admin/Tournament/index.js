@@ -9,6 +9,8 @@ import {
     DialogTitle,
     Grid,
     IconButton,
+    MenuItem,
+    TextField,
     Typography,
 } from '@mui/material';
 import { Delete, Edit, AddCircle } from '@mui/icons-material';
@@ -29,6 +31,10 @@ function Tournament() {
     const [openDialog, setOpenDialog] = useState(false);
     const [tournamentOnclick, setTournamentOnclick] = useState({ name: '', id: '' });
 
+    const handleChange = (event) => {
+        setSemester(event.target.value);
+    };
+
     const getListTournamentBySemester = async (params) => {
         try {
             const response = await adminTournamentAPI.getAllTournament(params);
@@ -40,7 +46,6 @@ function Tournament() {
             console.log('Lấy dữ liệu thất bại', error);
         }
     };
-    console.log(tournaments);
 
     const fetchSemester = async () => {
         try {
@@ -55,6 +60,10 @@ function Tournament() {
     useEffect(() => {
         getListTournamentBySemester(semester);
     }, [semester]);
+
+    useEffect(() => {
+        fetchSemester();
+    }, []);
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -100,25 +109,43 @@ function Tournament() {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Grid container spacing={2}>
-                <Grid item xs={8}>
-                    <Typography variant="h3">Quản lý giải đấu</Typography>
-                </Grid>
-                <Grid item xs={4}>
-                    {/* <Button component={Link} to="./create" sx={{ float: 'right', marginRight: 10 }}>
-                        Tạo giải đấu
-                    </Button> */}
-                    <Button
-                        variant="outlined"
-                        sx={{ maxHeight: '50px', minHeight: '50px' }}
-                        component={Link}
-                        to={'./create'}
-                        startIcon={<AddCircle />}
-                    >
-                        Tạo giải đấu
-                    </Button>
-                </Grid>
-            </Grid>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
+                    Quản lý giải đấu
+                </Typography>
+                <Button
+                    variant="outlined"
+                    sx={{ maxHeight: '50px', minHeight: '50px' }}
+                    component={Link}
+                    to={'./create'}
+                    startIcon={<AddCircle />}
+                >
+                    Tạo giải đấu
+                </Button>
+            </Box>
+            <Box>
+                <TextField
+                    id="outlined-select-currency"
+                    select
+                    size="small"
+                    label="Chọn kỳ"
+                    value={semester}
+                    onChange={handleChange}
+                >
+                    {semesterList.map((option) => (
+                        <MenuItem key={option.id} value={option.name}>
+                            {option.name}
+                        </MenuItem>
+                    ))}
+                </TextField>
+            </Box>
+            {tournaments && tournaments.length === 0 ? (
+                <Typography variant="h5" sx={{ textAlign: 'center', mt: 3 }}>
+                    KHÔNG CÓ GIẢI ĐẤU NÀO TRONG KỲ
+                </Typography>
+            ) : (
+                ''
+            )}
             <Box component="div">
                 {tournaments ? (
                     tournaments.map((tournament) => {

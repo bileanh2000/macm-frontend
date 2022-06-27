@@ -85,7 +85,7 @@ function MemberTournament() {
         fetchExhibitionTeam(tournamentId, exhibitionType == 0 ? { exhibitionType: 0 } : exhibitionType);
         fetchTournamentById(tournamentId);
         fetchExhibitionType(tournamentId);
-    }, []);
+    }, [type]);
 
     return (
         <Fragment>
