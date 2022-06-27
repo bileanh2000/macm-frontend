@@ -8,6 +8,13 @@
     text-decoration: none;
 }
 
+
+ul,
+li {
+    list-style-type: none;
+}
+
+
 //----------- OVERRIDE FULLCALENDAR STYLE -----------
 .fc-bg-event {
     opacity: 1 !important;
@@ -36,6 +43,9 @@
 
 .fc-toolbar {
     align-items: flex-end !important;
+}
+.fc-event-past {
+    background-color: rgb(187, 187, 187) !important;
 }
 
 //----------------------

@@ -122,7 +122,7 @@ function AddUser() {
     const validationSchema = Yup.object().shape({
         name: Yup.string().required('Không được để trống trường này'),
         studentId: Yup.mixed().uniqueStudentId(),
-        dateOfBirth: Yup.string().required('Không được để trống trường này'),
+        dateOfBirth: Yup.string().nullable().required('Không được để trống trường này'),
         email: Yup.mixed().uniqueEmail(),
         gender: Yup.string().required('Không được để trống trường này'),
         phone: Yup.mixed().uniquePhone(),
@@ -245,15 +245,7 @@ function AddUser() {
                             error={errors.studentId ? true : false}
                             helperText={errors.studentId?.message}
                         />
-                        {/* <TextField
-                            required
-                            id="outlined-disabled"
-                            label="Ngày sinh"
-                            fullWidth
-                            {...register('dateOfBirth')}
-                            error={errors.dateOfBirth ? true : false}
-                            helperText={errors.dateOfBirth?.message}
-                        /> */}
+
                         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                             <Controller
                                 required

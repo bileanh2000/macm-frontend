@@ -1,4 +1,4 @@
-import { Button, Typography } from '@mui/material';
+import { Box, Button, MenuItem, TextField, Typography } from '@mui/material';
 import { Fragment, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -9,9 +9,9 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { useState } from 'react';
 import trainingSchedule from 'src/api/trainingScheduleApi';
 import interactionPlugin from '@fullcalendar/interaction';
-import swal from 'sweetalert';
 import moment from 'moment';
-import { getDate } from 'date-fns';
+
+import semesterApi from 'src/api/semesterApi';
 
 const cx = classNames.bind(styles);
 
@@ -20,26 +20,46 @@ function TrainingSchedule() {
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
     const [scheduleList, setScheduleList] = useState([]);
     const [scheduleId, setScheduleId] = useState();
+    const [semester, setSemester] = useState(2);
+    const [semesterList, setSemesterList] = useState([]);
+
     const getMonthInCurrentTableView = (startDate) => {
         const temp = new Date(startDate);
         temp.setDate(temp.getDate() + 17);
         const currentMonth = temp.getMonth() + 1;
         const currentYear = temp.getFullYear();
         setMonthAndYear({ month: currentMonth, year: currentYear });
-        console.log(currentMonth, currentYear);
     };
+    const fetchScheduleBySemester = async (params) => {
+        try {
+            const response = await trainingSchedule.getAllScheduleBySemester(params);
+            console.log('Thanh cong roi: ', response);
+            setScheduleList(response.data);
+        } catch (error) {
+            console.log('That bai roi huhu ', error);
+        }
+    };
+    const fetchSemester = async () => {
+        try {
+            const response = await semesterApi.getTop3Semester();
+            console.log('Thanh cong roi, semester: ', response);
+            setSemesterList(response.data);
+        } catch (error) {
+            console.log('That bai roi huhu, semester: ', error);
+        }
+    };
+    const handleChange = (event) => {
+        console.log('semester', event.target.value);
+        let selectSemester = event.target.value;
+        setSemester(selectSemester);
+        // fetchScheduleBySemester(semester);
+    };
+
     useEffect(() => {
-        const fetchSchedule = async () => {
-            try {
-                const params = monthAndYear;
-                const response = await trainingSchedule.getAllSchedule();
-                console.log('Thanh cong roi: ', response);
-                setScheduleList(response.data);
-            } catch (error) {
-                console.log('That bai roi huhu ', error);
-            }
-        };
-        fetchSchedule();
+        fetchScheduleBySemester(semester);
+    }, [semester]);
+    useEffect(() => {
+        fetchSemester();
     }, []);
 
     const scheduleData = scheduleList.map((item) => {
@@ -52,11 +72,6 @@ function TrainingSchedule() {
 
         return container;
     });
-
-    useEffect(() => {
-        console.log(scheduleData);
-        console.log(scheduleData.filter((item) => item.id === 6));
-    }, [scheduleData]);
 
     const handleEventAdd = () => {
         console.log('selected');
@@ -83,12 +98,31 @@ function TrainingSchedule() {
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 700, marginBottom: 2 }}>
                 Theo dõi lịch tập
             </Typography>
-            <Button component={Link} to="/admin/trainingschedules/addsession" startIcon={<AddCircleIcon />}>
-                Thêm buổi tập
-            </Button>
-            <Button component={Link} to="/admin/trainingschedules/add" startIcon={<AddCircleIcon />}>
-                Thêm lịch tập
-            </Button>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <TextField
+                    id="outlined-select-currency"
+                    size="small"
+                    select
+                    label="Select"
+                    value={semester}
+                    onChange={handleChange}
+                >
+                    {semesterList.map((option) => (
+                        <MenuItem key={option.id} value={parseInt(option.id, 10)}>
+                            {option.name}
+                        </MenuItem>
+                    ))}
+                </TextField>
+                <Box>
+                    <Button component={Link} to="/admin/trainingschedules/addsession" startIcon={<AddCircleIcon />}>
+                        Thêm buổi tập
+                    </Button>
+                    <Button component={Link} to="/admin/trainingschedules/add" startIcon={<AddCircleIcon />}>
+                        Thêm lịch tập
+                    </Button>
+                </Box>
+            </Box>
+
             <div className={cx('schedule-container')}>
                 <div className={cx('schedule-content')}>
                     <FullCalendar
@@ -99,11 +133,12 @@ function TrainingSchedule() {
                         // events={[
                         //     {
                         //         id: 1,
-                        //         title: 'đi tập đi đmm',
-                        //         date: '2022-06-16',
+                        //         title: 'Teambuiding Tam đảo 18:00-19:00',
+                        //         start: '2022-06-24',
+                        //         end: '2022-06-27',
                         //         // display: 'background',
                         //         // textColor: 'white',
-                        //         backgroundColor: '#5ba8f5',
+                        //         // backgroundColor: '#5ba8f5',
                         //         classNames: ['test-css'],
                         //     },
                         // ]}
@@ -111,8 +146,9 @@ function TrainingSchedule() {
                         weekends={true}
                         headerToolbar={{
                             left: 'title',
-                            center: '',
+                            center: 'dayGridMonth,dayGridWeek',
                             right: 'prev next today',
+                            // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
                         }}
                         // editable={true}
                         // selectable={true}

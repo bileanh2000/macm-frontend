@@ -35,20 +35,31 @@ const adminClubFeeAPI = {
             },
         });
     },
-    //event fee api
-    getEventBySemester: (semesterId) => {
-        const url = `/event/geteventsbysemester/${semesterId}`;
+
+    getReportMembership: (id) => {
+        const url = `admin/treasure/membership/getreportmembershippaymentstatus/${id}`;
         return axiosClient.get(url);
     },
 
+    //event fee api
+    getEventBySemester: (semesterId) => {
+        const url = `/event/geteventsbysemester`;
+        return axiosClient.get(url, { params: { semester: semesterId } });
+    },
+
     getUserJoinEvent: (eventId) => {
-        const url = `/event/headculture/getalluserevent/${eventId}`;
+        const url = `/event/headculture/getmemberjoinevent/${eventId}`;
         return axiosClient.get(url);
     },
 
     updateUserPayment: (id) => {
-        const url = `/event/treasurer/updateusereventpaymentstatus/${id}`;
+        const url = `/event/treasurer/updatemembereventpaymentstatus/${id}`;
         return axiosClient.put(url);
+    },
+
+    getReportEvent: (id) => {
+        const url = `event/treasurer/getreportpaymentstatus/${id}`;
+        return axiosClient.get(url);
     },
 };
 

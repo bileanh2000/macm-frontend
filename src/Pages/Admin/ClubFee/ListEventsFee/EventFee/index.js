@@ -6,7 +6,7 @@ import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFi
 import clsx from 'clsx';
 import { useForm } from 'react-hook-form';
 import DialogCommon from 'src/Components/Dialog/Dialog';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 
 function EventFee() {
@@ -22,8 +22,9 @@ function EventFee() {
     const location = useLocation();
     const history = useNavigate();
     const _event = location.state?.event;
+    const view = location.state?.view;
     const [event, setEvent] = useState(_event);
-    console.log(event);
+    console.log(event, view);
 
     let attendance = userList.reduce((attendaceCount, user) => {
         return user.paymentStatus ? attendaceCount + 1 : attendaceCount;
@@ -105,13 +106,11 @@ function EventFee() {
                             onClick={() => toggleStatus(params.row.id)}
                             color="primary"
                             aria-details="Đã đóng"
-                            disabled={true}
                         />,
                         <GridActionsCellItem
                             icon={<RadioButtonUnchecked />}
                             label="Chưa đóng"
                             onClick={() => toggleStatus(params.row.id)}
-                            disabled={true}
                         />,
                     ];
                 }
@@ -129,6 +128,7 @@ function EventFee() {
                     />,
                 ];
             },
+            hide: view,
         },
     ];
 
@@ -215,7 +215,7 @@ function EventFee() {
                 </Grid>
                 <Grid item xs={8}>
                     <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                        {event.name}
+                        Tên sự kiện: {event.name} <Typography variant="subtitle2">{event.status}</Typography>
                         <Box sx={{ display: 'flex' }}>
                             <Typography variant="h6" sx={{ color: 'red', marginRight: 5 }}>
                                 Số tiền :{' '}
@@ -228,6 +228,11 @@ function EventFee() {
                     </Typography>
                 </Grid>
                 <Grid item xs={4}>
+                    <Button variant="contained" color="success">
+                        <Link to="./report" state={{ event: event }} style={{ color: 'white' }}>
+                            Lịch sử chỉnh sửa
+                        </Link>
+                    </Button>
                     <Typography variant="h6" sx={{ float: 'right' }}>
                         Đã đóng: {attendance}/{userList.length}
                     </Typography>
