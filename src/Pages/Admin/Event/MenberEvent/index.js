@@ -1,6 +1,8 @@
-import { Button, FormControl, Grid, MenuItem, Select, Typography } from '@mui/material';
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Box, Button, FormControl, Grid, MenuItem, Select, Typography } from '@mui/material';
+import React, { Fragment, useState } from 'react';
+import { useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import eventApi from 'src/api/eventApi';
 import Header from './Header';
 import MemberList from './MemberList';
 
@@ -29,45 +31,66 @@ const _memberList = [
 ];
 
 function MenberEvent() {
-    const [type, setType] = useState('All');
+    let { id } = useParams();
+    const [type, setType] = useState(0);
+    const [userList, setUserList] = useState([]);
 
     const handleChangeType = (event) => {
         setType(event.target.value);
     };
 
+    const fetchUserInEvent = async (params, index) => {
+        try {
+            const response = await eventApi.getAllMemberEvent(params, index);
+            console.log(response);
+            setUserList(response.data);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUserInEvent(id, type);
+    }, [id, type]);
+
     return (
-        <div>
-            <Grid container spacing={2}>
-                <Grid item xs={6}>
-                    <Typography variant="h4">Danh sách thành viên tham gia</Typography>
-                    <FormControl size="medium">
-                        <Typography variant="caption">Vai Trò</Typography>
-                        <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
-                            <MenuItem value="All">
-                                <em>Tất cả</em>
-                            </MenuItem>
-                            <MenuItem value={'Admin'}>Thành viên ban tổ chức</MenuItem>
-                        </Select>
-                    </FormControl>
-                </Grid>
-                <Grid item container xs={6}>
-                    <Link to="./membercancel" style={{ color: 'blue' }}>
-                        Danh sách thành viên hủy đăng ký tham gia sự kiện
-                    </Link>
-                    <Grid item xs={8}>
-                        <Button variant="contained">
-                            <Link to="./addtoadmin">Cập nhật thành viên vào ban tổ chức</Link>
-                        </Button>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Button variant="contained">
-                            <Link to="./addtoadmin">Điểm danh</Link>
-                        </Button>
-                    </Grid>
-                </Grid>
-            </Grid>
-            <MemberList data={_memberList} />
-        </div>
+        <Fragment>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                    Danh sách thành viên tham gia
+                </Typography>
+                <Box>
+                    <Button
+                        variant="outlined"
+                        component={Link}
+                        to={`/admin/events/${id}/member/addtoadmin`}
+                        sx={{ mr: 2 }}
+                    >
+                        Cập nhật thành viên ban tổ chức
+                    </Button>
+                    <Button variant="contained">
+                        {/* <Link to="./addtoadmin">Điểm danh</Link> */}
+                        Điểm danh
+                    </Button>
+                </Box>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
+                <FormControl size="small">
+                    <Typography variant="caption">Vai Trò</Typography>
+                    <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
+                        <MenuItem value={0}>
+                            <em>Tất cả</em>
+                        </MenuItem>
+                        <MenuItem value={1}>Thành viên tham gia</MenuItem>
+                        <MenuItem value={2}>Thành viên ban tổ chức</MenuItem>
+                    </Select>
+                </FormControl>
+                <Link to={`../admin/events/${id}/membercancel`}>Danh sách thành viên hủy đăng ký tham gia sự kiện</Link>
+                {/* <Typography variant="body1" component={}>Danh sách thành viên hủy đăng ký tham gia sự kiện</Typography> */}
+            </Box>
+
+            <MemberList data={userList} />
+        </Fragment>
     );
 }
 

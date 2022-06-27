@@ -33,6 +33,8 @@ function RenderSelectEditCell(props) {
             const editProps = {
                 value: Number(event.target.value),
             };
+            console.log(event.target.value);
+            setIdRole(event.target.value);
             api.commitCellChange({ id, field, props: editProps });
             api.setCellMode(id, field, 'view');
             event.stopPropagation();
@@ -42,20 +44,16 @@ function RenderSelectEditCell(props) {
 
     return (
         <FormControl className={classes.formControl}>
-            <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={props.row.id}
-                onChange={handleChange}
-            >
+            <Select labelId="demo-simple-select-label" id="demo-simple-select" value={value} onChange={handleChange}>
                 {/* {roles.map((role, index) => (
                     <MenuItem value={role.roleId} key={index}>
                         {role.roleName}
                     </MenuItem>
                 ))} */}
-                <MenuItem value={1}>Ban Van Hoa</MenuItem>
-                <MenuItem value={2}>Ban Truyen Thong</MenuItem>
-                <MenuItem value={3}>Ban Hau Can</MenuItem>
+                <MenuItem value={1}>Thành viên tham gia</MenuItem>
+                <MenuItem value={2}>Thành viên ban truyền thông</MenuItem>
+                <MenuItem value={3}>Thành viên ban hậu cần</MenuItem>
+                <MenuItem value={4}>Thành viên ban văn hóa</MenuItem>
             </Select>
         </FormControl>
     );

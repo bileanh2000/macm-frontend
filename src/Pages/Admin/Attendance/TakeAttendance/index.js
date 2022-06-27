@@ -26,6 +26,7 @@ function TakeAttendance() {
         try {
             const response = await adminAttendanceAPI.getAttendanceByStudentId(_trainingScheduleId);
             setUserList(response.data);
+            console.log('get from database', response.data);
         } catch (error) {
             console.log('Không thể lấy dữ liệu người dùng tham gia điểm danh. Error: ', error);
         }
@@ -133,7 +134,7 @@ function TakeAttendance() {
         history({ pathname: '/admin/attendance' }, { state: { id: _trainingScheduleId, date: _nowDate } });
     };
 
-    const takeAttendance = async (id) => {
+    const takeAttend = async (id) => {
         try {
             await adminAttendanceAPI.takeAttendance(id);
         } catch (error) {
@@ -142,7 +143,7 @@ function TakeAttendance() {
     };
 
     const toggleStatus = (id) => {
-        takeAttendance(id);
+        takeAttend(id);
         const newUserList = userList.map((user) => {
             return user.studentId === id ? { ...user, status: !user.status } : user;
         });
@@ -182,7 +183,7 @@ function TakeAttendance() {
                 </Alert>
             </Snackbar>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Trạng thái điểm danh ngày: {_nowDate.toLocaleDateString('vi-VN')}
+                Trạng thái điểm danh ngày: {_nowDate}
                 <Typography variant="h6">
                     Số người tham gia hôm nay {attendance}/{userList.length}
                 </Typography>

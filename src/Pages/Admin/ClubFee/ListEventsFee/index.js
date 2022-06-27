@@ -44,7 +44,7 @@ function ListEventsFee() {
 
     useEffect(() => {
         if (currentSemester) {
-            getEventsBySemester(currentSemester.name);
+            getEventsBySemester(currentSemester.id);
         }
     }, [currentSemester]);
 
@@ -71,7 +71,7 @@ function ListEventsFee() {
 
     const handleClickEvent = (row) => {
         console.log(row);
-        if (row.status === 'Chưa diễn ra') {
+        if (row.status === 'Chưa diễn ra' || row.status === 'Đang diễn ra') {
             history(
                 {
                     pathname: `/admin/clubfee/event/${row.id}`,
@@ -79,6 +79,12 @@ function ListEventsFee() {
                 { state: { event: row } },
             );
         } else {
+            history(
+                {
+                    pathname: `/admin/clubfee/event/${row.id}`,
+                },
+                { state: { event: row, view: true } },
+            );
             setOpenSnackBar(true);
             dynamicAlert(false, 'Event đã kết thúc');
         }

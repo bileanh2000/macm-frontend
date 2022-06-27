@@ -6,7 +6,8 @@ import { useForm } from 'react-hook-form';
 import { Link, useLocation } from 'react-router-dom';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 
-function ViewAttendance() {
+function ViewAttendance({ data }) {
+    console.log(data);
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
     const [totalActive, setTotalActive] = useState();
@@ -15,9 +16,12 @@ function ViewAttendance() {
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
     const location = useLocation();
 
-    const _trainingScheduleId = location.state?.id;
-    const _nowDate = location.state?.date;
-
+    let _trainingScheduleId = location.state?.id;
+    if (!_trainingScheduleId) _trainingScheduleId = data.trainingScheduleId;
+    console.log(_trainingScheduleId);
+    let _nowDate = location.state?.date;
+    if (!_nowDate) _nowDate = data.date;
+    console.log(_nowDate);
     const getAttendanceByStudentId = async () => {
         try {
             const response = await adminAttendanceAPI.getAttendanceByStudentId(_trainingScheduleId);
@@ -114,7 +118,7 @@ function ViewAttendance() {
                 </Alert>
             </Snackbar>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Trạng thái điểm danh ngày: {_nowDate.toLocaleDateString('vi-VN')}
+                Trạng thái điểm danh ngày: {_nowDate}
                 <Typography variant="h6">
                     Số người tham gia hôm nay {totalActive}/{totalResult}
                 </Typography>
