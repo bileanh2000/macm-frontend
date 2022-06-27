@@ -26,7 +26,17 @@ import EditNews from '../Pages/Admin/News/EditNews/EditNews';
 import CreateNews from '../Pages/Admin/News/CreateNews/CreateNews';
 import Rules from '../Pages/Admin/Rules';
 import TrainingSchedule from '../Pages/Admin/TrainingSchedule';
+
 import Tournament from '../Pages/Admin/Tournament';
+import DetailTournament from '../Pages/Admin/Tournament/DetailTournament';
+import CreateTourament from '../Pages/Admin/Tournament/CreateTournament';
+import UpdateTournament from '../Pages/Admin/Tournament/UpdateTournament';
+import TournamentSchedule from '../Pages/Admin/Tournament/TournamentSchedule';
+import UpdateTouramentSchedule from '../Pages/Admin/Tournament/TournamentSchedule/UpdateTouramentSchedule';
+import AdminTournament from '../Pages/Admin/Tournament/AdminTournament';
+import AddAdminTourament from '../Pages/Admin/Tournament/AdminTournament/AddAdminTourament';
+import MemberTournament from '../Pages/Admin/Tournament/MemberTournament';
+
 import CreateRule from '../Pages/Admin/Rules/CreateRule/CreateRule';
 import EditRule from '../Pages/Admin/Rules/EditRule/EditRule';
 import EditContact from '../Pages/Admin/Contact/EditContact/EditContact';
@@ -45,6 +55,7 @@ import Attendance from 'src/Pages/Admin/Attendance';
 import TakeAttendance from 'src/Pages/Admin/Attendance/TakeAttendance';
 import ViewEventSchedule from 'src/Pages/Admin/Event/ViewEventSchedule';
 import EditEventSchedule from 'src/Pages/Admin/Event/EditEventSchedule';
+import ReportFacility from 'src/Pages/Admin/Facility/ReportFacility';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -57,7 +68,6 @@ const privateRouters = [
     { path: '/admin/member/:userId/edit', component: UserDetailEditPage },
     { path: '/admin/headofdepartment/:userId/edit', component: UserDetailEditPage },
     { path: '/admin/adduser', component: AddUserPage },
-    { path: '/admin/facility', component: Facility },
     { path: '/admin/trainingschedule', component: TrainingSchedule },
 
     { path: '/admin/trainingschedules', component: TrainingSchedule },
@@ -87,7 +97,19 @@ const privateRouters = [
     { path: '/admin/rules/create', component: CreateRule },
     { path: '/admin/rules/edit', component: EditRule },
 
+    //Tournament
     { path: '/admin/tournament', component: Tournament },
+    { path: '/admin/tournament/:tournamentId', component: DetailTournament },
+    { path: '/admin/tournament/create', component: CreateTourament },
+    { path: '/admin/tournament/:tournamentId/update', component: UpdateTournament },
+    { path: '/admin/tournament/:tournamentId/tournamentschedule', component: TournamentSchedule },
+    {
+        path: '/admin/tournament/:tournamentId/tournamentschedule/:tournamentScheduleId/update',
+        component: UpdateTouramentSchedule,
+    },
+    { path: '/admin/tournament/:tournamentId/admin', component: AdminTournament },
+    { path: '/admin/tournament/:tournamentId/admin/addadmin', component: AddAdminTourament },
+    { path: '/admin/tournament/:tournamentId/members', component: MemberTournament },
 
     //News paths
     { path: '/admin/news', component: News },
@@ -95,18 +117,19 @@ const privateRouters = [
     { path: '/admin/news/:newsId/edit', component: EditNews },
     { path: '/admin/news/:newsId', component: NewsDetail },
 
-    //Event path
-    { path: '/admin/events', component: Event },
-    { path: '/admin/events/add', component: AddEvent },
-    { path: '/admin/events/:id', component: EventDetails },
-    { path: '/admin/events', component: Event },
     //Event paths
+    { path: '/admin/events', component: Event },
+    { path: '/admin/events/:id', component: EventDetails },
+    { path: '/admin/events/add', component: AddEvent },
     { path: '/admin/events/:id/edit', component: EditEvent },
     { path: '/admin/events/:id/eventschedule', component: ViewEventSchedule },
     { path: '/admin/events/:id/eventschedule/:eventScheduleId/edit', component: EditEventSchedule },
     { path: '/admin/events/:id/members', component: MemberEvent },
     { path: '/admin/events/:id/membercancel', component: MemberCancelEvent },
     { path: '/admin/events/:id/member/addtoadmin', component: AddToAdmin },
+    // Facility paths
+    { path: '/admin/facility', component: Facility },
+    { path: '/admin/facility/reports', component: ReportFacility },
 ];
 
 const publicRouters = [];

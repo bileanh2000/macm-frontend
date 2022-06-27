@@ -71,7 +71,7 @@ function ListEventsFee() {
 
     const handleClickEvent = (row) => {
         console.log(row);
-        if (row.status === 'Chưa diễn ra') {
+        if (row.status === 'Chưa diễn ra' || row.status === 'Đang diễn ra') {
             history(
                 {
                     pathname: `/admin/clubfee/event/${row.id}`,
