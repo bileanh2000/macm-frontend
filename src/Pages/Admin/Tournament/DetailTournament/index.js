@@ -27,7 +27,7 @@ import adminTournamentAPI from 'src/api/adminTournamentAPI';
 function DetailTournament() {
     let { tournamentId } = useParams();
     const [tournament, setTournament] = useState([]);
-    const [eventName, setEventName] = useState();
+    const [active, setActive] = useState(-1);
     const [scheduleList, setScheduleList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     let navigate = useNavigate();
@@ -55,6 +55,16 @@ function DetailTournament() {
         },
         [],
     );
+
+    const fetchAdminInTournament = async (params) => {
+        try {
+            const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
+            console.log(response);
+            setActive(response.totalActive);
+        } catch (error) {
+            console.log('Failed to fetch admin list: ', error);
+        }
+    };
 
     const getTournamentById = async () => {
         try {
@@ -91,8 +101,9 @@ function DetailTournament() {
     });
     useEffect(() => {
         getTournamentById();
+        fetchAdminInTournament(tournamentId);
         window.scrollTo({ behavior: 'smooth', top: '0px' });
-    }, []);
+    }, [tournamentId]);
 
     return (
         <Fragment>
@@ -175,8 +186,14 @@ function DetailTournament() {
                                         </div>
                                         <div>
                                             <Typography variant="h6">
-                                                <strong>Số thành viên ban tổ chức:</strong> {item.maxQuantityComitee}
+                                                <strong>Số thành viên tối đa trong ban tổ chức:</strong>{' '}
+                                                {item.maxQuantityComitee}
                                             </Typography>
+                                            {active > 0 && (
+                                                <Typography variant="h6">
+                                                    <strong>Số thành viên trong ban tổ chức hiện tại: </strong> {active}
+                                                </Typography>
+                                            )}
                                         </div>
                                         <div>
                                             <Typography variant="h6">
@@ -208,7 +225,7 @@ function DetailTournament() {
                                                             {item.competitiveTypes.map((data) => (
                                                                 <TableRow key={data.id}>
                                                                     <TableCell>
-                                                                        {data.gender == 1 ? 'Nam' : 'Nữ'}
+                                                                        {data.gender === 1 ? 'Nam' : 'Nữ'}
                                                                     </TableCell>
                                                                     <TableCell>
                                                                         {data.weightMin} - {data.weightMax} Kg

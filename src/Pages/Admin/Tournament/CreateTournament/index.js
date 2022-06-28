@@ -41,6 +41,7 @@ function CreateTourament() {
     const [datasFightingCompetition, setDataFightingCompetition] = useState([]);
     const [datasPerformanceCompetition, setDataPerformanceCompetition] = useState([]);
     const [open, setOpen] = useState(false);
+    const [startDate, setStartDate] = useState();
     const [submitData, setSubmitData] = useState([]);
     const [isChecked, setIsChecked] = useState(false);
     const [isOverride, setIsOverride] = useState(-1);
@@ -68,8 +69,12 @@ function CreateTourament() {
         ...(isChecked && {
             cash: Yup.string().required('Không được để trống trường này'),
         }),
-        startDate: Yup.string().nullable().required('Không được để trống trường này'),
-        finishDate: Yup.string().nullable().required('Không được để trống trường này'),
+        // startDate: Yup.string().nullable().required('Không được để trống trường này'),
+        // finishDate: Yup.string().nullable().required('Không được để trống trường này'),
+        startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
+        finishDate: Yup.date()
+            .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được bé hơn ngày bắt đầu`)
+            .typeError('Vui lòng không để trống trường này'),
         amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
         amountPerAdmin: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
     });
@@ -318,6 +323,7 @@ function CreateTourament() {
                                     render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                         <DatePicker
                                             label="Ngày bắt đầu"
+                                            inputFormat="dd/MM/yyyy"
                                             disablePast
                                             ampm={false}
                                             value={value}
@@ -347,13 +353,16 @@ function CreateTourament() {
                                 <Controller
                                     required
                                     name="finishDate"
+                                    inputFormat="dd/MM/yyyy"
                                     control={control}
                                     defaultValue={null}
                                     render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                         <DatePicker
                                             label="Ngày kết thúc"
+                                            minDate={startDate}
                                             disablePast
                                             ampm={false}
+                                            inputFormat="dd/MM/yyyy"
                                             value={value}
                                             onChange={(value) => onChange(value)}
                                             renderInput={(params) => (

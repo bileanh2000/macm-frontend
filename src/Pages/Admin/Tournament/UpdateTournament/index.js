@@ -4,10 +4,6 @@ import {
     Box,
     Button,
     Collapse,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     FormControlLabel,
     Grid,
     InputAdornment,
@@ -16,19 +12,14 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import { AddCircle } from '@mui/icons-material';
-import FullCalendar from '@fullcalendar/react';
-import { DatePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import vi from 'date-fns/locale/vi';
 import { Controller, useForm } from 'react-hook-form';
 import NumberFormat from 'react-number-format';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import classNames from 'classnames/bind';
-import moment from 'moment';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import styles from '../CreateTournament/CreateTournament.module.scss';
@@ -42,14 +33,22 @@ function UpdateTournament() {
     const [tournament, setTournament] = useState([]);
     const [datasFightingCompetition, setDataFightingCompetition] = useState([]);
     const [datasPerformanceCompetition, setDataPerformanceCompetition] = useState([]);
-    const [open, setOpen] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
-    const [description, setDescription] = useState('');
-    const [previewTournament, setPreviewTournament] = useState([]);
+    const [active, setActive] = useState(-1);
     const { tournamentId } = useParams();
     const [openSnackBar, setOpenSnackBar] = useState(false);
     let navigator = useNavigate();
     let snackBarStatus;
+
+    const fetchAdminInTournament = async (params) => {
+        try {
+            const response = await adminTournament.getAllTournamentOrganizingCommittee(params);
+            console.log(response);
+            setActive(response.totalActive);
+        } catch (error) {
+            console.log('Failed to fetch admin list: ', error);
+        }
+    };
 
     const getListTournamentsBySemester = async () => {
         try {
@@ -64,6 +63,7 @@ function UpdateTournament() {
     };
     useEffect(() => {
         getListTournamentsBySemester();
+        fetchAdminInTournament(tournamentId);
     }, []);
 
     const AddFightingCompetitionHandler = (FightingCompetition) => {
@@ -79,7 +79,7 @@ function UpdateTournament() {
         maxQuantityComitee: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+            .min(active, `Vui lòng nhập giá trị lớn hơn số lượng thành viên trong ban tổ chức hiện tại (${active})`),
         cost: Yup.string().required('Không được để trống trường này'),
         ...(isChecked && {
             cash: Yup.string().required('Không được để trống trường này'),
@@ -87,14 +87,6 @@ function UpdateTournament() {
         amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
         //amountPerAdmin: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
     });
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const handleCreate = () => {
-        console.log('create');
-    };
 
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
     const dynamicAlert = (status, message) => {
@@ -112,7 +104,6 @@ function UpdateTournament() {
             // totalAmount: data.totalAmount,
             amount_per_register: data.amountPerRegister,
             competitiveTypesDto: datasFightingCompetition,
-            description: data.description,
             exhibitionTypesDto: datasPerformanceCompetition,
             maxQuantityComitee: data.maxQuantityComitee,
             totalAmount: data.cost,
@@ -124,14 +115,12 @@ function UpdateTournament() {
             console.log('2', res.data);
             if (res.data.length !== 0) {
                 setOpenSnackBar(true);
-                // setSnackBarStatus(true);
                 snackBarStatus = true;
                 dynamicAlert(snackBarStatus, res.message);
                 navigator(-1);
             } else {
                 console.log('huhu');
                 setOpenSnackBar(true);
-                // setSnackBarStatus(false);
                 snackBarStatus = false;
                 dynamicAlert(snackBarStatus, res.message);
             }
@@ -343,7 +332,6 @@ function UpdateTournament() {
                                 multiline
                                 rows={4}
                                 // value={description}
-                                onChange={(e) => setDescription(e.target.value)}
                                 fullWidth
                                 {...register('description')}
                                 error={errors.description ? true : false}
