@@ -12,6 +12,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import moment from 'moment';
 
 import semesterApi from 'src/api/semesterApi';
+import { CollectionsBookmarkOutlined } from '@material-ui/icons';
 
 const cx = classNames.bind(styles);
 
@@ -126,6 +127,7 @@ function TrainingSchedule() {
             <div className={cx('schedule-container')}>
                 <div className={cx('schedule-content')}>
                     <FullCalendar
+                        // initialDate={new Date('2022-10-01')}
                         locale="vie"
                         height="60%"
                         plugins={[dayGridPlugin, interactionPlugin]}
@@ -157,6 +159,7 @@ function TrainingSchedule() {
                         }}
                         eventClick={(args) => {
                             navigateToUpdate(args.event.id, args.event.start);
+                            // console.log(args.event.start);
                         }}
                         // dateClick={function (arg) {
                         //     swal({

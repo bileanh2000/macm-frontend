@@ -83,13 +83,13 @@ function AddMemberToAdminEvent() {
     let { id } = useParams();
 
     const fetchUserInEvent = async (params) => {
-        // try {
-        //     const response = await eventApi.getListMemberToUpdate(params);
-        //     console.log(response);
-        //     setUserList(response.data);
-        // } catch (error) {
-        //     console.log('Failed to fetch user list: ', error);
-        // }
+        try {
+            const response = await eventApi.getListMemberToUpdate(params);
+            console.log(response);
+            setUserList(response.data);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
     };
 
     useEffect(() => {
@@ -262,7 +262,7 @@ function AddMemberToAdminEvent() {
                 }}
             >
                 <DataGrid
-                    loading={!userList.length}
+                    // loading={!userList.length}
                     disableSelectionOnClick={true}
                     rows={rowsUser}
                     columns={columns}

@@ -3,61 +3,55 @@ import { useParams, useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker, LocalizationProvider, StaticDatePicker, TimePicker } from '@mui/x-date-pickers';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import vi from 'date-fns/locale/vi';
 import { Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material';
-import trainingSchedule from 'src/api/trainingScheduleApi';
+import eventApi from 'src/api/eventApi';
 import moment from 'moment';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+
 function EditEventSchedule() {
     const currentDate = new Date();
 
     const [open, setOpen] = useState(false);
-    const { scheduleId } = useParams();
-    const [scheduleList, setScheduleList] = useState([]);
+    const { id } = useParams();
+    const [schedule, setSchedule] = useState([]);
+    const [previewData, setPreviewData] = useState([]);
 
-    const [value, setValue] = useState(scheduleList);
+    const [value, setValue] = useState(schedule);
     const [selectedDate, setSelectedDate] = useState();
     const [dateValue, setDateValue] = useState();
 
     const schema = Yup.object().shape({
-        date: Yup.string()
-            .nullable()
-            .matches(/(\d{4})-(\d{2})-(\d{2})/, 'Vui lòng nhập đúng định dạng ngày tháng YYYY-MM-DD'),
-        // endDate: Yup.string().nullable().required('Điền đi'),
-        startTime: Yup.string()
-            .nullable()
-            .required('Không để để trống trường này')
-            .matches(/(\d{2}):(\d{2}):(\d{2})/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
-        finishTime: Yup.string()
-            .nullable()
-            .required('Không để để trống trường này')
-            .matches(/(\d{2}):(\d{2}):(\d{2})/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
+        startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
+        finishDate: Yup.date()
+            .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được bé hơn ngày bắt đầu`)
+            .typeError('Vui lòng không để trống trường này'),
+        startTime: Yup.date().typeError('Vui lòng không để trống trường này'),
+        finishTime: Yup.date().typeError('Vui lòng không để trống trường này'),
     });
 
+    const fetchEventScheduleByEventId = async (params) => {
+        try {
+            const response = await eventApi.getPeriodTime(params);
+
+            console.log('fetchEventScheduleByEventId', response.data);
+            console.log('event id ', id);
+
+            setSchedule(response.data);
+        } catch (error) {
+            console.log('That bai roi huhu ', error);
+        }
+    };
     useEffect(() => {
         window.scrollTo(0, 0);
-        const fetchSchedule = async () => {
-            try {
-                const response = await trainingSchedule.getAllSchedule();
-                console.log(
-                    'Thanh cong roi: ',
-                    response.data.filter((item) => item.id === parseInt(scheduleId)),
-                );
-
-                console.log('scheduleId ', scheduleId);
-                let dataSelected = response.data.filter((item) => item.id === parseInt(scheduleId));
-                let dateSelected = dataSelected[0].date;
-                setScheduleList(dataSelected);
-                setSelectedDate(new Date(dateSelected));
-            } catch (error) {
-                console.log('That bai roi huhu ', error);
-            }
-        };
-        fetchSchedule();
-    }, []);
+        fetchEventScheduleByEventId(id);
+    }, [id]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -67,15 +61,15 @@ function EditEventSchedule() {
         setOpen(false);
     };
 
-    const handleConfirmDialog = async () => {
-        setOpen(false);
-        await trainingSchedule.deleteSession(scheduleId).then((res) => {
-            console.log('1', res);
-            console.log('2', res.data);
-            console.log('3', res.message);
-        });
-        setTimeout(navigate(-1), 50000);
-    };
+    // const handleConfirmDialog = async () => {
+    //     setOpen(false);
+    //     await trainingSchedule.deleteSession(id).then((res) => {
+    //         console.log('1', res);
+    //         console.log('2', res.data);
+    //         console.log('3', res.message);
+    //     });
+    //     setTimeout(navigate(-1), 50000);
+    // };
     const {
         control,
         handleSubmit,
@@ -107,139 +101,280 @@ function EditEventSchedule() {
     let navigate = useNavigate();
     const onSubmit = async (data) => {
         data = {
-            id: parseInt(scheduleId, 10),
-            date: moment(dateValue).format('yyyy-MM-DD'),
-            startTime: data.startTime,
-            finishTime: data.finishTime,
+            id: parseInt(id, 10),
+            startDate: moment(data.startDate).format('DD/MM/yyyy'),
+            finishDate: moment(data.finishDate).format('DD/MM/yyyy'),
+            startTime: moment(data.startTime).format('HH:mm:ss'),
+            finishTime: moment(data.finishTime).format('HH:mm:ss'),
         };
-        await trainingSchedule.updateSchedule(data).then((res) => {
-            console.log('1', res);
-            console.log('2', res.data);
+        console.log('form submit', data);
+        await eventApi.previewUpdateEventSessionTime(id, data).then((res) => {
+            console.log('preview', res);
+            console.log('preview Data', res.data);
+            setPreviewData(res.data);
             if (res.data.length != 0) {
-                setOpenSnackBar(true);
+                setOpen(true);
+                // setOpenSnackBar(true);
                 // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
-                navigate(`/admin/trainingschedules`);
+                // snackBarStatus = true;
+                // dynamicAlert(snackBarStatus, res.message);
+                // navigate(`/admin/events`);
             } else {
                 console.log('huhu');
-                setOpenSnackBar(true);
+                // setOpenSnackBar(true);
                 // setSnackBarStatus(false);
-                snackBarStatus = false;
-                dynamicAlert(snackBarStatus, res.message);
+                // snackBarStatus = false;
+                // dynamicAlert(snackBarStatus, res.message);
             }
         });
-        console.log('form submit', data);
     };
+    const EventSchedule = previewData.map((item, index) => {
+        const container = {};
+        container['id'] = index;
+        container['date'] = item.date;
+        container['title'] = item.title + '-' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['display'] = 'background';
+        // container['backgroundColor'] = '#5ba8f5';
+        container['existed'] = item.existed;
+        container['backgroundColor'] = item.existed ? '#ff3d00' : '#5ba8f5';
+
+        return container;
+    });
     // const onSubmit = (data) => {
     //     console.log('form submit', data);
     // };
+
+    const dateFormat = schedule.map((item) => {
+        return new Date(item);
+    });
+
+    const handleCreate = () => {
+        // const params = {
+        //     name: submitData.name,
+        //     amount_per_register: submitData.amountPerRegister,
+        //     description: submitData.description,
+        //     maxQuantityComitee: submitData.maxQuantityComitee,
+        //     totalAmount: submitData.cost,
+        //     IsContinuous: submitData.IsContinuous,
+        // };
+
+        eventApi.updateEventSchedule(id, previewData).then((response) => {
+            console.log('update event', response);
+            console.log('update event', response.data);
+
+            if (response.data.length != 0) {
+                // setOpenSnackBar(true);
+                // setSnackBarStatus(true);
+                // snackBarStatus = true;
+                // dynamicAlert(snackBarStatus, res.message);
+            } else {
+                console.log('huhu');
+                // setOpenSnackBar(true);
+                // setSnackBarStatus(false);
+                // snackBarStatus = false;
+                // dynamicAlert(snackBarStatus, res.message);
+            }
+        });
+    };
+
     return (
-        <Box>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
-            <Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">{'Xác nhận xóa!'}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">Bạn muốn xóa buổi sự kiện này?</DialogContentText>
+        <Fragment>
+            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                Chỉnh sửa lịch sự kiện
+            </Typography>
+            {/* {dateFormat[0] && dateFormat[0].toDateString()} */}
+            <Dialog fullWidth maxWidth="lg" open={open}>
+                <DialogTitle>Xem trước lịch sự kiện</DialogTitle>
+                <DialogContent sx={{ height: '590px' }}>
+                    <FullCalendar
+                        initialDate={EventSchedule[0] && new Date(EventSchedule[0].date)}
+                        locale="vie"
+                        height="100%"
+                        plugins={[dayGridPlugin, interactionPlugin]}
+                        initialView="dayGridMonth"
+                        // events={[
+                        //     {
+                        //         id: 1,
+                        //         title: 'đi tập đi đmm',
+                        //         date: '2022-06-16',
+                        //         // display: 'background',
+                        //         // textColor: 'white',
+                        //         backgroundColor: '#5ba8f5',
+                        //         classNames: ['test-css'],
+                        //     },
+                        // ]}
+                        events={EventSchedule}
+                        weekends={true}
+                        headerToolbar={{
+                            left: 'title',
+                            center: '',
+                            right: 'prev next today',
+                        }}
+                    />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Từ chối</Button>
-                    <Button onClick={handleConfirmDialog} autoFocus>
-                        Đồng ý
-                    </Button>
+                    <Button onClick={handleClose}>Quay lại</Button>
+                    <Button onClick={handleCreate}>Đồng ý</Button>
                 </DialogActions>
             </Dialog>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h4" color="initial" sx={{ marginBottom: '16px', fontWeight: '700' }}>
-                    Cập nhật buổi tập
-                </Typography>
-                {selectedDate <= currentDate ? (
-                    ''
-                ) : (
-                    <Button variant="outlined" startIcon={<DeleteIcon />} color="error" onClick={handleClickOpen}>
-                        Xóa buổi sự kiện
-                    </Button>
-                )}
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                    <Box
-                        component="form"
-                        noValidate
-                        onSubmit={handleSubmit(onSubmit)}
-                        className="signup-form"
-                        sx={{ width: '100%', mt: 5 }}
-                    >
-                        {scheduleList.map((item) => {
-                            return (
-                                <Grid container spacing={1} columns={12} key={item.id}>
-                                    <Grid item sm={4}>
-                                        <TextField
-                                            disabled
-                                            id="outlined-disabled"
-                                            label="Ngày tháng"
-                                            defaultValue={item.date}
-                                            fullWidth
-                                            {...register('date')}
-                                            error={errors.date ? true : false}
-                                            helperText={errors.date?.message}
-                                        />
-                                    </Grid>
-                                    <Grid item sm={4}>
-                                        <TextField
-                                            required
-                                            id="outlined-disabled"
-                                            label="Thời gian bắt đầu"
-                                            defaultValue={item.startTime}
-                                            fullWidth
-                                            {...register('startTime')}
-                                            error={errors.startTime ? true : false}
-                                            helperText={errors.startTime?.message}
-                                        />
-                                    </Grid>
-                                    <Grid item sm={4}>
-                                        <TextField
-                                            required
-                                            id="outlined-disabled"
-                                            label="Thời gian bắt đầu"
-                                            defaultValue={item.finishTime}
-                                            fullWidth
-                                            {...register('finishTime')}
-                                            error={errors.finishTime ? true : false}
-                                            helperText={errors.finishTime?.message}
-                                        />
-                                    </Grid>
+            <Box
+                component="form"
+                sx={{
+                    '& .MuiTextField-root': { mb: 2 },
+                    display: 'flex',
+                    justifyContent: 'center',
+                }}
+                noValidate
+                autoComplete="off"
+                onSubmit={handleSubmit}
+            >
+                {schedule[0] && (
+                    <Box sx={{ width: '60%', mt: 2 }}>
+                        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                            <Grid container columns={12} spacing={2}>
+                                <Grid item xs={6}>
+                                    <Controller
+                                        required
+                                        name="startDate"
+                                        control={control}
+                                        defaultValue={new Date(schedule[0])}
+                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                            <DatePicker
+                                                label="Ngày bắt đầu"
+                                                disablePast
+                                                ampm={false}
+                                                value={value}
+                                                onChange={(value) => onChange(value)}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        sx={{
+                                                            marginTop: '0px !important',
+                                                            marginBottom: '16px !important',
+                                                        }}
+                                                        {...params}
+                                                        required
+                                                        id="outlined-disabled"
+                                                        error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        // id="startDate"
+                                                        variant="outlined"
+                                                        margin="dense"
+                                                        fullWidth
+                                                    />
+                                                )}
+                                            />
+                                        )}
+                                    />
+                                    <Controller
+                                        required
+                                        name="startTime"
+                                        control={control}
+                                        defaultValue={new Date('2000-09-01T' + schedule[2] + ':00')}
+                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                            <TimePicker
+                                                label="Thời gian bắt đầu"
+                                                // disablePast
+                                                ampm={false}
+                                                value={value}
+                                                onChange={(value) => onChange(value)}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        sx={{
+                                                            marginTop: '0px !important',
+                                                            marginBottom: '16px !important',
+                                                        }}
+                                                        {...params}
+                                                        required
+                                                        id="outlined-disabled"
+                                                        error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        // id="startDate"
+                                                        variant="outlined"
+                                                        margin="dense"
+                                                        fullWidth
+                                                    />
+                                                )}
+                                            />
+                                        )}
+                                    />
                                 </Grid>
-                            );
-                        })}
+                                <Grid item xs={6}>
+                                    <Controller
+                                        required
+                                        name="finishDate"
+                                        control={control}
+                                        defaultValue={new Date(schedule[1])}
+                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                            <DatePicker
+                                                label="Ngày kết thúc"
+                                                disablePast
+                                                ampm={false}
+                                                value={value}
+                                                onChange={(value) => onChange(value)}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        sx={{
+                                                            marginTop: '0px !important',
+                                                            marginBottom: '16px !important',
+                                                        }}
+                                                        {...params}
+                                                        required
+                                                        id="outlined-disabled"
+                                                        error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        // id="startDate"
+                                                        variant="outlined"
+                                                        margin="dense"
+                                                        fullWidth
+                                                    />
+                                                )}
+                                            />
+                                        )}
+                                    />
+                                    <Controller
+                                        required
+                                        name="finishTime"
+                                        control={control}
+                                        defaultValue={new Date('2000-09-01T' + schedule[3] + ':00')}
+                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                            <TimePicker
+                                                label="Thời gian kết thúc"
+                                                ampm={false}
+                                                value={value}
+                                                onChange={(value) => onChange(value)}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        sx={{
+                                                            marginTop: '0px !important',
+                                                            marginBottom: '16px !important',
+                                                        }}
+                                                        {...params}
+                                                        required
+                                                        id="outlined-disabled"
+                                                        error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        // id="startDate"
+                                                        variant="outlined"
+                                                        margin="dense"
+                                                        fullWidth
+                                                    />
+                                                )}
+                                            />
+                                        )}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </LocalizationProvider>
+
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Button color="primary" variant="contained" type="submit" sx={{ mt: 3 }}>
-                                Xác nhận
+                            <Button variant="contained" onClick={handleSubmit(onSubmit)}>
+                                Xem trước
                             </Button>
                         </Box>
                     </Box>
-                </LocalizationProvider>
+                )}
             </Box>
-        </Box>
+        </Fragment>
     );
 }
 

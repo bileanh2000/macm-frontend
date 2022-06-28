@@ -201,7 +201,7 @@ function MemberList({ data }) {
                         </g>
                     </g>
                 </svg>
-                <Box sx={{ mt: 1 }}>No Rows</Box>
+                <Box sx={{ mt: 1 }}>Danh sách trống</Box>
             </StyledGridOverlay>
         );
     }
@@ -235,7 +235,7 @@ function MemberList({ data }) {
             }}
         >
             <DataGrid
-                loading={data.length === 0}
+                // loading={data.length === 0}
                 disableSelectionOnClick={true}
                 rows={rowsUser}
                 columns={columns}

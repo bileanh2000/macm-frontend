@@ -138,23 +138,12 @@ function EditEvent() {
     // console.log(events);
     const validationSchema = Yup.object().shape({
         name: Yup.string().required('Không được để trống trường này'),
-        maxQuantityComitee: Yup.number()
-            .required('Không được để trống trường này')
-            .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
-        // numOfParticipants: Yup.number()
+        // maxQuantityComitee: Yup.number()
         //     .required('Không được để trống trường này')
         //     .typeError('Vui lòng nhập số')
         //     .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
-        // startTime: Yup.string().nullable().required('Không được để trống trường này'),
-        // finishTime: Yup.string().nullable().required('Không được để trống trường này'),
-        cost: Yup.string().required('Không được để trống trường này'),
-        ...(isChecked && {
-            cash: Yup.string().required('Không được để trống trường này'),
-        }),
-        // startDate: Yup.string().nullable().required('Không được để trống trường này'),
-        // finishDate: Yup.string().nullable().required('Không được để trống trường này'),
-        amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
+        // amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
+        // totalAmount: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
     });
     const {
         register,
@@ -260,7 +249,7 @@ function EditEvent() {
                 <Typography variant="h4" component="div" sx={{ fontWeight: 500 }}>
                     Chỉnh sửa thông tin sự kiện
                 </Typography>
-                <Button variant="contained" size="medium" component={Link} to={`../admin/events/${id}/eventschedule`}>
+                <Button variant="contained" size="medium" component={Link} to={`./eventschedule`}>
                     Chỉnh sửa lịch sự kiện
                 </Button>
             </Box>
@@ -268,6 +257,8 @@ function EditEvent() {
                 <DialogTitle>Xem trước lịch sự kiện</DialogTitle>
                 <DialogContent sx={{ height: '590px' }}>
                     <FullCalendar
+                        // defaultDate={EventSchedule[0] && EventSchedule[0].date}
+                        initialDate={EventSchedule[0] && new Date(EventSchedule[0].date)}
                         locale="vie"
                         height="100%"
                         plugins={[dayGridPlugin, interactionPlugin]}
@@ -335,33 +326,19 @@ function EditEvent() {
                                 error={errors.name ? true : false}
                                 helperText={errors.name?.message}
                             />
-                            <Grid container columns={12} spacing={2}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        type="number"
-                                        id="outlined-basic"
-                                        label="Dự kiến số người tham gia"
-                                        variant="outlined"
-                                        fullWidth
-                                        {...register('numOfParticipants')}
-                                        error={errors.numOfParticipants ? true : false}
-                                        helperText={errors.numOfParticipants?.message}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        type="number"
-                                        id="outlined-basic"
-                                        label="Số người ban tổ chức"
-                                        defaultValue={item.maxQuantityComitee}
-                                        variant="outlined"
-                                        fullWidth
-                                        {...register('maxQuantityComitee')}
-                                        error={errors.maxQuantityComitee ? true : false}
-                                        helperText={errors.maxQuantityComitee?.message}
-                                    />
-                                </Grid>
-                            </Grid>
+
+                            <TextField
+                                type="number"
+                                id="outlined-basic"
+                                label="Số người ban tổ chức"
+                                defaultValue={item.maxQuantityComitee}
+                                variant="outlined"
+                                fullWidth
+                                {...register('maxQuantityComitee')}
+                                error={errors.maxQuantityComitee ? true : false}
+                                helperText={errors.maxQuantityComitee?.message}
+                            />
+
                             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                                 <Grid container columns={12} spacing={2}>
                                     <Grid item xs={6}></Grid>
@@ -370,7 +347,7 @@ function EditEvent() {
                             </LocalizationProvider>
 
                             <Controller
-                                name="cost"
+                                name="totalAmount"
                                 variant="outlined"
                                 defaultValue={item.totalAmount}
                                 control={control}
@@ -387,7 +364,7 @@ function EditEvent() {
                                             onChange(Number(v.value));
                                         }}
                                         InputProps={{
-                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                            endAdornment: <InputAdornment position="end">VND</InputAdornment>,
                                         }}
                                         error={invalid}
                                         helperText={invalid ? error.message : null}
@@ -395,45 +372,10 @@ function EditEvent() {
                                     />
                                 )}
                             />
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                                <FormControlLabel
-                                    sx={{ marginLeft: '1px' }}
-                                    control={<Switch checked={isChecked} onChange={() => setIsChecked(!isChecked)} />}
-                                    label="Sử dụng tiền quỹ"
-                                />
-                                <Typography>Tổng tiền quỹ: 2.000.000 vnđ</Typography>
-                            </Box>
-                            <Collapse in={isChecked}>
-                                <Controller
-                                    name="cash"
-                                    variant="outlined"
-                                    defaultValue=""
-                                    control={control}
-                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                        <NumberFormat
-                                            name="cost"
-                                            customInput={TextField}
-                                            label="Dùng quỹ CLB"
-                                            thousandSeparator={true}
-                                            onValueChange={(v) => {
-                                                onChange(Number(v.value));
-                                            }}
-                                            variant="outlined"
-                                            defaultValue=""
-                                            value={value}
-                                            InputProps={{
-                                                endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                            }}
-                                            error={invalid}
-                                            helperText={invalid ? error.message : null}
-                                            fullWidth
-                                        />
-                                    )}
-                                />
-                            </Collapse>
-                            <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+
+                            {/* <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
                                 Dự kiến mỗi người phải đóng: 160k
-                            </Typography>
+                            </Typography> */}
                             <Controller
                                 name="amountPerRegister"
                                 variant="outlined"
@@ -452,7 +394,7 @@ function EditEvent() {
                                             onChange(Number(v.value));
                                         }}
                                         InputProps={{
-                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                            endAdornment: <InputAdornment position="end">VND</InputAdornment>,
                                         }}
                                         error={invalid}
                                         helperText={invalid ? error.message : null}
@@ -469,6 +411,7 @@ function EditEvent() {
                                 maxRows={4}
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
+                                // defaultValue={item.description}
                                 fullWidth
                                 // {...register('content')}
                             />

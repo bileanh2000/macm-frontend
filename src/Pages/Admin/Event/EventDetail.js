@@ -116,32 +116,31 @@ function EventDetail() {
                     </Button>
                 </DialogActions>
             </Dialog>
-            {event.map((item) => {
-                return (
-                    <Fragment key={item.id}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
-                            <Typography
-                                variant="h5"
-                                gutterBottom
-                                component="div"
-                                sx={{ fontWeight: 500, marginBottom: 2 }}
+
+            {/* {scheduleList.map((item) => { */}
+            {/* return ( */}
+            {scheduleList[0] && (
+                <Fragment key={scheduleList[0].id}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+                        <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                            Thông tin sự kiện "{scheduleList[0].event.name}"
+                        </Typography>
+                        <Box>
+                            <Button
+                                variant="outlined"
+                                component={Link}
+                                to={`../admin/events/${id}/members`}
+                                startIcon={<GroupIcon />}
+                                sx={{ mr: 1 }}
                             >
-                                Thông tin sự kiện "{item.name}"
-                            </Typography>
-                            <Box>
-                                <Button
-                                    variant="outlined"
-                                    component={Link}
-                                    to={`../admin/events/${id}/members`}
-                                    startIcon={<GroupIcon />}
-                                    sx={{ mr: 1 }}
-                                >
-                                    Xem danh sách thành viên tham gia
-                                </Button>
-                                <Button variant="outlined" startIcon={<EditIcon />} component={Link} to={`edit`}>
-                                    Chỉnh sửa thông tin
-                                </Button>
-                                {item.status === 'Chưa diễn ra' ? (
+                                Xem danh sách thành viên tham gia
+                            </Button>
+
+                            {new Date(scheduleList[0].date) > new Date() ? (
+                                <Fragment>
+                                    <Button variant="outlined" startIcon={<EditIcon />} component={Link} to={`edit`}>
+                                        Chỉnh sửa thông tin
+                                    </Button>
                                     <Button
                                         variant="outlined"
                                         startIcon={<DeleteIcon />}
@@ -150,59 +149,65 @@ function EventDetail() {
                                     >
                                         Xóa sự kiện
                                     </Button>
-                                ) : (
-                                    ''
-                                )}
-                            </Box>
+                                </Fragment>
+                            ) : (
+                                ''
+                            )}
                         </Box>
-                        <Grid container columns={12} sx={{ mt: 2 }}>
-                            <Grid item xs={4}>
-                                <Box sx={{ marginTop: '16px' }}>
-                                    <div>
-                                        <Typography variant="h6">
-                                            <strong>Số thành viên ban tổ chức:</strong> {item.maxQuantityComitee}
-                                        </Typography>
-                                    </div>
-                                    <div>
-                                        <Typography variant="h6">
-                                            <strong>Tổng chi phí: </strong> {item.totalAmount.toLocaleString('en-US')}{' '}
-                                            vnđ
-                                        </Typography>
-                                    </div>
-                                    <div>
-                                        <Typography variant="h6">
-                                            <strong>Số tiền mỗi người phải đóng: </strong>
-                                            {item.amountPerMemberRegister.toLocaleString('en-US')} vnđ
-                                        </Typography>
-                                    </div>
-                                    <div>
-                                        <Typography variant="h6">
-                                            <strong>Nội dung: </strong>
-                                            <p>{item.description}</p>
-                                        </Typography>
-                                    </div>
-                                </Box>
-                            </Grid>
-                            <Grid item xs={8} sx={{ minHeight: '755px' }}>
-                                <FullCalendar
-                                    locale="vie"
-                                    height="60%"
-                                    plugins={[dayGridPlugin, interactionPlugin]}
-                                    initialView="dayGridMonth"
-                                    events={scheduleData}
-                                    weekends={true}
-                                    headerToolbar={{
-                                        left: 'title',
-                                        center: 'dayGridMonth,dayGridWeek',
-                                        right: 'prev next today',
-                                        // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                                    }}
-                                />
-                            </Grid>
+                    </Box>
+                    <Grid container columns={12} sx={{ mt: 2 }}>
+                        <Grid item xs={4}>
+                            <Box sx={{ marginTop: '16px' }}>
+                                <div>
+                                    <Typography variant="h6">
+                                        <strong>Số thành viên ban tổ chức:</strong>{' '}
+                                        {scheduleList[0].event.maxQuantityComitee}
+                                    </Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="h6">
+                                        <strong>Tổng chi phí: </strong>
+                                        {scheduleList[0].event.totalAmount.toLocaleString('en-US')} vnđ
+                                    </Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="h6">
+                                        <strong>Số tiền mỗi người phải đóng: </strong>
+                                        {scheduleList[0].event.amount_per_register.toLocaleString('en-US')} vnđ
+                                    </Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="h6">
+                                        <strong>Nội dung: </strong>
+                                        <p>{scheduleList[0].event.description}</p>
+                                    </Typography>
+                                </div>
+                            </Box>
                         </Grid>
-                    </Fragment>
-                );
-            })}
+                        <Grid item xs={8} sx={{ minHeight: '755px' }}>
+                            <FullCalendar
+                                // initialDate={new Date('2022-09-01')}
+                                initialDate={scheduleData[0] && new Date(scheduleData[0].date)}
+                                locale="vie"
+                                height="60%"
+                                plugins={[dayGridPlugin, interactionPlugin]}
+                                defaultView="dayGridMonth"
+                                events={scheduleData}
+                                weekends={true}
+                                headerToolbar={{
+                                    left: 'title',
+                                    center: 'dayGridMonth,dayGridWeek',
+                                    right: 'prev next today',
+                                    // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                </Fragment>
+            )}
+
+            {/* ); */}
+            {/* })} */}
             {/* <MemberEvent /> */}
         </Fragment>
     );

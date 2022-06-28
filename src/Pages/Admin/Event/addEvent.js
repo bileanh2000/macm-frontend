@@ -45,6 +45,7 @@ function AddEvent() {
     const [previewData, setPreviewData] = useState([]);
     const [eventId, setEventId] = useState();
     const [checked, setChecked] = useState(false);
+
     const [isOverride, setIsOverride] = useState(-1);
     let navigator = useNavigate();
 
@@ -105,6 +106,7 @@ function AddEvent() {
 
     const handleClose = () => {
         setOpen(false);
+        isChecked(false);
     };
 
     const validationSchema = Yup.object().shape({
@@ -112,16 +114,19 @@ function AddEvent() {
         maxQuantityComitee: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+            .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
         numOfParticipants: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+            .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
         startTime: Yup.string().nullable().required('Không được để trống trường này'),
         finishTime: Yup.string().nullable().required('Không được để trống trường này'),
-        cost: Yup.string().required('Không được để trống trường này'),
+        cost: Yup.string().required('Không được để trống trường này').min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
         ...(isChecked && {
-            amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
+            amountPerRegister: Yup.number()
+                .required('Không được để trống trường này')
+                .typeError('Vui lòng nhập số')
+                .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
         }),
         startDate: Yup.string().nullable().required('Không được để trống trường này'),
         finishDate: Yup.string().nullable().required('Không được để trống trường này'),
@@ -138,6 +143,8 @@ function AddEvent() {
     });
 
     const onSubmit = (data) => {
+        setIsChecked(false);
+        // setOpen(false);
         let dataSubmit = {
             maxQuantityComitee: data.maxQuantityComitee,
             description: description,
@@ -149,8 +156,8 @@ function AddEvent() {
             name: data.name,
             cash: data.cash,
             cost: data.cost,
-            amountPerRegister: data.amountPerRegister,
-            IsContinuous: isChecked,
+            amount_per_register: data.amountPerRegister,
+            // IsContinuous: isChecked,
         };
         setSubmitData(dataSubmit);
 
@@ -182,7 +189,8 @@ function AddEvent() {
         container['date'] = item.date;
         container['title'] = item.title + '-' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
-        container['backgroundColor'] = isOverride === -1 || isOverride === 0 ? '#5ba8f5' : '#ff3d00';
+        // container['backgroundColor'] = isOverride === -1 || isOverride === 0 ? '#5ba8f5' : '#ff3d00';
+        container['backgroundColor'] = item.existed ? '#ff3d00' : '#5ba8f5';
 
         return container;
     });
@@ -498,7 +506,7 @@ function AddEvent() {
                                     onChange(Number(v.value));
                                 }}
                                 InputProps={{
-                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                    endAdornment: <InputAdornment position="end">VND</InputAdornment>,
                                 }}
                                 error={invalid}
                                 helperText={invalid ? error.message : null}
@@ -560,7 +568,7 @@ function AddEvent() {
                     />
                     <div className={cx('create-event-button')}>
                         <Button variant="contained" onClick={handleSubmit(onSubmit)}>
-                            Tạo sự kiện
+                            Xem trước
                         </Button>
                     </div>
                 </Box>
