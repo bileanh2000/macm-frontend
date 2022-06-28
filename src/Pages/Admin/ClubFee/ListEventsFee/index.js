@@ -128,7 +128,8 @@ function ListEventsFee() {
                 </Grid>
                 <Grid item xs={6} sx={{ float: 'right' }}>
                     <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                        Số dư câu lạc bộ hiện tại: {funClub}
+                        Số dư câu lạc bộ hiện tại:{' '}
+                        {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                     </Typography>
                 </Grid>
             </Grid>

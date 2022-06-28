@@ -50,6 +50,8 @@ function CreateTourament() {
     const [tourament, setTourament] = useState([]);
     const [previewTournament, setPreviewTournament] = useState([]);
     const [checked, setChecked] = useState(false);
+    const [disabled, setDisabled] = useState(false);
+
     let navigator = useNavigate();
 
     const AddFightingCompetitionHandler = (FightingCompetition) => {
@@ -96,8 +98,10 @@ function CreateTourament() {
     const handleChangeOverride = (event) => {
         setChecked(event.target.checked);
         if (event.target.checked) {
-            setIsOverride(-1);
+            setIsOverride(2);
+            setDisabled(false);
         } else {
+            setDisabled(true);
             setIsOverride(0);
         }
     };
@@ -180,12 +184,15 @@ function CreateTourament() {
     const checkOveride = (TournamentSchedule) => {
         TournamentSchedule.map((item) => {
             if (item.title.toString() === 'Trùng với Lịch tập') {
+                setDisabled(true);
                 setIsOverride(0);
                 return 0;
             } else if (item.title.toString().includes('Trùng với')) {
+                setDisabled(true);
                 setIsOverride(1);
                 return 1;
             } else {
+                setDisabled(false);
                 setIsOverride(-1);
                 return -1;
             }
@@ -225,7 +232,7 @@ function CreateTourament() {
                                     right: 'prev next today',
                                 }}
                             />
-                            {(isOverride === 0 || isOverride === -1) && (
+                            {(isOverride === 0 || isOverride === 2) && (
                                 <FormControlLabel
                                     sx={{ marginLeft: '1px' }}
                                     control={
@@ -249,7 +256,7 @@ function CreateTourament() {
 
                 <DialogActions>
                     <Button onClick={handleClose}>Quay lại</Button>
-                    <Button onClick={handleCreate} disabled={isOverride === 1 || isOverride === 0}>
+                    <Button onClick={handleCreate} disabled={disabled}>
                         Đồng ý
                     </Button>
                 </DialogActions>

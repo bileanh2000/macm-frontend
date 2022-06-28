@@ -8,10 +8,12 @@ import { useForm } from 'react-hook-form';
 import DialogCommon from 'src/Components/Dialog/Dialog';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
+import adminFunAPi from 'src/api/adminFunAPi';
 
 function EventFee() {
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
+    const [funClub, setFunClub] = useState('');
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
     const [editDialog, setEditDialog] = useState({
@@ -29,7 +31,15 @@ function EventFee() {
     let attendance = userList.reduce((attendaceCount, user) => {
         return user.paymentStatus ? attendaceCount + 1 : attendaceCount;
     }, 0);
-
+    const fetchFunClub = async () => {
+        try {
+            const response = await adminFunAPi.getClubFund();
+            console.log(response.data[0].fundAmount);
+            setFunClub(response.data[0].fundAmount);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
     const getUserJoinEvent = async (eventId) => {
         try {
             const response = await adminClubFeeAPI.getUserJoinEvent(eventId);
@@ -43,7 +53,9 @@ function EventFee() {
             getUserJoinEvent(event.id);
         }
     }, [event.id]);
-
+    useEffect(() => {
+        fetchFunClub();
+    }, []);
     const handleEditDialog = (message, isLoading, params) => {
         setEditDialog({
             message,
@@ -228,6 +240,10 @@ function EventFee() {
                     </Typography>
                 </Grid>
                 <Grid item xs={4}>
+                    <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                        Số dư câu lạc bộ hiện tại:{' '}
+                        {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                    </Typography>
                     <Button variant="contained" color="success">
                         <Link to="./report" state={{ event: event }} style={{ color: 'white' }}>
                             Lịch sử chỉnh sửa

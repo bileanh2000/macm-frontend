@@ -9,10 +9,11 @@ import DialogCommon from 'src/Components/Dialog/Dialog';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
+import adminFunAPi from 'src/api/adminFunAPi';
 
 function TournamentFee() {
     let { tournamentId } = useParams();
-
+    const [funClub, setFunClub] = useState('');
     const [type, setType] = useState(1);
     const [userPaymentStatus, setUserPaymentStatus] = useState([]);
     const [pageSize, setPageSize] = useState(10);
@@ -34,6 +35,16 @@ function TournamentFee() {
     let payment = userPaymentStatus.reduce((pay, user) => {
         return user.paymentStatus ? pay + 1 : pay;
     }, 0);
+
+    const fetchFunClub = async () => {
+        try {
+            const response = await adminFunAPi.getClubFund();
+            console.log(response.data[0].fundAmount);
+            setFunClub(response.data[0].fundAmount);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
 
     const handleChangeType = (event) => {
         setType(event.target.value);
@@ -73,6 +84,7 @@ function TournamentFee() {
     useEffect(() => {
         fetchUserPaymentStatus(tournamentId, type);
         getTournamentById(tournamentId);
+        fetchFunClub();
     }, [tournamentId]);
 
     const handleEditDialog = (message, isLoading, params) => {
@@ -269,6 +281,10 @@ function TournamentFee() {
                     )}
                 </Grid>
                 <Grid item xs={4}>
+                    <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                        Số dư câu lạc bộ hiện tại:{' '}
+                        {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                    </Typography>
                     <Button variant="contained" color="success">
                         <Link to={`./report/${type}`} state={{ event: tournament }} style={{ color: 'white' }}>
                             Lịch sử chỉnh sửa
