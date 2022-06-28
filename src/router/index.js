@@ -7,6 +7,10 @@ import MembershipFee from '../Pages/Admin/ClubFee/MembershipFee';
 import FacilityFee from '../Pages/Admin/ClubFee/FacilityFee';
 import ListEventsFee from '../Pages/Admin/ClubFee/ListEventsFee';
 import EventFee from '../Pages/Admin/ClubFee/ListEventsFee/EventFee';
+import ListTournament from 'src/Pages/Admin/ClubFee/ListTournament';
+import TournamentFee from 'src/Pages/Admin/ClubFee/ListTournament/TournamentFee';
+import TournamentFeeReport from 'src/Pages/Admin/ClubFee/ListTournament/TournamentFeeReport';
+
 import ReportMembership from '../Pages/Admin/ClubFee/MembershipFee/ReportMembership';
 import ReportEvent from '../Pages/Admin/ClubFee/ListEventsFee/EventFeeReport';
 import Report from '../Pages/Admin/ClubFee/Report';
@@ -92,6 +96,9 @@ const privateRouters = [
     { path: '/admin/clubfee/event/:eventId/report', component: ReportEvent },
     { path: '/admin/clubfee/facility', component: FacilityFee },
     { path: '/admin/clubfee/membership/report', component: ReportMembership },
+    { path: '/admin/clubfee/tournaments', component: ListTournament },
+    { path: '/admin/clubfee/tournaments/:tournamentId', component: TournamentFee },
+    { path: '/admin/clubfee/tournaments/:tournamentId/report/:typeId', component: TournamentFeeReport },
 
     //Rule paths
     { path: '/admin/rules/*', component: Rules },
