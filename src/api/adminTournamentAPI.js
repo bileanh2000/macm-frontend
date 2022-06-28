@@ -68,7 +68,7 @@ const adminTournament = {
         const url = `/tournament/headclub/getallexhibitionteam/${tournamentId}`;
         return axiosClient.get(url, {
             params: {
-                exhibitionType: params.exhibitionType,
+                exhibitionType: params.id,
             },
         });
     },
@@ -103,10 +103,38 @@ const adminTournament = {
         return axiosClient.put(url);
     },
 
-    updateTournamentOrganizingCommitteeRole: (params) => {
-        const url = '/tournament/headclub/updatetournamentorganizingcommitteerole';
-        return axiosClient.put(url, params);
+    //Fee
+
+    getAllTournamentOrganizingCommitteePaymentStatus: (tournamentId) => {
+        const url = `/tournament/treasurer/getalltournamentorganizingcommitteepaymentstatus/${tournamentId}`;
+        return axiosClient.get(url);
     },
+
+    updateTournamentOrganizingCommitteePaymentStatus: (id) => {
+        const url = `/tournament/treasurer/updatetournamentorganizingcommitteepaymentstatus/${id}`;
+        return axiosClient.put(url);
+    },
+
+    getAllTournamentOrganizingCommitteePaymentStatusReport: (tournamentId) => {
+        const url = `/tournament/treasurer/getalltournamentorganizingcommitteepaymentstatusreport/${tournamentId}`;
+        return axiosClient.get(url);
+    },
+
+    getAllTournamentPlayerPaymentStatus: (tournamentId) => {
+        const url = `/tournament/treasurer/getalltournamentplayerpaymentstatus/${tournamentId}`;
+        return axiosClient.get(url);
+    },
+
+    updateTournamentPlayerPaymentStatus: (tournamentId) => {
+        const url = `/tournament/treasurer/updatetournamentplayerpaymentstatus/${tournamentId}`;
+        return axiosClient.put(url);
+    },
+
+    getAllTournamentPlayerPaymentStatusReport: (tournamentId) => {
+        const url = `/tournament/treasurer/getalltournamentplayerpaymentstatusreport/${tournamentId}`;
+        return axiosClient.get(url);
+    },
+
     ///////////////////////////
 
     // getAllMemberEvent: (params, index) => {

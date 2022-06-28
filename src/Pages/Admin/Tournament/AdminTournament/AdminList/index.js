@@ -3,7 +3,7 @@ import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { styled } from '@mui/material/styles';
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 
 function AdminList({ data }) {
     const [pageSize, setPageSize] = useState(10);
@@ -178,19 +178,25 @@ function AdminList({ data }) {
                 },
             }}
         >
-            <DataGrid
-                loading={data.length === 0}
-                disableSelectionOnClick={true}
-                rows={rowsUser}
-                columns={columns}
-                pageSize={pageSize}
-                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                rowsPerPageOptions={[10, 20, 30]}
-                components={{
-                    Toolbar: CustomToolbar,
-                    NoRowsOverlay: CustomNoRowsOverlay,
-                }}
-            />
+            {data.length > 0 ? (
+                <DataGrid
+                    loading={data.length === 0}
+                    disableSelectionOnClick={true}
+                    rows={rowsUser}
+                    columns={columns}
+                    pageSize={pageSize}
+                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                    rowsPerPageOptions={[10, 20, 30]}
+                    components={{
+                        Toolbar: CustomToolbar,
+                        NoRowsOverlay: CustomNoRowsOverlay,
+                    }}
+                />
+            ) : (
+                <Typography variant="h4" sx={{ mb: 3, margin: 'auto' }}>
+                    Chưa có thành viên trong ban tổ chức
+                </Typography>
+            )}
         </Box>
     );
 }

@@ -45,6 +45,7 @@ function AddEvent() {
     const [previewData, setPreviewData] = useState([]);
     const [eventId, setEventId] = useState();
     const [checked, setChecked] = useState(false);
+    const [disabled, setDisabled] = useState(false);
 
     const [isOverride, setIsOverride] = useState(-1);
     let navigator = useNavigate();
@@ -198,8 +199,10 @@ function AddEvent() {
     const handleChangeOverride = (event) => {
         setChecked(event.target.checked);
         if (event.target.checked) {
-            setIsOverride(-1);
+            setIsOverride(2);
+            setDisabled(false);
         } else {
+            setDisabled(true);
             setIsOverride(0);
         }
     };
@@ -207,12 +210,15 @@ function AddEvent() {
     const checkOveride = (EventSchedule) => {
         EventSchedule.map((item) => {
             if (item.title.toString() === 'Trùng với Lịch tập') {
+                setDisabled(true);
                 setIsOverride(0);
                 return 0;
             } else if (item.title.toString().includes('Trùng với')) {
+                setDisabled(true);
                 setIsOverride(1);
                 return 1;
             } else {
+                setDisabled(false);
                 setIsOverride(-1);
                 return -1;
             }
@@ -288,7 +294,7 @@ function AddEvent() {
                         // select={handleEventAdd}
                         // eventDrop={(e) => console.log(e)}
                     />
-                    {(isOverride === 0 || isOverride === -1) && (
+                    {(isOverride === 0 || isOverride === 2) && (
                         <FormControlLabel
                             sx={{ marginLeft: '1px' }}
                             control={
@@ -300,7 +306,7 @@ function AddEvent() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Quay lại</Button>
-                    <Button onClick={handleCreate} disabled={isOverride === 1 || isOverride === 0}>
+                    <Button onClick={handleCreate} disabled={disabled}>
                         Đồng ý
                     </Button>
                 </DialogActions>

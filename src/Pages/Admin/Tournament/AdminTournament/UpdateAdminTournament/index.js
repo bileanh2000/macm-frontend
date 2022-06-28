@@ -215,7 +215,7 @@ function UpdateAdminTournament() {
                     },
                 }}
             >
-                {adminList && roles && (
+                {adminList.length > 0 && roles ? (
                     <DataGrid
                         loading={!adminList.length}
                         disableSelectionOnClick={true}
@@ -229,13 +229,19 @@ function UpdateAdminTournament() {
                         }}
                         onCellEditCommit={handleRowEditCommit}
                     />
+                ) : (
+                    <Typography variant="h4" sx={{ mb: 3, margin: 'auto' }}>
+                        Chưa có thành viên trong ban tổ chức
+                    </Typography>
                 )}
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button variant="contained" onClick={handleOpenDialog} sx={{ mt: 3 }}>
-                    Lưu lại
-                </Button>
-            </Box>
+            {adminList.length > 0 && (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button variant="contained" onClick={handleOpenDialog} sx={{ mt: 3 }}>
+                        Lưu lại
+                    </Button>
+                </Box>
+            )}
         </div>
     );
 }

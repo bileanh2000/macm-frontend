@@ -34,6 +34,11 @@ function Attendance() {
     }, [trainingScheduleId]);
     return (
         <Fragment>
+            <Button variant="contained" color="success" sx={{ float: 'right' }}>
+                <Link to={`./report`} style={{ color: 'white' }}>
+                    Báo cáo điểm danh
+                </Link>
+            </Button>
             {trainingScheduleId && (
                 <div>
                     <ViewAttendance data={{ trainingScheduleId, date }} />
@@ -44,7 +49,7 @@ function Attendance() {
                     </Button>
                 </div>
             )}
-            {!_trainingScheduleId && <Typography variant="h3">Hôm nay không có buổi tập nào</Typography>}
+            {!trainingScheduleId && <Typography variant="h3">Hôm nay không có buổi tập nào</Typography>}
         </Fragment>
     );
 }

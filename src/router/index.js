@@ -7,6 +7,10 @@ import MembershipFee from '../Pages/Admin/ClubFee/MembershipFee';
 import FacilityFee from '../Pages/Admin/ClubFee/FacilityFee';
 import ListEventsFee from '../Pages/Admin/ClubFee/ListEventsFee';
 import EventFee from '../Pages/Admin/ClubFee/ListEventsFee/EventFee';
+import ListTournament from 'src/Pages/Admin/ClubFee/ListTournament';
+import TournamentFee from 'src/Pages/Admin/ClubFee/ListTournament/TournamentFee';
+import TournamentFeeReport from 'src/Pages/Admin/ClubFee/ListTournament/TournamentFeeReport';
+
 import ReportMembership from '../Pages/Admin/ClubFee/MembershipFee/ReportMembership';
 import ReportEvent from '../Pages/Admin/ClubFee/ListEventsFee/EventFeeReport';
 import Report from '../Pages/Admin/ClubFee/Report';
@@ -20,6 +24,7 @@ import MemberCancelEvent from '../Pages/Admin/Event/MenberEvent/MemberCancelEven
 import AddToAdmin from '../Pages/Admin/Event/MenberEvent/AddMemberToAdminEvent';
 
 import Facility from '../Pages/Admin/Facility';
+import FacilityReport from '../Pages/Admin/ClubFee/FacilityFee/FacilityReport';
 import News from '../Pages/Admin/News';
 import NewsDetail from '../Pages/Admin/News/NewsDetail/NewsDetail';
 import EditNews from '../Pages/Admin/News/EditNews/EditNews';
@@ -53,6 +58,7 @@ import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession';
 import EditEvent from '../Pages/Admin/Event/EditEvent';
 
 import Attendance from 'src/Pages/Admin/Attendance';
+import ReportAttendance from 'src/Pages/Admin/Attendance/ReportAttendance';
 import TakeAttendance from 'src/Pages/Admin/Attendance/TakeAttendance';
 import ViewEventSchedule from 'src/Pages/Admin/Event/ViewEventSchedule';
 import EditEventSchedule from 'src/Pages/Admin/Event/EditEventSchedule';
@@ -83,6 +89,7 @@ const privateRouters = [
     //Attendance paths
     { path: '/admin/attendance', component: Attendance },
     { path: '/admin/attendance/take', component: TakeAttendance },
+    { path: '/admin/attendance/report', component: ReportAttendance },
 
     //Club fee paths
     { path: '/admin/clubfee', component: ClubFee },
@@ -91,7 +98,11 @@ const privateRouters = [
     { path: '/admin/clubfee/event/:eventId', component: EventFee },
     { path: '/admin/clubfee/event/:eventId/report', component: ReportEvent },
     { path: '/admin/clubfee/facility', component: FacilityFee },
+    { path: '/admin/clubfee/facility/report', component: FacilityReport },
     { path: '/admin/clubfee/membership/report', component: ReportMembership },
+    { path: '/admin/clubfee/tournaments', component: ListTournament },
+    { path: '/admin/clubfee/tournaments/:tournamentId', component: TournamentFee },
+    { path: '/admin/clubfee/tournaments/:tournamentId/report/:typeId', component: TournamentFeeReport },
 
     //Rule paths
     { path: '/admin/rules/*', component: Rules },

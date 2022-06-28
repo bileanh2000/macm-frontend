@@ -6,12 +6,14 @@ import clsx from 'clsx';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
+import adminFunAPi from 'src/api/adminFunAPi';
 import EditFee from '../EditFee/EditFee';
 
 function MembershipFee() {
     const [userList, setUserList] = useState([]);
     const [semesterList, setSemesterList] = useState([]);
     const [cost, setCost] = useState(0);
+    const [funClub, setFunClub] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [semesterId, setSemesterId] = useState();
@@ -24,6 +26,15 @@ function MembershipFee() {
         isLoading: false,
         params: -1,
     });
+    const fetchFunClub = async () => {
+        try {
+            const response = await adminFunAPi.getClubFund();
+            console.log(response.data[0].fundAmount);
+            setFunClub(response.data[0].fundAmount);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
 
     const getListMemberShip = async (data) => {
         try {
@@ -67,6 +78,7 @@ function MembershipFee() {
     };
 
     useEffect(() => {
+        fetchFunClub();
         getSemester();
         getCurrentSemester();
         console.log(currentSemester);
@@ -299,6 +311,10 @@ function MembershipFee() {
                     </Typography>
                 </Grid>
                 <Grid item xs={4}>
+                    <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                        Số dư câu lạc bộ hiện tại:{' '}
+                        {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                    </Typography>
                     <Typography variant="h6" sx={{ float: 'right' }}>
                         {semesterList && (
                             <Button variant="contained" color="success">
