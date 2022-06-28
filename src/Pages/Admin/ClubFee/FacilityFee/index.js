@@ -1,58 +1,34 @@
 import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
 import { Edit } from '@mui/icons-material';
-import { Alert, Box, Button, Grid, Snackbar, Typography } from '@mui/material';
+import {
+    Alert,
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Grid,
+    Snackbar,
+    Typography,
+} from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import EditFee from '../EditFee/EditFee';
-
-const _facilityList = [
-    {
-        name: 'Giáp đầu',
-        category: 'Giáp',
-        quantity: 10,
-        price: 500000,
-    },
-    {
-        name: 'Đồ long đao',
-        category: 'Vũ khí',
-        quantity: 10,
-        price: 500000,
-    },
-    {
-        name: 'Ỷ thiên kiếm',
-        category: 'Vũ khí',
-        quantity: 10,
-        price: 500000,
-    },
-    {
-        name: 'Giáp chim',
-        category: 'Giáp',
-        quantity: 10,
-        price: 500000,
-    },
-    {
-        name: 'Giáp ngực',
-        category: 'Giáp',
-        quantity: 10,
-        price: 500000,
-    },
-];
+import { Link, useNavigate } from 'react-router-dom';
+import facilityApi from 'src/api/facilityApi';
 
 function FacilityFee() {
-    const [facilityList, setFacilityList] = useState(_facilityList);
+    const [facilityList, setFacilityList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
+    const [openDialog, setOpenDialog] = useState(false);
     const [openSnackBar, setOpenSnackBar] = useState(false);
+    const [isApprove, setIsApprove] = useState(false);
+    const [idUpdate, setIdUpdate] = useState(0);
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    const [editDialog, setEditDialog] = useState({
-        message: '',
-        isLoading: false,
-        params: -1,
-    });
-
-    let snackBarStatus;
-    console.log(facilityList);
+    let navigate = useNavigate();
 
     const dynamicAlert = (status, message) => {
         console.log('status of dynamicAlert', status);
@@ -63,12 +39,39 @@ function FacilityFee() {
         }
     };
 
+    let snackBarStatus;
+
+    const fetchRequestToBuyFacility = async () => {
+        try {
+            const response = await facilityApi.getAllRequest();
+            console.log(response);
+            const newUser = response.data.filter((user) => user.status === 'Đang chờ duyệt');
+            console.log(newUser);
+            setFacilityList(newUser);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchRequestToBuyFacility();
+    }, []);
+
     const handleCloseSnackBar = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
 
         setOpenSnackBar(false);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+    const handleOpenDialog = (id, isApprove) => {
+        setIsApprove(isApprove);
+        setIdUpdate(id);
+        setOpenDialog(true);
     };
 
     const columns = [
@@ -87,7 +90,7 @@ function FacilityFee() {
                     <Button
                         component="button"
                         label="Đã đóng"
-                        onClick={() => toggleStatus(true)}
+                        onClick={() => handleOpenDialog(params.row.id, true)}
                         style={{ backgroundColor: 'aquamarine' }}
                     >
                         Chấp nhận
@@ -95,7 +98,7 @@ function FacilityFee() {
                     <Button
                         component="button"
                         label="Đã đóng"
-                        onClick={() => toggleStatus(false)}
+                        onClick={() => handleOpenDialog(params.row.id, false)}
                         style={{ backgroundColor: 'lightcoral' }}
                     >
                         Từ chối
@@ -107,11 +110,11 @@ function FacilityFee() {
 
     const rowsFacility = facilityList.map((item, index) => {
         const container = {};
-        container['id'] = index + 1;
-        container['name'] = item.name;
-        container['category'] = item.category;
+        container['id'] = item.id;
+        container['name'] = item.facilityName;
+        container['category'] = item.facilityCategory;
         container['quantity'] = item.quantity;
-        container['price'] = item.price;
+        container['price'] = item.unitPrice;
         return container;
     });
 
@@ -125,13 +128,45 @@ function FacilityFee() {
         console.log(userList);
     };
 
-    const toggleStatus = (flag) => {
-        // console.log(id);
-        // const newUserList = facilityList.map((facility) => {
-        //     return facility.studentId === id ? { ...facility, active: !facility.active } : facility;
-        // });
-        // console.log(newUserList);
-        // setFacilityList(newUserList);
+    const acceptRequest = async (facilityId) => {
+        try {
+            const response = await facilityApi.approveRequestToBuyFacility(facilityId);
+            setOpenSnackBar(true);
+            snackBarStatus = true;
+            dynamicAlert(snackBarStatus, response.message);
+        } catch (error) {
+            console.log('Khong the chap thuan yeu cau nay, loi:', error);
+            setOpenSnackBar(true);
+            snackBarStatus = true;
+            dynamicAlert(snackBarStatus, 'Khong the chap thuan yeu cau nay');
+        }
+    };
+
+    const declineRequest = async (facilityId) => {
+        try {
+            const response = await facilityApi.declineRequestToBuyFacility(facilityId);
+            setOpenSnackBar(true);
+            snackBarStatus = true;
+            dynamicAlert(snackBarStatus, response.message);
+        } catch (error) {
+            console.log('Khong the chap thuan yeu cau nay, loi:', error);
+            setOpenSnackBar(true);
+            snackBarStatus = true;
+            dynamicAlert(snackBarStatus, 'Khong the chap thuan yeu cau nay');
+        }
+    };
+    const handleUpdate = () => {
+        console.log(idUpdate, isApprove);
+        if (isApprove) {
+            acceptRequest(idUpdate);
+        } else {
+            declineRequest(idUpdate);
+        }
+
+        const newUser = facilityList.filter((user) => user.id !== idUpdate);
+        setFacilityList(newUser);
+
+        handleCloseDialog();
     };
 
     function CustomToolbar() {
@@ -150,6 +185,23 @@ function FacilityFee() {
     }
     return (
         <Fragment>
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">Bạn có muốn lưu các thay đổi ?</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>Từ chối</Button>
+                    <Button onClick={handleUpdate} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <Snackbar
                 open={openSnackBar}
                 autoHideDuration={5000}
@@ -169,7 +221,11 @@ function FacilityFee() {
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                 Xác nhận mua cơ sở vật chất
             </Typography>
-
+            <Button variant="contained" color="success">
+                <Link to={`./report`} style={{ color: 'white' }}>
+                    Lịch sử duyệt mua cơ sở vật chất
+                </Link>
+            </Button>
             <Box sx={{ height: 500 }}>
                 <DataGrid
                     loading={!facilityList.length}

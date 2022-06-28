@@ -56,5 +56,15 @@ const facilityApi = {
     //         },
     //     });
     // },
+
+    approveRequestToBuyFacility: (facilityRequestId) => {
+        const url = `/facility/treasurer/approverequesttobuyfacility/${facilityRequestId}`;
+        return axiosClient.put(url);
+    },
+
+    declineRequestToBuyFacility: (facilityRequestId) => {
+        const url = `/facility/treasurer/declinerequesttobuyfacility/${facilityRequestId}`;
+        return axiosClient.put(url);
+    },
 };
 export default facilityApi;

@@ -189,6 +189,7 @@ function AddAdminTourament() {
         setUserList(newUser);
 
         handleCloseDialog();
+        navigate(-1);
     };
     const CustomToolbar = () => {
         return (
@@ -258,18 +259,24 @@ function AddAdminTourament() {
                     },
                 }}
             >
-                <DataGrid
-                    loading={!userList.length}
-                    disableSelectionOnClick={true}
-                    rows={rowsUser}
-                    columns={columns}
-                    pageSize={pageSize}
-                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                    rowsPerPageOptions={[10, 20, 30]}
-                    components={{
-                        Toolbar: CustomToolbar,
-                    }}
-                />
+                {userList.length > 0 ? (
+                    <DataGrid
+                        loading={!userList.length}
+                        disableSelectionOnClick={true}
+                        rows={rowsUser}
+                        columns={columns}
+                        pageSize={pageSize}
+                        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                        rowsPerPageOptions={[10, 20, 30]}
+                        components={{
+                            Toolbar: CustomToolbar,
+                        }}
+                    />
+                ) : (
+                    <Typography variant="h4" sx={{ mb: 3 }}>
+                        Không có yêu cầu đăng kí vào btc nào
+                    </Typography>
+                )}
             </Box>
         </div>
     );
