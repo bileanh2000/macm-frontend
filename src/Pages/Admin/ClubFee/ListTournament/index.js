@@ -21,18 +21,28 @@ import styles from './ListTournament.module.scss';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import semesterApi from 'src/api/semesterApi';
 import moment from 'moment';
+import adminFunAPi from 'src/api/adminFunAPi';
 
 const cx = classNames.bind(styles);
 
 function ListTournament() {
     const [tournaments, setTournaments] = useState();
+    const [funClub, setFunClub] = useState('');
     const [semester, setSemester] = useState('Summer2022');
     const [semesterList, setSemesterList] = useState([]);
-    const [openDialog, setOpenDialog] = useState(false);
-    const [tournamentOnclick, setTournamentOnclick] = useState({ name: '', id: '' });
 
     const handleChange = (event) => {
         setSemester(event.target.value);
+    };
+
+    const fetchFunClub = async () => {
+        try {
+            const response = await adminFunAPi.getClubFund();
+            console.log(response.data[0].fundAmount);
+            setFunClub(response.data[0].fundAmount);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
     };
 
     const getListTournamentBySemester = async (params) => {
@@ -59,16 +69,25 @@ function ListTournament() {
     }, [semester]);
 
     useEffect(() => {
+        fetchFunClub();
         fetchSemester();
     }, []);
 
     return (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
-                    Danh sách giải đấu
-                </Typography>
-            </Box>
+            <Grid container spacing={2}>
+                <Grid item xs={6}>
+                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
+                        Danh sách giải đấu
+                    </Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ float: 'right' }}>
+                    <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                        Số dư câu lạc bộ hiện tại: {funClub}
+                    </Typography>
+                </Grid>
+            </Grid>
+            {/* <Box sx={{ display: 'flex', justifyContent: 'space-between' }}></Box> */}
             <Box>
                 <TextField
                     id="outlined-select-currency"

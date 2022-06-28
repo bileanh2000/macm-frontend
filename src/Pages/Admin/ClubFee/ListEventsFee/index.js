@@ -5,6 +5,7 @@ import classNames from 'classnames/bind';
 import styles from './EventFee.module.scss';
 import { useNavigate } from 'react-router-dom';
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
+import adminFunAPi from 'src/api/adminFunAPi';
 
 const cx = classNames.bind(styles);
 
@@ -12,12 +13,23 @@ function ListEventsFee() {
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
     const history = useNavigate();
+    const [funClub, setFunClub] = useState('');
     //Paging
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [currentSemester, setCurrentSemester] = useState();
     const [events, setEvents] = useState([]);
+
+    const fetchFunClub = async () => {
+        try {
+            const response = await adminFunAPi.getClubFund();
+            console.log(response.data[0].fundAmount);
+            setFunClub(response.data[0].fundAmount);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
 
     const getCurrentSemester = async () => {
         try {
@@ -39,6 +51,7 @@ function ListEventsFee() {
     };
 
     useEffect(() => {
+        fetchFunClub();
         getCurrentSemester();
     }, []);
 
@@ -107,9 +120,19 @@ function ListEventsFee() {
                     {customAlert.message}
                 </Alert>
             </Snackbar>
-            <Typography variant="h3" className={cx('event-header')}>
-                Danh sách sự kiện
-            </Typography>
+            <Grid container spacing={2}>
+                <Grid item xs={6}>
+                    <Typography variant="h3" className={cx('event-header')}>
+                        Danh sách sự kiện
+                    </Typography>
+                </Grid>
+                <Grid item xs={6} sx={{ float: 'right' }}>
+                    <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                        Số dư câu lạc bộ hiện tại: {funClub}
+                    </Typography>
+                </Grid>
+            </Grid>
+
             <div className={cx('event-container')}>
                 {events.length > 0 ? (
                     events.map((row, index) => (

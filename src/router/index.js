@@ -58,6 +58,7 @@ import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession';
 import EditEvent from '../Pages/Admin/Event/EditEvent';
 
 import Attendance from 'src/Pages/Admin/Attendance';
+import ReportAttendance from 'src/Pages/Admin/Attendance/ReportAttendance';
 import TakeAttendance from 'src/Pages/Admin/Attendance/TakeAttendance';
 import ViewEventSchedule from 'src/Pages/Admin/Event/ViewEventSchedule';
 import EditEventSchedule from 'src/Pages/Admin/Event/EditEventSchedule';
@@ -88,6 +89,7 @@ const privateRouters = [
     //Attendance paths
     { path: '/admin/attendance', component: Attendance },
     { path: '/admin/attendance/take', component: TakeAttendance },
+    { path: '/admin/attendance/report', component: ReportAttendance },
 
     //Club fee paths
     { path: '/admin/clubfee', component: ClubFee },

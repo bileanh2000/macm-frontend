@@ -16,6 +16,11 @@ const adminAttendanceAPI = {
         const url = `trainingschedule/gettrainingsesionbydate`;
         return axiosClient.get(url, { params: { date } });
     },
+
+    attendanceReportBySemester: (semester) => {
+        const url = `/admin/headtechnique/checkattendance/report`;
+        return axiosClient.get(url, { params: { semester } });
+    },
 };
 
 export default adminAttendanceAPI;

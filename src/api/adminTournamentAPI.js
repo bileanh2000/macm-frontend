@@ -68,7 +68,7 @@ const adminTournament = {
         const url = `/tournament/headclub/getallexhibitionteam/${tournamentId}`;
         return axiosClient.get(url, {
             params: {
-                exhibitionType: params.exhibitionType,
+                exhibitionType: params.id,
             },
         });
     },
@@ -101,11 +101,6 @@ const adminTournament = {
     acceptRequestToJoinOrganizingCommittee: (organizingCommitteeId) => {
         const url = `/tournament/headclub/acceptrequesttojoinorganizingcommittee/${organizingCommitteeId}`;
         return axiosClient.put(url);
-    },
-
-    updateTournamentOrganizingCommitteeRole: (params) => {
-        const url = '/tournament/headclub/updatetournamentorganizingcommitteerole';
-        return axiosClient.put(url, params);
     },
 
     //Fee

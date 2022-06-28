@@ -19,9 +19,11 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import facilityApi from 'src/api/facilityApi';
+import adminFunAPi from 'src/api/adminFunAPi';
 
 function FacilityFee() {
     const [facilityList, setFacilityList] = useState([]);
+    const [funClub, setFunClub] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [openDialog, setOpenDialog] = useState(false);
     const [openSnackBar, setOpenSnackBar] = useState(false);
@@ -41,6 +43,16 @@ function FacilityFee() {
 
     let snackBarStatus;
 
+    const fetchFunClub = async () => {
+        try {
+            const response = await adminFunAPi.getClubFund();
+            console.log(response.data[0].fundAmount);
+            setFunClub(response.data[0].fundAmount);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
+
     const fetchRequestToBuyFacility = async () => {
         try {
             const response = await facilityApi.getAllRequest();
@@ -55,6 +67,7 @@ function FacilityFee() {
 
     useEffect(() => {
         fetchRequestToBuyFacility();
+        fetchFunClub();
     }, []);
 
     const handleCloseSnackBar = (event, reason) => {
@@ -217,15 +230,24 @@ function FacilityFee() {
                     {customAlert.message}
                 </Alert>
             </Snackbar>
+            <Grid container spacing={2} sx={{ justifyContent: 'space-between', marginBottom: 1 }}>
+                <Grid item xs={6}>
+                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                        Xác nhận mua cơ sở vật chất
+                    </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                    <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                        Số dư câu lạc bộ hiện tại: {funClub}
+                    </Typography>
+                    <Button variant="contained" color="success">
+                        <Link to={`./report`} style={{ color: 'white' }}>
+                            Lịch sử duyệt mua cơ sở vật chất
+                        </Link>
+                    </Button>
+                </Grid>
+            </Grid>
 
-            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Xác nhận mua cơ sở vật chất
-            </Typography>
-            <Button variant="contained" color="success">
-                <Link to={`./report`} style={{ color: 'white' }}>
-                    Lịch sử duyệt mua cơ sở vật chất
-                </Link>
-            </Button>
             <Box sx={{ height: 500 }}>
                 <DataGrid
                     loading={!facilityList.length}

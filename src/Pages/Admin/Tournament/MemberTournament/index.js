@@ -35,6 +35,7 @@ function MemberTournament() {
     };
 
     const handleChangeExhibitionType = (event) => {
+        console.log(event.target.value);
         setExhibitionType(event.target.value);
         let exType;
         if (event.target.value === 0) {
@@ -42,6 +43,7 @@ function MemberTournament() {
         } else {
             exType = listExhibitionType.find((type) => type.id === event.target.value);
         }
+        console.log(exType);
         fetchExhibitionTeam(tournamentId, exType);
     };
 

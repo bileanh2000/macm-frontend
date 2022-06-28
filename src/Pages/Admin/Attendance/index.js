@@ -34,6 +34,11 @@ function Attendance() {
     }, [trainingScheduleId]);
     return (
         <Fragment>
+            <Button variant="contained" color="success" sx={{ float: 'right' }}>
+                <Link to={`./report`} style={{ color: 'white' }}>
+                    Báo cáo điểm danh
+                </Link>
+            </Button>
             {trainingScheduleId && (
                 <div>
                     <ViewAttendance data={{ trainingScheduleId, date }} />
