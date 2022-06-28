@@ -18,7 +18,7 @@ import styles from './Event.module.scss';
 import classNames from 'classnames/bind';
 import { Link } from 'react-router-dom';
 import eventApi from 'src/api/eventApi';
-import { useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import semesterApi from 'src/api/semesterApi';
 import moment from 'moment';
 
@@ -177,23 +177,28 @@ function Event() {
                                             </Box>
                                             <div className={cx('event-action')}>
                                                 {item.status === 'Chưa diễn ra' ? (
-                                                    <IconButton
-                                                        aria-label="delete"
-                                                        onClick={() => {
-                                                            handleOpenDialog();
-                                                            SetEventOnclick({ name: item.name, id: item.id });
-                                                            // handleDelete(item.id);
-                                                        }}
-                                                    >
-                                                        <DeleteIcon />
-                                                    </IconButton>
+                                                    <Fragment>
+                                                        <IconButton
+                                                            aria-label="delete"
+                                                            onClick={() => {
+                                                                handleOpenDialog();
+                                                                SetEventOnclick({ name: item.name, id: item.id });
+                                                                // handleDelete(item.id);
+                                                            }}
+                                                        >
+                                                            <DeleteIcon />
+                                                        </IconButton>
+                                                        <IconButton
+                                                            aria-label="edit"
+                                                            component={Link}
+                                                            to={`${item.id}/edit`}
+                                                        >
+                                                            <EditIcon />
+                                                        </IconButton>
+                                                    </Fragment>
                                                 ) : (
                                                     ''
                                                 )}
-
-                                                <IconButton aria-label="edit" component={Link} to={`${item.id}/edit`}>
-                                                    <EditIcon />
-                                                </IconButton>
                                             </div>
                                         </div>
                                     </li>

@@ -49,7 +49,7 @@ function MemberCancelEvent() {
                         <MenuItem value={'Admin'}>Thành viên ban tổ chức</MenuItem>
                     </Select>
                 </FormControl> */}
-                <Link to={`../admin/events/${id}/members`}>Danh sách thành viên đăng ký tham gia sự kiện</Link>
+                {/* <Link to={`../admin/events/${id}/members`}>Danh sách thành viên đăng ký tham gia sự kiện</Link> */}
                 {/* <Typography variant="body1" component={}>Danh sách thành viên hủy đăng ký tham gia sự kiện</Typography> */}
             </Box>
 

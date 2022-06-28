@@ -70,42 +70,46 @@ function ViewEventSchedule() {
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 700, marginBottom: 2 }}>
                 Chỉnh sửa lịch sự kiện
             </Typography>
-
             <div className={cx('schedule-container')}>
                 <div className={cx('schedule-content')}>
-                    <FullCalendar
-                        locale="vie"
-                        height="60%"
-                        plugins={[dayGridPlugin, interactionPlugin]}
-                        initialView="dayGridMonth"
-                        // events={[
-                        //     {
-                        //         id: 1,
-                        //         title: 'đi tập đi đmm',
-                        //         date: '2022-06-16',
-                        //         // display: 'background',
-                        //         // textColor: 'white',
-                        //         backgroundColor: '#5ba8f5',
-                        //         classNames: ['test-css'],
-                        //     },
-                        // ]}
-                        events={scheduleData}
-                        weekends={true}
-                        headerToolbar={{
-                            left: 'title',
-                            center: 'dayGridMonth,dayGridWeek',
-                            right: 'prev next today',
-                            // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                        }}
-                        // editable={true}
-                        // selectable={true}
-                        datesSet={(dateInfo) => {
-                            getMonthInCurrentTableView(dateInfo.start);
-                        }}
-                        eventClick={(args) => {
-                            navigateToUpdate(args.event.id);
-                        }}
-                    />
+                    {scheduleList[0] && (
+                        <FullCalendar
+                            initialDate={scheduleList[0] && new Date(scheduleList[0].date)}
+                            // initialDate={scheduleData[0] && scheduleData[0].date}
+                            locale="vie"
+                            height="60%"
+                            plugins={[dayGridPlugin, interactionPlugin]}
+                            initialView="dayGridMonth"
+                            // events={[
+                            //     {
+                            //         id: 1,
+                            //         title: 'đi tập đi đmm',
+                            //         date: '2022-06-16',
+                            //         // display: 'background',
+                            //         // textColor: 'white',
+                            //         backgroundColor: '#5ba8f5',
+                            //         classNames: ['test-css'],
+                            //     },
+                            // ]}
+                            events={scheduleData}
+                            weekends={true}
+                            headerToolbar={{
+                                left: 'title',
+                                center: 'dayGridMonth,dayGridWeek',
+                                right: 'prev next today',
+                                // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                            }}
+                            // editable={true}
+                            // selectable={true}
+                            datesSet={(dateInfo) => {
+                                getMonthInCurrentTableView(dateInfo.start);
+                            }}
+                            eventClick={(args) => {
+                                // navigateToUpdate(args.event.id);
+                                console.log(args.event.start);
+                            }}
+                        />
+                    )}
                 </div>
             </div>
         </Fragment>

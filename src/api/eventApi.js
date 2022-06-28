@@ -29,7 +29,7 @@ const eventApi = {
         return axiosClient.post(url, params);
     },
     createScheduleSession: (params, eventId) => {
-        const url = `/eventschedule/headculture/addnewschedule/${eventId}`;
+        const url = `/eventschedule/headculture/addnewschedule/${eventId}?isOverwritten=true`;
         return axiosClient.post(url, params);
     },
     updateEvent: (params, eventId) => {
@@ -55,7 +55,7 @@ const eventApi = {
         return axiosClient.get(url);
     },
     getAllMemberCancel: (params) => {
-        const url = `/event/headculture/getallusercanceljoinevent/${params}?pageNo=0&pageSize=1000&sortBy=id`;
+        const url = `/event/headculture/getallmembercanceljoinevent/${params}?pageNo=0&pageSize=1000&sortBy=id`;
         return axiosClient.get(url);
     },
     updateRoleEvent: (params) => {
@@ -69,6 +69,27 @@ const eventApi = {
     updateMemberRole: (params) => {
         const url = `/event/headculture/updatelistmembereventrole`;
         return axiosClient.put(url, params);
+    },
+
+    getPeriodTime: (id) => {
+        const url = `/eventschedule/headculture/getperiodtimeofevent/${id}`;
+        return axiosClient.get(url);
+    },
+
+    previewUpdateEventSessionTime: (eventId, params) => {
+        const url = `/eventschedule/headculture/updatepreview/${eventId}`;
+        return axiosClient.post(url, null, {
+            params: {
+                startDate: params.startDate,
+                finishDate: params.finishDate,
+                startTime: params.startTime,
+                finishTime: params.finishTime,
+            },
+        });
+    },
+    updateEventSchedule: (eventId, params) => {
+        const url = `/eventschedule/headculture/updateschedule/${eventId}?isOverwritten=true`;
+        return axiosClient.post(url, params);
     },
 };
 export default eventApi;
