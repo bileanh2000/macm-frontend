@@ -60,7 +60,7 @@ function PerformanceCompetition(props) {
             const newInput = { ...data, id: Math.random() };
             const newData = [...datas, newInput];
             setDatas(newData);
-            props.onAddPerformanceCompetition(datas);
+            props.onAddPerformanceCompetition(newData);
             setIsChecked(!isChecked);
             reset({
                 name: '',

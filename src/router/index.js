@@ -24,6 +24,7 @@ import MemberCancelEvent from '../Pages/Admin/Event/MenberEvent/MemberCancelEven
 import AddToAdmin from '../Pages/Admin/Event/MenberEvent/AddMemberToAdminEvent';
 
 import Facility from '../Pages/Admin/Facility';
+import FacilityReport from '../Pages/Admin/ClubFee/FacilityFee/FacilityReport';
 import News from '../Pages/Admin/News';
 import NewsDetail from '../Pages/Admin/News/NewsDetail/NewsDetail';
 import EditNews from '../Pages/Admin/News/EditNews/EditNews';
@@ -95,6 +96,7 @@ const privateRouters = [
     { path: '/admin/clubfee/event/:eventId', component: EventFee },
     { path: '/admin/clubfee/event/:eventId/report', component: ReportEvent },
     { path: '/admin/clubfee/facility', component: FacilityFee },
+    { path: '/admin/clubfee/facility/report', component: FacilityReport },
     { path: '/admin/clubfee/membership/report', component: ReportMembership },
     { path: '/admin/clubfee/tournaments', component: ListTournament },
     { path: '/admin/clubfee/tournaments/:tournamentId', component: TournamentFee },

@@ -44,7 +44,7 @@ function Attendance() {
                     </Button>
                 </div>
             )}
-            {!_trainingScheduleId && <Typography variant="h3">Hôm nay không có buổi tập nào</Typography>}
+            {!trainingScheduleId && <Typography variant="h3">Hôm nay không có buổi tập nào</Typography>}
         </Fragment>
     );
 }
