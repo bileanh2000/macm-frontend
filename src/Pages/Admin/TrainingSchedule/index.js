@@ -99,7 +99,7 @@ function TrainingSchedule() {
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 700, marginBottom: 2 }}>
                 Theo dõi lịch tập
             </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <TextField
                     id="outlined-select-currency"
                     size="small"
@@ -115,6 +115,16 @@ function TrainingSchedule() {
                     ))}
                 </TextField>
                 <Box>
+                    <Box component="span" sx={{ backgroundColor: '#BBBB', p: 1, ml: 1, borderRadius: '5px' }}>
+                        Lịch tập trong quá khứ
+                    </Box>
+                    <Box component="span" sx={{ backgroundColor: '#5BA8F5', p: 1, ml: 1, borderRadius: '5px' }}>
+                        Lịch tập trong tương lai
+                    </Box>
+                </Box>
+                <Box>
+                    {/* <Box sx={{ mt: 8, ml: 2 }}>
+                    </Box> */}
                     <Button component={Link} to="/admin/trainingschedules/addsession" startIcon={<AddCircleIcon />}>
                         Thêm buổi tập
                     </Button>

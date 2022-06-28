@@ -257,6 +257,7 @@ function AddEvent() {
                 <DialogTitle>Xem trước lịch sự kiện</DialogTitle>
                 <DialogContent sx={{ height: '590px' }}>
                     <FullCalendar
+                        initialDate={EventSchedule[0] && new Date(EventSchedule[0].date)}
                         locale="vie"
                         height="100%"
                         plugins={[dayGridPlugin, interactionPlugin]}
