@@ -118,7 +118,6 @@ function EditEventSchedule() {
                 // setSnackBarStatus(true);
                 // snackBarStatus = true;
                 // dynamicAlert(snackBarStatus, res.message);
-                // navigate(`/admin/events`);
             } else {
                 console.log('huhu');
                 // setOpenSnackBar(true);
@@ -167,6 +166,7 @@ function EditEventSchedule() {
                 // setSnackBarStatus(true);
                 // snackBarStatus = true;
                 // dynamicAlert(snackBarStatus, res.message);
+                navigate(`/admin/events/${id}`);
             } else {
                 console.log('huhu');
                 // setOpenSnackBar(true);
