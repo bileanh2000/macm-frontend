@@ -2,7 +2,7 @@ import axiosClient from './axiosClient';
 
 const semesterApi = {
     getTop3Semester: () => {
-        const url = '/semester/getTop3Semesters';
+        const url = '/semester/gettop3semesters';
         return axiosClient.get(url);
     },
     getCurrentSemester: () => {

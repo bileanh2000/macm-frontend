@@ -122,7 +122,7 @@ function EventDetail() {
             {scheduleList[0] && (
                 <Fragment key={scheduleList[0].id}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
-                        <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                        <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                             Thông tin sự kiện "{scheduleList[0].event.name}"
                         </Typography>
                         <Box>
@@ -156,24 +156,24 @@ function EventDetail() {
                         </Box>
                     </Box>
                     <Grid container columns={12} sx={{ mt: 2 }}>
-                        <Grid item xs={4}>
+                        <Grid item xs={5}>
                             <Box sx={{ marginTop: '16px' }}>
                                 <div>
                                     <Typography variant="h6">
-                                        <strong>Số thành viên ban tổ chức:</strong>{' '}
+                                        <strong>Số người ban tổ chức: </strong>
                                         {scheduleList[0].event.maxQuantityComitee}
                                     </Typography>
                                 </div>
                                 <div>
                                     <Typography variant="h6">
-                                        <strong>Tổng chi phí: </strong>
-                                        {scheduleList[0].event.totalAmount.toLocaleString('en-US')} vnđ
+                                        <strong>Tổng chi phí dự kiến: </strong>
+                                        {scheduleList[0].event.totalAmount.toLocaleString('en-US')} VND
                                     </Typography>
                                 </div>
                                 <div>
                                     <Typography variant="h6">
-                                        <strong>Số tiền mỗi người phải đóng: </strong>
-                                        {scheduleList[0].event.amount_per_register.toLocaleString('en-US')} vnđ
+                                        <strong>Dự kiến số tiền mỗi người phải đóng: </strong>
+                                        {scheduleList[0].event.amount_per_register.toLocaleString('en-US')} VND
                                     </Typography>
                                 </div>
                                 <div>
@@ -184,7 +184,7 @@ function EventDetail() {
                                 </div>
                             </Box>
                         </Grid>
-                        <Grid item xs={8} sx={{ minHeight: '755px' }}>
+                        <Grid item xs={7} sx={{ minHeight: '755px' }}>
                             <FullCalendar
                                 // initialDate={new Date('2022-09-01')}
                                 initialDate={scheduleData[0] && new Date(scheduleData[0].date)}

@@ -8,6 +8,7 @@ import {
     DialogTitle,
     IconButton,
     MenuItem,
+    Pagination,
     TextField,
     Typography,
 } from '@mui/material';
@@ -21,15 +22,18 @@ import eventApi from 'src/api/eventApi';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import semesterApi from 'src/api/semesterApi';
 import moment from 'moment';
+import { EventSeatTwoTone } from '@mui/icons-material';
 
 const cx = classNames.bind(styles);
 
 function Event() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
-    const [events, setEvents] = useState();
+    const [events, setEvents] = useState([]);
     const [pageSize, setPageSize] = useState(10);
     const [semester, setSemester] = useState('Summer2022');
+    const [monthInSemester, setMonthInSemester] = useState([]);
+    const [month, setMonth] = useState(0);
     const [semesterList, setSemesterList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [eventOnclick, SetEventOnclick] = useState({ name: '', id: '' });
@@ -43,18 +47,28 @@ function Event() {
     const handleOpenDialog = () => {
         setOpenDialog(true);
     };
-    const getListEventsBySemester = async (params) => {
+    const getListEventsBySemester = async (month, page, semester) => {
         try {
-            const response = await eventApi.getEventBySemester(params);
+            const response = await eventApi.getEventBySemester(month, page, semester);
             setEvents(response.data);
+
             // setTotal(response.totalPage);
             // setPageSize(response.pageSize);
-            console.log('hahahaah', response.data);
+            console.log('getListEventsBySemester', response.data);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
     };
-    console.log(events);
+    // console.log(events);
+    const fetchMonthInSemester = async (semester) => {
+        try {
+            const response = await eventApi.getMonthsBySemester(semester);
+            setMonthInSemester(response.data);
+            console.log('monthsInSemester', response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const fetchSemester = async () => {
         try {
@@ -73,8 +87,9 @@ function Event() {
         fetchSemester();
     }, []);
     useEffect(() => {
-        getListEventsBySemester(semester);
-    }, [semester]);
+        fetchMonthInSemester(semester);
+        getListEventsBySemester(month, page - 1, semester);
+    }, [semester, month, page]);
 
     const handleDelete = useCallback(
         (id) => () => {
@@ -125,7 +140,7 @@ function Event() {
                     Thêm sự kiện mới
                 </Button>
             </Box>
-            <Box>
+            <Box sx={{ mb: 1 }}>
                 <TextField
                     id="outlined-select-currency"
                     select
@@ -133,6 +148,7 @@ function Event() {
                     label="Chọn kỳ"
                     value={semester}
                     onChange={handleChange}
+                    sx={{ mr: 2 }}
                 >
                     {semesterList.map((option) => (
                         <MenuItem key={option.id} value={option.name}>
@@ -140,13 +156,29 @@ function Event() {
                         </MenuItem>
                     ))}
                 </TextField>
+                <TextField
+                    id="outlined-select-currency"
+                    select
+                    size="small"
+                    label="Chọn tháng"
+                    value={month}
+                    onChange={(e) => {
+                        setMonth(e.target.value);
+                    }}
+                >
+                    <MenuItem value={0}>Tất cả</MenuItem>
+                    {monthInSemester.map((option) => (
+                        <MenuItem key={option} value={option}>
+                            Tháng {option}
+                        </MenuItem>
+                    ))}
+                </TextField>
             </Box>
-
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Box sx={{ width: '80%' }}>
                     {events && events.length === 0 ? (
                         <Typography variant="h5" sx={{ textAlign: 'center', mt: 3 }}>
-                            KHÔNG CÓ SỰ KIỆN NÀO TRONG KỲ
+                            KHÔNG CÓ SỰ KIỆN NÀO
                         </Typography>
                     ) : (
                         ''
@@ -205,6 +237,16 @@ function Event() {
                                 );
                             })}
                     </ul>
+                    <Box>
+                        <Pagination
+                            count={events && Math.floor(events.length / 5) + 1}
+                            // count={3}
+                            page={page}
+                            color="primary"
+                            sx={{ display: 'flex', mt: 4, justifyContent: 'flex-end' }}
+                            onChange={(event, value) => setPage(value)}
+                        />
+                    </Box>
                 </Box>
             </Box>
         </Box>

@@ -7,10 +7,11 @@ const eventApi = {
         const url = '/event/geteventsbysemester';
         return axiosClient.get(url);
     },
-    getEventBySemester: (params) => {
-        const url = `/event/geteventsbysemester?semester=${params}`;
+    getEventBySemester: (month, page, semester) => {
+        const url = `/event/geteventsbysemester?month=${month}&pageNo=${page}&pageSize=5&semester=${semester}`;
         return axiosClient.get(url);
     },
+
     createPreviewEvent: (params) => {
         const url = '/eventschedule/headculture/createpreview/';
         return axiosClient.post(url, null, {
@@ -90,6 +91,11 @@ const eventApi = {
     updateEventSchedule: (eventId, params) => {
         const url = `/eventschedule/headculture/updateschedule/${eventId}?isOverwritten=true`;
         return axiosClient.post(url, params);
+    },
+
+    getMonthsBySemester: (semester) => {
+        const url = `/semester/getlistmonths?semester=${semester}`;
+        return axiosClient.get(url);
     },
 };
 export default eventApi;

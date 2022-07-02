@@ -169,7 +169,7 @@ function MemberAndCollaborator() {
             setEditable(false);
         }
         console.log(editable);
-        fetchUserListBySemester(semester);
+        // fetchUserListBySemester(semester);
     };
 
     useEffect(() => {
