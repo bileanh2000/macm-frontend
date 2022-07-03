@@ -21,6 +21,13 @@ const adminAttendanceAPI = {
         const url = `/admin/headtechnique/checkattendance/report`;
         return axiosClient.get(url, { params: { semester } });
     },
+
+    //Event
+
+    getAttendanceByEventId: (eventId) => {
+        const url = `/event/headculture/checkattendance/${eventId}`;
+        return axiosClient.get(url);
+    },
 };
 
 export default adminAttendanceAPI;
