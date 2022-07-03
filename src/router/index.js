@@ -42,6 +42,7 @@ import AdminTournament from '../Pages/Admin/Tournament/AdminTournament';
 import AddAdminTourament from '../Pages/Admin/Tournament/AdminTournament/AddAdminTourament';
 import UpdateAdminTournament from '../Pages/Admin/Tournament/AdminTournament/UpdateAdminTournament';
 import MemberTournament from '../Pages/Admin/Tournament/MemberTournament';
+import TournamentBracket from '../Pages/Admin/Tournament/TournamentBracket';
 
 import CreateRule from '../Pages/Admin/Rules/CreateRule/CreateRule';
 import EditRule from '../Pages/Admin/Rules/EditRule/EditRule';
@@ -123,6 +124,7 @@ const privateRouters = [
     { path: '/admin/tournament/:tournamentId/admin/addadmin', component: AddAdminTourament },
     { path: '/admin/tournament/:tournamentId/admin/update', component: UpdateAdminTournament },
     { path: '/admin/tournament/:tournamentId/members', component: MemberTournament },
+    { path: '/admin/tournament/:tournamentId/tournamentbracket', component: TournamentBracket },
 
     //News paths
     { path: '/admin/news', component: News },
