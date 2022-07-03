@@ -68,10 +68,10 @@ function MenberEvent() {
                     >
                         Cập nhật thành viên ban tổ chức
                     </Button>
-                    {/* <Button variant="contained">
+                    <Button variant="contained">
                         <Link to="./addtoadmin">Điểm danh</Link>
                         Điểm danh
-                    </Button> */}
+                    </Button>
                 </Box>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
