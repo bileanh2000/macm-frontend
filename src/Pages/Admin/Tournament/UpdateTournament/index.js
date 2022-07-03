@@ -85,7 +85,7 @@ function UpdateTournament() {
             cash: Yup.string().required('Không được để trống trường này'),
         }),
         amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
-        //amountPerAdmin: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
+        amountPerAdmin: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
     });
 
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
@@ -294,35 +294,70 @@ function UpdateTournament() {
                                     )}
                                 />
                             </Collapse>
-                            <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                            {/* <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
                                 Dự kiến mỗi người phải đóng: 160k
-                            </Typography>
-                            <Controller
-                                name="amountPerRegister"
-                                variant="outlined"
-                                defaultValue={item.amount_per_register}
-                                control={control}
-                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                    <NumberFormat
-                                        name="amountPerRegister"
-                                        customInput={TextField}
-                                        label="Số tiền mỗi người cần phải đóng"
-                                        thousandSeparator={true}
+                            </Typography> */}
+                            <Grid container spacing={2} sx={{ alignItems: 'center' }}>
+                                <Grid item xs={6}>
+                                    {/* <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                                Dự kiến mỗi người phải đóng: 160k
+                            </Typography> */}
+                                    <Controller
+                                        name="amountPerAdmin"
                                         variant="outlined"
-                                        defaultValue={item.amount_per_register}
-                                        value={value}
-                                        onValueChange={(v) => {
-                                            onChange(Number(v.value));
-                                        }}
-                                        InputProps={{
-                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                        }}
-                                        error={invalid}
-                                        helperText={invalid ? error.message : null}
-                                        fullWidth
+                                        defaultValue={item.feeOrganizingCommiteePay}
+                                        control={control}
+                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                            <NumberFormat
+                                                name="amountPerAdmin"
+                                                customInput={TextField}
+                                                label="Số tiền thành viên ban tổ chức cần phải đóng"
+                                                thousandSeparator={true}
+                                                variant="outlined"
+                                                defaultValue={item.feeOrganizingCommiteePay}
+                                                value={value}
+                                                onValueChange={(v) => {
+                                                    onChange(Number(v.value));
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                                }}
+                                                error={invalid}
+                                                helperText={invalid ? error.message : null}
+                                                fullWidth
+                                            />
+                                        )}
                                     />
-                                )}
-                            />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Controller
+                                        name="amountPerRegister"
+                                        variant="outlined"
+                                        defaultValue={item.feePlayerPay}
+                                        control={control}
+                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                            <NumberFormat
+                                                name="amountPerRegister"
+                                                customInput={TextField}
+                                                label="Số tiền mỗi người cần phải đóng"
+                                                thousandSeparator={true}
+                                                variant="outlined"
+                                                defaultValue={item.feePlayerPay}
+                                                value={value}
+                                                onValueChange={(v) => {
+                                                    onChange(Number(v.value));
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                                }}
+                                                error={invalid}
+                                                helperText={invalid ? error.message : null}
+                                                fullWidth
+                                            />
+                                        )}
+                                    />
+                                </Grid>
+                            </Grid>
                             <TextField
                                 id="outlined-multiline-flexible"
                                 name="description"

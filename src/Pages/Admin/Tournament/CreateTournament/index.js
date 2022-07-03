@@ -93,6 +93,7 @@ function CreateTourament() {
             }
         });
         setOpen(false);
+        setDisabled(false);
     };
 
     const handleChangeOverride = (event) => {
@@ -117,14 +118,16 @@ function CreateTourament() {
                 console.log('huhu');
             }
         });
+        setDisabled(false);
     };
     const createTourament = async (data) => {
         const params = {
-            amount_per_register: data.amountPerRegister,
             competitiveTypes: datasFightingCompetition,
             description: data.description,
             exhibitionTypes: datasPerformanceCompetition,
             maxQuantityComitee: data.numOfParticipants,
+            feeOrganizingCommiteePay: data.amountPerAdmin,
+            feePlayerPay: data.amountPerRegister,
             totalAmount: data.cost,
             name: data.tournamentName,
         };
@@ -140,7 +143,7 @@ function CreateTourament() {
     const onSubmit = (data) => {
         let dataSubmit = {
             numOfParticipants: data.numOfParticipants,
-            description: description,
+            description: data.description,
             finishTime: moment(new Date(2022, 5, 21, 20, 0, 0)).format('HH:mm:ss'),
             startTime: moment(new Date(2022, 5, 20, 8, 0, 0)).format('HH:mm:ss'),
             startDate: moment(new Date(data.startDate)).format('DD/MM/yyyy'),
@@ -149,6 +152,7 @@ function CreateTourament() {
             cash: data.cash,
             cost: data.cost,
             amountPerRegister: data.amountPerRegister,
+            amountPerAdmin: data.amountPerAdmin,
         };
         setSubmitData(dataSubmit);
         createTourament(dataSubmit);

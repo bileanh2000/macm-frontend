@@ -1,5 +1,4 @@
-import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
-import { Edit } from '@mui/icons-material';
+import { Edit, Assessment } from '@mui/icons-material';
 import {
     Alert,
     Box,
@@ -18,6 +17,7 @@ import clsx from 'clsx';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
+
 import facilityApi from 'src/api/facilityApi';
 import adminFunAPi from 'src/api/adminFunAPi';
 
@@ -184,16 +184,23 @@ function FacilityFee() {
 
     function CustomToolbar() {
         return (
-            <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-                <Box
-                    sx={{
-                        p: 0.5,
-                        pb: 0,
-                    }}
-                >
-                    <GridToolbarQuickFilter />
-                </Box>
-            </GridToolbarContainer>
+            <Fragment>
+                <GridToolbarContainer>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <GridToolbarQuickFilter />
+                        {/* <GridToolbarFilterButton /> */}
+                    </Box>
+                    <Button
+                        startIcon={<Assessment />}
+                        size="small"
+                        sx={{ marginLeft: 'auto', marginRight: '1rem' }}
+                        component={Link}
+                        to={`report`}
+                    >
+                        Lịch sử duyệt mua cơ sở vật chất
+                    </Button>
+                </GridToolbarContainer>
+            </Fragment>
         );
     }
     return (
@@ -237,21 +244,23 @@ function FacilityFee() {
                     </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                    <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                        Số dư câu lạc bộ hiện tại:{' '}
-                        {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-                    </Typography>
-                    <Button variant="contained" color="success">
+                    {funClub && (
+                        <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                            Số dư câu lạc bộ hiện tại:{' '}
+                            {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                        </Typography>
+                    )}
+                    {/* <Button variant="contained" color="success">
                         <Link to={`./report`} style={{ color: 'white' }}>
                             Lịch sử duyệt mua cơ sở vật chất
                         </Link>
-                    </Button>
+                    </Button> */}
                 </Grid>
             </Grid>
 
             <Box sx={{ height: 500 }}>
                 <DataGrid
-                    loading={!facilityList.length}
+                    // loading={!facilityList.length}
                     disableSelectionOnClick={true}
                     rows={rowsFacility}
                     columns={columns}
@@ -263,7 +272,7 @@ function FacilityFee() {
                     }}
                 />
             </Box>
-            <Button type="submit">Đồng ý</Button>
+            {/* <Button type="submit">Đồng ý</Button> */}
         </Fragment>
     );
 }

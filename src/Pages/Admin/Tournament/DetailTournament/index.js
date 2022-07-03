@@ -203,11 +203,16 @@ function DetailTournament() {
                                         </div>
                                         <div>
                                             <Typography variant="h6">
-                                                <strong>Số tiền mỗi người phải đóng: </strong>
-                                                {item.amount_per_register.toLocaleString('en-US')} vnđ
+                                                <strong>Số tiền người tham gia phải đóng: </strong>
+                                                {item.feePlayerPay.toLocaleString('en-US')} vnđ
                                             </Typography>
                                         </div>
-
+                                        <div>
+                                            <Typography variant="h6">
+                                                <strong>Số tiền ban tổ chức phải đóng: </strong>
+                                                {item.feeOrganizingCommiteePay.toLocaleString('en-US')} vnđ
+                                            </Typography>
+                                        </div>
                                         <div>
                                             {item.competitiveTypes.length > 0 && (
                                                 <TableContainer sx={{ maxHeight: 440 }}>

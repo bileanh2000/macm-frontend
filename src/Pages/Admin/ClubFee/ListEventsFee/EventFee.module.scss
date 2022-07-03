@@ -14,3 +14,78 @@
         border-radius: 15px;
     }
 }
+.events {
+    position: relative;
+}
+.event-list {
+    display: flex;
+    border: 1px solid #caced8;
+    border-radius: 8px;
+    padding: 0 10px 0 10px;
+    margin-top: 1rem;
+    height: 80px;
+    align-items: center;
+    font-weight: 500;
+    // position: relative;
+    // justify-content: space-between;
+}
+
+.event-status {
+    // flex: 1;
+    color: black;
+    // width: 130px;
+    margin-right: 20px;
+}
+.upcoming {
+    display: flex;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 5px;
+    color: white;
+    background-color: #259323;
+}
+.going-on {
+    display: flex;
+    justify-content: center;
+    padding: 8px;
+    // width: 90px;
+    border-radius: 5px;
+    color: white;
+    background-color: #7292e5;
+}
+.closed {
+    display: flex;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 5px;
+    color: white;
+    background-color: #748998;
+}
+
+.event-link {
+    display: flex;
+    align-items: center;
+}
+.event-title {
+    // color: pink;
+    flex: 6;
+}
+.event-amount {
+    flex: 4;
+}
+
+.event-date {
+    flex: 2;
+}
+.event-action {
+    // flex: 1;
+    position: absolute;
+    z-index: 1;
+    top: 19px;
+    right: 19px;
+}
+.create-event-button {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
