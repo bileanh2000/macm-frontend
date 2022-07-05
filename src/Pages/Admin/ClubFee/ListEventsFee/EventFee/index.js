@@ -1,23 +1,28 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { RadioButtonChecked, RadioButtonUnchecked, Assessment } from '@mui/icons-material';
+import { RadioButtonChecked, RadioButtonUnchecked, Assessment, CurrencyExchange } from '@mui/icons-material';
 import { Alert, Box, Button, Grid, Snackbar, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { useForm } from 'react-hook-form';
 import DialogCommon from 'src/Components/Dialog/Dialog';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 import adminFunAPi from 'src/api/adminFunAPi';
 import eventApi from 'src/api/eventApi';
+import EventSumUp from '../EventSumUp';
+import ClubFee from '../..';
 
 function EventFee() {
     const [userList, setUserList] = useState([]);
     const [event, setEvent] = useState();
-    const [view, setView] = useState(true);
+    // const [view, setView] = useState(true);
     const [pageSize, setPageSize] = useState(10);
     const [funClub, setFunClub] = useState('');
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
+    const [openSumUpDialog, setOpenSumUpDialog] = useState(false);
+    const [status, setStatus] = useState(false);
     const [editDialog, setEditDialog] = useState({
         message: '',
         isLoading: false,
@@ -52,8 +57,14 @@ function EventFee() {
         try {
             const response = await eventApi.getAll();
             let selectedEvent = response.data.filter((item) => item.id === parseInt(eventId, 10));
-            setEvent(selectedEvent[0]);
-            selectedEvent.status === 'Đã kết thúc' ? setView(false) : setView(true);
+            const response2 = await eventApi.getEventById(eventId);
+            const newEvent = response2.data && {
+                totalAmountActual: response2.data[0].totalAmountActual,
+                ...selectedEvent[0],
+            };
+            console.log(newEvent);
+            setEvent(newEvent);
+            // selectedEvent.status === 'Đã kết thúc' ? setView(false) : setView(true);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
@@ -67,7 +78,9 @@ function EventFee() {
     useEffect(() => {
         fetchFunClub();
     }, []);
-
+    const handleDialogOpen = () => {
+        setOpenSumUpDialog(true);
+    };
     const handleEditDialog = (message, isLoading, params) => {
         setEditDialog({
             message,
@@ -109,6 +122,7 @@ function EventFee() {
                 return clsx('status-rows', {
                     active: params.value === 'Đã đóng',
                     deactive: params.value === 'Chưa đóng',
+                    subActive: params.value === 'Chưa đóng đủ',
                 });
             },
         },
@@ -125,14 +139,14 @@ function EventFee() {
                         <GridActionsCellItem
                             icon={<RadioButtonChecked />}
                             label="Đã đóng"
-                            onClick={() => toggleStatus(params.row.id)}
+                            onClick={() => toggleStatus(params.row.id, true)}
                             color="primary"
                             aria-details="Đã đóng"
                         />,
                         <GridActionsCellItem
                             icon={<RadioButtonUnchecked />}
                             label="Chưa đóng"
-                            onClick={() => toggleStatus(params.row.id)}
+                            onClick={() => toggleStatus(params.row.id, false)}
                         />,
                     ];
                 }
@@ -140,17 +154,17 @@ function EventFee() {
                     <GridActionsCellItem
                         icon={<RadioButtonUnchecked />}
                         label="Đã đóng"
-                        onClick={() => toggleStatus(params.row.id)}
+                        onClick={() => toggleStatus(params.row.id, true)}
                     />,
                     <GridActionsCellItem
                         icon={<RadioButtonChecked />}
                         label="Chưa đóng"
-                        onClick={() => toggleStatus(params.row.id)}
+                        onClick={() => toggleStatus(params.row.id, false)}
                         color="primary"
                     />,
                 ];
             },
-            hide: view,
+            // hide: view,
         },
     ];
 
@@ -159,7 +173,24 @@ function EventFee() {
         container['id'] = item.id;
         container['userName'] = item.userName;
         container['userStudentId'] = item.userStudentId;
-        container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
+
+        //check status of payment
+        let paymentStatus;
+        if (item.amountPerRegisterActual == 0) {
+            paymentStatus = item.paymentValue == 0 ? 'Chưa đóng' : 'Đã đóng';
+        } else {
+            if (item.paymentValue == 0) {
+                paymentStatus = 'Chưa đóng';
+            } else if (
+                item.paymentValue == item.amountPerRegisterEstimate &&
+                item.paymentValue < item.amountPerRegisterActual
+            ) {
+                paymentStatus = 'Chưa đóng đủ';
+            } else if (item.paymentValue == item.amountPerRegisterActual) {
+                paymentStatus = 'Đã đóng';
+            }
+        }
+        container['paymentStatus'] = paymentStatus;
         return container;
     });
 
@@ -175,7 +206,8 @@ function EventFee() {
         }
     };
 
-    const toggleStatus = (id) => {
+    const toggleStatus = (id, status) => {
+        setStatus(status);
         console.log(id);
         handleEditDialog('Bạn có chắc muốn cập nhật trạng thái đóng tiền', true, id);
     };
@@ -184,10 +216,16 @@ function EventFee() {
         if (choose) {
             updateUserPayment(editDialog.params);
             const newUserList = userList.map((user) => {
-                return user.id === editDialog.params ? { ...user, paymentStatus: !user.paymentStatus } : user;
+                return user.id === editDialog.params
+                    ? { ...user, paymentValue: status ? user.amountPerRegisterEstimate : 0 }
+                    : user;
             });
             console.log(newUserList);
             setUserList(newUserList);
+            const newFun = status
+                ? +funClub + +event.amountPerMemberRegister
+                : +funClub - event.amountPerMemberRegister;
+            setFunClub(newFun);
             dynamicAlert(true, 'Cập nhật thành công');
             setOpenSnackBar(true);
             handleEditDialog('', false, -1);
@@ -204,6 +242,9 @@ function EventFee() {
                         <GridToolbarQuickFilter />
                         {/* <GridToolbarFilterButton /> */}
                     </Box>
+                    <Typography variant="subtitle1" sx={{ marginLeft: 'auto', marginRight: '1rem' }}>
+                        Đã đóng tiền: {payment}/{userList.length}
+                    </Typography>
                     <Button
                         startIcon={<Assessment />}
                         size="small"
@@ -235,7 +276,20 @@ function EventFee() {
                     {customAlert.message}
                 </Alert>
             </Snackbar>
-
+            {event && userList && (
+                <EventSumUp
+                    title="Tổng kết chi phí sau sự kiện"
+                    params={{ event, userList, funClub }}
+                    isOpen={openSumUpDialog}
+                    handleClose={() => {
+                        setOpenSumUpDialog(false);
+                    }}
+                    onSucess={(newItem) => {
+                        setFunClub((prev) => prev + newItem);
+                        setOpenSumUpDialog(false);
+                    }}
+                />
+            )}
             <Grid container spacing={4}>
                 <Grid item xs={12}>
                     <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
@@ -263,14 +317,18 @@ function EventFee() {
                         Số dư câu lạc bộ hiện tại:{' '}
                         {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                     </Typography>
-                    <Typography variant="subtitle1" sx={{ float: 'right' }}>
-                        Đã đóng: {payment}/{userList.length}
-                    </Typography>
-                    {/* <Button variant="contained" color="success" sx={{ float: 'right' }}>
-                        <Link to="./report" state={{ event: event }} style={{ color: 'white' }}>
-                            Lịch sử chỉnh sửa
-                        </Link>
-                    </Button> */}
+                    {event && event.status === 'Đã kết thúc' && event.totalAmountActual === 0 ? (
+                        <Button
+                            variant="outlined"
+                            startIcon={<CurrencyExchange />}
+                            sx={{ ml: 1 }}
+                            onClick={handleDialogOpen}
+                        >
+                            Tổng kết chi phí sau sự kiện
+                        </Button>
+                    ) : (
+                        <Typography variant="subtitle1">Sự kiện đã tổng kết</Typography>
+                    )}
                 </Grid>
             </Grid>
 
@@ -294,6 +352,11 @@ function EventFee() {
                     },
                     '& .status-rows.deactive': {
                         backgroundColor: '#ff3838',
+                        color: '#fff',
+                        fontWeight: '600',
+                    },
+                    '& .status-rows.subActive': {
+                        backgroundColor: '#cfb2b2',
                         color: '#fff',
                         fontWeight: '600',
                     },

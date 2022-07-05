@@ -97,5 +97,20 @@ const eventApi = {
         const url = `/semester/getlistmonths?semester=${semester}`;
         return axiosClient.get(url);
     },
+
+    updateAfterEvent: (params) => {
+        const url = `/event/headculture/updateafterevent/${params.id}`;
+        return axiosClient.put(url, null, {
+            params: {
+                isIncurred: params.isIncurred,
+                isUseClubFund: params.isUseClubFund,
+                money: params.money,
+            },
+        });
+    },
+    getEventById: (eventId) => {
+        const url = `/event/geteventbyid/${eventId}`;
+        return axiosClient.get(url);
+    },
 };
 export default eventApi;

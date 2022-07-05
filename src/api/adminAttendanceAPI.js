@@ -7,9 +7,9 @@ const adminAttendanceAPI = {
         return axiosClient.get(url);
     },
 
-    takeAttendance: (studentId) => {
+    takeAttendance: (studentId, status) => {
         const url = `/admin/headtechnique/takeattendance/${studentId}`;
-        return axiosClient.put(url);
+        return axiosClient.put(url, null, { params: { status } });
     },
 
     getTrainingSessionByDate: (date) => {
@@ -27,6 +27,13 @@ const adminAttendanceAPI = {
     getAttendanceByEventId: (eventId) => {
         const url = `/event/headculture/checkattendance/${eventId}`;
         return axiosClient.get(url);
+    },
+
+    //common
+
+    getCommonSessionByDate: (date) => {
+        const url = '/commonschedule/getcommonsessionbydate';
+        return axiosClient.get(url, { params: { date } });
     },
 };
 

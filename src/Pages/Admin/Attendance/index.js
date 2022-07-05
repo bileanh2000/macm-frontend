@@ -14,14 +14,14 @@ function Attendance() {
 
     const [trainingScheduleId, setTrainingScheduleId] = useState(_trainingScheduleId);
 
-    const nowDate = new Date();
+    const nowDate = new Date('07/07/2022');
     if (!_nowDate) _nowDate = nowDate;
     const date = moment(new Date(_nowDate)).format('DD/MM/yyyy');
 
     const getSessionByDate = async () => {
         try {
             console.log(date);
-            const response = await adminAttendanceAPI.getTrainingSessionByDate(date);
+            const response = await adminAttendanceAPI.getCommonSessionByDate(date);
             console.log(response.data);
             if (!_trainingScheduleId) setTrainingScheduleId(response.data[0].id);
         } catch (error) {
