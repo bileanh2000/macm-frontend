@@ -387,7 +387,7 @@ function EditEvent() {
                                 <Controller
                                     name="totalAmount"
                                     variant="outlined"
-                                    defaultValue={scheduleList[0].event.totalAmount}
+                                    defaultValue={scheduleList[0].event.totalAmountEstimated}
                                     control={control}
                                     render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                         <NumberFormat
@@ -396,7 +396,7 @@ function EditEvent() {
                                             label="Tổng chi phí dự kiến"
                                             thousandSeparator={true}
                                             variant="outlined"
-                                            defaultValue={scheduleList[0].event.totalAmount}
+                                            defaultValue={scheduleList[0].event.totalAmountEstimated}
                                             value={value}
                                             onValueChange={(v) => {
                                                 onChange(Number(v.value));
@@ -417,7 +417,7 @@ function EditEvent() {
                                 <Controller
                                     name="amountPerRegister"
                                     variant="outlined"
-                                    defaultValue={scheduleList[0].event.amount_per_register}
+                                    defaultValue={scheduleList[0].event.amountPerRegisterEstimated}
                                     control={control}
                                     render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                         <NumberFormat
@@ -426,7 +426,7 @@ function EditEvent() {
                                             label="Dự kiến số tiền mỗi người phải đóng"
                                             thousandSeparator={true}
                                             variant="outlined"
-                                            defaultValue={scheduleList[0].event.amount_per_register}
+                                            defaultValue={scheduleList[0].event.amountPerRegisterEstimated}
                                             value={value}
                                             onValueChange={(v) => {
                                                 onChange(Number(v.value));
@@ -453,151 +453,153 @@ function EditEvent() {
                                 // {...register('content')}
                             /> */}
                                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                                    <Grid container columns={12} spacing={2}>
-                                        <Grid item xs={6}>
-                                            <Controller
-                                                required
-                                                name="startDate"
-                                                control={control}
-                                                defaultValue={new Date(schedule[0])}
-                                                render={({
-                                                    field: { onChange, value },
-                                                    fieldState: { error, invalid },
-                                                }) => (
-                                                    <DatePicker
-                                                        label="Ngày bắt đầu"
-                                                        disablePast
-                                                        ampm={false}
-                                                        value={value}
-                                                        onChange={(value) => onChange(value)}
-                                                        renderInput={(params) => (
-                                                            <TextField
-                                                                sx={{
-                                                                    marginTop: '0px !important',
-                                                                    marginBottom: '16px !important',
-                                                                }}
-                                                                {...params}
-                                                                required
-                                                                id="outlined-disabled"
-                                                                error={invalid}
-                                                                helperText={invalid ? error.message : null}
-                                                                // id="startDate"
-                                                                variant="outlined"
-                                                                margin="dense"
-                                                                fullWidth
-                                                            />
-                                                        )}
-                                                    />
-                                                )}
-                                            />
-                                            <Controller
-                                                required
-                                                name="startTime"
-                                                control={control}
-                                                defaultValue={new Date('2000-09-01T' + schedule[2] + ':00')}
-                                                render={({
-                                                    field: { onChange, value },
-                                                    fieldState: { error, invalid },
-                                                }) => (
-                                                    <TimePicker
-                                                        label="Thời gian bắt đầu"
-                                                        // disablePast
-                                                        ampm={false}
-                                                        value={value}
-                                                        onChange={(value) => onChange(value)}
-                                                        renderInput={(params) => (
-                                                            <TextField
-                                                                sx={{
-                                                                    marginTop: '0px !important',
-                                                                    marginBottom: '16px !important',
-                                                                }}
-                                                                {...params}
-                                                                required
-                                                                id="outlined-disabled"
-                                                                error={invalid}
-                                                                helperText={invalid ? error.message : null}
-                                                                // id="startDate"
-                                                                variant="outlined"
-                                                                margin="dense"
-                                                                fullWidth
-                                                            />
-                                                        )}
-                                                    />
-                                                )}
-                                            />
+                                    {schedule[0] && (
+                                        <Grid container columns={12} spacing={2}>
+                                            <Grid item xs={6}>
+                                                <Controller
+                                                    required
+                                                    name="startDate"
+                                                    control={control}
+                                                    defaultValue={new Date(schedule[0])}
+                                                    render={({
+                                                        field: { onChange, value },
+                                                        fieldState: { error, invalid },
+                                                    }) => (
+                                                        <DatePicker
+                                                            label="Ngày bắt đầu"
+                                                            disablePast
+                                                            ampm={false}
+                                                            value={value}
+                                                            onChange={(value) => onChange(value)}
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    sx={{
+                                                                        marginTop: '0px !important',
+                                                                        marginBottom: '16px !important',
+                                                                    }}
+                                                                    {...params}
+                                                                    required
+                                                                    id="outlined-disabled"
+                                                                    error={invalid}
+                                                                    helperText={invalid ? error.message : null}
+                                                                    // id="startDate"
+                                                                    variant="outlined"
+                                                                    margin="dense"
+                                                                    fullWidth
+                                                                />
+                                                            )}
+                                                        />
+                                                    )}
+                                                />
+                                                <Controller
+                                                    required
+                                                    name="startTime"
+                                                    control={control}
+                                                    defaultValue={new Date('2000-09-01T' + schedule[2] + ':00')}
+                                                    render={({
+                                                        field: { onChange, value },
+                                                        fieldState: { error, invalid },
+                                                    }) => (
+                                                        <TimePicker
+                                                            label="Thời gian bắt đầu"
+                                                            // disablePast
+                                                            ampm={false}
+                                                            value={value}
+                                                            onChange={(value) => onChange(value)}
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    sx={{
+                                                                        marginTop: '0px !important',
+                                                                        marginBottom: '16px !important',
+                                                                    }}
+                                                                    {...params}
+                                                                    required
+                                                                    id="outlined-disabled"
+                                                                    error={invalid}
+                                                                    helperText={invalid ? error.message : null}
+                                                                    // id="startDate"
+                                                                    variant="outlined"
+                                                                    margin="dense"
+                                                                    fullWidth
+                                                                />
+                                                            )}
+                                                        />
+                                                    )}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <Controller
+                                                    required
+                                                    name="finishDate"
+                                                    control={control}
+                                                    defaultValue={new Date(schedule[1])}
+                                                    render={({
+                                                        field: { onChange, value },
+                                                        fieldState: { error, invalid },
+                                                    }) => (
+                                                        <DatePicker
+                                                            label="Ngày kết thúc"
+                                                            disablePast
+                                                            ampm={false}
+                                                            value={value}
+                                                            onChange={(value) => onChange(value)}
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    sx={{
+                                                                        marginTop: '0px !important',
+                                                                        marginBottom: '16px !important',
+                                                                    }}
+                                                                    {...params}
+                                                                    required
+                                                                    id="outlined-disabled"
+                                                                    error={invalid}
+                                                                    helperText={invalid ? error.message : null}
+                                                                    // id="startDate"
+                                                                    variant="outlined"
+                                                                    margin="dense"
+                                                                    fullWidth
+                                                                />
+                                                            )}
+                                                        />
+                                                    )}
+                                                />
+                                                <Controller
+                                                    required
+                                                    name="finishTime"
+                                                    control={control}
+                                                    defaultValue={new Date('2000-09-01T' + schedule[3] + ':00')}
+                                                    render={({
+                                                        field: { onChange, value },
+                                                        fieldState: { error, invalid },
+                                                    }) => (
+                                                        <TimePicker
+                                                            label="Thời gian kết thúc"
+                                                            ampm={false}
+                                                            value={value}
+                                                            onChange={(value) => onChange(value)}
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    sx={{
+                                                                        marginTop: '0px !important',
+                                                                        marginBottom: '16px !important',
+                                                                    }}
+                                                                    {...params}
+                                                                    required
+                                                                    id="outlined-disabled"
+                                                                    error={invalid}
+                                                                    helperText={invalid ? error.message : null}
+                                                                    // id="startDate"
+                                                                    variant="outlined"
+                                                                    margin="dense"
+                                                                    fullWidth
+                                                                />
+                                                            )}
+                                                        />
+                                                    )}
+                                                />
+                                            </Grid>
                                         </Grid>
-                                        <Grid item xs={6}>
-                                            <Controller
-                                                required
-                                                name="finishDate"
-                                                control={control}
-                                                defaultValue={new Date(schedule[1])}
-                                                render={({
-                                                    field: { onChange, value },
-                                                    fieldState: { error, invalid },
-                                                }) => (
-                                                    <DatePicker
-                                                        label="Ngày kết thúc"
-                                                        disablePast
-                                                        ampm={false}
-                                                        value={value}
-                                                        onChange={(value) => onChange(value)}
-                                                        renderInput={(params) => (
-                                                            <TextField
-                                                                sx={{
-                                                                    marginTop: '0px !important',
-                                                                    marginBottom: '16px !important',
-                                                                }}
-                                                                {...params}
-                                                                required
-                                                                id="outlined-disabled"
-                                                                error={invalid}
-                                                                helperText={invalid ? error.message : null}
-                                                                // id="startDate"
-                                                                variant="outlined"
-                                                                margin="dense"
-                                                                fullWidth
-                                                            />
-                                                        )}
-                                                    />
-                                                )}
-                                            />
-                                            <Controller
-                                                required
-                                                name="finishTime"
-                                                control={control}
-                                                defaultValue={new Date('2000-09-01T' + schedule[3] + ':00')}
-                                                render={({
-                                                    field: { onChange, value },
-                                                    fieldState: { error, invalid },
-                                                }) => (
-                                                    <TimePicker
-                                                        label="Thời gian kết thúc"
-                                                        ampm={false}
-                                                        value={value}
-                                                        onChange={(value) => onChange(value)}
-                                                        renderInput={(params) => (
-                                                            <TextField
-                                                                sx={{
-                                                                    marginTop: '0px !important',
-                                                                    marginBottom: '16px !important',
-                                                                }}
-                                                                {...params}
-                                                                required
-                                                                id="outlined-disabled"
-                                                                error={invalid}
-                                                                helperText={invalid ? error.message : null}
-                                                                // id="startDate"
-                                                                variant="outlined"
-                                                                margin="dense"
-                                                                fullWidth
-                                                            />
-                                                        )}
-                                                    />
-                                                )}
-                                            />
-                                        </Grid>
-                                    </Grid>
+                                    )}
                                 </LocalizationProvider>
                                 <TextField
                                     id="standard-multiline-static"

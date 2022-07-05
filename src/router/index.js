@@ -63,6 +63,8 @@ import TakeAttendance from 'src/Pages/Admin/Attendance/TakeAttendance';
 import ViewEventSchedule from 'src/Pages/Admin/Event/ViewEventSchedule';
 import EditEventSchedule from 'src/Pages/Admin/Event/EditEventSchedule';
 import ReportFacility from 'src/Pages/Admin/Facility/ReportFacility';
+import QRScanner from 'src/Pages/Admin/Attendance/QRScan';
+import AddMemberToEvent from 'src/Pages/Admin/Event/MenberEvent/AddMemberToEvent';
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
@@ -77,9 +79,11 @@ const privateRouters = [
     { path: '/admin/adduser', component: AddUserPage },
     { path: '/admin/trainingschedule', component: TrainingSchedule },
 
+    // Training schedule paths
     { path: '/admin/trainingschedules', component: TrainingSchedule },
     { path: '/admin/trainingschedules/add', component: AddTrainingSchedulePage },
     { path: '/admin/trainingschedules/addsession', component: addSessionPage },
+    { path: '/admin/trainingschedules/addsession/:date', component: addSessionPage },
     { path: '/admin/trainingschedules/:scheduleId/edit', component: UpdateTrainingSchedulePage },
 
     //Contact paths
@@ -90,6 +94,7 @@ const privateRouters = [
     { path: '/admin/attendance', component: Attendance },
     { path: '/admin/attendance/take', component: TakeAttendance },
     { path: '/admin/attendance/report', component: ReportAttendance },
+    { path: '/admin/attendance/scanqrcode', component: QRScanner, layout: HeaderOnly },
 
     //Club fee paths
     { path: '/admin/clubfee', component: ClubFee },
@@ -140,6 +145,7 @@ const privateRouters = [
     { path: '/admin/events/:id/members', component: MemberEvent },
     { path: '/admin/events/:id/membercancel', component: MemberCancelEvent },
     { path: '/admin/events/:id/member/addtoadmin', component: AddToAdmin },
+    { path: '/admin/events/:id/member/addmember', component: AddMemberToEvent },
     // Facility paths
     { path: '/admin/facility', component: Facility },
     { path: '/admin/facility/reports', component: ReportFacility },

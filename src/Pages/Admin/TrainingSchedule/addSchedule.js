@@ -35,6 +35,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useNavigate } from 'react-router-dom';
+import semesterApi from 'src/api/semesterApi';
 
 function AddSchedule() {
     moment().locale('vi');
@@ -43,6 +44,10 @@ function AddSchedule() {
     const [endDate, setEndDate] = useState(new Date());
     const [submitData, setSubmitData] = useState();
     const [previewData, setPreviewData] = useState();
+    const [currentSemester, setCurrentSemester] = useState([]);
+    const today = new Date();
+    const tomorrow = today.setDate(today.getDate() + 1);
+
     let navigate = useNavigate();
 
     const handleClickOpen = () => {
@@ -53,6 +58,21 @@ function AddSchedule() {
         setOpen(false);
     };
 
+    const getCurrentSemester = async () => {
+        try {
+            const response = await semesterApi.getCurrentSemester();
+            console.log('thanh cong roi, currentSemester:', response);
+            setCurrentSemester(response.data);
+        } catch (error) {
+            console.log('failed in get current semester', error);
+        }
+    };
+    useEffect(() => {
+        getCurrentSemester();
+    }, []);
+    useEffect(() => {
+        currentSemester[0] && console.log(currentSemester[0].endDate);
+    }, [currentSemester]);
     const schema = Yup.object().shape({
         startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
         endDate: Yup.date()
@@ -151,9 +171,9 @@ function AddSchedule() {
             if (res.data.length != 0) {
                 setOpenSnackBar(true);
                 // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
-                setPreviewData(res.data);
+                // snackBarStatus = true;
+                // dynamicAlert(snackBarStatus, res.message);
+                // setPreviewData(res.data);
                 setOpen(true);
             } else {
                 console.log('huhu');
@@ -275,40 +295,43 @@ function AddSchedule() {
                     </Typography>
                     <Grid container spacing={6} columns={12}>
                         <Grid item xs={12} sm={6}>
-                            <Controller
-                                required
-                                name="startDate"
-                                control={control}
-                                defaultValue={null}
-                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                    <DatePicker
-                                        disablePast
-                                        label="Ngày bắt đầu"
-                                        inputFormat="dd/MM/yyyy"
-                                        disableFuture={false}
-                                        value={value}
-                                        onChange={(value) => onChange(value)}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                required
-                                                id="outlined-disabled"
-                                                error={invalid}
-                                                helperText={invalid ? error.message : null}
-                                                // id="startDate"
-                                                variant="outlined"
-                                                margin="dense"
-                                                fullWidth
-                                            />
-                                        )}
-                                    />
-                                )}
-                            />
+                            {currentSemester[0] && (
+                                <Controller
+                                    required
+                                    name="startDate"
+                                    control={control}
+                                    defaultValue={tomorrow}
+                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        <DatePicker
+                                            disablePast
+                                            label="Ngày bắt đầu"
+                                            inputFormat="dd/MM/yyyy"
+                                            disableFuture={false}
+                                            value={value}
+                                            onChange={(value) => onChange(value)}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    required
+                                                    id="outlined-disabled"
+                                                    error={invalid}
+                                                    helperText={invalid ? error.message : null}
+                                                    // id="startDate"
+                                                    variant="outlined"
+                                                    margin="dense"
+                                                    fullWidth
+                                                />
+                                            )}
+                                        />
+                                    )}
+                                />
+                            )}
+
                             <Controller
                                 required
                                 name="startTime"
                                 control={control}
-                                defaultValue={null}
+                                defaultValue={new Date('1/1/2000 18:00:00')}
                                 render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                     <TimePicker
                                         label="Thời gian bắt đầu mỗi buổi"
@@ -337,47 +360,51 @@ function AddSchedule() {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Controller
-                                required
-                                name="endDate"
-                                inputFormat="DD/MM/YYYY"
-                                control={control}
-                                defaultValue={null}
-                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                    <DatePicker
-                                        label="Ngày kết thúc"
-                                        // minDate={new Date('2022-06-29')}
-                                        minDate={startDate}
-                                        // disablePast
-                                        disableFuture={false}
-                                        inputFormat="dd/MM/yyyy"
-                                        value={value}
-                                        onChange={(value) => {
-                                            console.log(value);
-                                            onChange(value);
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                required
-                                                id="outlined-disabled"
-                                                error={invalid}
-                                                helperText={invalid ? error.message : null}
-                                                // id="startDate"
-                                                variant="outlined"
-                                                margin="dense"
-                                                type="datetime-local"
-                                                fullWidth
-                                            />
-                                        )}
-                                    />
-                                )}
-                            />
+                            {currentSemester[0] && (
+                                <Controller
+                                    required
+                                    name="endDate"
+                                    inputFormat="DD/MM/YYYY"
+                                    control={control}
+                                    // defaultValue="2022-09-04"
+                                    defaultValue={currentSemester[0].endDate}
+                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        <DatePicker
+                                            label="Ngày kết thúc"
+                                            // minDate={new Date('2022-06-29')}
+                                            // minDate={startDate}
+                                            disablePast
+                                            disableFuture={false}
+                                            inputFormat="dd/MM/yyyy"
+                                            value={value}
+                                            onChange={(value) => {
+                                                console.log(value);
+                                                onChange(value);
+                                            }}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    required
+                                                    id="outlined-disabled"
+                                                    error={invalid}
+                                                    helperText={invalid ? error.message : null}
+                                                    // id="startDate"
+                                                    variant="outlined"
+                                                    margin="dense"
+                                                    type="datetime-local"
+                                                    fullWidth
+                                                />
+                                            )}
+                                        />
+                                    )}
+                                />
+                            )}
+
                             <Controller
                                 required
                                 name="endTime"
                                 control={control}
-                                defaultValue={null}
+                                defaultValue={new Date('1/1/2000 19:45:00')}
                                 render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                     <TimePicker
                                         label="Thời gian kết thúc mỗi buổi"
@@ -418,7 +445,8 @@ function AddSchedule() {
                                                     required={true}
                                                     key={item.value}
                                                     label={item.label}
-                                                    error={invalid}
+                                                    // error={invalid}
+                                                    // helperText={invalid ? error.message : null}
                                                     control={
                                                         <Checkbox
                                                             required

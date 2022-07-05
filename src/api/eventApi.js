@@ -97,5 +97,14 @@ const eventApi = {
         const url = `/semester/getlistmonths?semester=${semester}`;
         return axiosClient.get(url);
     },
+
+    getAllMemberNotJointEvent: (id) => {
+        const url = `/event/headculture/getlistmembernotjoin/${id}?pageNo=0&pageSize=10`;
+        return axiosClient.get(url);
+    },
+    updateMemberToJoinEvent: (id, body) => {
+        const url = `/event/headculture/addlistmemberjoin/${id}`;
+        return axiosClient.post(url, body);
+    },
 };
 export default eventApi;

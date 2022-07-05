@@ -6,7 +6,7 @@ const semesterApi = {
         return axiosClient.get(url);
     },
     getCurrentSemester: () => {
-        const url = '/trainingschedule/gettrainingschedule';
+        const url = '/semester/currentsemester';
         return axiosClient.get(url);
     },
 };

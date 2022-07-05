@@ -198,13 +198,15 @@ function DetailTournament() {
                                         <div>
                                             <Typography variant="h6">
                                                 <strong>Tổng chi phí: </strong>{' '}
-                                                {item.totalAmount.toLocaleString('en-US')} vnđ
+                                                {item.totalAmount.toLocaleString('en-US')} VND
                                             </Typography>
                                         </div>
                                         <div>
                                             <Typography variant="h6">
                                                 <strong>Số tiền mỗi người phải đóng: </strong>
-                                                {item.amount_per_register.toLocaleString('en-US')} vnđ
+                                                {item.amount_per_register &&
+                                                    item.amount_per_register.toLocaleString('en-US')}{' '}
+                                                VND
                                             </Typography>
                                         </div>
 

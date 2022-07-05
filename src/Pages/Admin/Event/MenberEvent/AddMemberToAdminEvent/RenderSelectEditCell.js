@@ -13,9 +13,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const roles = [
-    { roleId: 11, roleName: 'Thành viên ban truyền thông' },
-    { roleId: 22, roleName: 'Thành viên ban văn hóa' },
-    { roleId: 33, roleName: 'Thành viên ban hậu cần' },
+    { roleId: 1, roleName: 'Thành viên tham gia' },
+    { roleId: 2, roleName: 'Thành viên ban truyền thông' },
+    { roleId: 3, roleName: 'Thành viên ban văn hóa' },
+    { roleId: 4, roleName: 'Thành viên ban hậu cần' },
 ];
 
 const getRoleNameByid = (roleId) => {

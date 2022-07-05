@@ -167,13 +167,13 @@ function EventDetail() {
                                 <div>
                                     <Typography variant="h6">
                                         <strong>Tổng chi phí dự kiến: </strong>
-                                        {scheduleList[0].event.totalAmount.toLocaleString('en-US')} VND
+                                        {scheduleList[0].event.totalAmountEstimated.toLocaleString('en-US')} VND
                                     </Typography>
                                 </div>
                                 <div>
                                     <Typography variant="h6">
                                         <strong>Dự kiến số tiền mỗi người phải đóng: </strong>
-                                        {scheduleList[0].event.amount_per_register.toLocaleString('en-US')} VND
+                                        {scheduleList[0].event.amountPerRegisterEstimated.toLocaleString('en-US')} VND
                                     </Typography>
                                 </div>
                                 <div>

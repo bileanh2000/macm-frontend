@@ -49,16 +49,14 @@ let snackBarStatus;
 // ];
 
 const roles = [
-    {
-        roleId: 1,
-        roleName: 'Thành viên ban truyền thông',
-    },
-    { roleId: 2, roleName: 'Thành viên ban văn hóa' },
-    { roleId: 3, roleName: 'Thành viên ban hậu cần' },
+    { roleId: 1, roleName: 'Thành viên tham gia' },
+    { roleId: 2, roleName: 'Thành viên ban truyền thông' },
+    { roleId: 3, roleName: 'Thành viên ban văn hóa' },
+    { roleId: 4, roleName: 'Thành viên ban hậu cần' },
 ];
 
 function AddMemberToAdminEvent() {
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(30);
     const [newList, setNewList] = useState([]);
     const [userList, setUserList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
@@ -94,7 +92,7 @@ function AddMemberToAdminEvent() {
 
     useEffect(() => {
         fetchUserInEvent(id);
-    }, [id]);
+    }, []);
 
     const columns = [
         { field: 'studentName', headerName: 'Tên', flex: 0.8 },
@@ -123,17 +121,17 @@ function AddMemberToAdminEvent() {
         //         <MenuItem value={4}>Thành viên ban văn hóa</MenuItem>
         {
             field: 'role',
-            headerName: `Vai trò trong sự kiện ${1 + 1 + 2}`,
+            headerName: `Vai trò trong sự kiện`,
             width: 150,
             flex: 0.6,
             editable: true,
             type: 'singleSelect',
             // valueOptions: roles.map((role) => role.roleName),
             valueOptions: [
-                { label: 'Thành viên tham gia', value: 1 },
-                { label: 'Thành viên ban truyền thông', value: 2 },
-                { label: 'Thành viên ban hậu cần', value: 3 },
-                { label: 'Thành viên ban văn hóa', value: 4 },
+                { label: 'Thành viên tham gia', value: 'Thành viên tham gia' },
+                { label: 'Thành viên ban truyền thông', value: 'Thành viên ban truyền thông' },
+                { label: 'Thành viên ban hậu cần', value: 'Thành viên ban hậu cần' },
+                { label: 'Thành viên ban văn hóa', value: 'Thành viên ban văn hóa' },
             ],
             cellClassName: (params) => {
                 if (params.value == null) {
@@ -160,17 +158,26 @@ function AddMemberToAdminEvent() {
 
     const { handleSubmit } = useForm({});
 
-    const handleRowEditCommit = React.useCallback((params) => {
-        const id = params.id;
-        const key = params.field;
-        const value = params.value;
-        console.log(id, key, value, params);
-        const newRole = roles.find((role) => role.roleName == value);
-        console.log(newRole);
-        console.log(userList);
-        const newMemberList = userList.map((member) => (member.id === id ? { ...member, role: newRole } : member));
-        setNewList(newMemberList);
-    }, []);
+    const handleRowEditCommit = React.useCallback(
+        (params) => {
+            const id = params.id;
+            const key = params.field;
+            const value = params.value;
+            console.log(id, key, value, params);
+            const newRole = roles.find((role) => role.roleName === value);
+            console.log(newRole);
+            console.log(userList);
+            const newMemberList =
+                userList &&
+                userList.map((member) =>
+                    member.id == id
+                        ? { ...member, roleEventDto: { id: newRole.roleId, name: newRole.roleName } }
+                        : member,
+                );
+            setNewList(newMemberList);
+        },
+        [userList],
+    );
 
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
 
@@ -268,7 +275,7 @@ function AddMemberToAdminEvent() {
                     columns={columns}
                     pageSize={pageSize}
                     onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                    rowsPerPageOptions={[10, 20, 30]}
+                    rowsPerPageOptions={[30, 40, 50]}
                     components={{
                         Toolbar: CustomToolbar,
                     }}
