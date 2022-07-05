@@ -174,7 +174,7 @@ function AddMemberToAdminEvent() {
                         ? { ...member, roleEventDto: { id: newRole.roleId, name: newRole.roleName } }
                         : member,
                 );
-            setNewList(newMemberList);
+            setUserList(newMemberList);
         },
         [userList],
     );
@@ -190,8 +190,8 @@ function AddMemberToAdminEvent() {
         }
     };
     const handleUpdate = () => {
-        console.log('submit', newList);
-        eventApi.updateMemberRole(newList).then((res) => {
+        console.log('submit', userList);
+        eventApi.updateMemberRole(userList).then((res) => {
             console.log(res);
             console.log(res.data);
             if (res.message === 'Cập nhật chức vụ cho thành viên trong sự kiện thành công') {
