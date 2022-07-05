@@ -326,6 +326,8 @@ function EventFee() {
                         >
                             Tổng kết chi phí sau sự kiện
                         </Button>
+                    ) : event && event.status !== 'Đã kết thúc' ? (
+                        ''
                     ) : (
                         <Typography variant="subtitle1">Sự kiện đã tổng kết</Typography>
                     )}
