@@ -1,12 +1,11 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
-import { Edit } from '@mui/icons-material';
+import { Assessment } from '@mui/icons-material';
 import { Alert, Box, Button, FormControl, Grid, MenuItem, Select, Snackbar, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
-import { useForm } from 'react-hook-form';
 import DialogCommon from 'src/Components/Dialog/Dialog';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import adminFunAPi from 'src/api/adminFunAPi';
@@ -39,10 +38,10 @@ function TournamentFee() {
     const fetchFunClub = async () => {
         try {
             const response = await adminFunAPi.getClubFund();
-            console.log(response.data[0].fundAmount);
+            console.log(response.data[0]);
             setFunClub(response.data[0].fundAmount);
         } catch (error) {
-            console.log('Failed to fetch user list: ', error);
+            console.log('Failed to fetch fund club: ', error);
         }
     };
 
@@ -78,8 +77,6 @@ function TournamentFee() {
             console.log('Không thể lấy danh sách đóng tiền của ban tổ chức');
         }
     };
-
-    console.log(type);
 
     useEffect(() => {
         fetchUserPaymentStatus(tournamentId, type);
@@ -219,16 +216,23 @@ function TournamentFee() {
 
     function CustomToolbar() {
         return (
-            <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-                <Box
-                    sx={{
-                        p: 0.5,
-                        pb: 0,
-                    }}
-                >
-                    <GridToolbarQuickFilter />
-                </Box>
-            </GridToolbarContainer>
+            <Fragment>
+                <GridToolbarContainer>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <GridToolbarQuickFilter />
+                        {/* <GridToolbarFilterButton /> */}
+                    </Box>
+                    <Button
+                        startIcon={<Assessment />}
+                        size="small"
+                        sx={{ marginLeft: 'auto', marginRight: '1rem' }}
+                        component={Link}
+                        to={`report/${type}`}
+                    >
+                        Lịch sử đóng tiền sự kiện
+                    </Button>
+                </GridToolbarContainer>
+            </Fragment>
         );
     }
 
@@ -269,13 +273,23 @@ function TournamentFee() {
                             Tên sự kiện: {tournament.name}{' '}
                             <Typography variant="subtitle2">{tournament.status}</Typography>
                             <Box sx={{ display: 'flex' }}>
-                                <Typography variant="h6" sx={{ color: 'red', marginRight: 5 }}>
-                                    Số tiền mỗi người phải đóng:{' '}
-                                    {tournament.amount_per_register?.toLocaleString('vi-VN', {
-                                        style: 'currency',
-                                        currency: 'VND',
-                                    })}
-                                </Typography>
+                                {type === 1 ? (
+                                    <Typography variant="h6" sx={{ color: 'red', marginRight: 5 }}>
+                                        Số tiền mỗi người phải đóng:{' '}
+                                        {tournament.feePlayerPay?.toLocaleString('vi-VN', {
+                                            style: 'currency',
+                                            currency: 'VND',
+                                        })}
+                                    </Typography>
+                                ) : (
+                                    <Typography variant="h6" sx={{ color: 'red', marginRight: 5 }}>
+                                        Số tiền mỗi người phải đóng:{' '}
+                                        {tournament.feeOrganizingCommiteePay?.toLocaleString('vi-VN', {
+                                            style: 'currency',
+                                            currency: 'VND',
+                                        })}
+                                    </Typography>
+                                )}
                             </Box>
                         </Typography>
                     )}
@@ -285,11 +299,11 @@ function TournamentFee() {
                         Số dư câu lạc bộ hiện tại:{' '}
                         {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                     </Typography>
-                    <Button variant="contained" color="success">
+                    {/* <Button variant="contained" color="success">
                         <Link to={`./report/${type}`} state={{ event: tournament }} style={{ color: 'white' }}>
                             Lịch sử chỉnh sửa
                         </Link>
-                    </Button>
+                    </Button> */}
                     <Typography variant="h6" sx={{ float: 'right' }}>
                         Đã đóng: {payment}/{userPaymentStatus.length}
                     </Typography>
@@ -323,7 +337,7 @@ function TournamentFee() {
                 }}
             >
                 <DataGrid
-                    loading={!userPaymentStatus.length}
+                    //loading={!userPaymentStatus.length}
                     disableSelectionOnClick={true}
                     rows={rowsUser}
                     columns={columns}

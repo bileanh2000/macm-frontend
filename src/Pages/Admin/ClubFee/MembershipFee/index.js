@@ -1,4 +1,4 @@
-import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
+import { RadioButtonChecked, RadioButtonUnchecked, Assessment } from '@mui/icons-material';
 import { Edit } from '@mui/icons-material';
 import { Alert, Box, Button, FormControl, Grid, MenuItem, Select, Snackbar, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
@@ -26,10 +26,14 @@ function MembershipFee() {
         isLoading: false,
         params: -1,
     });
+
+    let payment = userList.reduce((paymentCount, user) => {
+        return user.status ? paymentCount + 1 : paymentCount;
+    }, 0);
+
     const fetchFunClub = async () => {
         try {
             const response = await adminFunAPi.getClubFund();
-            console.log(response.data[0].fundAmount);
             setFunClub(response.data[0].fundAmount);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
@@ -48,7 +52,6 @@ function MembershipFee() {
     const getCurrentSemester = async () => {
         try {
             const response = await adminClubFeeAPI.getCurrentSemester();
-            console.log(response.data[0]);
             setCurrentSemester(response.data[0]);
         } catch (error) {
             console.log('Không thể lấy dữ liệu kì hiện tại, error: ', error);
@@ -81,7 +84,6 @@ function MembershipFee() {
         fetchFunClub();
         getSemester();
         getCurrentSemester();
-        console.log(currentSemester);
         if (JSON.stringify(currentSemester) !== '{}') {
             getListMemberShip(currentSemester.id);
         }
@@ -95,7 +97,6 @@ function MembershipFee() {
     }, [currentSemester]);
 
     const handleChangeSemester = (e) => {
-        console.log(e.target.value);
         setSemesterId(e.target.value);
         setSemesterName(semesterList.find((semester) => semester.id == e.target.value).name);
         getListMemberShip(e.target.value);
@@ -134,8 +135,6 @@ function MembershipFee() {
             handleEditDialog('', false, -1);
         }
     };
-
-    let snackBarStatus;
 
     const dynamicAlert = (status, message) => {
         console.log('status of dynamicAlert', status);
@@ -247,16 +246,29 @@ function MembershipFee() {
 
     function CustomToolbar() {
         return (
-            <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-                <Box
-                    sx={{
-                        p: 0.5,
-                        pb: 0,
-                    }}
-                >
-                    <GridToolbarQuickFilter />
-                </Box>
-            </GridToolbarContainer>
+            <Fragment>
+                <GridToolbarContainer>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <GridToolbarQuickFilter />
+                        {/* <GridToolbarFilterButton /> */}
+                    </Box>
+                    <Button
+                        startIcon={<Assessment />}
+                        size="small"
+                        sx={{ marginLeft: 'auto', marginRight: '1rem' }}
+                        component={Link}
+                        to={`report`}
+                        state={{
+                            semester: {
+                                id: semesterId,
+                                name: semesterName,
+                            },
+                        }}
+                    >
+                        Lịch sử đóng tiền phí câu lạc bộ
+                    </Button>
+                </GridToolbarContainer>
+            </Fragment>
         );
     }
 
@@ -287,7 +299,7 @@ function MembershipFee() {
                 <Grid item xs={8}>
                     <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                         {semesterId > 0 && (
-                            <FormControl fullWidth>
+                            <FormControl medium="true">
                                 <Select id="demo-simple-select" value={semesterId} onChange={handleChangeSemester}>
                                     {semesterList.map((semester) => (
                                         <MenuItem value={semester.id} key={semester.id}>
@@ -316,23 +328,7 @@ function MembershipFee() {
                         {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                     </Typography>
                     <Typography variant="h6" sx={{ float: 'right' }}>
-                        {semesterList && (
-                            <Button variant="contained" color="success">
-                                <Link
-                                    to="./report"
-                                    state={{
-                                        semester: {
-                                            id: semesterId,
-                                            name: semesterName,
-                                        },
-                                    }}
-                                    style={{ color: 'white' }}
-                                >
-                                    Lịch sử chỉnh sửa
-                                </Link>
-                            </Button>
-                        )}
-                        {/* Đã đóng: {totalActive}/{totalResult} */}
+                        Đã đóng: {payment}/{userList.length}
                     </Typography>
                 </Grid>
             </Grid>
@@ -375,7 +371,7 @@ function MembershipFee() {
                     }}
                 />
             </Box>
-            <Button onClick={onSubmit}>Đồng ý</Button>
+            {/* <Button onClick={onSubmit}>Đồng ý</Button> */}
             {editDialog.isLoading && (
                 <EditFee onDialog={areUSureEdit} message={editDialog.message} id={editDialog.params} />
             )}

@@ -17,7 +17,6 @@ function TournamentFeeReport() {
 
     const getReportPayment = async (tournamentId, typeId) => {
         try {
-            console.log(typeof typeId);
             if (typeId == 1) {
                 const response = await adminTournamentAPI.getAllTournamentOrganizingCommitteePaymentStatusReport(
                     tournamentId,
@@ -111,12 +110,12 @@ function TournamentFeeReport() {
         <div>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box>
-                    <Typography variant="h3">Lịch sử thay đổi tiền phí giải đấu</Typography>
-                    <Typography variant="h5">{typeId === 1 ? 'Ban tổ chức' : 'Người tham gia'}</Typography>
+                    <Typography variant="h3">Lịch sử đóng tiền giải đấu</Typography>
+                    <Typography variant="h5">{typeId == 1 ? 'Ban tổ chức' : 'Người tham gia'}</Typography>
                 </Box>
-                <Button variant="contained" color="success" size="small" onClick={() => navigate(-1)}>
+                {/* <Button variant="contained" color="success" size="small" onClick={() => navigate(-1)}>
                     Quay lại
-                </Button>
+                </Button> */}
             </Box>
             <Box
                 sx={{
@@ -135,7 +134,7 @@ function TournamentFeeReport() {
                 }}
             >
                 <DataGrid
-                    loading={!membershipReport.length}
+                    // loading={!membershipReport.length}
                     disableSelectionOnClick={true}
                     rows={rowsUser}
                     columns={columns}

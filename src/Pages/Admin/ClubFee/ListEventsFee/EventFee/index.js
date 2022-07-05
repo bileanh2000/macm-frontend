@@ -1,17 +1,19 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
-import { Edit } from '@mui/icons-material';
+import { RadioButtonChecked, RadioButtonUnchecked, Assessment } from '@mui/icons-material';
 import { Alert, Box, Button, Grid, Snackbar, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { useForm } from 'react-hook-form';
 import DialogCommon from 'src/Components/Dialog/Dialog';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 import adminFunAPi from 'src/api/adminFunAPi';
+import eventApi from 'src/api/eventApi';
 
 function EventFee() {
     const [userList, setUserList] = useState([]);
+    const [event, setEvent] = useState();
+    const [view, setView] = useState(true);
     const [pageSize, setPageSize] = useState(10);
     const [funClub, setFunClub] = useState('');
     const [openSnackBar, setOpenSnackBar] = useState(false);
@@ -21,16 +23,13 @@ function EventFee() {
         isLoading: false,
         params: -1,
     });
-    const location = useLocation();
+    const { eventId } = useParams();
     const history = useNavigate();
-    const _event = location.state?.event;
-    const view = location.state?.view;
-    const [event, setEvent] = useState(_event);
-    console.log(event, view);
 
-    let attendance = userList.reduce((attendaceCount, user) => {
-        return user.paymentStatus ? attendaceCount + 1 : attendaceCount;
+    let payment = userList.reduce((paymentCount, user) => {
+        return user.paymentStatus ? paymentCount + 1 : paymentCount;
     }, 0);
+
     const fetchFunClub = async () => {
         try {
             const response = await adminFunAPi.getClubFund();
@@ -40,6 +39,7 @@ function EventFee() {
             console.log('Failed to fetch user list: ', error);
         }
     };
+
     const getUserJoinEvent = async (eventId) => {
         try {
             const response = await adminClubFeeAPI.getUserJoinEvent(eventId);
@@ -48,14 +48,26 @@ function EventFee() {
         } catch (error) {}
     };
 
-    useEffect(() => {
-        if (event.id) {
-            getUserJoinEvent(event.id);
+    const getEventById = async (eventId) => {
+        try {
+            const response = await eventApi.getAll();
+            let selectedEvent = response.data.filter((item) => item.id === parseInt(eventId, 10));
+            setEvent(selectedEvent[0]);
+            selectedEvent.status === 'Đã kết thúc' ? setView(false) : setView(true);
+        } catch (error) {
+            console.log('Lấy dữ liệu thất bại', error);
         }
-    }, [event.id]);
+    };
+
+    useEffect(() => {
+        getUserJoinEvent(eventId);
+        getEventById(eventId);
+    }, [eventId]);
+
     useEffect(() => {
         fetchFunClub();
     }, []);
+
     const handleEditDialog = (message, isLoading, params) => {
         setEditDialog({
             message,
@@ -63,8 +75,6 @@ function EventFee() {
             params,
         });
     };
-
-    let snackBarStatus;
 
     const dynamicAlert = (status, message) => {
         console.log('status of dynamicAlert', status);
@@ -153,15 +163,15 @@ function EventFee() {
         return container;
     });
 
-    const onSubmit = () => {
-        history({ pathname: '/admin/clubfee/event' });
-    };
+    // const onSubmit = () => {
+    //     history({ pathname: '/admin/clubfee/event' });
+    // };
 
     const updateUserPayment = async (id) => {
         try {
             await adminClubFeeAPI.updateUserPayment(id);
         } catch (error) {
-            console.log('không thể cập nhật trạng thái điểm danh');
+            console.log('không thể cập nhật trạng thái đóng tiền');
         }
     };
 
@@ -188,16 +198,23 @@ function EventFee() {
 
     function CustomToolbar() {
         return (
-            <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-                <Box
-                    sx={{
-                        p: 0.5,
-                        pb: 0,
-                    }}
-                >
-                    <GridToolbarQuickFilter />
-                </Box>
-            </GridToolbarContainer>
+            <Fragment>
+                <GridToolbarContainer>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <GridToolbarQuickFilter />
+                        {/* <GridToolbarFilterButton /> */}
+                    </Box>
+                    <Button
+                        startIcon={<Assessment />}
+                        size="small"
+                        sx={{ marginLeft: 'auto', marginRight: '1rem' }}
+                        component={Link}
+                        to={`report`}
+                    >
+                        Lịch sử đóng tiền sự kiện
+                    </Button>
+                </GridToolbarContainer>
+            </Fragment>
         );
     }
 
@@ -226,32 +243,34 @@ function EventFee() {
                     </Typography>
                 </Grid>
                 <Grid item xs={8}>
-                    <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                        Tên sự kiện: {event.name} <Typography variant="subtitle2">{event.status}</Typography>
-                        <Box sx={{ display: 'flex' }}>
-                            <Typography variant="h6" sx={{ color: 'red', marginRight: 5 }}>
-                                Số tiền :{' '}
-                                {event.amountPerMemberRegister.toLocaleString('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND',
-                                })}
-                            </Typography>
-                        </Box>
-                    </Typography>
+                    {event && (
+                        <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                            Tên sự kiện: {event.name} <Typography variant="subtitle2">{event.status}</Typography>
+                            <Box sx={{ display: 'flex' }}>
+                                <Typography variant="h6" sx={{ color: 'red', marginRight: 5 }}>
+                                    Số tiền :{' '}
+                                    {event.amountPerMemberRegister.toLocaleString('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND',
+                                    })}
+                                </Typography>
+                            </Box>
+                        </Typography>
+                    )}
                 </Grid>
                 <Grid item xs={4}>
                     <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                         Số dư câu lạc bộ hiện tại:{' '}
                         {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                     </Typography>
-                    <Button variant="contained" color="success">
+                    <Typography variant="subtitle1" sx={{ float: 'right' }}>
+                        Đã đóng: {payment}/{userList.length}
+                    </Typography>
+                    {/* <Button variant="contained" color="success" sx={{ float: 'right' }}>
                         <Link to="./report" state={{ event: event }} style={{ color: 'white' }}>
                             Lịch sử chỉnh sửa
                         </Link>
-                    </Button>
-                    <Typography variant="h6" sx={{ float: 'right' }}>
-                        Đã đóng: {attendance}/{userList.length}
-                    </Typography>
+                    </Button> */}
                 </Grid>
             </Grid>
 
@@ -266,7 +285,6 @@ function EventFee() {
                         borderRadius: '100px',
                         position: 'relative',
                         top: '9px',
-                        //minWidth: '104.143px !important',
                     },
                     '& .status-rows.active': {
                         backgroundColor: '#56f000',
@@ -282,22 +300,19 @@ function EventFee() {
                 }}
             >
                 <DataGrid
-                    loading={!userList.length}
+                    // loading={!userList.length}
                     disableSelectionOnClick={true}
                     rows={rowsUser}
                     columns={columns}
                     pageSize={pageSize}
                     onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                     rowsPerPageOptions={[10, 20, 30]}
-                    // onCellDoubleClick={(param) => {
-                    //     handleOnClick(param.row);
-                    // }}
                     components={{
                         Toolbar: CustomToolbar,
                     }}
                 />
             </Box>
-            <Button onClick={onSubmit}>Đồng ý</Button>
+            {/* <Button onClick={onSubmit}>Đồng ý</Button> */}
             {editDialog.isLoading && (
                 <DialogCommon onDialog={areUSureEdit} message={editDialog.message} id={editDialog.params} />
             )}

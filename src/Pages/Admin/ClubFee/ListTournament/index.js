@@ -142,12 +142,22 @@ function ListTournament() {
                                                     })}
                                                 </div>
                                                 <div className={cx('tournament-title')}>
-                                                    Chi phí mỗi người phải đóng:{' '}
-                                                    {tournament.amount_per_register.toLocaleString('vi-VN', {
-                                                        style: 'currency',
-                                                        currency: 'VND',
-                                                    })}
+                                                    <div>
+                                                        Chi phí người chơi phải đóng:{' '}
+                                                        {tournament.feePlayerPay.toLocaleString('vi-VN', {
+                                                            style: 'currency',
+                                                            currency: 'VND',
+                                                        })}
+                                                    </div>
+                                                    <div>
+                                                        Chi phí ban tổ chức phải đóng:{' '}
+                                                        {tournament.feeOrganizingCommiteePay.toLocaleString('vi-VN', {
+                                                            style: 'currency',
+                                                            currency: 'VND',
+                                                        })}
+                                                    </div>
                                                 </div>
+
                                                 <div className={cx('tournament-date')}>
                                                     Thời gian diễn ra:{' '}
                                                     {moment(new Date(tournament.startDate)).format('DD/MM/yyyy')}
