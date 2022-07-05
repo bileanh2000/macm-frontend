@@ -63,14 +63,21 @@ function MenberEvent() {
                     <Button
                         variant="outlined"
                         component={Link}
+                        to={`/admin/events/${id}/member/addmember`}
+                        sx={{ mr: 2 }}
+                    >
+                        Thêm thành viên vào sự kiện
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        component={Link}
                         to={`/admin/events/${id}/member/addtoadmin`}
-                        // sx={{ mr: 2 }}
+                        sx={{ mr: 2 }}
                     >
                         Cập nhật thành viên ban tổ chức
                     </Button>
                     <Button variant="contained">
                         <Link to="./addtoadmin">Điểm danh</Link>
-                        Điểm danh
                     </Button>
                 </Box>
             </Box>

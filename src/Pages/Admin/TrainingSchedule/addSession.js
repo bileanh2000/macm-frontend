@@ -25,8 +25,11 @@ import vi from 'date-fns/locale/vi';
 import { useEffect } from 'react';
 import { Paper } from '@mui/material';
 import trainingScheduleApi from 'src/api/trainingScheduleApi';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 function AddSchedule() {
     moment().locale('vi');
+    let { date } = useParams();
+    let navigate = useNavigate();
 
     const schema = Yup.object().shape({
         date: Yup.string().nullable().required('Điền đi'),
@@ -71,6 +74,7 @@ function AddSchedule() {
                 // setSnackBarStatus(true);
                 snackBarStatus = true;
                 dynamicAlert(snackBarStatus, res.message);
+                navigate(-1);
             } else {
                 console.log('huhu');
                 setOpenSnackBar(true);
@@ -111,7 +115,7 @@ function AddSchedule() {
                                 required
                                 name="date"
                                 control={control}
-                                defaultValue={null}
+                                defaultValue={date ? date : null}
                                 render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                     <DatePicker
                                         disablePast

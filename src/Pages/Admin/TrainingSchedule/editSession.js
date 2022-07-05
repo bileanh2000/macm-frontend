@@ -172,7 +172,7 @@ function UpdateSchedule() {
             </Dialog>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" color="initial" sx={{ marginBottom: '16px', fontWeight: '700' }}>
-                    Cập nhật buổi tập {scheduleId}
+                    Cập nhật buổi tập
                 </Typography>
                 {selectedDate <= currentDate ? (
                     ''
@@ -286,7 +286,7 @@ function UpdateSchedule() {
                                         <TextField
                                             required
                                             id="outlined-disabled"
-                                            label="Thời gian bắt đầu"
+                                            label="Thời gian kết thúc"
                                             defaultValue={item.finishTime}
                                             fullWidth
                                             {...register('finishTime')}

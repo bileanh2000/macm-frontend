@@ -198,7 +198,7 @@ function DetailTournament() {
                                         <div>
                                             <Typography variant="h6">
                                                 <strong>Tổng chi phí: </strong>{' '}
-                                                {item.totalAmount.toLocaleString('en-US')} vnđ
+                                                {item.totalAmount.toLocaleString('en-US')} VND
                                             </Typography>
                                         </div>
                                         <div>

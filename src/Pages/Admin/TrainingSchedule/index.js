@@ -10,6 +10,7 @@ import { useState } from 'react';
 import trainingSchedule from 'src/api/trainingScheduleApi';
 import interactionPlugin from '@fullcalendar/interaction';
 import moment from 'moment';
+import SquareIcon from '@mui/icons-material/Square';
 
 import semesterApi from 'src/api/semesterApi';
 import { CollectionsBookmarkOutlined } from '@material-ui/icons';
@@ -23,6 +24,7 @@ function TrainingSchedule() {
     const [scheduleId, setScheduleId] = useState();
     const [semester, setSemester] = useState(2);
     const [semesterList, setSemesterList] = useState([]);
+    const [currentSemester, setCurrentSemester] = useState([]);
 
     const getMonthInCurrentTableView = (startDate) => {
         const temp = new Date(startDate);
@@ -49,6 +51,15 @@ function TrainingSchedule() {
             console.log('That bai roi huhu, semester: ', error);
         }
     };
+    // const getCurrentSemester = async () => {
+    //     try {
+    //         const response = await semesterApi.getCurrentSemester();
+    //         console.log('thanh cong roi, currentSemester:', response);
+    //         setCurrentSemester(response.data);
+    //     } catch (error) {
+    //         console.log('failed in get current semester', error);
+    //     }
+    // };
     const handleChange = (event) => {
         console.log('semester', event.target.value);
         let selectSemester = event.target.value;
@@ -61,13 +72,20 @@ function TrainingSchedule() {
     }, [semester]);
     useEffect(() => {
         fetchSemester();
+        // getCurrentSemester();
     }, []);
 
     const scheduleData = scheduleList.map((item) => {
         const container = {};
         container['id'] = item.id;
         container['date'] = item.date;
-        container['title'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['title'] = item.startTime.slice(0, 5) + '||' + item.finishTime.slice(0, 5);
+        // container['title'] = (
+        //     <>
+        //         {' '}
+        //         {item.startTime.slice(0, 5)} <br /> {item.finishTime.slice(0, 5)}{' '}
+        //     </>
+        // );
         container['display'] = 'background';
         container['backgroundColor'] = '#5ba8f5';
 
@@ -94,11 +112,43 @@ function TrainingSchedule() {
             navigate(path);
         }
     };
+    const navigateToCreate = (date) => {
+        const existSession = scheduleList.filter((item) => item.date === date).length; //length = 0 (false) is not exist
+        if (!existSession) {
+            navigate(`addsession/${date}`);
+            console.log(date);
+        } else {
+            return;
+        }
+    };
     return (
         <Fragment>
-            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 700, marginBottom: 2 }}>
-                Theo dõi lịch tập
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 700, marginBottom: 2 }}>
+                    Theo dõi lịch tập
+                </Typography>
+                <Box>
+                    {/* <Box sx={{ mt: 8, ml: 2 }}>
+                    </Box> */}
+                    <Button
+                        component={Link}
+                        to="/admin/trainingschedules/addsession"
+                        startIcon={<AddCircleIcon />}
+                        variant="outlined"
+                        sx={{ mr: 1 }}
+                    >
+                        Thêm buổi tập
+                    </Button>
+                    <Button
+                        component={Link}
+                        to="/admin/trainingschedules/add"
+                        startIcon={<AddCircleIcon />}
+                        variant="outlined"
+                    >
+                        Thêm lịch tập
+                    </Button>
+                </Box>
+            </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <TextField
                     id="outlined-select-currency"
@@ -114,26 +164,19 @@ function TrainingSchedule() {
                         </MenuItem>
                     ))}
                 </TextField>
-                <Box>
-                    <Box component="span" sx={{ backgroundColor: '#BBBB', p: 1, ml: 1, borderRadius: '5px' }}>
-                        Lịch tập trong quá khứ
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                        <SquareIcon sx={{ color: '#BBBBBB', mr: 0.5 }} />
+                        {/* <Box component="span" sx={{ backgroundColor: '#BBBB', p: 1, borderRadius: '5px' }}></Box> */}
+                        <span>Lịch tập trong quá khứ</span>
                     </Box>
-                    <Box component="span" sx={{ backgroundColor: '#5BA8F5', p: 1, ml: 1, borderRadius: '5px' }}>
-                        Lịch tập trong tương lai
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <SquareIcon sx={{ color: '#5BA8F5', mr: 0.5 }} />
+                        {/* <Box component="span" sx={{ backgroundColor: '#5BA8F5', p: 1, borderRadius: '5px' }}></Box> */}
+                        <span>Lịch tập trong tương lai</span>
                     </Box>
-                </Box>
-                <Box>
-                    {/* <Box sx={{ mt: 8, ml: 2 }}>
-                    </Box> */}
-                    <Button component={Link} to="/admin/trainingschedules/addsession" startIcon={<AddCircleIcon />}>
-                        Thêm buổi tập
-                    </Button>
-                    <Button component={Link} to="/admin/trainingschedules/add" startIcon={<AddCircleIcon />}>
-                        Thêm lịch tập
-                    </Button>
                 </Box>
             </Box>
-
             <div className={cx('schedule-container')}>
                 <div className={cx('schedule-content')}>
                     <FullCalendar
@@ -169,15 +212,17 @@ function TrainingSchedule() {
                         }}
                         eventClick={(args) => {
                             navigateToUpdate(args.event.id, args.event.start);
-                            // console.log(args.event.start);
+                            // console.log(args);
                         }}
-                        // dateClick={function (arg) {
-                        //     swal({
-                        //         title: 'Date',
-                        //         text: arg.dateStr,
-                        //         type: 'success',
-                        //     });
-                        // }}
+                        dateClick={function (arg) {
+                            // console.log(arg.dateStr);
+                            navigateToCreate(arg.dateStr);
+                            // swal({
+                            //     title: 'Date',
+                            //     text: arg.dateStr,
+                            //     type: 'success',
+                            // });
+                        }}
                         // selectable
                         // select={handleEventAdd}
                         // eventDrop={(e) => console.log(e)}
