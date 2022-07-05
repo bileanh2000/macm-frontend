@@ -98,6 +98,22 @@ const eventApi = {
         return axiosClient.get(url);
     },
 
+
+    updateAfterEvent: (params) => {
+        const url = `/event/headculture/updateafterevent/${params.id}`;
+        return axiosClient.put(url, null, {
+            params: {
+                isIncurred: params.isIncurred,
+                isUseClubFund: params.isUseClubFund,
+                money: params.money,
+            },
+        });
+    },
+    getEventById: (eventId) => {
+        const url = `/event/geteventbyid/${eventId}`;
+        return axiosClient.get(url);
+    },
+
     getAllMemberNotJointEvent: (id) => {
         const url = `/event/headculture/getlistmembernotjoin/${id}?pageNo=0&pageSize=10`;
         return axiosClient.get(url);
@@ -106,5 +122,6 @@ const eventApi = {
         const url = `/event/headculture/addlistmemberjoin/${id}`;
         return axiosClient.post(url, body);
     },
+
 };
 export default eventApi;

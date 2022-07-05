@@ -42,23 +42,10 @@ function ReportAttendance() {
     }, [semester]);
 
     const columns = [
-        { field: 'studentName', headerName: 'Têm sinh viên', flex: 0.8 },
-        { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
+        { field: 'studentName', headerName: 'Tên sinh viên', flex: 0.5 },
+        { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.3 },
         { field: 'roleName', headerName: 'Vai trò trong CLB', width: 150, flex: 0.6 },
-        {
-            field: 'totalAttend',
-            headerName: 'Số buổi có mặt',
-            width: 150,
-            flex: 0.6,
-            cellClassName: (params) => {
-                if (params.value == null) {
-                    return '';
-                }
-                return clsx('status-rows', {
-                    active: true,
-                });
-            },
-        },
+
         {
             field: 'totalAbsent',
             headerName: 'Số buổi nghỉ',
@@ -73,6 +60,18 @@ function ReportAttendance() {
                 });
             },
         },
+        {
+            field: 'percentAbsent',
+            headerName: 'Phần trăm số buổi nghỉ',
+            width: 150,
+            flex: 0.4,
+            cellClassName: (params) => {
+                if (params.value == null) {
+                    return '';
+                }
+                return clsx('status-rows-active');
+            },
+        },
     ];
 
     const rowsAttendance = attendanceList.map((item, index) => {
@@ -81,7 +80,7 @@ function ReportAttendance() {
         container['studentName'] = item.studentName;
         container['studentId'] = item.studentId;
         container['roleName'] = item.roleName;
-        container['totalAttend'] = item.totalAttend;
+        container['percentAbsent'] = item.percentAbsent + '%';
         container['totalAbsent'] = item.totalAbsent;
         return container;
     });
@@ -134,23 +133,16 @@ function ReportAttendance() {
                     height: '70vh',
                     width: '100%',
                     '& .status-rows': {
-                        justifyContent: 'center !important',
-                        minHeight: '0px !important',
-                        maxHeight: '35px !important',
-                        borderRadius: '100px',
-                        position: 'relative',
-                        top: '9px',
+                        // justifyContent: 'center !important',
                     },
-                    '& .status-rows.active': {
-                        backgroundColor: '#56f000',
-                        color: '#fff',
-                        fontWeight: '600',
-                        textAlign: 'center',
+                    '& .status-rows-active': {
+                        justifyContent: 'center !important',
                     },
                     '& .status-rows.deactive': {
-                        backgroundColor: '#ff3838',
-                        color: '#fff',
+                        // backgroundColor: '#ff3838',
+                        color: '#ff3838',
                         fontWeight: '600',
+                        textAlign: 'center',
                     },
                 }}
             >

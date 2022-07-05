@@ -2,34 +2,46 @@ import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { Typography } from '@mui/material';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import moment from 'moment';
 
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
+import eventApi from 'src/api/eventApi';
 
 function EventFeeReport() {
     moment().locale('vi');
     const location = useLocation();
-    const event = location.state?.event;
+    const { eventId } = useParams();
+    const [event, setEvent] = useState();
     const [pageSize, setPageSize] = useState(10);
     const [userPaymentReport, setUserPaymentReport] = useState([]);
 
-    console.log(event);
+    console.log(eventId);
 
     const getReportEvent = async () => {
         try {
-            if (event) {
-                const response = await adminClubFeeAPI.getReportEvent(event.id);
-                setUserPaymentReport(response.data);
-                console.log(response.data);
-            }
+            const response = await adminClubFeeAPI.getReportEvent(eventId);
+            setUserPaymentReport(response.data);
+            console.log(response.data);
         } catch (error) {
             console.log('Không thể lấy dữ liệu');
         }
     };
 
+    const getEventById = async (eventId) => {
+        try {
+            const response = await eventApi.getAll();
+            let selectedEvent = response.data.filter((item) => item.id === parseInt(eventId, 10));
+            setEvent(selectedEvent[0]);
+            // selectedEvent.status === 'Đã kết thúc' ? setView(false) : setView(true);
+        } catch (error) {
+            console.log('Lấy dữ liệu thất bại', error);
+        }
+    };
+
     useEffect(() => {
         getReportEvent();
+        getEventById(eventId);
     }, []);
 
     const columns = [
@@ -58,8 +70,23 @@ function EventFeeReport() {
         container['time'] = moment(new Date(item.createdOn)).format('HH:mm:ss');
         container['studentName'] = item.userName;
         container['studentId'] = item.userStudentId;
-        container['note'] =
-            item.fundChange == true ? 'Thay đổi trạng thái thành đã đóng' : 'Thay đổi trạng thái thành chưa đóng';
+        let paymentStatus;
+        if (item.amountPerRegisterActual == 0) {
+            paymentStatus =
+                item.paymentValue == 0 ? 'Thay đổi trạng thái thành chưa đóng' : 'Thay đổi trạng thái thành đã đóng';
+        } else {
+            if (item.paymentValue == 0) {
+                paymentStatus = 'Thay đổi trạng thái thành chưa đóng';
+            } else if (
+                item.paymentValue == item.amountPerRegisterEstimate &&
+                item.paymentValue < item.amountPerRegisterActual
+            ) {
+                paymentStatus = 'Thay đổi trạng thái thành chưa đóng đủ';
+            } else if (item.paymentValue == item.amountPerRegisterActual) {
+                paymentStatus = 'Thay đổi trạng thái thành đã đóng';
+            }
+        }
+        container['note'] = paymentStatus;
         container['fundChange'] = item.fundChange;
         container['updatedBy'] = item.createdBy;
         return container;
@@ -113,7 +140,7 @@ function EventFeeReport() {
                 }}
             >
                 <DataGrid
-                    loading={!userPaymentReport.length}
+                    //loading={!userPaymentReport.length}
                     disableSelectionOnClick={true}
                     rows={rowsUser}
                     columns={columns}

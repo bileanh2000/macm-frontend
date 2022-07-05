@@ -7,7 +7,6 @@ import { Link, useLocation } from 'react-router-dom';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 
 function ViewAttendance({ data }) {
-    console.log(data);
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
     const [totalActive, setTotalActive] = useState();
@@ -18,12 +17,13 @@ function ViewAttendance({ data }) {
 
     let _trainingScheduleId = location.state?.id;
     if (!_trainingScheduleId) _trainingScheduleId = data.trainingScheduleId;
-    console.log(_trainingScheduleId);
+
     let _nowDate = location.state?.date;
     if (!_nowDate) _nowDate = data.date;
-    console.log(_nowDate);
+
     const getAttendanceByStudentId = async () => {
         try {
+            console.log(_trainingScheduleId);
             const response = await adminAttendanceAPI.getAttendanceByStudentId(_trainingScheduleId);
             console.log(response);
             setUserList(response.data);
@@ -71,6 +71,7 @@ function ViewAttendance({ data }) {
                 return clsx('status-rows', {
                     active: params.value === 'Có mặt',
                     deactive: params.value === 'Vắng mặt',
+                    subActive: params.value === 'Chưa điểm danh',
                 });
             },
         },
@@ -81,7 +82,7 @@ function ViewAttendance({ data }) {
         container['id'] = index + 1;
         container['name'] = item.name;
         container['studentId'] = item.studentId;
-        container['status'] = item.status ? 'Có mặt' : 'Vắng mặt';
+        container['status'] = item.status == 0 ? 'Vắng mặt' : item.status == 1 ? 'Có mặt' : 'Chưa điểm danh';
         return container;
     });
 
@@ -144,6 +145,11 @@ function ViewAttendance({ data }) {
                     },
                     '& .status-rows.deactive': {
                         backgroundColor: '#ff3838',
+                        color: '#fff',
+                        fontWeight: '600',
+                    },
+                    '& .status-rows.subActive': {
+                        backgroundColor: '#cfb2b2',
                         color: '#fff',
                         fontWeight: '600',
                     },
