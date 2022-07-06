@@ -52,6 +52,21 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
+    createTournamentSession: (tournamentId, params) => {
+        const url = `/tournamentschedule/headclub/tournamentschedule/create/${tournamentId}`;
+        return axiosClient.post(url, params);
+    },
+
+    updateTournamentSession: (tournamentId, params) => {
+        const url = `/tournamentschedule/headclub/tournamentschedule/update/${tournamentId}`;
+        return axiosClient.put(url, params);
+    },
+
+    deleteTournamentSession: (tournamentSessionId) => {
+        const url = `/tournamentschedule/headclub/tournamentschedule/delete/${tournamentSessionId}`;
+        return axiosClient.delete(url);
+    },
+
     //Member
 
     getAllCompetitivePlayer: (tournamentId, params) => {

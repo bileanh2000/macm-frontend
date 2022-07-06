@@ -6,12 +6,14 @@ import {
     DialogContentText,
     DialogTitle,
     Grid,
+    InputAdornment,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
+    TextField,
     Typography,
 } from '@mui/material';
 import { Box } from '@mui/system';
@@ -23,11 +25,15 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import GroupIcon from '@mui/icons-material/Group';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
+import { Controller, useForm } from 'react-hook-form';
+import NumberFormat from 'react-number-format';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 
 function DetailTournament() {
     let { tournamentId } = useParams();
     const [tournament, setTournament] = useState([]);
-    const [active, setActive] = useState(-1);
+    const [active, setActive] = useState(0);
     const [scheduleList, setScheduleList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     let navigate = useNavigate();
@@ -40,22 +46,6 @@ function DetailTournament() {
         setOpenDialog(true);
     };
 
-    const handleDelete = useCallback(
-        (id) => () => {
-            handleCloseDialog();
-            setTimeout(() => {
-                // const params = { studentId: id, semester: semester };
-                adminTournamentAPI.deleteTournament(id).then((res) => {
-                    // setEvents((prev) => prev.filter((item) => item.id !== id));
-                    console.log('delete', res);
-                    console.log('delete', res.data);
-                    navigate(-1);
-                });
-            });
-        },
-        [],
-    );
-
     const fetchAdminInTournament = async (params) => {
         try {
             const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
@@ -66,7 +56,7 @@ function DetailTournament() {
         }
     };
 
-    const getTournamentById = async () => {
+    const getTournamentById = async (tournamentId) => {
         try {
             const response = await adminTournamentAPI.getTournamentById(tournamentId);
             console.log(response.data);
@@ -84,8 +74,12 @@ function DetailTournament() {
             console.log('That bai roi huhu ', error);
         }
     };
+
     useEffect(() => {
+        getTournamentById(tournamentId);
+        fetchAdminInTournament(tournamentId);
         fetchTournamentSchedule(tournamentId);
+        window.scrollTo({ behavior: 'smooth', top: '0px' });
     }, [tournamentId]);
 
     const scheduleData = scheduleList.map((item) => {
@@ -96,14 +90,24 @@ function DetailTournament() {
             item.tournament.name + ' - ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
         container['backgroundColor'] = '#5ba8f5';
-
         return container;
     });
-    useEffect(() => {
-        getTournamentById();
-        fetchAdminInTournament(tournamentId);
-        window.scrollTo({ behavior: 'smooth', top: '0px' });
-    }, [tournamentId]);
+
+    const { control } = useForm({});
+
+    const handleDelete = useCallback(
+        (id) => () => {
+            handleCloseDialog();
+            setTimeout(() => {
+                adminTournamentAPI.deleteTournament(id).then((res) => {
+                    console.log('delete', res);
+                    console.log('delete', res.data);
+                    navigate(-1);
+                });
+            });
+        },
+        [],
+    );
 
     return (
         <Fragment>
@@ -132,12 +136,12 @@ function DetailTournament() {
                         <Fragment key={item.id}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
                                 <Typography
-                                    variant="h5"
+                                    variant="h4"
                                     gutterBottom
                                     component="div"
                                     sx={{ fontWeight: 500, marginBottom: 2 }}
                                 >
-                                    Thông tin sự kiện "{item.name}"
+                                    Thông tin giải đấu "{item.name}"
                                 </Typography>
                                 <Box>
                                     <Button
@@ -176,117 +180,234 @@ function DetailTournament() {
                                 </Box>
                             </Box>
                             <Grid container columns={12} sx={{ mt: 2 }} spacing={2}>
-                                <Grid item xs={4}>
-                                    <Box sx={{ marginTop: '16px' }}>
-                                        <div>
-                                            <Typography variant="h6">
-                                                <strong>Nội dung: </strong>
-                                                <p>{item.description}</p>
-                                            </Typography>
-                                        </div>
-                                        <div>
-                                            <Typography variant="h6">
-                                                <strong>Số thành viên tối đa trong ban tổ chức:</strong>{' '}
-                                                {item.maxQuantityComitee}
-                                            </Typography>
-                                            {active > 0 && (
+                                <Grid item xs={7}>
+                                    <TextField
+                                        id="outlined-basic"
+                                        label="Tên giải đấu"
+                                        variant="outlined"
+                                        defaultValue={item.name}
+                                        fullWidth
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        margin="normal"
+                                    />
+                                    <TextField
+                                        id="outlined-multiline-flexible"
+                                        name="description"
+                                        label="Nội dung"
+                                        defaultValue={item.description}
+                                        multiline
+                                        rows={4}
+                                        InputProps={{
+                                            readOnly: true,
+                                        }}
+                                        fullWidth
+                                        margin="normal"
+                                    />
+                                    <Controller
+                                        name="cost"
+                                        variant="outlined"
+                                        control={control}
+                                        defaultValue={item.totalAmountEstimate}
+                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                            <NumberFormat
+                                                name="totalAmount"
+                                                customInput={TextField}
+                                                label="Tổng chi phí tổ chức"
+                                                thousandSeparator={true}
+                                                variant="outlined"
+                                                defaultValue={item.totalAmountEstimate}
+                                                value={value}
+                                                onValueChange={(v) => {
+                                                    onChange(Number(v.value));
+                                                }}
+                                                InputProps={{
+                                                    readOnly: true,
+                                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                                }}
+                                                // error={invalid}
+                                                helperText={invalid ? error.message : null}
+                                                fullWidth
+                                                margin="normal"
+                                            />
+                                        )}
+                                    />
+                                    <Grid container columns={12} spacing={2}>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                type="number"
+                                                id="outlined-basic"
+                                                label="Số người dự kiến tham gia ban tổ chức"
+                                                variant="outlined"
+                                                fullWidth
+                                                defaultValue={item.maxQuantityComitee}
+                                                InputProps={{
+                                                    readOnly: true,
+                                                }}
+                                                margin="normal"
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                type="number"
+                                                id="outlined-basic"
+                                                label="Số người trong ban tổ chức hiện tại"
+                                                variant="outlined"
+                                                fullWidth
+                                                defaultValue={active}
+                                                InputProps={{
+                                                    readOnly: true,
+                                                }}
+                                                margin="normal"
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container spacing={2} sx={{ alignItems: 'center' }}>
+                                        <Grid item xs={6}>
+                                            <Controller
+                                                name="amountPerRegister"
+                                                variant="outlined"
+                                                control={control}
+                                                defaultValue={item.feePlayerPay}
+                                                render={({
+                                                    field: { onChange, value },
+                                                    fieldState: { error, invalid },
+                                                }) => (
+                                                    <NumberFormat
+                                                        name="amountPerRegister"
+                                                        customInput={TextField}
+                                                        label="Số tiền mỗi người chơi cần phải đóng"
+                                                        thousandSeparator={true}
+                                                        variant="outlined"
+                                                        defaultValue={item.feePlayerPay}
+                                                        value={value}
+                                                        onValueChange={(v) => {
+                                                            onChange(Number(v.value));
+                                                        }}
+                                                        InputProps={{
+                                                            readOnly: true,
+                                                            endAdornment: (
+                                                                <InputAdornment position="end">vnđ</InputAdornment>
+                                                            ),
+                                                        }}
+                                                        error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        fullWidth
+                                                        margin="normal"
+                                                    />
+                                                )}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Controller
+                                                name="amountPerAdmin"
+                                                variant="outlined"
+                                                control={control}
+                                                defaultValue={item.feeOrganizingCommiteePay}
+                                                render={({
+                                                    field: { onChange, value },
+                                                    fieldState: { error, invalid },
+                                                }) => (
+                                                    <NumberFormat
+                                                        name="amountPerAdmin"
+                                                        customInput={TextField}
+                                                        label="Số tiền thành viên ban tổ chức cần phải đóng"
+                                                        thousandSeparator={true}
+                                                        variant="outlined"
+                                                        defaultValue={item.feeOrganizingCommiteePay}
+                                                        value={value}
+                                                        onValueChange={(v) => {
+                                                            onChange(Number(v.value));
+                                                        }}
+                                                        InputProps={{
+                                                            readOnly: true,
+                                                            endAdornment: (
+                                                                <InputAdornment position="end">vnđ</InputAdornment>
+                                                            ),
+                                                        }}
+                                                        // error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        fullWidth
+                                                        margin="normal"
+                                                    />
+                                                )}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    <div>
+                                        {item.competitiveTypes.length > 0 && (
+                                            <TableContainer sx={{ maxHeight: 440 }}>
                                                 <Typography variant="h6">
-                                                    <strong>Số thành viên trong ban tổ chức hiện tại: </strong> {active}
+                                                    <strong>Thi đấu đối kháng: </strong>
                                                 </Typography>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <Typography variant="h6">
-                                                <strong>Tổng chi phí: </strong>{' '}
-                                                {item.totalAmount.toLocaleString('en-US')} VND
-                                            </Typography>
-                                        </div>
-                                        <div>
-                                            <Typography variant="h6">
-                                                <strong>Số tiền người tham gia phải đóng: </strong>
-                                                {item.feePlayerPay.toLocaleString('en-US')} vnđ
-                                            </Typography>
-                                        </div>
-                                        <div>
-                                            <Typography variant="h6">
-                                                <strong>Số tiền ban tổ chức phải đóng: </strong>
-                                                {item.feeOrganizingCommiteePay.toLocaleString('en-US')} vnđ
-                                            </Typography>
-                                        </div>
-                                        <div>
-                                            {item.competitiveTypes.length > 0 && (
-                                                <TableContainer sx={{ maxHeight: 440 }}>
-                                                    <Typography variant="h6">
-                                                        <strong>Thi đấu đối kháng: </strong>
-                                                    </Typography>
-                                                    <Table stickyHeader aria-label="sticky table">
-                                                        <TableHead>
-                                                            <TableRow>
-                                                                <TableCell align="center">Giới tính</TableCell>
-                                                                <TableCell align="center">Hạng cân</TableCell>
+                                                <Table stickyHeader aria-label="sticky table">
+                                                    <TableHead>
+                                                        <TableRow>
+                                                            <TableCell align="center">Giới tính</TableCell>
+                                                            <TableCell align="center">Hạng cân</TableCell>
+                                                        </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {item.competitiveTypes.map((data) => (
+                                                            <TableRow key={data.id}>
+                                                                <TableCell align="center">
+                                                                    {data.gender === 1 ? 'Nam' : 'Nữ'}
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    {data.weightMin} - {data.weightMax} Kg
+                                                                </TableCell>
                                                             </TableRow>
-                                                        </TableHead>
-                                                        <TableBody>
-                                                            {item.competitiveTypes.map((data) => (
-                                                                <TableRow key={data.id}>
-                                                                    <TableCell>
-                                                                        {data.gender === 1 ? 'Nam' : 'Nữ'}
-                                                                    </TableCell>
-                                                                    <TableCell>
-                                                                        {data.weightMin} - {data.weightMax} Kg
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                            ))}
-                                                        </TableBody>
-                                                    </Table>
-                                                </TableContainer>
-                                            )}
-                                        </div>
-                                        <div>
-                                            {item.exhibitionTypes.length > 0 && (
-                                                <TableContainer sx={{ maxHeight: 440 }}>
-                                                    <Typography variant="h6">
-                                                        <strong>Thi đấu biểu diễn: </strong>
-                                                    </Typography>
-                                                    <Table stickyHeader aria-label="sticky table">
-                                                        <TableHead>
-                                                            <TableRow>
-                                                                <TableCell align="center">Nội dung thi đấu</TableCell>
-                                                                <TableCell align="center">Số lượng nữ</TableCell>
-                                                                <TableCell align="center">Số lượng nam</TableCell>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
+                                        )}
+                                    </div>
+                                    <div>
+                                        {item.exhibitionTypes.length > 0 && (
+                                            <TableContainer sx={{ maxHeight: 440 }}>
+                                                <Typography variant="h6">
+                                                    <strong>Thi đấu biểu diễn: </strong>
+                                                </Typography>
+                                                <Table stickyHeader aria-label="sticky table">
+                                                    <TableHead>
+                                                        <TableRow>
+                                                            <TableCell align="center">Nội dung thi đấu</TableCell>
+                                                            <TableCell align="center">Số lượng nữ</TableCell>
+                                                            <TableCell align="center">Số lượng nam</TableCell>
+                                                        </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {item.exhibitionTypes.map((data) => (
+                                                            <TableRow key={data.id}>
+                                                                <TableCell align="center">{data.name}</TableCell>
+                                                                <TableCell align="center">
+                                                                    {data.numberFemale}
+                                                                </TableCell>
+                                                                <TableCell align="center">{data.numberMale}</TableCell>
                                                             </TableRow>
-                                                        </TableHead>
-                                                        <TableBody>
-                                                            {item.exhibitionTypes.map((data) => (
-                                                                <TableRow key={data.id}>
-                                                                    <TableCell>{data.name}</TableCell>
-                                                                    <TableCell align="center">
-                                                                        {data.numberFemale}
-                                                                    </TableCell>
-                                                                    <TableCell align="center">
-                                                                        {data.numberMale}
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                            ))}
-                                                        </TableBody>
-                                                    </Table>
-                                                </TableContainer>
-                                            )}
-                                        </div>
-                                    </Box>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
+                                        )}
+                                    </div>
                                 </Grid>
-                                <Grid item xs={8} sx={{ minHeight: '755px' }}>
+                                <Grid item xs={5} sx={{ minHeight: '755px' }}>
                                     <FullCalendar
+                                        // initialDate={new Date('2022-09-01')}
+                                        initialDate={scheduleData[0] && new Date(scheduleData[0].date)}
                                         locale="vie"
                                         height="60%"
                                         plugins={[dayGridPlugin, interactionPlugin]}
-                                        initialView="dayGridMonth"
+                                        defaultView="dayGridMonth"
                                         events={scheduleData}
                                         weekends={true}
                                         headerToolbar={{
                                             left: 'title',
                                             center: 'dayGridMonth,dayGridWeek',
-                                            right: 'prev next today',
+                                            right: 'prev next',
                                             // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
                                         }}
                                     />

@@ -30,42 +30,41 @@ function AdminTournament() {
 
     return (
         <Fragment>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Box>
-                    <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+            <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Grid item xs={6}>
+                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                         Danh sách thành viên ban tổ chức
                     </Typography>
                     {active > 0 && total > 0 && (
-                        <Typography
-                            variant="body1"
-                            gutterBottom
-                            component="div"
-                            sx={{ fontWeight: 500, marginBottom: 2 }}
-                        >
+                        <Typography variant="body2">
                             Số lượng thành viên trong ban tổ chức: {active}/{total}
                         </Typography>
                     )}
-                </Box>
-
-                <Box>
-                    <Button
-                        variant="outlined"
-                        component={Link}
-                        to={`/admin/tournament/${tournamentId}/admin/update`}
-                        sx={{ mr: 2 }}
-                    >
-                        Cập nhật vai trò thành viên ban tổ chức
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        component={Link}
-                        to={`/admin/tournament/${tournamentId}/admin/addadmin`}
-                        sx={{ mr: 2 }}
-                    >
-                        Xét duyệt thành viên vào ban tổ chức
-                    </Button>
-                </Box>
-            </Box>
+                </Grid>
+                <Grid item xs={6} container>
+                    <Grid item xs={6}>
+                        {' '}
+                        <Button
+                            variant="outlined"
+                            component={Link}
+                            to={`/admin/tournament/${tournamentId}/admin/update`}
+                            sx={{ mr: 2 }}
+                        >
+                            Cập nhật vai trò thành viên ban tổ chức
+                        </Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Button
+                            variant="outlined"
+                            component={Link}
+                            to={`/admin/tournament/${tournamentId}/admin/addadmin`}
+                            sx={{ mr: 2 }}
+                        >
+                            Xét duyệt thành viên vào ban tổ chức
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Grid>
             <AdminList data={adminList} />
         </Fragment>
     );

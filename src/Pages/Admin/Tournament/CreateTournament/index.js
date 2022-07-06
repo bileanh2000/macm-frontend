@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { AddCircle } from '@mui/icons-material';
 import FullCalendar from '@fullcalendar/react';
-import { DatePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import vi from 'date-fns/locale/vi';
 import { Controller, useForm } from 'react-hook-form';
@@ -49,6 +49,7 @@ function CreateTourament() {
     const [touramentId, setTouramentId] = useState();
     const [tourament, setTourament] = useState([]);
     const [previewTournament, setPreviewTournament] = useState([]);
+    const [previewData, setPreviewData] = useState({});
     const [checked, setChecked] = useState(false);
     const [disabled, setDisabled] = useState(false);
 
@@ -63,22 +64,23 @@ function CreateTourament() {
 
     const validationSchema = Yup.object().shape({
         tournamentName: Yup.string().required('Không được để trống trường này'),
-        numOfParticipants: Yup.number()
-            .required('Không được để trống trường này')
-            .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
-        cost: Yup.string().required('Không được để trống trường này'),
-        ...(isChecked && {
-            cash: Yup.string().required('Không được để trống trường này'),
-        }),
-        // startDate: Yup.string().nullable().required('Không được để trống trường này'),
-        // finishDate: Yup.string().nullable().required('Không được để trống trường này'),
+        description: Yup.string().required('Không được để trống trường này'),
         startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
         finishDate: Yup.date()
             .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được bé hơn ngày bắt đầu`)
             .typeError('Vui lòng không để trống trường này'),
-        amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
-        amountPerAdmin: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
+        cost: Yup.string().required('Không được để trống trường này'),
+        numOfOrganizingCommitee: Yup.number()
+            .required('Không được để trống trường này')
+            .typeError('Vui lòng nhập số')
+            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+        numOfParticipants: Yup.number()
+            .required('Không được để trống trường này')
+            .typeError('Vui lòng nhập số')
+            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+
+        feePlayerPay: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
+        feeOrganizingCommiteePay: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
     });
 
     const handleClose = () => {
@@ -122,14 +124,15 @@ function CreateTourament() {
     };
     const createTourament = async (data) => {
         const params = {
-            competitiveTypes: datasFightingCompetition,
-            description: data.description,
-            exhibitionTypes: datasPerformanceCompetition,
-            maxQuantityComitee: data.numOfParticipants,
-            feeOrganizingCommiteePay: data.amountPerAdmin,
-            feePlayerPay: data.amountPerRegister,
-            totalAmount: data.cost,
             name: data.tournamentName,
+            description: data.description,
+            competitiveTypes: datasFightingCompetition,
+            exhibitionTypes: datasPerformanceCompetition,
+            maxQuantityComitee: data.numOfOrganizingCommitee,
+            feeOrganizingCommiteePay: data.feeOrganizingCommiteePay,
+            feePlayerPay: data.feePlayerPay,
+            totalAmountEstimate: data.cost,
+            totalAmountFromClubEstimate: data.totalAmountFromClubEstimate > 0 ? data.totalAmountFromClubEstimate : 0,
         };
         console.log(params);
         await adminTournamentAPI.createTournament(params).then((response) => {
@@ -141,19 +144,25 @@ function CreateTourament() {
         });
     };
     const onSubmit = (data) => {
+        console.log(data);
         let dataSubmit = {
-            numOfParticipants: data.numOfParticipants,
-            description: data.description,
             finishTime: moment(new Date(2022, 5, 21, 20, 0, 0)).format('HH:mm:ss'),
             startTime: moment(new Date(2022, 5, 20, 8, 0, 0)).format('HH:mm:ss'),
             startDate: moment(new Date(data.startDate)).format('DD/MM/yyyy'),
             finishDate: moment(new Date(data.finishDate)).format('DD/MM/yyyy'),
-            tournamentName: data.tournamentName,
-            cash: data.cash,
             cost: data.cost,
-            amountPerRegister: data.amountPerRegister,
-            amountPerAdmin: data.amountPerAdmin,
+            tournamentName: data.tournamentName,
+            description: data.description,
+            feeOrganizingCommiteePay: data.feeOrganizingCommiteePay,
+            feePlayerPay: data.feePlayerPay,
+            numOfOrganizingCommitee: data.numOfOrganizingCommitee,
+            numOfParticipants: data.numOfParticipants,
+            totalAmountFromClubEstimate:
+                data.cost -
+                (data.numOfOrganizingCommitee * data.feeOrganizingCommiteePay +
+                    data.numOfParticipants * data.feePlayerPay),
         };
+        console.log(dataSubmit);
         setSubmitData(dataSubmit);
         createTourament(dataSubmit);
         adminTournamentAPI.createPreviewTournamentSchedule(dataSubmit).then((res) => {
@@ -161,6 +170,7 @@ function CreateTourament() {
             console.log('2', res.data);
             if (res.data.length != 0) {
                 console.log(res.data);
+                setPreviewData(dataSubmit);
                 setPreviewTournament(res.data);
                 checkOveride(res.data);
                 setOpen(true);
@@ -251,9 +261,9 @@ function CreateTourament() {
                             )}
                         </DialogContent>
                     </Grid>
-                    {previewTournament && (
+                    {previewData && (
                         <Grid item xs={4}>
-                            <PreviewData data={previewTournament} />
+                            <PreviewData data={previewData} />
                         </Grid>
                     )}
                 </Grid>
@@ -294,35 +304,13 @@ function CreateTourament() {
                         multiline
                         maxRows={4}
                         value={description}
+                        {...register('description')}
+                        error={errors.description ? true : false}
+                        helperText={errors.description?.message}
                         onChange={(e) => setDescription(e.target.value)}
                         fullWidth
                         // {...register('content')}
                     />
-                    <Grid container columns={12} spacing={2}>
-                        <Grid item xs={6}>
-                            <TextField
-                                type="number"
-                                id="outlined-basic"
-                                label="Số người ban tổ chức"
-                                variant="outlined"
-                                fullWidth
-                                {...register('numOfParticipants')}
-                                error={errors.numOfParticipants ? true : false}
-                                helperText={errors.numOfParticipants?.message}
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            {/* <Button
-                                variant="outlined"
-                                sx={{ maxHeight: '50px', minHeight: '50px', width: '100%' }}
-                                component={Link}
-                                to={'/admin/events/add'}
-                                startIcon={<AddCircle />}
-                            >
-                                Thêm người vào ban tổ chức
-                            </Button> */}
-                        </Grid>
-                    </Grid>
                     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                         <Grid container columns={12} spacing={2}>
                             <Grid item xs={6}>
@@ -399,7 +387,6 @@ function CreateTourament() {
                             </Grid>
                         </Grid>
                     </LocalizationProvider>
-
                     <Controller
                         name="cost"
                         variant="outlined"
@@ -426,7 +413,92 @@ function CreateTourament() {
                             />
                         )}
                     />
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    <Grid container columns={12} spacing={2}>
+                        <Grid item xs={6}>
+                            <TextField
+                                type="number"
+                                id="outlined-basic"
+                                label="Số người dự kiến tham gia ban tổ chức"
+                                variant="outlined"
+                                fullWidth
+                                {...register('numOfOrganizingCommitee')}
+                                error={errors.numOfOrganizingCommitee ? true : false}
+                                helperText={errors.numOfOrganizingCommitee?.message}
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Controller
+                                name="feeOrganizingCommiteePay"
+                                variant="outlined"
+                                defaultValue=""
+                                control={control}
+                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                    <NumberFormat
+                                        name="feeOrganizingCommiteePay"
+                                        customInput={TextField}
+                                        label="Phí tham gia ban tổ chức"
+                                        thousandSeparator={true}
+                                        onValueChange={(v) => {
+                                            onChange(Number(v.value));
+                                        }}
+                                        variant="outlined"
+                                        defaultValue=""
+                                        value={value}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                        }}
+                                        error={invalid}
+                                        helperText={invalid ? error.message : null}
+                                        fullWidth
+                                    />
+                                )}
+                            />
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} sx={{ alignItems: 'center' }}>
+                        <Grid item xs={6}>
+                            <TextField
+                                type="number"
+                                id="outlined-basic"
+                                label="Số người dự kiến tham gia thi đấu"
+                                variant="outlined"
+                                fullWidth
+                                {...register('numOfParticipants')}
+                                error={errors.numOfParticipants ? true : false}
+                                helperText={errors.numOfParticipants?.message}
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Controller
+                                name="feePlayerPay"
+                                variant="outlined"
+                                defaultValue=""
+                                control={control}
+                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                    <NumberFormat
+                                        name="feePlayerPay"
+                                        customInput={TextField}
+                                        label="Phí tham gia thi đấu"
+                                        thousandSeparator={true}
+                                        onValueChange={(v) => {
+                                            onChange(Number(v.value));
+                                        }}
+                                        variant="outlined"
+                                        defaultValue=""
+                                        value={value}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                        }}
+                                        error={invalid}
+                                        helperText={invalid ? error.message : null}
+                                        fullWidth
+                                    />
+                                )}
+                            />
+                        </Grid>
+                    </Grid>
+
+                    {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                         <FormControlLabel
                             sx={{ marginLeft: '1px' }}
                             control={<Switch checked={isChecked} onChange={() => setIsChecked(!isChecked)} />}
@@ -461,70 +533,9 @@ function CreateTourament() {
                                 />
                             )}
                         />
-                    </Collapse>
-                    <Grid container spacing={2} sx={{ alignItems: 'center' }}>
-                        <Grid item xs={6}>
-                            {/* <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
-                                Dự kiến mỗi người phải đóng: 160k
-                            </Typography> */}
-                            <Controller
-                                name="amountPerAdmin"
-                                variant="outlined"
-                                defaultValue=""
-                                control={control}
-                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                    <NumberFormat
-                                        name="amountPerAdmin"
-                                        customInput={TextField}
-                                        label="Số tiền thành viên ban tổ chức cần phải đóng"
-                                        thousandSeparator={true}
-                                        variant="outlined"
-                                        defaultValue=""
-                                        value={value}
-                                        onValueChange={(v) => {
-                                            onChange(Number(v.value));
-                                        }}
-                                        InputProps={{
-                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                        }}
-                                        error={invalid}
-                                        helperText={invalid ? error.message : null}
-                                        fullWidth
-                                    />
-                                )}
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Controller
-                                name="amountPerRegister"
-                                variant="outlined"
-                                defaultValue=""
-                                control={control}
-                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                    <NumberFormat
-                                        name="amountPerRegister"
-                                        customInput={TextField}
-                                        label="Số tiền thành viên tham dự cần phải đóng"
-                                        thousandSeparator={true}
-                                        variant="outlined"
-                                        defaultValue=""
-                                        value={value}
-                                        onValueChange={(v) => {
-                                            onChange(Number(v.value));
-                                        }}
-                                        InputProps={{
-                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                        }}
-                                        error={invalid}
-                                        helperText={invalid ? error.message : null}
-                                        fullWidth
-                                    />
-                                )}
-                            />
-                        </Grid>
-                    </Grid>
+                    </Collapse> */}
 
-                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="h6">
                         Nội dung thi đấu
                     </Typography>
                     <Grid container spacing={1}>
