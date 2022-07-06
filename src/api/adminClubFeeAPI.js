@@ -59,7 +59,13 @@ const adminClubFeeAPI = {
 
     getReportEvent: (id) => {
         const url = `event/treasurer/getreportpaymentstatus/${id}`;
-        return axiosClient.get(url);
+        return axiosClient.get(url, {
+            params: {
+                pageNo: 0,
+                pageSize: 1000,
+                sortBy: 'id',
+            },
+        });
     },
 };
 

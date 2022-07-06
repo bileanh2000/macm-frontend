@@ -21,17 +21,18 @@ import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 import adminFunAPi from 'src/api/adminFunAPi';
 import eventApi from 'src/api/eventApi';
 import semesterApi from 'src/api/semesterApi';
+import EventSumUp from './EventSumUp';
 
 const cx = classNames.bind(styles);
 
 function ListEventsFee() {
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    const history = useNavigate();
+    // const history = useNavigate();
     const [funClub, setFunClub] = useState('');
     //Paging
     const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
+    // const [total, setTotal] = useState(0);
     const [semester, setSemester] = useState('Summer2022');
     const [monthInSemester, setMonthInSemester] = useState([]);
     const [month, setMonth] = useState(0);
@@ -94,6 +95,7 @@ function ListEventsFee() {
 
     const handleChangeSemester = (event) => {
         setSemester(event.target.value);
+        setMonth(0);
     };
 
     const dynamicAlert = (status, message) => {

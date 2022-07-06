@@ -119,15 +119,6 @@ function AddAdminTourament() {
         },
     ];
 
-    // const toggleStatus = (id, flag) => {
-    //     console.log(id, flag);
-    //     // const newUserList = facilityList.map((facility) => {
-    //     //     return facility.studentId === id ? { ...facility, active: !facility.active } : facility;
-    //     // });
-    //     // console.log(newUserList);
-    //     // setFacilityList(newUserList);
-    // };
-
     const rowsUser = userList.map((item, index) => {
         const container = {};
         container['id'] = item.id;
@@ -273,7 +264,7 @@ function AddAdminTourament() {
                         }}
                     />
                 ) : (
-                    <Typography variant="h4" sx={{ mb: 3 }}>
+                    <Typography variant="body1" sx={{ mb: 3 }}>
                         Không có yêu cầu đăng kí vào btc nào
                     </Typography>
                 )}

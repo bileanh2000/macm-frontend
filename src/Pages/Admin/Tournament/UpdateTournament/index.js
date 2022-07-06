@@ -4,6 +4,10 @@ import {
     Box,
     Button,
     Collapse,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     FormControlLabel,
     Grid,
     InputAdornment,
@@ -12,43 +16,39 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import vi from 'date-fns/locale/vi';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Controller, useForm } from 'react-hook-form';
 import NumberFormat from 'react-number-format';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import classNames from 'classnames/bind';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import moment from 'moment';
 
 import styles from '../CreateTournament/CreateTournament.module.scss';
 import UpdatePerformanceCompetition from './UpdatePerformanceCompetition';
 import adminTournament from 'src/api/adminTournamentAPI';
 import UpdateFightingCompetition from './UpdateFightingCompetition';
+import PreviewData from './PreviewData';
 
 const cx = classNames.bind(styles);
 
 function UpdateTournament() {
+    const nowDate = new Date();
     const [tournament, setTournament] = useState([]);
     const [datasFightingCompetition, setDataFightingCompetition] = useState([]);
     const [datasPerformanceCompetition, setDataPerformanceCompetition] = useState([]);
-    const [isChecked, setIsChecked] = useState(false);
-    const [active, setActive] = useState(-1);
+    const [open, setOpen] = useState(false);
     const { tournamentId } = useParams();
     const [openSnackBar, setOpenSnackBar] = useState(false);
-    let navigator = useNavigate();
-    let snackBarStatus;
+    const [scheduleUpdate, setScheduleUpdate] = useState({});
+    const [scheduleList, setScheduleList] = useState([]);
+    const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
 
-    const fetchAdminInTournament = async (params) => {
-        try {
-            const response = await adminTournament.getAllTournamentOrganizingCommittee(params);
-            console.log(response);
-            setActive(response.totalActive);
-        } catch (error) {
-            console.log('Failed to fetch admin list: ', error);
-        }
-    };
+    let snackBarStatus;
 
     const getListTournamentsBySemester = async () => {
         try {
@@ -56,15 +56,37 @@ function UpdateTournament() {
             setTournament(response.data);
             setDataFightingCompetition(response.data[0].competitiveTypes);
             setDataPerformanceCompetition(response.data[0].exhibitionTypes);
-            console.log(response.data);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
     };
+
+    const getTournamentSchedule = async (params) => {
+        try {
+            const response = await adminTournament.getTournamentSchedule(params);
+            console.log('Thanh cong roi: ', response);
+            setScheduleList(response.data);
+        } catch (error) {
+            console.log('That bai roi huhu ', error);
+        }
+    };
+
     useEffect(() => {
         getListTournamentsBySemester();
-        fetchAdminInTournament(tournamentId);
+        getTournamentSchedule(tournamentId);
     }, []);
+
+    const scheduleData = scheduleList.map((item) => {
+        const container = {};
+        container['id'] = item.id;
+        container['date'] = item.date;
+        container['title'] =
+            item.tournament.name + ' - ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['display'] = 'background';
+        container['backgroundColor'] = '#5ba8f5';
+
+        return container;
+    });
 
     const AddFightingCompetitionHandler = (FightingCompetition) => {
         setDataFightingCompetition(FightingCompetition);
@@ -76,21 +98,23 @@ function UpdateTournament() {
     const validationSchema = Yup.object().shape({
         tournamentName: Yup.string().required('Không được để trống trường này'),
         description: Yup.string().required('Không được để trống trường này'),
-        maxQuantityComitee: Yup.number()
-            .required('Không được để trống trường này')
-            .typeError('Vui lòng nhập số')
-            .min(active, `Vui lòng nhập giá trị lớn hơn số lượng thành viên trong ban tổ chức hiện tại (${active})`),
+        startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
+        finishDate: Yup.date()
+            .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được bé hơn ngày bắt đầu`)
+            .typeError('Vui lòng không để trống trường này'),
         cost: Yup.string().required('Không được để trống trường này'),
-        ...(isChecked && {
-            cash: Yup.string().required('Không được để trống trường này'),
-        }),
-        amountPerRegister: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
-        amountPerAdmin: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
+        startTime: Yup.string()
+            .nullable()
+            .required('Không để để trống trường này')
+            .matches(/^([01]?\d|2[0-3]):([0-5]?\d):([0-5]?\d)$/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
+        finishTime: Yup.string()
+            .nullable()
+            .required('Không để để trống trường này')
+            .matches(/^([01]?\d|2[0-3]):([0-5]?\d):([0-5]?\d)$/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
     });
 
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
     const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
         if (status) {
             setCustomAlert({ severity: 'success', message: message });
         } else {
@@ -100,26 +124,17 @@ function UpdateTournament() {
 
     const onUpdateTournament = (data) => {
         let dataSubmit = {
-            description: data.description,
-            // totalAmount: data.totalAmount,
-            amount_per_register: data.amountPerRegister,
             competitiveTypesDto: datasFightingCompetition,
             exhibitionTypesDto: datasPerformanceCompetition,
-            maxQuantityComitee: data.maxQuantityComitee,
-            totalAmount: data.cost,
             name: data.tournamentName,
+            description: data.description,
         };
-
         adminTournament.updateTournament(dataSubmit, tournamentId).then((res) => {
-            console.log('1', res);
-            console.log('2', res.data);
-            if (res.data.length !== 0) {
+            if (res.data.length != 0) {
                 setOpenSnackBar(true);
                 snackBarStatus = true;
                 dynamicAlert(snackBarStatus, res.message);
-                navigator(-1);
             } else {
-                console.log('huhu');
                 setOpenSnackBar(true);
                 snackBarStatus = false;
                 dynamicAlert(snackBarStatus, res.message);
@@ -127,6 +142,107 @@ function UpdateTournament() {
         });
     };
 
+    const handleUpdate = (data) => {
+        const newData = { finishTime: data.finishTime, startTime: data.startTime, date: scheduleUpdate.date };
+
+        if (scheduleUpdate.params) {
+            adminTournament.updateTournamentSession(scheduleUpdate.params.id, newData).then((res) => {
+                if (res.data.length != 0) {
+                    const newScheduleList = scheduleList.map((date) =>
+                        date.id === scheduleUpdate.params.id
+                            ? { ...date, finishTime: newData.finishTime, startTime: newData.startTime }
+                            : date,
+                    );
+
+                    setScheduleList(newScheduleList);
+                    setOpenSnackBar(true);
+                    snackBarStatus = true;
+                    dynamicAlert(snackBarStatus, res.message);
+                    handleClose();
+                } else {
+                    setOpenSnackBar(true);
+                    snackBarStatus = false;
+                    dynamicAlert(snackBarStatus, res.message);
+                    handleClose();
+                }
+            });
+        } else {
+            adminTournament.createTournamentSession(tournamentId, newData).then((res) => {
+                if (res.data.length != 0) {
+                    const newScheduleList = [...scheduleList, res.data[0]];
+                    setScheduleList(newScheduleList);
+                    setOpenSnackBar(true);
+                    snackBarStatus = true;
+                    dynamicAlert(snackBarStatus, res.message);
+                    handleClose();
+                } else {
+                    setOpenSnackBar(true);
+                    snackBarStatus = false;
+                    dynamicAlert(snackBarStatus, res.message);
+                    handleClose();
+                }
+            });
+        }
+    };
+    const handleClose = () => {
+        setOpen(false);
+        setScheduleUpdate({});
+        reset({
+            startTime: '',
+            finishTime: '',
+        });
+    };
+
+    const handleDelete = (id) => {
+        adminTournament.deleteTournamentSession(id).then((res) => {
+            if (res.data.length != 0) {
+                const newScheduleList = scheduleList.filter((date) => date.id !== id);
+                setScheduleList(newScheduleList);
+                setOpenSnackBar(true);
+                snackBarStatus = true;
+                dynamicAlert(snackBarStatus, res.message);
+                handleClose();
+            } else {
+                setOpenSnackBar(true);
+                snackBarStatus = false;
+                dynamicAlert(snackBarStatus, res.message);
+                handleClose();
+            }
+        });
+    };
+
+    const getMonthInCurrentTableView = (startDate) => {
+        const temp = new Date(startDate);
+        temp.setDate(temp.getDate() + 17);
+        const currentMonth = temp.getMonth() + 1;
+        const currentYear = temp.getFullYear();
+        setMonthAndYear({ month: currentMonth, year: currentYear });
+    };
+
+    const navigateToUpdate = (params, date, day) => {
+        if (
+            date.getMonth() === nowDate.getMonth() &&
+            date.getFullYear() === nowDate.getFullYear() &&
+            date.getDate() === nowDate.getDate()
+        ) {
+            return;
+        } else {
+            const data = scheduleList.filter((date) => date.id == params);
+            setScheduleUpdate({ date: day, params: data[0] });
+            setOpen(true);
+        }
+    };
+    const navigateToCreate = (day, date) => {
+        if (date > nowDate) {
+            const existSession = scheduleList.filter((item) => item.date === day).length; //length = 0 (false) is not exist
+            if (!existSession) {
+                setScheduleUpdate({ date: day, params: null });
+                setOpen(true);
+            } else {
+                return;
+            }
+        }
+    };
     const handleCloseSnackBar = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -139,6 +255,7 @@ function UpdateTournament() {
         control,
         handleSubmit,
         formState: { errors },
+        reset,
     } = useForm({
         resolver: yupResolver(validationSchema),
         mode: 'onBlur',
@@ -164,14 +281,6 @@ function UpdateTournament() {
                 <Typography variant="h4" component="div" sx={{ fontWeight: 500 }}>
                     Chỉnh sửa thông tin giải đấu
                 </Typography>
-                <Button
-                    variant="contained"
-                    size="medium"
-                    component={Link}
-                    to={`../admin/tournament/${tournamentId}/tournamentschedule`}
-                >
-                    Chỉnh sửa lịch giải đấu
-                </Button>
             </Box>
             <Box
                 component="form"
@@ -186,229 +295,291 @@ function UpdateTournament() {
             >
                 {tournament.map((item, index) => {
                     return (
-                        <Box sx={{ width: '50%' }} key={index}>
-                            <TextField
-                                id="outlined-basic"
-                                label="Tên giải đấu"
-                                variant="outlined"
-                                defaultValue={item.name}
-                                fullWidth
-                                {...register('tournamentName')}
-                                error={errors.tournamentName ? true : false}
-                                helperText={errors.tournamentName?.message}
-                            />
-                            <Grid container columns={12} spacing={2}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        type="number"
-                                        id="outlined-basic"
-                                        label="Số người ban tổ chức"
-                                        defaultValue={item.maxQuantityComitee}
-                                        variant="outlined"
-                                        fullWidth
-                                        {...register('maxQuantityComitee')}
-                                        error={errors.maxQuantityComitee ? true : false}
-                                        helperText={errors.maxQuantityComitee?.message}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    {/* <TextField
-                                        type="number"
-                                        id="outlined-basic"
-                                        label="Số người ban tổ chức"
-                                        defaultValue={item.maxQuantityComitee}
-                                        variant="outlined"
-                                        fullWidth
-                                        {...register('maxQuantityComitee')}
-                                        error={errors.maxQuantityComitee ? true : false}
-                                        helperText={errors.maxQuantityComitee?.message}
-                                    /> */}
-                                </Grid>
-                            </Grid>
-                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                                <Grid container columns={12} spacing={2}>
-                                    <Grid item xs={6}></Grid>
-                                    <Grid item xs={6}></Grid>
-                                </Grid>
-                            </LocalizationProvider>
+                        <Fragment key={index}>
+                            {scheduleUpdate && (
+                                <Dialog fullWidth maxWidth="lg" open={open}>
+                                    <DialogTitle>
+                                        <Grid container spacing={1} columns={12}>
+                                            <Grid item sm={6}>
+                                                {scheduleUpdate.params ? 'Cập nhật' : 'Thêm mới'}
+                                            </Grid>
+                                            <Grid item sm={6}>
+                                                {scheduleUpdate.params && (
+                                                    <Button
+                                                        variant="outlined"
+                                                        startIcon={<DeleteIcon />}
+                                                        color="error"
+                                                        onClick={() => handleDelete(scheduleUpdate.params.id)}
+                                                        sx={{ float: 'right' }}
+                                                    >
+                                                        Xóa lịch
+                                                    </Button>
+                                                )}
+                                            </Grid>
+                                        </Grid>
+                                    </DialogTitle>
+                                    <DialogContent sx={{ height: '500px', paddingTop: '20px !important' }}>
+                                        <Grid container spacing={1} columns={12} key={item.id}>
+                                            <Grid item sm={4}>
+                                                <TextField
+                                                    disabled
+                                                    id="outlined-disabled"
+                                                    label="Ngày tháng"
+                                                    defaultValue={scheduleUpdate.date}
+                                                    fullWidth
+                                                    {...register('date')}
+                                                    //error={errors.date ? true : false}
+                                                    //helperText={errors.date?.message}
+                                                />
+                                            </Grid>
+                                            <Grid item sm={4}>
+                                                <TextField
+                                                    required
+                                                    control={control}
+                                                    id="outlined-disabled"
+                                                    label="Thời gian bắt đầu"
+                                                    defaultValue={
+                                                        scheduleUpdate.params ? scheduleUpdate.params.startTime : ''
+                                                    }
+                                                    fullWidth
+                                                    {...register('startTime')}
+                                                    error={errors.startTime ? true : false}
+                                                    helperText={errors.startTime?.message}
+                                                />
+                                            </Grid>
+                                            <Grid item sm={4}>
+                                                <TextField
+                                                    required
+                                                    control={control}
+                                                    id="outlined-disabled"
+                                                    label="Thời gian kết thúc"
+                                                    defaultValue={
+                                                        scheduleUpdate.params ? scheduleUpdate.params.finishTime : ''
+                                                    }
+                                                    fullWidth
+                                                    {...register('finishTime')}
+                                                    error={errors.finishTime ? true : false}
+                                                    helperText={errors.finishTime?.message}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </DialogContent>
 
-                            <Controller
-                                name="cost"
-                                variant="outlined"
-                                defaultValue={item.totalAmount}
-                                control={control}
-                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                    <NumberFormat
-                                        name="totalAmount"
-                                        customInput={TextField}
-                                        label="Tổng chi phí tổ chức"
-                                        thousandSeparator={true}
+                                    <DialogActions>
+                                        <Button onClick={handleClose}>Quay lại</Button>
+                                        <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
+                                    </DialogActions>
+                                </Dialog>
+                            )}
+                            <Grid container columns={12} sx={{ mt: 2 }} spacing={3}>
+                                {/* <Box sx={{ width: '50%' }}  key={index}> */}
+                                <Grid item xs={7}>
+                                    <TextField
+                                        id="outlined-basic"
+                                        label="Tên giải đấu"
                                         variant="outlined"
-                                        defaultValue={item.totalAmount}
-                                        value={value}
-                                        onValueChange={(v) => {
-                                            onChange(Number(v.value));
-                                        }}
-                                        InputProps={{
-                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                        }}
-                                        error={invalid}
-                                        helperText={invalid ? error.message : null}
+                                        defaultValue={item.name}
                                         fullWidth
+                                        {...register('tournamentName')}
+                                        error={errors.tournamentName ? true : false}
+                                        helperText={errors.tournamentName?.message}
                                     />
-                                )}
-                            />
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                                <FormControlLabel
-                                    sx={{ marginLeft: '1px' }}
-                                    control={<Switch checked={isChecked} onChange={() => setIsChecked(!isChecked)} />}
-                                    label="Sử dụng tiền quỹ"
-                                />
-                                <Typography>Tổng tiền quỹ: 2.000.000 vnđ</Typography>
-                            </Box>
-                            <Collapse in={isChecked}>
-                                <Controller
-                                    name="cash"
-                                    variant="outlined"
-                                    defaultValue=""
-                                    control={control}
-                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                        <NumberFormat
-                                            name="cost"
-                                            customInput={TextField}
-                                            label="Dùng quỹ CLB"
-                                            thousandSeparator={true}
-                                            onValueChange={(v) => {
-                                                onChange(Number(v.value));
-                                            }}
-                                            variant="outlined"
-                                            defaultValue=""
-                                            value={value}
-                                            InputProps={{
-                                                endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                            }}
-                                            error={invalid}
-                                            helperText={invalid ? error.message : null}
-                                            fullWidth
-                                        />
-                                    )}
-                                />
-                            </Collapse>
-                            {/* <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
-                                Dự kiến mỗi người phải đóng: 160k
-                            </Typography> */}
-                            <Grid container spacing={2} sx={{ alignItems: 'center' }}>
-                                <Grid item xs={6}>
-                                    {/* <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
-                                Dự kiến mỗi người phải đóng: 160k
-                            </Typography> */}
+                                    <TextField
+                                        id="outlined-multiline-flexible"
+                                        name="description"
+                                        control={control}
+                                        label="Nội dung"
+                                        defaultValue={item.description}
+                                        multiline
+                                        rows={4}
+                                        // value={description}
+                                        fullWidth
+                                        {...register('description')}
+                                        error={errors.description ? true : false}
+                                        helperText={errors.description?.message}
+                                    />
                                     <Controller
-                                        name="amountPerAdmin"
+                                        name="cost"
                                         variant="outlined"
-                                        defaultValue={item.feeOrganizingCommiteePay}
+                                        defaultValue={item.totalAmountEstimate}
                                         control={control}
                                         render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                             <NumberFormat
-                                                name="amountPerAdmin"
+                                                name="totalAmount"
                                                 customInput={TextField}
-                                                label="Số tiền thành viên ban tổ chức cần phải đóng"
+                                                label="Tổng chi phí tổ chức"
                                                 thousandSeparator={true}
+                                                variant="outlined"
+                                                defaultValue={item.totalAmountEstimate}
+                                                value={value}
+                                                onValueChange={(v) => {
+                                                    onChange(Number(v.value));
+                                                }}
+                                                InputProps={{
+                                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                                }}
+                                                // error={invalid}
+                                                helperText={invalid ? error.message : null}
+                                                fullWidth
+                                                disabled={true}
+                                            />
+                                        )}
+                                    />
+                                    <Grid container columns={12} spacing={2}>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                type="number"
+                                                id="outlined-basic"
+                                                label="Số người dự kiến tham gia ban tổ chức"
+                                                variant="outlined"
+                                                fullWidth
+                                                defaultValue={item.maxQuantityComitee}
+                                                disabled={true}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Controller
+                                                name="amountPerAdmin"
                                                 variant="outlined"
                                                 defaultValue={item.feeOrganizingCommiteePay}
-                                                value={value}
-                                                onValueChange={(v) => {
-                                                    onChange(Number(v.value));
-                                                }}
-                                                InputProps={{
-                                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                                }}
-                                                error={invalid}
-                                                helperText={invalid ? error.message : null}
-                                                fullWidth
+                                                control={control}
+                                                render={({
+                                                    field: { onChange, value },
+                                                    fieldState: { error, invalid },
+                                                }) => (
+                                                    <NumberFormat
+                                                        name="amountPerAdmin"
+                                                        customInput={TextField}
+                                                        label="Số tiền thành viên ban tổ chức cần phải đóng"
+                                                        thousandSeparator={true}
+                                                        variant="outlined"
+                                                        defaultValue={item.feeOrganizingCommiteePay}
+                                                        value={value}
+                                                        onValueChange={(v) => {
+                                                            onChange(Number(v.value));
+                                                        }}
+                                                        InputProps={{
+                                                            endAdornment: (
+                                                                <InputAdornment position="end">vnđ</InputAdornment>
+                                                            ),
+                                                        }}
+                                                        // error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        fullWidth
+                                                        disabled={true}
+                                                    />
+                                                )}
                                             />
-                                        )}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Controller
-                                        name="amountPerRegister"
-                                        variant="outlined"
-                                        defaultValue={item.feePlayerPay}
-                                        control={control}
-                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                            <NumberFormat
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container spacing={2} sx={{ alignItems: 'center' }}>
+                                        <Grid item xs={6}>
+                                            <Controller
                                                 name="amountPerRegister"
-                                                customInput={TextField}
-                                                label="Số tiền mỗi người cần phải đóng"
-                                                thousandSeparator={true}
                                                 variant="outlined"
                                                 defaultValue={item.feePlayerPay}
-                                                value={value}
-                                                onValueChange={(v) => {
-                                                    onChange(Number(v.value));
-                                                }}
-                                                InputProps={{
-                                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                                }}
-                                                error={invalid}
-                                                helperText={invalid ? error.message : null}
-                                                fullWidth
+                                                control={control}
+                                                render={({
+                                                    field: { onChange, value },
+                                                    fieldState: { error, invalid },
+                                                }) => (
+                                                    <NumberFormat
+                                                        name="amountPerRegister"
+                                                        customInput={TextField}
+                                                        label="Số tiền mỗi người cần phải đóng"
+                                                        thousandSeparator={true}
+                                                        variant="outlined"
+                                                        defaultValue={item.feePlayerPay}
+                                                        value={value}
+                                                        onValueChange={(v) => {
+                                                            onChange(Number(v.value));
+                                                        }}
+                                                        InputProps={{
+                                                            endAdornment: (
+                                                                <InputAdornment position="end">vnđ</InputAdornment>
+                                                            ),
+                                                        }}
+                                                        error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        fullWidth
+                                                        disabled={true}
+                                                    />
+                                                )}
                                             />
-                                        )}
+                                        </Grid>
+                                    </Grid>
+                                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                                        Nội dung thi đấu
+                                    </Typography>
+                                    <Grid container spacing={1}>
+                                        <Grid item xs={4}>
+                                            <Typography
+                                                sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }}
+                                                variant="body1"
+                                            >
+                                                Thi đấu đối kháng
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={8}>
+                                            {datasFightingCompetition && (
+                                                <UpdateFightingCompetition
+                                                    onAddFightingCompetition={AddFightingCompetitionHandler}
+                                                    data={datasFightingCompetition}
+                                                />
+                                            )}
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <Typography
+                                                sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }}
+                                                variant="body1"
+                                            >
+                                                Thi đấu biểu diễn
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={8}>
+                                            {datasPerformanceCompetition && (
+                                                <UpdatePerformanceCompetition
+                                                    onAddPerformanceCompetition={PerformanceCompetitionHandler}
+                                                    data={datasPerformanceCompetition}
+                                                />
+                                            )}
+                                        </Grid>
+                                    </Grid>
+                                    <div className={cx('create-event-button')}>
+                                        <Button variant="contained" onClick={handleSubmit(onUpdateTournament)}>
+                                            Cập nhật thông tin
+                                        </Button>
+                                    </div>
+                                </Grid>
+                                <Grid item xs={5} sx={{ minHeight: '755px' }}>
+                                    <FullCalendar
+                                        // initialDate={new Date('2022-09-01')}
+                                        initialDate={scheduleData[0] && new Date(scheduleData[0].date)}
+                                        locale="vie"
+                                        height="60%"
+                                        plugins={[dayGridPlugin, interactionPlugin]}
+                                        defaultView="dayGridMonth"
+                                        events={scheduleData}
+                                        weekends={true}
+                                        headerToolbar={{
+                                            left: 'title',
+                                            center: 'dayGridMonth,dayGridWeek',
+                                            right: 'prev next',
+                                            // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                                        }}
+                                        datesSet={(dateInfo) => {
+                                            getMonthInCurrentTableView(dateInfo.start);
+                                        }}
+                                        eventClick={(args) => {
+                                            navigateToUpdate(args.event.id, args.event.start, args.event.startStr);
+                                        }}
+                                        dateClick={function (arg) {
+                                            navigateToCreate(arg.dateStr, arg.date);
+                                        }}
                                     />
                                 </Grid>
                             </Grid>
-                            <TextField
-                                id="outlined-multiline-flexible"
-                                name="description"
-                                control={control}
-                                label="Nội dung"
-                                defaultValue={item.description}
-                                multiline
-                                rows={4}
-                                // value={description}
-                                fullWidth
-                                {...register('description')}
-                                error={errors.description ? true : false}
-                                helperText={errors.description?.message}
-                            />
-                            <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
-                                Nội dung thi đấu
-                            </Typography>
-                            <Grid container spacing={1}>
-                                <Grid item xs={4}>
-                                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
-                                        Thi đấu đối kháng
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={8}>
-                                    {datasFightingCompetition && (
-                                        <UpdateFightingCompetition
-                                            onAddFightingCompetition={AddFightingCompetitionHandler}
-                                            data={datasFightingCompetition}
-                                        />
-                                    )}
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
-                                        Thi đấu biểu diễn
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={8}>
-                                    {datasPerformanceCompetition && (
-                                        <UpdatePerformanceCompetition
-                                            onAddPerformanceCompetition={PerformanceCompetitionHandler}
-                                            data={datasPerformanceCompetition}
-                                        />
-                                    )}
-                                </Grid>
-                            </Grid>
-                            <div className={cx('create-event-button')}>
-                                <Button variant="contained" onClick={handleSubmit(onUpdateTournament)}>
-                                    Cập nhật thông tin
-                                </Button>
-                            </div>
-                        </Box>
+                        </Fragment>
                     );
                 })}
             </Box>

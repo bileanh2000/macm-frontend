@@ -21,9 +21,11 @@ function Attendance() {
     const getSessionByDate = async () => {
         try {
             console.log(date);
-            const response = await adminAttendanceAPI.getTrainingSessionByDate(date);
+            const response = await adminAttendanceAPI.getCommonSessionByDate(date);
             console.log(response.data);
-            if (!_trainingScheduleId) setTrainingScheduleId(response.data[0].id);
+            if (!_trainingScheduleId && response.data.lenght > 0) {
+                setTrainingScheduleId(response.data[0].id);
+            }
         } catch (error) {
             console.log('dm', error);
         }
@@ -36,7 +38,7 @@ function Attendance() {
         <Fragment>
             <Button variant="contained" color="success" sx={{ float: 'right' }}>
                 <Link to={`./report`} style={{ color: 'white' }}>
-                    Báo cáo điểm danh
+                    Thống kê thành viên tham gia buổi tập
                 </Link>
             </Button>
             {trainingScheduleId && (

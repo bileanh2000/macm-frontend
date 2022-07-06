@@ -1,7 +1,7 @@
 import { Alert, Box, Button, FormControlLabel, Radio, RadioGroup, Snackbar, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
-import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
+import { RadioButtonChecked, RadioButtonUnchecked, SignalWifiStatusbarConnectedNoInternet4 } from '@mui/icons-material';
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 
 function TakeAttendance() {
     const [userList, setUserList] = useState([]);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(20);
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
     const location = useLocation();
@@ -71,6 +71,7 @@ function TakeAttendance() {
                 return clsx('status-rows', {
                     active: params.value === 'Có mặt',
                     deactive: params.value === 'Vắng mặt',
+                    subActive: params.value === 'Chưa điểm danh',
                 });
             },
         },
@@ -87,14 +88,28 @@ function TakeAttendance() {
                         <GridActionsCellItem
                             icon={<RadioButtonChecked />}
                             label="Có mặt"
-                            onClick={() => toggleStatus(params.row.studentId)}
+                            onClick={() => toggleStatus(params.row.studentId, 1)}
                             color="primary"
                             aria-details="Có mặt"
                         />,
                         <GridActionsCellItem
                             icon={<RadioButtonUnchecked />}
                             label="Vắng mặt"
-                            onClick={() => toggleStatus(params.row.studentId)}
+                            onClick={() => toggleStatus(params.row.studentId, 0)}
+                        />,
+                    ];
+                } else if (params.row.status == 'Vắng mặt') {
+                    return [
+                        <GridActionsCellItem
+                            icon={<RadioButtonUnchecked />}
+                            label="Có mặt"
+                            onClick={() => toggleStatus(params.row.studentId, 1)}
+                        />,
+                        <GridActionsCellItem
+                            icon={<RadioButtonChecked />}
+                            label="Vắng mặt"
+                            onClick={() => toggleStatus(params.row.studentId, 0)}
+                            color="primary"
                         />,
                     ];
                 }
@@ -102,12 +117,12 @@ function TakeAttendance() {
                     <GridActionsCellItem
                         icon={<RadioButtonUnchecked />}
                         label="Có mặt"
-                        onClick={() => toggleStatus(params.row.studentId)}
+                        onClick={() => toggleStatus(params.row.studentId, 1)}
                     />,
                     <GridActionsCellItem
-                        icon={<RadioButtonChecked />}
+                        icon={<RadioButtonUnchecked />}
                         label="Vắng mặt"
-                        onClick={() => toggleStatus(params.row.studentId)}
+                        onClick={() => toggleStatus(params.row.studentId, 0)}
                         color="primary"
                     />,
                 ];
@@ -120,7 +135,7 @@ function TakeAttendance() {
         container['id'] = index + 1;
         container['name'] = item.name;
         container['studentId'] = item.studentId;
-        container['status'] = item.status ? 'Có mặt' : 'Vắng mặt';
+        container['status'] = item.status == 0 ? 'Vắng mặt' : item.status == 1 ? 'Có mặt' : 'Chưa điểm danh';
         return container;
     });
 
@@ -134,18 +149,18 @@ function TakeAttendance() {
         history({ pathname: '/admin/attendance' }, { state: { id: _trainingScheduleId, date: _nowDate } });
     };
 
-    const takeAttend = async (id) => {
+    const takeAttend = async (id, status) => {
         try {
-            await adminAttendanceAPI.takeAttendance(id);
+            await adminAttendanceAPI.takeAttendance(id, status);
         } catch (error) {
             console.log('Không thể điểm danh, error: ', error);
         }
     };
 
-    const toggleStatus = (id) => {
-        takeAttend(id);
+    const toggleStatus = (id, status) => {
+        takeAttend(id, status);
         const newUserList = userList.map((user) => {
-            return user.studentId === id ? { ...user, status: !user.status } : user;
+            return user.studentId === id ? { ...user, status: status } : user;
         });
         console.log(newUserList);
         setUserList(newUserList);
@@ -212,6 +227,11 @@ function TakeAttendance() {
                             color: '#fff',
                             fontWeight: '600',
                         },
+                        '& .status-rows.subActive': {
+                            backgroundColor: '#cfb2b2',
+                            color: '#fff',
+                            fontWeight: '600',
+                        },
                     }}
                 >
                     <DataGrid
@@ -221,7 +241,7 @@ function TakeAttendance() {
                         columns={columns}
                         pageSize={pageSize}
                         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                        rowsPerPageOptions={[10, 20, 30]}
+                        rowsPerPageOptions={[20, 30, 50]}
                         components={{
                             Toolbar: CustomToolbar,
                         }}
