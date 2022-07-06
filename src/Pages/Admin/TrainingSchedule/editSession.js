@@ -39,27 +39,29 @@ function UpdateSchedule() {
             .matches(/(\d{2}):(\d{2}):(\d{2})/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
     });
 
+    const fetchSchedule = async (date) => {
+        try {
+            const response = await trainingSchedule.getTrainingSessionByDate(date);
+            // console.log(
+            //     'Thanh cong roi: ',
+            //     response.data.filter((item) => item.id === parseInt(scheduleId)),
+            // );
+            // console.log(response.data);
+
+            // console.log('scheduleId ', scheduleId);
+            // let dataSelected = response.data.filter((item) => item.id === parseInt(scheduleId));
+            // let dateSelected = dataSelected[0].date;
+            setScheduleList(response.data);
+            // setSelectedDate(new Date(dateSelected));
+        } catch (error) {
+            console.log('That bai roi huhu ', error);
+        }
+    };
     useEffect(() => {
         window.scrollTo(0, 0);
-        const fetchSchedule = async () => {
-            try {
-                const response = await trainingSchedule.getAllSchedule();
-                console.log(
-                    'Thanh cong roi: ',
-                    response.data.filter((item) => item.id === parseInt(scheduleId)),
-                );
 
-                console.log('scheduleId ', scheduleId);
-                let dataSelected = response.data.filter((item) => item.id === parseInt(scheduleId));
-                let dateSelected = dataSelected[0].date;
-                setScheduleList(dataSelected);
-                setSelectedDate(new Date(dateSelected));
-            } catch (error) {
-                console.log('That bai roi huhu ', error);
-            }
-        };
-        fetchSchedule();
-    }, []);
+        fetchSchedule(moment(scheduleId).format('DD/MM/YYYY'));
+    }, [scheduleId]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -71,7 +73,7 @@ function UpdateSchedule() {
 
     const handleConfirmDialog = async () => {
         setOpen(false);
-        await trainingSchedule.deleteSession(scheduleId).then((res) => {
+        await trainingSchedule.deleteSession(moment(scheduleId).format('DD/MM/YYYY')).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
             console.log('3', res.message);
@@ -114,7 +116,7 @@ function UpdateSchedule() {
             startTime: data.startTime,
             finishTime: data.finishTime,
         };
-        await trainingSchedule.updateSchedule(data).then((res) => {
+        await trainingSchedule.updateSchedule(moment(scheduleId).format('DD/MM/YYYY'), data).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
             if (res.data.length != 0) {

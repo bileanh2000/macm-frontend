@@ -1,5 +1,20 @@
+import { Fragment } from 'react';
+import { useNavigate } from 'react-router-dom';
+import loginApi from 'src/api/loginApi';
+
 function Login() {
-    return <h1>Login Page</h1>;
+    let navigate = useNavigate();
+    const login = () => {
+        loginApi.login().then((res) => {
+            console.log(res);
+        });
+    };
+    return (
+        <Fragment>
+            <h1>Login Page</h1>
+            <button onClick={login}>Login with google</button>
+        </Fragment>
+    );
 }
 
 export default Login;

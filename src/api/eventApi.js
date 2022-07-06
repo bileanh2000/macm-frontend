@@ -34,7 +34,7 @@ const eventApi = {
         return axiosClient.post(url, params);
     },
     updateEvent: (params, eventId) => {
-        const url = `/event/headculture/updateevent/${eventId}`;
+        const url = `/event/headculture/updatebeforeevent/${eventId}`;
         return axiosClient.put(url, params);
     },
     getEventScheduleByEvent: (params) => {

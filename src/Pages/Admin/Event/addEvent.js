@@ -31,11 +31,13 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import eventApi from 'src/api/eventApi';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const cx = classNames.bind(styles);
 
 function AddEvent() {
     const [isChecked, setIsChecked] = useState(false);
+    const [isCheckedForm, setIsCheckedForm] = useState(false);
     const [description, setDescription] = useState('');
     const [submitData, setSubmitData] = useState([]);
     const [event, setEvent] = useState([]);
@@ -46,6 +48,9 @@ function AddEvent() {
     const [eventId, setEventId] = useState();
     const [checked, setChecked] = useState(false);
     const [disabled, setDisabled] = useState(false);
+    const [numOfPersonEstimated, setNumOfPersonEstimated] = useState();
+    const [totalAmountEstimated, setTotalAmountEstimated] = useState();
+    const [amountFromClub, setAmountFromClub] = useState();
 
     const [isOverride, setIsOverride] = useState(-1);
     let navigator = useNavigate();
@@ -57,12 +62,14 @@ function AddEvent() {
     const handleCreate = () => {
         const params = {
             name: submitData.name,
-            amount_per_register: submitData.amountPerRegister,
+            amountPerRegisterEstimated: submitData.amount_per_register,
             description: submitData.description,
             maxQuantityComitee: submitData.maxQuantityComitee,
-            totalAmount: submitData.cost,
+            totalAmountEstimated: submitData.cost,
             IsContinuous: submitData.IsContinuous,
+            amountFromClub: submitData.amountFromClub,
         };
+        console.log(params);
 
         eventApi.createEvent(params).then((response) => {
             console.log('create event', response);
@@ -158,6 +165,7 @@ function AddEvent() {
             cash: data.cash,
             cost: data.cost,
             amount_per_register: data.amountPerRegister,
+            amountFromClub: data.amountFromClub,
             // IsContinuous: isChecked,
         };
         setSubmitData(dataSubmit);
@@ -344,6 +352,10 @@ function AddEvent() {
                                 {...register('numOfParticipants')}
                                 error={errors.numOfParticipants ? true : false}
                                 helperText={errors.numOfParticipants?.message}
+                                onChange={(e) => {
+                                    console.log(e.target.value);
+                                    setNumOfPersonEstimated(e.target.value);
+                                }}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -494,7 +506,10 @@ function AddEvent() {
                             </Grid>
                         </Grid>
                     </LocalizationProvider>
-
+                    {amountFromClub &&
+                        totalAmountEstimated &&
+                        amountFromClub &&
+                        (totalAmountEstimated - amountFromClub) / numOfPersonEstimated}
                     <Controller
                         name="cost"
                         variant="outlined"
@@ -504,13 +519,41 @@ function AddEvent() {
                             <NumberFormat
                                 name="cost"
                                 customInput={TextField}
-                                label="Tổng chi phí tổ chức"
+                                label="Tổng chi phí tổ chức dự kiến"
                                 thousandSeparator={true}
                                 variant="outlined"
                                 defaultValue=""
                                 value={value}
                                 onValueChange={(v) => {
                                     onChange(Number(v.value));
+                                    setTotalAmountEstimated(Number(v.value));
+                                }}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end">VND</InputAdornment>,
+                                }}
+                                error={invalid}
+                                helperText={invalid ? error.message : null}
+                                fullWidth
+                            />
+                        )}
+                    />
+                    <Controller
+                        name="amountFromClub"
+                        variant="outlined"
+                        defaultValue=""
+                        control={control}
+                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                            <NumberFormat
+                                name="amountFromClub"
+                                customInput={TextField}
+                                label="Số tiền tài trợ từ CLB"
+                                thousandSeparator={true}
+                                variant="outlined"
+                                defaultValue=""
+                                value={value}
+                                onValueChange={(v) => {
+                                    onChange(Number(v.value));
+                                    setAmountFromClub(Number(v.value));
                                 }}
                                 InputProps={{
                                     endAdornment: <InputAdornment position="end">VND</InputAdornment>,
@@ -524,22 +567,28 @@ function AddEvent() {
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                         <FormControlLabel
                             sx={{ marginLeft: '1px' }}
-                            control={<Switch checked={isChecked} onChange={() => setIsChecked(!isChecked)} />}
+                            control={
+                                <Switch checked={isCheckedForm} onChange={() => setIsCheckedForm(!isCheckedForm)} />
+                            }
                             label="Yêu cầu thành viên đóng tiền"
                         />
                         {/* <Typography>Tổng tiền quỹ: 2.000.000 vnđ</Typography> */}
                     </Box>
-                    <Collapse in={isChecked}>
+                    <Collapse in={isCheckedForm}>
+                        {/* {amountFromClub && totalAmountEstimated && amountFromClub && ( */}
                         <Controller
                             name="amountPerRegister"
                             variant="outlined"
+                            // defaultValue={
+                            //     amountFromClub && (totalAmountEstimated - amountFromClub) / numOfPersonEstimated
+                            // }
                             defaultValue=""
                             control={control}
                             render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                 <NumberFormat
                                     name="amountPerRegister"
                                     customInput={TextField}
-                                    label="Số tiền mỗi người cần phải đóng"
+                                    label="Dự kiến số tiền mỗi người cần phải đóng"
                                     thousandSeparator={true}
                                     variant="outlined"
                                     defaultValue=""
@@ -556,6 +605,7 @@ function AddEvent() {
                                 />
                             )}
                         />
+                        {/* )} */}
                     </Collapse>
                     {/* <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
                         Dự kiến mỗi người phải đóng: 160k

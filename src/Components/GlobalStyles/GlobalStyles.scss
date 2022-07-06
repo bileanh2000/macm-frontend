@@ -8,12 +8,10 @@
     text-decoration: none;
 }
 
-
 ul,
 li {
     list-style-type: none;
 }
-
 
 //----------- OVERRIDE FULLCALENDAR STYLE -----------
 .fc-bg-event {
@@ -22,6 +20,9 @@ li {
 }
 .fc-event-title {
     font-style: normal !important;
+    margin-top: 20px !important;
+    font-weight: 500 !important;
+    color: #4a4c4f !important;
     // font-size: 1.2rem !important;
 }
 
@@ -46,6 +47,9 @@ li {
 }
 .fc-event-past {
     background-color: rgb(187, 187, 187) !important;
+}
+.fc-daygrid-day {
+    cursor: pointer;
 }
 
 //----------------------

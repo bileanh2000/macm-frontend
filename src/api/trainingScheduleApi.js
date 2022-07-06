@@ -14,11 +14,11 @@ const trainingScheduleApi = {
         return axiosClient.post(url, params);
     },
     deleteSession: (params) => {
-        const url = `/trainingschedule/headtechnique/deletesession/${params}`;
+        const url = `/trainingschedule/headtechnique/deletesession?date=${params}`;
         return axiosClient.put(url);
     },
-    updateSchedule: (params) => {
-        const url = `/trainingschedule/headtechnique/updatesession/${params.id}`;
+    updateSchedule: (date, params) => {
+        const url = `/trainingschedule/headtechnique/updatesession?date=${date}`;
         return axiosClient.put(url, params);
     },
     createSession: (params) => {
@@ -35,6 +35,19 @@ const trainingScheduleApi = {
                 startTime: params.startTime,
             },
         });
+    },
+    commonSchedule: () => {
+        const url = `/commonschedule/getcommonschedule`;
+        return axiosClient.get(url);
+    },
+    commonScheduleBySemesterId: (semesterId) => {
+        const url = `/commonschedule/getcommonschedulebysemester/${semesterId}`;
+        return axiosClient.get(url);
+    },
+
+    getTrainingSessionByDate: (date) => {
+        const url = `/trainingschedule/gettrainingsesionbydate?date=${date}`;
+        return axiosClient.get(url);
     },
 };
 export default trainingScheduleApi;

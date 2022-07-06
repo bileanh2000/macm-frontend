@@ -18,6 +18,7 @@ import Collapse from '@mui/material/Collapse';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import { Toolbar } from '@mui/material';
 
 const cx = classNames.bind(styles);
 
@@ -34,7 +35,8 @@ function Sidebar() {
         setOpen(!open);
     };
     return (
-        <List className={cx('wrapper')} component="nav" aria-label="mailbox folders">
+        <List>
+            <Toolbar />
             <ListItem button component={Link} to="/admin">
                 <ListItemIcon>
                     <HomeRoundedIcon />
