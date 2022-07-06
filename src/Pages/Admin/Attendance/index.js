@@ -14,7 +14,7 @@ function Attendance() {
 
     const [trainingScheduleId, setTrainingScheduleId] = useState(_trainingScheduleId);
 
-    const nowDate = new Date('07/07/2022');
+    const nowDate = new Date();
     if (!_nowDate) _nowDate = nowDate;
     const date = moment(new Date(_nowDate)).format('DD/MM/yyyy');
 
@@ -23,7 +23,9 @@ function Attendance() {
             console.log(date);
             const response = await adminAttendanceAPI.getCommonSessionByDate(date);
             console.log(response.data);
-            if (!_trainingScheduleId) setTrainingScheduleId(response.data[0].id);
+            if (!_trainingScheduleId && response.data.lenght > 0) {
+                setTrainingScheduleId(response.data[0].id);
+            }
         } catch (error) {
             console.log('dm', error);
         }
@@ -36,7 +38,7 @@ function Attendance() {
         <Fragment>
             <Button variant="contained" color="success" sx={{ float: 'right' }}>
                 <Link to={`./report`} style={{ color: 'white' }}>
-                    Báo cáo điểm danh
+                    Thống kê thành viên tham gia buổi tập
                 </Link>
             </Button>
             {trainingScheduleId && (

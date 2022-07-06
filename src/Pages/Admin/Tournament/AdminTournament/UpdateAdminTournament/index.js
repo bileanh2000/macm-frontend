@@ -230,7 +230,7 @@ function UpdateAdminTournament() {
                         onCellEditCommit={handleRowEditCommit}
                     />
                 ) : (
-                    <Typography variant="h4" sx={{ mb: 3, margin: 'auto' }}>
+                    <Typography variant="body1" sx={{ mb: 3, margin: 'auto' }}>
                         Chưa có thành viên trong ban tổ chức
                     </Typography>
                 )}

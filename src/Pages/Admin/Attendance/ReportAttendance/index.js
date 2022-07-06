@@ -105,7 +105,7 @@ function ReportAttendance() {
             <Grid container spacing={4}>
                 <Grid item xs={12}>
                     <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                        Báo cáo điểm danh
+                        Thống kê thành viên tham gia buổi tập
                     </Typography>
                 </Grid>
                 <Grid item xs={8}>

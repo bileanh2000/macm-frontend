@@ -8,8 +8,6 @@ import { Button, Typography } from '@mui/material';
 function AdminList({ data }) {
     const [pageSize, setPageSize] = useState(10);
 
-    console.log(data);
-
     const columns = [
         { field: 'studentName', headerName: 'Tên', flex: 0.8 },
         {
@@ -193,7 +191,7 @@ function AdminList({ data }) {
                     }}
                 />
             ) : (
-                <Typography variant="h4" sx={{ mb: 3, margin: 'auto' }}>
+                <Typography variant="body1" sx={{ mb: 3, margin: 'auto' }}>
                     Chưa có thành viên trong ban tổ chức
                 </Typography>
             )}
