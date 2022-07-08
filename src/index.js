@@ -8,11 +8,13 @@ import GlobalStyles from './Components/GlobalStyles';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     // <React.StrictMode>
+
     <BrowserRouter>
         <GlobalStyles>
             <App />
         </GlobalStyles>
-    </BrowserRouter>
+    </BrowserRouter>,
+
     // {
     //     /* </React.StrictMode>, */
     // },

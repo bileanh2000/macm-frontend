@@ -95,7 +95,7 @@ const privateRouters = [
     { path: '/admin/attendance', component: Attendance },
     { path: '/admin/attendance/take', component: TakeAttendance },
     { path: '/admin/attendance/report', component: ReportAttendance },
-    { path: '/admin/attendance/scanqrcode', component: QRScanner, layout: HeaderOnly },
+    { path: '/admin/attendance/scanqrcode', component: QRScanner },
 
     //Club fee paths
     { path: '/admin/clubfee', component: ClubFee },

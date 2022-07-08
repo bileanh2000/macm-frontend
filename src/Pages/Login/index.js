@@ -4,6 +4,7 @@ import loginApi from 'src/api/loginApi';
 
 function Login() {
     let navigate = useNavigate();
+
     const login = () => {
         loginApi.login().then((res) => {
             console.log(res);
@@ -12,7 +13,7 @@ function Login() {
     return (
         <Fragment>
             <h1>Login Page</h1>
-            <button onClick={login}>Login with google</button>
+            <div id="signInDiv"></div>
         </Fragment>
     );
 }
