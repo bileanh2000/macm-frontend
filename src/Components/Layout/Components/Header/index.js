@@ -19,11 +19,15 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
+import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
 const pages = ['1', '2', '3'];
-const settings = ['Tài khoản', 'Đăng xuất'];
+const settings = [
+    { name: 'Tài khoản', url: 'HE141272' },
+    { name: 'Đăng xuất', url: 'logout' },
+];
 
 function Header() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -158,9 +162,10 @@ function Header() {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-                                {settings.map((setting) => (
-                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                        <Typography textAlign="center">{setting}</Typography>
+                                {settings.map((setting, index) => (
+                                    <MenuItem key={index} onClick={handleCloseUserMenu}>
+                                        {/* <Typography textAlign="center">{setting}</Typography> */}
+                                        <Link to={`../${setting.url}`}>{setting.name}</Link>
                                     </MenuItem>
                                 ))}
                             </Menu>

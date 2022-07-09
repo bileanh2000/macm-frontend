@@ -73,5 +73,11 @@ const userApi = {
             },
         });
     },
+    generateQrCode: (params) => {
+        const url = `/admin/hr/member/qrcode/create`;
+        return axiosClient.post(url, {
+            params: { email: params.email, studentId: params.studentId, studentName: params.name },
+        });
+    },
 };
 export default userApi;
