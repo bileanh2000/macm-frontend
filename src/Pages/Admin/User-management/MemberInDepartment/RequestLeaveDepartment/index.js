@@ -12,7 +12,7 @@ import {
     Snackbar,
     Typography,
 } from '@mui/material';
-import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -21,7 +21,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import facilityApi from 'src/api/facilityApi';
 import adminFunAPi from 'src/api/adminFunAPi';
 
-function FacilityFee() {
+function RequestLeaveDepartment() {
     const [facilityList, setFacilityList] = useState([]);
     const [funClub, setFunClub] = useState('');
     const [pageSize, setPageSize] = useState(10);
@@ -277,4 +277,4 @@ function FacilityFee() {
     );
 }
 
-export default FacilityFee;
+export default RequestLeaveDepartment;
