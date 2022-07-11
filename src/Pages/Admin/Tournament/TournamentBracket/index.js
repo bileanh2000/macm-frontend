@@ -18,13 +18,12 @@ function TournamentBracket() {
         } else {
             range = listWeightRange.find((weight) => weight.id === event.target.value);
         }
-        spawnMatchs(event.target.value, 1);
+        listMatchs(event.target.value);
     };
 
-    const spawnMatchs = async (competitiveTypeId, round) => {
+    const listMatchs = async (competitiveTypeId) => {
         try {
-            const response = await adminTournament.spawnMatchs(competitiveTypeId, round);
-            console.log(response.data);
+            const response = await adminTournament.listMatchs(competitiveTypeId);
             setMatches(response.data);
         } catch (error) {
             console.log('Failed to fetch match: ', error);
@@ -36,6 +35,7 @@ function TournamentBracket() {
             const response = await adminTournament.getTournamentById(tournamentId);
             setListWeightRange(response.data[0].competitiveTypes);
             setWeightRange(response.data[0].competitiveTypes[0].id);
+            listMatchs(response.data[0].competitiveTypes[0].id);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -43,8 +43,8 @@ function TournamentBracket() {
 
     useEffect(() => {
         fetchTournamentById(tournamentId);
-        spawnMatchs(weightRange, 1);
-    }, [tournamentId, weightRange]);
+        // listMatchs(weightRange);
+    }, [tournamentId]);
 
     return (
         <Fragment>
@@ -73,8 +73,8 @@ function TournamentBracket() {
                     </Select>
                 </FormControl>
             </Box>
-            {matches ? (
-                <CustomMatchBracket data={matches} />
+            {matches.length > 0 ? (
+                <CustomMatchBracket params={matches} />
             ) : (
                 <Typography variant="body1">Hạng cân này hiện đang chưa có tuyển thủ</Typography>
             )}

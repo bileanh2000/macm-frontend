@@ -14,7 +14,7 @@ const adminNewsAPI = {
     createNews: (data) => {
         const url = `/news/headcommunication/createnews`;
         return axiosClient.post(url, data, {
-            params: { isSendNotification: data.isSendNotification }
+            params: { isSendNotification: data.isSendNotification },
         });
     },
 
@@ -32,8 +32,16 @@ const adminNewsAPI = {
         const url = `/news/headcommunication/updatenewsstatus/${data.id}`;
         return axiosClient.put(url, null, {
             params: {
-                status: data.status
-            }
+                status: data.status,
+            },
+        });
+    },
+    getAllNotification: (pageNo) => {
+        const url = `notification/getallnotification`;
+        return axiosClient.get(url, null, {
+            params: {
+                pageNo: pageNo,
+            },
         });
     },
 };

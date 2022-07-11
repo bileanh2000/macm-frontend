@@ -180,5 +180,9 @@ const adminTournament = {
             },
         });
     },
+    listMatchs: (competitiveTypeId) => {
+        const url = `/competitive/headclub/listmatchs/${competitiveTypeId}`;
+        return axiosClient.get(url);
+    },
 };
 export default adminTournament;

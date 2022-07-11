@@ -174,9 +174,12 @@ const findPlayer = (array, id) => {
     return player;
 };
 
-function CustomMatchBracket(data) {
+function CustomMatchBracket({ params }) {
     const [matches, setMatches] = useState(_matches);
-    const [listPlayer, setListPlayer] = useState();
+    let round1 = params.filter((match) => match.round == 1);
+    console.log(round1);
+    let round2 = params.filter((match) => match.round == 2);
+    console.log(round2);
     const [dragItem, setDragItem] = useState({});
     const [dragOverItem, setDragOverItem] = useState({});
     const [open, setOpen] = useState(false);
@@ -184,23 +187,7 @@ function CustomMatchBracket(data) {
     const [score1, setScore1] = useState(-1);
     const [score2, setScore2] = useState(-1);
 
-    // const { tournamentId } = useParams();
-
-    // const getTournamentById = async (tournamentId) => {
-    //     try {
-    //         const response = await adminTournament.getTournamentById(tournamentId);
-    //         console.log(response.data);
-    //         spawnMatchs(response.data[0]);
-    //     } catch (error) {
-    //         console.log('Lấy dữ liệu thất bại', error);
-    //     }
-    // };
-
-    // const spawnMatchs = async (competitiveTypeId, round) => {
-    //     try {
-    //         const response = await adminTournament.spawnMatchs(competitiveTypeId, round);
-    //     } catch (error) {}
-    // };
+    console.log(params);
 
     const onDragStart = (e, id, index) => {
         const player = findPlayer(matches[0], id);
@@ -323,7 +310,6 @@ function CustomMatchBracket(data) {
         score == 1 ? setScore1(Number(event)) : setScore2(Number(event));
         console.log(score, Number(event));
     };
-    console.log(score1, score2);
 
     return (
         <Fragment>
@@ -424,7 +410,7 @@ function CustomMatchBracket(data) {
             <div className={cx('theme', 'theme-dark')}>
                 <div className={cx('bracket', ' disable-image')}>
                     <div className={cx('column')}>
-                        {matches[0].map((match, index) => (
+                        {round1.map((match, index) => (
                             <div
                                 className={cx('match', 'winner-top', 'winner-bottom')}
                                 key={match.id}
@@ -434,27 +420,27 @@ function CustomMatchBracket(data) {
                                     className={cx('match-top', 'team', 'draggable')}
                                     draggable="true"
                                     onDragOver={(e) => onDragOver(e)}
-                                    onDragStart={(e) => onDragStart(e, match.players[0].id, index)}
+                                    onDragStart={(e) => onDragStart(e, match.firstPlayer.id, index)}
                                     onDragEnd={() => onDragEnd()}
-                                    onDrop={(e) => onDragDrop(e, match.players[0].id, index)}
+                                    onDrop={(e) => onDragDrop(e, match.firstPlayer.id, index)}
                                 >
                                     <span className={cx('image')}></span>
-                                    <span className={cx('seed')}>{match.players[0].seed}</span>
-                                    <span className={cx('name')}>{match.players[0].name}</span>
-                                    <span className={cx('score')}>{match.players[0].resultText}</span>
+                                    {/* <span className={cx('seed')}>{match.firstPlayer.seed}</span> */}
+                                    <span className={cx('name')}>{match.firstPlayer.name}</span>
+                                    <span className={cx('score')}>{match.firstPoint}</span>
                                 </div>
                                 <div
                                     className={cx('match-bottom', 'team', 'draggable')}
                                     draggable="true"
                                     onDragOver={(e) => onDragOver(e)}
-                                    onDragStart={(e) => onDragStart(e, match.players[1].id, index)}
+                                    onDragStart={(e) => onDragStart(e, match.secondPlayer.id, index)}
                                     onDragEnd={() => onDragEnd()}
-                                    onDrop={(e) => onDragDrop(e, match.players[1].id, index)}
+                                    onDrop={(e) => onDragDrop(e, match.secondPlayer.id, index)}
                                 >
                                     <span className={cx('image')}></span>
                                     <span className={cx('seed')}>8</span>
-                                    <span className={cx('name')}>{match.players[1].name}</span>
-                                    <span className={cx('score')}>{match.players[1].resultText}</span>
+                                    <span className={cx('name')}>{match.secondPlayer.name}</span>
+                                    <span className={cx('score')}>{match.secondPoint}</span>
                                 </div>
                                 <div className={cx('match-lines')}>
                                     <div className={cx('line', 'one')}></div>
@@ -465,10 +451,49 @@ function CustomMatchBracket(data) {
                                 </div>
                             </div>
                         ))}
+                        <div
+                            className={cx('match', 'winner-top', 'winner-bottom')}
+                            // key={match.id}
+                            // onClick={(e) => handleClickResult(e, match)}
+                        >
+                            <div
+                                className={cx('match-top', 'team', 'draggable')}
+                                draggable="true"
+                                onDragOver={(e) => onDragOver(e)}
+                                // onDragStart={(e) => onDragStart(e, match.firstPlayer.id, index)}
+                                // onDragEnd={() => onDragEnd()}
+                                // onDrop={(e) => onDragDrop(e, match.firstPlayer.id, index)}
+                            >
+                                <span className={cx('image')}></span>
+                                {/* <span className={cx('seed')}>{match.firstPlayer.seed}</span> */}
+                                <span className={cx('name')}>hihi</span>
+                                <span className={cx('score')}>1</span>
+                            </div>
+                            {/* <div
+                                className={cx('match-bottom', 'team', 'draggable')}
+                                draggable="true"
+                                onDragOver={(e) => onDragOver(e)}
+                                onDragStart={(e) => onDragStart(e, match.secondPlayer.id, index)}
+                                onDragEnd={() => onDragEnd()}
+                                onDrop={(e) => onDragDrop(e, match.secondPlayer.id, index)}
+                            >
+                                <span className={cx('image')}></span>
+                                <span className={cx('seed')}>8</span>
+                                <span className={cx('name')}>{match.secondPlayer.name}</span>
+                                <span className={cx('score')}>{match.secondPoint}</span>
+                            </div> */}
+                            <div className={cx('match-lines')}>
+                                <div className={cx('line', 'one')}></div>
+                                <div className={cx('line', 'two')}></div>
+                            </div>
+                            <div className={cx('match-lines', 'alt')}>
+                                <div className={cx('line', 'one')}></div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className={cx('column')}>
-                        {matches[1].map((match, index) => (
+                        {round2.map((match, index) => (
                             <div
                                 className={cx('match', 'winner-bottom', 'winner-top')}
                                 key={match.id}
@@ -476,19 +501,15 @@ function CustomMatchBracket(data) {
                             >
                                 <div className={cx('match-top', 'team')}>
                                     <span className={cx('image')}></span>
-                                    <span className={cx('seed')}>{match.players[0] && match.players[0].seed}</span>
-                                    <span className={cx('name')}>{match.players[0] && match.players[0].name}</span>
-                                    <span className={cx('score')}>
-                                        {match.players[0] && match.players[0].resultText}
-                                    </span>
+                                    {/* <span className={cx('seed')}>{match.players[0] && match.players[0].seed}</span> */}
+                                    <span className={cx('name')}>{match.firstPlayer.name}</span>
+                                    <span className={cx('score')}>{match.firstPoint}</span>
                                 </div>
                                 <div className={cx('match-bottom', 'team')}>
                                     <span className={cx('image')}></span>
                                     <span className={cx('seed')}></span>
-                                    <span className={cx('name')}>{match.players[1] && match.players[1].name}</span>
-                                    <span className={cx('score')}>
-                                        {match.players[1] && match.players[1].resultText}
-                                    </span>
+                                    <span className={cx('name')}>{match.secondPlayer.name}</span>
+                                    <span className={cx('score')}>{match.secondPoint}</span>
                                 </div>
                                 <div className={cx('match-lines')}>
                                     <div className={cx('line', 'one')}></div>
@@ -501,7 +522,7 @@ function CustomMatchBracket(data) {
                         ))}
                     </div>
 
-                    <div className={cx('column')}>
+                    {/* <div className={cx('column')}>
                         {matches[2].map((match, index) => (
                             <div
                                 className={cx('match', 'winner-top')}
@@ -533,7 +554,7 @@ function CustomMatchBracket(data) {
                                 </div>
                             </div>
                         ))}
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </Fragment>
