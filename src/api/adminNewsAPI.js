@@ -39,9 +39,10 @@ const adminNewsAPI = {
     },
     getAllNotification: (pageNo) => {
         const url = `notification/getallnotification`;
-        return axiosClient.get(url, null, {
+        return axiosClient.get(url, {
             params: {
                 pageNo: pageNo,
+                pageSize: '5'
             },
         });
     },

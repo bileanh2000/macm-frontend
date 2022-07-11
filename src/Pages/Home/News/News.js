@@ -1,17 +1,16 @@
-
-
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
+import { Grid, Pagination, Stack } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 import styles from './News.module.scss';
-import { Grid, Pagination, Stack } from '@mui/material';
-
 import adminNewsAPI from 'src/api/adminNewsAPI';
 
 const cx = classNames.bind(styles);
 
 function News() {
     const [newsList, setNews] = useState([]);
+    const navigator = useNavigate()
 
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
@@ -40,13 +39,22 @@ function News() {
         setPage(value);
     };
 
+    const onClickNotification = (news) => {
+        if (news.notificationType == 1) {
+            navigator({ pathname: `/admin/events/${news.notificationTypeId}` })
+        } else if (news.notificationType == 0) {
+            navigator({ pathname: `/admin/tournament/${news.notificationTypeId}` })
+        } else {
+            return
+        }
+    }
 
     return (
         <div className={cx('news-container')}>
             <h2>Thông báo</h2>
 
             {newsList.map((news, index) => (
-                <div className={cx('news-item')} key={index}>
+                <div className={cx('news-item')} key={index} onClick={() => onClickNotification(news)}>
                     <Grid container spacing={1} className={cx('news-title')}>
                         <Grid item xs={10}>
 
@@ -57,8 +65,8 @@ function News() {
                                 {news.notificationType == 0
                                     ? 'Giải đấu'
                                     : news.notificationType == 1
-                                    ? 'Sự kiện'
-                                    : 'Lịch tập'}
+                                        ? 'Sự kiện'
+                                        : 'Lịch tập'}
                             </small>
                         </Grid>
 
