@@ -1,3 +1,4 @@
+
 import classNames from 'classnames/bind';
 import * as React from 'react';
 import styles from './Header.module.scss';
@@ -19,15 +20,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
-import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
 const pages = ['1', '2', '3'];
-const settings = [
-    { name: 'Tài khoản', url: 'HE141272' },
-    { name: 'Đăng xuất', url: 'logout' },
-];
+const settings = ['Tài khoản', 'Đăng xuất'];
 
 function Header() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -162,10 +159,9 @@ function Header() {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-                                {settings.map((setting, index) => (
-                                    <MenuItem key={index} onClick={handleCloseUserMenu}>
-                                        {/* <Typography textAlign="center">{setting}</Typography> */}
-                                        <Link to={`../${setting.url}`}>{setting.name}</Link>
+                                {settings.map((setting) => (
+                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                        <Typography textAlign="center">{setting}</Typography>
                                     </MenuItem>
                                 ))}
                             </Menu>
@@ -178,3 +174,4 @@ function Header() {
 }
 
 export default Header;
+

@@ -226,7 +226,7 @@ function TrainingSchedule() {
                             // {...(semester!==2?(initialDate: '2022-10-01'):{})}
                             // initialDate={semester !== 2 ? new Date('2022-10-01') : new Date()}
                             locale="vie"
-                            height="60%"
+                            height="100%"
                             plugins={[dayGridPlugin, interactionPlugin]}
                             initialView="dayGridMonth"
                             // events={[
