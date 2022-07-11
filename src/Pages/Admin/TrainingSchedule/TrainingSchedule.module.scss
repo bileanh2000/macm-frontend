@@ -1,3 +1,4 @@
+
 #TrainingSchedule {
     .test-css {
         color: red !important;
@@ -11,11 +12,12 @@
     }
 }
 .schedule-container {
-    height: 130vh;
+    height: 100%;
     display: flex;
     justify-content: center;
 }
 .schedule-content {
-    height: 130vh;
+    height: 120vh;
     width: 70%;
 }
+
