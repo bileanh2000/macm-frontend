@@ -15,6 +15,16 @@ function UserProfile() {
     const [openQRDialog, setOpenQRDialog] = useState(false);
     const [QRUrl, setQRUrl] = useState('');
 
+    const fetchUserQR = async (userDetail) => {
+        try {
+
+            const response = await userApi.generateQrCode(userDetail);
+            setQRUrl(response.data[0]);
+        } catch (error) {
+            console.log('Failed to fetch user QR code: ', error);
+        }
+    };
+
     useEffect(() => {
         const fetchUserDetail = async () => {
             try {
@@ -27,17 +37,15 @@ function UserProfile() {
                 console.log('Failed to fetch user detail: ', error);
             }
         };
-        const fetchUserQR = async (userDetail) => {
-            try {
-                const response = await userApi.generateQrCode(userDetail);
-                setQRUrl(response.data[0]);
-            } catch (error) {
-                console.log('Failed to fetch user QR code: ', error);
-            }
-        };
-        userDetail && fetchUserQR(userDetail);
+
         fetchUserDetail();
+
     }, []);
+
+    useEffect(() => {
+        console.log(userDetail[0]);
+        fetchUserQR(userDetail[0]);
+    }, [userDetail])
 
     const handleDialogOpen = () => {
         setOpenQRDialog(true);

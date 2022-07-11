@@ -21,9 +21,10 @@ function Attendance() {
     const getSessionByDate = async () => {
         try {
             console.log(date);
-            const response = await adminAttendanceAPI.getCommonSessionByDate(date);
+            const response = await adminAttendanceAPI.getTrainingSessionByDate(date);
             console.log(response.data);
-            if (!_trainingScheduleId && response.data.lenght > 0) {
+            if (!_trainingScheduleId && response.data.length > 0) {
+                console.log(response.data[0].id)
                 setTrainingScheduleId(response.data[0].id);
             }
         } catch (error) {
