@@ -152,30 +152,33 @@ const adminTournament = {
 
     ///////////////////////////
 
-    // getAllMemberEvent: (params, index) => {
-    //     const url = `/event/headculture/getmemberjoinevent/${params}?filterIndex=${index}&pageSize=1000&sortBy=id`;
-    //     return axiosClient.get(url);
-    // },
+    getListPlayerBracket: (competitiveTypeId, round) => {
+        const url = `/competitive/headclub/getlistplayerbracket/${competitiveTypeId}`;
+        return axiosClient.get(url, null, {
+            params: {
+                round: round,
+            },
+        });
+    },
 
-    // getAllMember: (params) => {
-    //     const url = `/event/headculture/getallmemberevent/${params}?pageNo=0&pageSize=1000&sortBy=id`;
-    //     return axiosClient.get(url);
-    // },
-    // getAllMemberCancel: (params) => {
-    //     const url = `/event/headculture/getallusercanceljoinevent/${params}?pageNo=0&pageSize=1000&sortBy=id`;
-    //     return axiosClient.get(url);
-    // },
-    // updateRoleEvent: (params) => {
-    //     const url = `/event/headculture/updateuserroleevent`;
-    //     return axiosClient.get(url, { params });
-    // },
-    // getListMemberToUpdate: (params) => {
-    //     const url = `/event/headculture/getlistmembereventtoupdaterole/${params}`;
-    //     return axiosClient.get(url);
-    // },
-    // updateMemberRole: (params) => {
-    //     const url = `/event/headculture/updatelistmembereventrole`;
-    //     return axiosClient.put(url, params);
-    // },
+    spawnMatchs: (competitiveTypeId, round) => {
+        const url = `/competitive/headclub/spawnmatchs/${competitiveTypeId}`;
+        return axiosClient.post(url, null, {
+            params: {
+                round: round,
+            },
+        });
+    },
+    updateResultMatch: (params) => {
+        const url = `/competitive/headclub/updateresultmatch/${params.matchId}`;
+        return axiosClient.post(url, null, {
+            params: {
+                areaId: params.areaId,
+                firstPoint: params.firstPoint,
+                secondPoint: params.secondPoint,
+                time: params.time,
+            },
+        });
+    },
 };
 export default adminTournament;

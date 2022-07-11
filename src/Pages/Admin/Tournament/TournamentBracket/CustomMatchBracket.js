@@ -20,9 +20,11 @@ import {
     Typography,
     useFormControl,
 } from '@mui/material';
-
-import styles from '../TournamentBracket/CustomMatchBracket.module.scss';
 import NumberFormat from 'react-number-format';
+import { useParams } from 'react-router-dom';
+
+import adminTournament from 'src/api/adminTournamentAPI';
+import styles from '../TournamentBracket/CustomMatchBracket.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -172,14 +174,33 @@ const findPlayer = (array, id) => {
     return player;
 };
 
-function CustomMatchBracket() {
+function CustomMatchBracket(data) {
     const [matches, setMatches] = useState(_matches);
+    const [listPlayer, setListPlayer] = useState();
     const [dragItem, setDragItem] = useState({});
     const [dragOverItem, setDragOverItem] = useState({});
     const [open, setOpen] = useState(false);
     const [match, setMatch] = useState();
     const [score1, setScore1] = useState(-1);
     const [score2, setScore2] = useState(-1);
+
+    // const { tournamentId } = useParams();
+
+    // const getTournamentById = async (tournamentId) => {
+    //     try {
+    //         const response = await adminTournament.getTournamentById(tournamentId);
+    //         console.log(response.data);
+    //         spawnMatchs(response.data[0]);
+    //     } catch (error) {
+    //         console.log('Lấy dữ liệu thất bại', error);
+    //     }
+    // };
+
+    // const spawnMatchs = async (competitiveTypeId, round) => {
+    //     try {
+    //         const response = await adminTournament.spawnMatchs(competitiveTypeId, round);
+    //     } catch (error) {}
+    // };
 
     const onDragStart = (e, id, index) => {
         const player = findPlayer(matches[0], id);

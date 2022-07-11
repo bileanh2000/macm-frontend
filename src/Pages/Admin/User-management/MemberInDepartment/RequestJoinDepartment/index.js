@@ -21,7 +21,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import facilityApi from 'src/api/facilityApi';
 import adminFunAPi from 'src/api/adminFunAPi';
 
-function FacilityFee() {
+function RequestJoinDepartment() {
     const [facilityList, setFacilityList] = useState([]);
     const [funClub, setFunClub] = useState('');
     const [pageSize, setPageSize] = useState(10);
@@ -277,4 +277,4 @@ function FacilityFee() {
     );
 }
 
-export default FacilityFee;
+export default RequestJoinDepartment;
