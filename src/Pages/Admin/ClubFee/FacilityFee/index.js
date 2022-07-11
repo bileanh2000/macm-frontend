@@ -12,7 +12,7 @@ import {
     Snackbar,
     Typography,
 } from '@mui/material';
-import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';

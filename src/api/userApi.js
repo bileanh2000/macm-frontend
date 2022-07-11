@@ -1,3 +1,4 @@
+
 // https://fakestoreapi.com/docs
 
 import axiosClient from './axiosClient';
@@ -81,3 +82,4 @@ const userApi = {
     },
 };
 export default userApi;
+

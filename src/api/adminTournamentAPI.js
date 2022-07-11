@@ -1,3 +1,4 @@
+
 // https://fakestoreapi.com/docs
 
 import axiosClient from './axiosClient';
@@ -186,3 +187,4 @@ const adminTournament = {
     },
 };
 export default adminTournament;
+
