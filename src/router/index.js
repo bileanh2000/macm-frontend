@@ -1,6 +1,10 @@
 import { HeaderOnly } from '../Components/Layout';
 import AdminHomePage from '../Pages/Admin/Home';
 import UserManagementPage from '../Pages/Admin/User-management';
+
+import UserProfile from 'src/Pages/User/Profile/UserProfile';
+import EditUserProfile from 'src/Pages/User/Profile/EditUserProfile';
+
 import LoginPage from '../Pages/Login';
 import ClubFee from '../Pages/Admin/ClubFee';
 import MembershipFee from '../Pages/Admin/ClubFee/MembershipFee';
@@ -69,6 +73,8 @@ import AddMemberToEvent from 'src/Pages/Admin/Event/MenberEvent/AddMemberToEvent
 
 const privateRouters = [
     { path: '/', component: LoginPage, layout: null },
+    { path: '/:userId', component: UserProfile, layout: HeaderOnly },
+    { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
     { path: '/home', component: Home, layout: HeaderOnly },
     { path: '/admin', component: AdminHomePage },
     { path: '/admin/headofdepartment', component: HeadOfDepartment },
@@ -95,7 +101,7 @@ const privateRouters = [
     { path: '/admin/attendance', component: Attendance },
     { path: '/admin/attendance/take', component: TakeAttendance },
     { path: '/admin/attendance/report', component: ReportAttendance },
-    { path: '/admin/attendance/scanqrcode', component: QRScanner },
+    { path: '/admin/attendance/scanqrcode', component: QRScanner, layout: HeaderOnly },
 
     //Club fee paths
     { path: '/admin/clubfee', component: ClubFee },
