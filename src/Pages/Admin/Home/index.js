@@ -12,6 +12,7 @@ import MemberChart from './Charts/Member';
 import UpNext from './UpNext';
 import Attendance from './Charts/Attendance';
 import dashboardApi from 'src/api/dashboardApi';
+import FeeReport from './Charts/Fee';
 
 export const CustomPersentStatus = ({ persent }) => {
     let bgColor = '#ccf5e7';
@@ -43,17 +44,19 @@ export const CustomPersentStatus = ({ persent }) => {
 };
 function Home() {
     const [memberReport, setMemberReport] = useState([]);
+    const [feeReport, setFeeReport] = useState([]);
+
+    const fetchMemberReport = async () => {
+        try {
+            const response = await dashboardApi.getUserStatus();
+            console.log('Member Report', response.data);
+            let reverseList = response.data.sort((a, b) => b.id - a.id);
+            setMemberReport(reverseList);
+        } catch (error) {
+            console.log('Failed when fetch member report', error);
+        }
+    };
     useEffect(() => {
-        const fetchMemberReport = async () => {
-            try {
-                const response = await dashboardApi.getUserStatus();
-                console.log('Member Report', response.data);
-                let reverseList = response.data.sort((a, b) => b.id - a.id);
-                setMemberReport(reverseList);
-            } catch (error) {
-                console.log('Failed when fetch member report', error);
-            }
-        };
         fetchMemberReport();
 
         getPersentMemberSinceLastSemester();
@@ -196,6 +199,13 @@ function Home() {
                 <Grid item xs={12}>
                     <Paper elevation={2} sx={{ padding: '16px' }}>
                         <Attendance />
+                    </Paper>
+                </Grid>
+            </Grid>
+            <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                <Grid item xs={12}>
+                    <Paper elevation={2} sx={{ padding: '16px' }}>
+                        <FeeReport />
                     </Paper>
                 </Grid>
             </Grid>

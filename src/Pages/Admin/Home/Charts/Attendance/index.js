@@ -29,7 +29,7 @@ const data = [
         numberFemale: 6,
     },
 ];
-const CustomTooltip = () => <div>hahaha</div>;
+
 function AttendanceChart() {
     const [semesterList, setSemesterList] = useState([]);
     const [semester, setSemester] = useState('Summer2022');
