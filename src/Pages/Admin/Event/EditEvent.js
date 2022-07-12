@@ -33,7 +33,6 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import eventApi from 'src/api/eventApi';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
 
 const cx = classNames.bind(styles);
 
