@@ -1,4 +1,3 @@
-
 import React, { Fragment, useEffect, useState } from 'react';
 import { Box, FormControl, MenuItem, Select, Typography } from '@mui/material';
 import CustomMatchBracket from './CustomMatchBracket';
@@ -10,6 +9,7 @@ function TournamentBracket() {
     const [weightRange, setWeightRange] = useState(0);
     const [listWeightRange, setListWeightRange] = useState([]);
     const [matches, setMatches] = useState([]);
+    const [rounds, setRounds] = useState()
 
     const handleChangeWeight = (event) => {
         setWeightRange(event.target.value);
@@ -26,6 +26,7 @@ function TournamentBracket() {
         try {
             const response = await adminTournament.listMatchs(competitiveTypeId);
             setMatches(response.data);
+            setRounds(response.totalResult)
         } catch (error) {
             console.log('Failed to fetch match: ', error);
         }
@@ -33,10 +34,11 @@ function TournamentBracket() {
 
     const fetchTournamentById = async (tournamentId) => {
         try {
-            const response = await adminTournament.getTournamentById(tournamentId);
-            setListWeightRange(response.data[0].competitiveTypes);
-            setWeightRange(response.data[0].competitiveTypes[0].id);
-            listMatchs(response.data[0].competitiveTypes[0].id);
+            const response = await adminTournament.getAllCompetitiveType(tournamentId);
+            console.log(response.data[0])
+            setListWeightRange(response.data[0]);
+            setWeightRange(response.data[0][0].id);
+            listMatchs(response.data[0][0].id);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -68,14 +70,14 @@ function TournamentBracket() {
                         {listWeightRange &&
                             listWeightRange.map((range) => (
                                 <MenuItem value={range.id} key={range.id}>
-                                    {range.weightMin} - {range.weightMax} Kg
+                                    {range.gender == 0 ? "Nam: " : 'Nữ: '}  {range.weightMin} - {range.weightMax} Kg
                                 </MenuItem>
                             ))}
                     </Select>
                 </FormControl>
             </Box>
             {matches.length > 0 ? (
-                <CustomMatchBracket params={matches} />
+                <CustomMatchBracket matches={matches} rounds={rounds} />
             ) : (
                 <Typography variant="body1">Hạng cân này hiện đang chưa có tuyển thủ</Typography>
             )}

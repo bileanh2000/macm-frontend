@@ -177,6 +177,9 @@ function DetailTournament() {
                                     ) : (
                                         ''
                                     )}
+                                    <Button variant="outlined" startIcon={<Edit />} component={Link} to={`tournamentbracket`}>
+                                        Xem thông tin bảng đấu đối kháng
+                                    </Button>
                                 </Box>
                             </Box>
                             <Grid container columns={12} sx={{ mt: 2 }} spacing={2}>
