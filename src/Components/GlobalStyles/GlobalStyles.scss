@@ -23,6 +23,10 @@ li {
     margin-top: 20px !important;
     font-weight: 500 !important;
     color: #4a4c4f !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
     // font-size: 1.2rem !important;
 }
 

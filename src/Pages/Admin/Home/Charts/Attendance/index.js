@@ -102,7 +102,7 @@ function AttendanceChart() {
                     <Tooltip />
                     ff569b
                     <Legend />
-                    <Bar name="Có mặt" dataKey="totalAttendInTrainingSession" stackId="a" fill="#82ca9d" />
+                    <Bar name="Có mặt" dataKey="totalAttendInTrainingSession" stackId="a" fill="#8884d8" />
                     <Bar name="Vắng mặt" dataKey="totalAbsentInTrainingSession" stackId="a" fill="#ff569b" />
                 </BarChart>
             </ResponsiveContainer>
