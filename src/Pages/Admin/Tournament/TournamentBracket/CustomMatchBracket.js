@@ -175,12 +175,17 @@ const findPlayer = (array, id) => {
     return player;
 };
 
-function CustomMatchBracket({ params }) {
+function CustomMatchBracket(params) {
+    console.log(params)
     const [matches, setMatches] = useState(_matches);
-    let round1 = params.filter((match) => match.round == 1);
-    console.log(round1);
-    let round2 = params.filter((match) => match.round == 2);
-    console.log(round2);
+    let i;
+    let __matches = [];
+    for (i = 1; i <= params.rounds; i++) {
+        const round = params.matches.filter(match => match.round == i)
+        __matches.push(round);
+    }
+    console.log(__matches)
+
     const [dragItem, setDragItem] = useState({});
     const [dragOverItem, setDragOverItem] = useState({});
     const [open, setOpen] = useState(false);
@@ -190,58 +195,60 @@ function CustomMatchBracket({ params }) {
 
     console.log(params);
 
-    const onDragStart = (e, id, index) => {
-        const player = findPlayer(matches[0], id);
-        setDragItem({ ...player, index: index });
-        e.dataTransfer.effectAllowed = 'move';
-    };
+    // const onDragStart = (e, id, index) => {
+    //     const player = findPlayer(matches[0], id);
+    //     setDragItem({ ...player, index: index });
+    //     e.dataTransfer.effectAllowed = 'move';
+    // };
 
-    const onDragOver = (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        return false;
-    };
+    // const onDragOver = (e) => {
+    //     e.preventDefault();
+    //     e.dataTransfer.dropEffect = 'move';
+    //     return false;
+    // };
 
-    const onDragEnd = () => {
-        setDragItem(null);
-    };
-    const onDragDrop = (e, id, index) => {
-        const player = { ...findPlayer(matches[0], id), index: index };
-        setDragOverItem(player);
-        //if the item is dragged over itself, ignore
-        if (dragItem === dragOverItem) {
-            return;
-        }
-        // filter out the currently dragged item
-        const playersDrag = matches[0][dragItem.index].players;
-        const indexPlayerDrag = playersDrag.findIndex((player) => player.id === dragItem.id);
+    // const onDragEnd = () => {
+    //     setDragItem(null);
+    // };
+    // const onDragDrop = (e, id, index) => {
+    //     const player = { ...findPlayer(matches[0], id), index: index };
+    //     setDragOverItem(player);
+    //     //if the item is dragged over itself, ignore
+    //     if (dragItem === dragOverItem) {
+    //         return;
+    //     }
+    //     // filter out the currently dragged item
+    //     const playersDrag = matches[0][dragItem.index].players;
+    //     const indexPlayerDrag = playersDrag.findIndex((player) => player.id === dragItem.id);
 
-        const playersDrop = matches[0][player.index].players;
-        const indexPlayerDrop = playersDrop.findIndex((p) => p.id === player.id);
+    //     const playersDrop = matches[0][player.index].players;
+    //     const indexPlayerDrop = playersDrop.findIndex((p) => p.id === player.id);
 
-        matches[0][dragItem.index].players[indexPlayerDrag] = player;
-        matches[0][player.index].players[indexPlayerDrop] = dragItem;
-    };
+    //     matches[0][dragItem.index].players[indexPlayerDrag] = player;
+    //     matches[0][player.index].players[indexPlayerDrop] = dragItem;
+    // };
 
     const handleClickResult = (e, data) => {
-        if (data.state != 'SCHEDULED') {
+        console.log(data)
+        if (data.firstStudentId == null || data.secondStudentId == null) {
+            return;
+        }
+        if (data.firstPoint != null && data.secondPoint != null) {
             return;
         }
         setMatch(data);
         setOpen(true);
-        console.log(match);
-        console.log(data.players[0].name);
     };
 
     const validationSchema = Yup.object().shape({
         score1: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 39 Kg'),
+            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
         score2: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 39Kg'),
+            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
     });
 
     const {
@@ -273,38 +280,41 @@ function CustomMatchBracket({ params }) {
 
     const handleClose = () => {
         setOpen(false);
+        reset({
+            score1: -1,
+            score2: -1,
+        });
     };
+
+    const updateRedsult = async (params) => {
+        try {
+            await adminTournament.updateResultMatch(params)
+        } catch (error) {
+            console.log('khong the cap nhat ket quá')
+        }
+    }
 
     const handleUpdate = (data) => {
         console.log(data);
+        if (data.score1 == data.score2) {
+            setError('score1', {
+                message: 'Điểm 2 người chơi không được bằng nhau',
+            });
+            setError('score2', {
+                message: 'Điểm 2 người chơi không được bằng nhau',
+            });
+        } else {
+            match.firstPoint = data.score1
+            match.secondPoint = data.score2
+            console.log(match);
+            updateRedsult(match)
+            setOpen(false);
+            reset({
+                score1: -1,
+                score2: -1,
+            });
+        }
 
-        const player1 = {
-            ...match.players[0],
-            isWinner: score1 > score2,
-            resultText: score1 > score2 ? 'Won' : 'Lost',
-            status: 'PLAYED',
-        };
-        const player2 = {
-            ...match.players[1],
-            isWinner: score1 < score2,
-            resultText: score1 < score2 ? 'Won' : 'Lost',
-            status: 'PLAYED',
-        };
-
-        const winner = score1 > score2 ? player1 : player2;
-
-        match.players[0] = player1;
-        match.players[1] = player2;
-
-        console.log(match.nextMatchId);
-        console.log(player1, player2);
-
-        const temp = matches.map((m) =>
-            m.map((item) => (item.id === match.nextMatchId ? { ...item, players: [...item.players, winner] } : item)),
-        );
-        setMatches(temp);
-        console.log(temp);
-        setOpen(false);
     };
 
     const handleChange = (score, event) => {
@@ -329,7 +339,7 @@ function CustomMatchBracket({ params }) {
                                     </TableHead>
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell>{match.players[0].name}</TableCell>
+                                            <TableCell>{match.firstName}</TableCell>
                                             <TableCell>
                                                 <Controller
                                                     name="score1"
@@ -360,7 +370,7 @@ function CustomMatchBracket({ params }) {
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>{match.players[1].name}</TableCell>
+                                            <TableCell>{match.secondName}</TableCell>
                                             <TableCell>
                                                 <Controller
                                                     name="score2"
@@ -396,9 +406,9 @@ function CustomMatchBracket({ params }) {
                             {score1 > 0 &&
                                 score2 > 0 &&
                                 (score1 > score2 ? (
-                                    <Typography>Nguời chiến thắng: {match.players[0].name} </Typography>
+                                    <Typography>Nguời chiến thắng: {match.firstName} </Typography>
                                 ) : (
-                                    <Typography>Nguời chiến thắng: {match.players[1].name} </Typography>
+                                    score1 < score2 ? <Typography>Nguời chiến thắng: {match.secondName} </Typography> : ''
                                 ))}
                         </DialogContent>
                         <DialogActions>
@@ -408,93 +418,43 @@ function CustomMatchBracket({ params }) {
                     </div>
                 )}
             </Dialog>
+
             <div className={cx('theme', 'theme-dark')}>
                 <div className={cx('bracket', ' disable-image')}>
-                    <div className={cx('column')}>
-                        {round1.map((match, index) => (
-                            <div
-                                className={cx('match', 'winner-top', 'winner-bottom')}
-                                key={match.id}
-                                onClick={(e) => handleClickResult(e, match)}
-                            >
+                    {__matches.map((matchs, index) =>
+                        <div className={cx('column')} key={index}>
+                            {matchs.map(match =>
                                 <div
-                                    className={cx('match-top', 'team', 'draggable')}
-                                    draggable="true"
-                                    onDragOver={(e) => onDragOver(e)}
-                                    onDragStart={(e) => onDragStart(e, match.firstPlayer.id, index)}
-                                    onDragEnd={() => onDragEnd()}
-                                    onDrop={(e) => onDragDrop(e, match.firstPlayer.id, index)}
+                                    className={cx('match', 'winner-bottom', 'winner-top')}
+                                    key={match.id}
+                                    onClick={(e) => handleClickResult(e, match)}
                                 >
-                                    <span className={cx('image')}></span>
-                                    {/* <span className={cx('seed')}>{match.firstPlayer.seed}</span> */}
-                                    <span className={cx('name')}>{match.firstPlayer.name}</span>
-                                    <span className={cx('score')}>{match.firstPoint}</span>
+                                    <div className={cx('match-top', 'team')}>
+                                        <span className={cx('image')}></span>
+                                        <span className={cx('seed')}>{match.firstStudentId}</span>
+                                        <span className={cx('name')}>{match.firstName}</span>
+                                        <span className={cx('score')}>{match.firstPoint}</span>
+                                    </div>
+                                    <div className={cx('match-bottom', 'team')}>
+                                        <span className={cx('image')}></span>
+                                        <span className={cx('seed')}>{match.secondStudentId}</span>
+                                        <span className={cx('name')}>{match.secondName}</span>
+                                        <span className={cx('score')}>{match.secondPoint}</span>
+                                    </div>
+                                    <div className={cx('match-lines')}>
+                                        <div className={cx('line', 'one')}></div>
+                                        <div className={cx('line', 'two')}></div>
+                                    </div>
+                                    <div className={cx('match-lines', 'alt')}>
+                                        <div className={cx('line', 'one')}></div>
+                                    </div>
                                 </div>
-                                <div
-                                    className={cx('match-bottom', 'team', 'draggable')}
-                                    draggable="true"
-                                    onDragOver={(e) => onDragOver(e)}
-                                    onDragStart={(e) => onDragStart(e, match.secondPlayer.id, index)}
-                                    onDragEnd={() => onDragEnd()}
-                                    onDrop={(e) => onDragDrop(e, match.secondPlayer.id, index)}
-                                >
-                                    <span className={cx('image')}></span>
-                                    <span className={cx('seed')}>8</span>
-                                    <span className={cx('name')}>{match.secondPlayer.name}</span>
-                                    <span className={cx('score')}>{match.secondPoint}</span>
-                                </div>
-                                <div className={cx('match-lines')}>
-                                    <div className={cx('line', 'one')}></div>
-                                    <div className={cx('line', 'two')}></div>
-                                </div>
-                                <div className={cx('match-lines', 'alt')}>
-                                    <div className={cx('line', 'one')}></div>
-                                </div>
-                            </div>
-                        ))}
-                        <div
-                            className={cx('match', 'winner-top', 'winner-bottom')}
-                            // key={match.id}
-                            // onClick={(e) => handleClickResult(e, match)}
-                        >
-                            <div
-                                className={cx('match-top', 'team', 'draggable')}
-                                draggable="true"
-                                onDragOver={(e) => onDragOver(e)}
-                                // onDragStart={(e) => onDragStart(e, match.firstPlayer.id, index)}
-                                // onDragEnd={() => onDragEnd()}
-                                // onDrop={(e) => onDragDrop(e, match.firstPlayer.id, index)}
-                            >
-                                <span className={cx('image')}></span>
-                                {/* <span className={cx('seed')}>{match.firstPlayer.seed}</span> */}
-                                <span className={cx('name')}>hihi</span>
-                                <span className={cx('score')}>1</span>
-                            </div>
-                            {/* <div
-                                className={cx('match-bottom', 'team', 'draggable')}
-                                draggable="true"
-                                onDragOver={(e) => onDragOver(e)}
-                                onDragStart={(e) => onDragStart(e, match.secondPlayer.id, index)}
-                                onDragEnd={() => onDragEnd()}
-                                onDrop={(e) => onDragDrop(e, match.secondPlayer.id, index)}
-                            >
-                                <span className={cx('image')}></span>
-                                <span className={cx('seed')}>8</span>
-                                <span className={cx('name')}>{match.secondPlayer.name}</span>
-                                <span className={cx('score')}>{match.secondPoint}</span>
-                            </div> */}
-                            <div className={cx('match-lines')}>
-                                <div className={cx('line', 'one')}></div>
-                                <div className={cx('line', 'two')}></div>
-                            </div>
-                            <div className={cx('match-lines', 'alt')}>
-                                <div className={cx('line', 'one')}></div>
-                            </div>
+                            )}
                         </div>
-                    </div>
+                    )}
 
-                    <div className={cx('column')}>
-                        {round2.map((match, index) => (
+                    {/* <div className={cx('column')}>
+                        {__matches[1].map((match, index) => (
                             <div
                                 className={cx('match', 'winner-bottom', 'winner-top')}
                                 key={match.id}
@@ -502,14 +462,14 @@ function CustomMatchBracket({ params }) {
                             >
                                 <div className={cx('match-top', 'team')}>
                                     <span className={cx('image')}></span>
-                                    {/* <span className={cx('seed')}>{match.players[0] && match.players[0].seed}</span> */}
-                                    <span className={cx('name')}>{match.firstPlayer.name}</span>
+                                    {/* <span className={cx('seed')}>{match.firstPlayer.seed}</span> 
+                                    <span className={cx('name')}>{match.firstNameAndId}</span>
                                     <span className={cx('score')}>{match.firstPoint}</span>
                                 </div>
                                 <div className={cx('match-bottom', 'team')}>
                                     <span className={cx('image')}></span>
-                                    <span className={cx('seed')}></span>
-                                    <span className={cx('name')}>{match.secondPlayer.name}</span>
+                                    {/* <span className={cx('seed')}></span> 
+                                    <span className={cx('name')}>{match.secondNameAndId}</span>
                                     <span className={cx('score')}>{match.secondPoint}</span>
                                 </div>
                                 <div className={cx('match-lines')}>
@@ -523,8 +483,8 @@ function CustomMatchBracket({ params }) {
                         ))}
                     </div>
 
-                    {/* <div className={cx('column')}>
-                        {matches[2].map((match, index) => (
+                    <div className={cx('column')}>
+                        {__matches[2].map((match, index) => (
                             <div
                                 className={cx('match', 'winner-top')}
                                 key={match.id}
@@ -532,19 +492,44 @@ function CustomMatchBracket({ params }) {
                             >
                                 <div className={cx('match-top ', 'team')}>
                                     <span className={cx('image')}></span>
-                                    <span className={cx('seed')}>{match.players[0] && match.players[0].seed}</span>
-                                    <span className={cx('name')}>{match.players[0] && match.players[0].name}</span>
-                                    <span className={cx('score')}>
-                                        {match.players[0] && match.players[0].resultText}
-                                    </span>
+                                    {/* <span className={cx('seed')}>{match.firstPlayer.seed}</span> 
+                                    <span className={cx('name')}>{match.firstNameAndId}</span>
+                                    <span className={cx('score')}>{match.firstPoint}</span>
                                 </div>
                                 <div className={cx('match-bottom', 'team')}>
                                     <span className={cx('image')}></span>
-                                    <span className={cx('seed')}></span>
-                                    <span className={cx('name')}>{match.players[1] && match.players[1].name}</span>
-                                    <span className={cx('score')}>
-                                        {match.players[1] && match.players[1].resultText}
-                                    </span>
+                                    {/* <span className={cx('seed')}></span> 
+                                    <span className={cx('name')}>{match.secondNameAndId}</span>
+                                    <span className={cx('score')}>{match.secondPoint}</span>
+                                </div>
+                                <div className={cx('match-lines')}>
+                                    <div className={cx('line', 'one')}></div>
+                                    <div className={cx('line', 'two')}></div>
+                                </div>
+                                <div className={cx('match-lines', 'alt')}>
+                                    <div className={cx('line', 'one')}></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className={cx('column')}>
+                        {__matches[3].map((match, index) => (
+                            <div
+                                className={cx('match', 'winner-top')}
+                                key={match.id}
+                                onClick={(e) => handleClickResult(e, match)}
+                            >
+                                <div className={cx('match-top ', 'team')}>
+                                    <span className={cx('image')}></span>
+                                    {/* <span className={cx('seed')}>{match.firstPlayer.seed}</span> 
+                                    <span className={cx('name')}>{match.firstNameAndId}</span>
+                                    <span className={cx('score')}>{match.firstPoint}</span>
+                                </div>
+                                <div className={cx('match-bottom', 'team')}>
+                                    <span className={cx('image')}></span>
+                                    {/* <span className={cx('seed')}></span> 
+                                    <span className={cx('name')}>{match.secondNameAndId}</span>
+                                    <span className={cx('score')}>{match.secondPoint}</span>
                                 </div>
                                 <div className={cx('match-lines')}>
                                     <div className={cx('line', 'one')}></div>
@@ -557,8 +542,8 @@ function CustomMatchBracket({ params }) {
                         ))}
                     </div> */}
                 </div>
-            </div>
-        </Fragment>
+            </div >
+        </Fragment >
     );
 }
 

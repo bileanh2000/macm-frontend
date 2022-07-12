@@ -119,6 +119,11 @@ const adminTournament = {
         return axiosClient.put(url);
     },
 
+    getAllCompetitiveType: (tournamentId) => {
+        const url = `/tournament/treasurer/getallcompetitivetype/${tournamentId}`;
+        return axiosClient.get(url);
+    },
+
     //Fee
 
     getAllTournamentOrganizingCommitteePaymentStatus: (tournamentId) => {
@@ -171,13 +176,11 @@ const adminTournament = {
         });
     },
     updateResultMatch: (params) => {
-        const url = `/competitive/headclub/updateresultmatch/${params.matchId}`;
-        return axiosClient.post(url, null, {
+        const url = `/competitive/headclub/updateresultmatch/${params.id}`;
+        return axiosClient.put(url, null, {
             params: {
-                areaId: params.areaId,
                 firstPoint: params.firstPoint,
                 secondPoint: params.secondPoint,
-                time: params.time,
             },
         });
     },
@@ -185,6 +188,16 @@ const adminTournament = {
         const url = `/competitive/headclub/listmatchs/${competitiveTypeId}`;
         return axiosClient.get(url);
     },
+
+    previewMatchsPlayer: (competitiveTypeId) => {
+        const url = `/competitive/headclub/previewmatchsplayer/${competitiveTypeId}`;
+        return axiosClient.post(url);
+    },
+
+    updateListMatchsPlayer: (params) => {
+        const url = `/competitive/headclub/updatelistmatchsplayer`;
+        return axiosClient.put(url, params);
+    }
 };
 export default adminTournament;
 
