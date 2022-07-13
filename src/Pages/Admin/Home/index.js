@@ -47,27 +47,65 @@ export const CustomPersentStatus = ({ persent }) => {
 function Home() {
     const [memberReport, setMemberReport] = useState([]);
     const [feeReport, setFeeReport] = useState([]);
+    const [balanceInCurrentMonth, setBalanceInCurrentMonth] = useState([]);
+    const [balanceInLastMonth, setBalanceInLastMonth] = useState([]);
+    const [currentSemester, setCurrentSemester] = useState([]);
+
+    const currentMonth = new Date().getMonth() + 1;
+
+    const fetchFeeInCurrentSemester = async () => {
+        try {
+            const semester = await semesterApi.getCurrentSemester();
+
+            console.log('Current Semester', semester.data);
+            const fee = await dashboardApi.getFeeReportBySemester(semester.data[0].name);
+            console.log('fee in currentmonth', fee.data);
+            let fillerFeeByCurrentMonth = fee.data.filter((semester) => semester.month === currentMonth);
+            let fillerFeeByLastMonth = fee.data.filter((semester) => semester.month === currentMonth - 1);
+            setBalanceInCurrentMonth(fillerFeeByCurrentMonth);
+            setBalanceInLastMonth(fillerFeeByLastMonth);
+            console.log('fillerFeeByCurrentMonth', fillerFeeByCurrentMonth);
+            console.log('fillerFeeByLastMonth', fillerFeeByLastMonth);
+            setFeeReport(fee.data);
+        } catch (error) {
+            console.log('Failed when fetch Current Semester', error);
+        }
+    };
 
     const fetchMemberReport = async () => {
         try {
             const response = await dashboardApi.getUserStatus();
             console.log('Member Report', response.data);
             let reverseList = response.data.sort((a, b) => b.id - a.id);
+            // let filterByMonth = response.data.filter((item) => item.month === currentMonth);
+            // setBalanceInCurrentMonth(filterByMonth);
             setMemberReport(reverseList);
         } catch (error) {
             console.log('Failed when fetch member report', error);
         }
     };
     useEffect(() => {
+        fetchFeeInCurrentSemester();
         fetchMemberReport();
         getPersentMemberSinceLastSemester();
     }, []);
+    // useEffect(() => {
+    //     console.log(balanceInCurrentMonth);
+    // }, [balanceInCurrentMonth]);
 
     const getPersentMemberSinceLastSemester = () => {
         let memberPersent =
             memberReport[0] &&
             Math.floor((memberReport[0].totalNumberUserInSemester / memberReport[1].totalNumberUserInSemester) * 100);
         console.log(memberPersent);
+    };
+    const gridContainer = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(5, 1fr)',
+    };
+    const gridItem = {
+        margin: '8px',
+        border: '1px solid red',
     };
 
     return (
@@ -76,7 +114,7 @@ function Home() {
                 Dashboard
             </Typography>
             <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={12} sm={12} md={4}>
                     <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
                         <Box>
                             <Typography variant="button" color="initial">
@@ -108,7 +146,7 @@ function Home() {
                         </Avatar>
                     </Paper>
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={12} sm={12} md={4}>
                     <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
                         <Box>
                             <Typography variant="button" color="initial">
@@ -125,9 +163,13 @@ function Home() {
                                 <CustomPersentStatus
                                     persent={
                                         memberReport[0] &&
+                                        memberReport[1] &&
                                         Math.floor(
-                                            (memberReport[0].totalNumberUserInSemester /
-                                                memberReport[1].totalNumberUserInSemester) *
+                                            (memberReport[0].numberActiveInSemester /
+                                                memberReport[0].totalNumberUserInSemester /
+                                                (memberReport[1].numberActiveInSemester /
+                                                    memberReport[1].totalNumberUserInSemester)) *
+                                                100 -
                                                 100,
                                         )
                                     }
@@ -142,18 +184,27 @@ function Home() {
                         </Avatar>
                     </Paper>
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={12} sm={12} md={4}>
                     <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
                         <Box>
                             <Typography variant="button" color="initial">
                                 Tổng tiền quỹ
                             </Typography>
                             <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                1,200,000 VND
+                                {balanceInCurrentMonth[0] && balanceInCurrentMonth[0].balance.toLocaleString()} VND
                             </Typography>
 
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <CustomPersentStatus persent="43" />
+                                <CustomPersentStatus
+                                    persent={
+                                        balanceInLastMonth[0] &&
+                                        balanceInCurrentMonth[0] &&
+                                        Math.floor(
+                                            (balanceInCurrentMonth[0].balance / balanceInLastMonth[0].balance) * 100 -
+                                                100,
+                                        )
+                                    }
+                                />
                                 <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
                                     so với tháng trước
                                 </Typography>
@@ -164,33 +215,11 @@ function Home() {
                         </Avatar>
                     </Paper>
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                    <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
-                        <Box>
-                            <Typography variant="button" color="initial">
-                                Tổng số thành viên
-                            </Typography>
-                            <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                120 người
-                            </Typography>
-
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <CustomPersentStatus persent="-13" />
-                                <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
-                                    so với kỳ trước
-                                </Typography>
-                            </Box>
-                        </Box>
-                        <Avatar sx={{ bgcolor: '#ff569b', width: 48, height: 48 }}>
-                            <PeopleIcon sx={{ fontSize: '2rem' }} />
-                        </Avatar>
-                    </Paper>
-                </Grid>
             </Grid>
             <Grid container spacing={2} sx={{ mt: 0.5 }}>
                 <Grid item xs={12} md={9} order={{ xs: 2, md: 1 }}>
                     <Paper elevation={2} sx={{ padding: '16px' }}>
-                        <MemberChart />
+                        <Attendance />
                     </Paper>
                 </Grid>
                 <Grid item xs={12} md={3} order={{ xs: 1, md: 2 }}>
@@ -200,19 +229,18 @@ function Home() {
                 </Grid>
             </Grid>
             <Grid container spacing={2} sx={{ mt: 0.5 }}>
-                <Grid item xs={12}>
+                <Grid item xs={12} md={6}>
                     <Paper elevation={2} sx={{ padding: '16px' }}>
-                        <Attendance />
+                        <MemberChart />
                     </Paper>
                 </Grid>
-            </Grid>
-            <Grid container spacing={2} sx={{ mt: 0.5 }}>
-                <Grid item xs={12}>
+                <Grid item xs={12} md={6}>
                     <Paper elevation={2} sx={{ padding: '16px' }}>
                         <FeeReport />
                     </Paper>
                 </Grid>
             </Grid>
+            <Grid container spacing={2} sx={{ mt: 0.5 }}></Grid>
         </Fragment>
     );
 }
