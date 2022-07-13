@@ -43,11 +43,14 @@ function TournamentBracket() {
             console.log('Failed to fetch user list: ', error);
         }
     };
-
     useEffect(() => {
         fetchTournamentById(tournamentId);
         // listMatchs(weightRange);
     }, [tournamentId]);
+
+    const UpdateResultHandler = (newMatches) => {
+        setMatches(newMatches)
+    }
 
     return (
         <Fragment>
@@ -59,6 +62,7 @@ function TournamentBracket() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
                 <Box>
                     <Typography variant="body1">Nội dung thi đấu đối kháng</Typography>
+
                 </Box>
 
                 <FormControl size="small">
@@ -77,7 +81,7 @@ function TournamentBracket() {
                 </FormControl>
             </Box>
             {matches.length > 0 ? (
-                <CustomMatchBracket matches={matches} rounds={rounds} />
+                <CustomMatchBracket matches={matches} rounds={rounds} onUpdareResult={UpdateResultHandler} />
             ) : (
                 <Typography variant="body1">Hạng cân này hiện đang chưa có tuyển thủ</Typography>
             )}

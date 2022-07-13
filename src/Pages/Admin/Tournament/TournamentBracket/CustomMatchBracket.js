@@ -29,138 +29,6 @@ import styles from '../TournamentBracket/CustomMatchBracket.module.scss';
 
 const cx = classNames.bind(styles);
 
-const _matches = [
-    [
-        {
-            id: 1,
-            nextMatchId: 5,
-            round: 1,
-            startTime: '18:00 26/6/2022',
-            state: 'SCORE_DONE',
-            players: [
-                {
-                    id: 11,
-                    name: 'Đức',
-                    resultText: 'Won',
-                    isWinner: true,
-                    status: 'PLAYED',
-                    seed: 1,
-                },
-                {
-                    id: 22,
-                    name: 'Toan',
-                    resultText: 'Lost',
-                    isWinner: false,
-                    status: 'PLAYED',
-                    seed: 8,
-                },
-            ],
-        },
-        {
-            id: 2,
-            nextMatchId: 5,
-            round: 1,
-            startTime: '18:00 26/6/2022',
-            state: 'SCHEDULED',
-            players: [
-                {
-                    id: 33,
-                    name: 'Linh',
-                    resultText: '',
-                    isWinner: false,
-                    status: '',
-                    seed: 2,
-                },
-                {
-                    id: 44,
-                    name: 'Tuan',
-                    resultText: '',
-                    isWinner: false,
-                    status: '',
-                    seed: 7,
-                },
-            ],
-        },
-        {
-            id: 3,
-            nextMatchId: 6,
-            round: 1,
-            startTime: '18:00 26/6/2022',
-            state: 'SCHEDULED',
-            players: [
-                {
-                    id: 55,
-                    name: 'Khoi',
-                    resultText: '',
-                    isWinner: false,
-                    status: '',
-                    seed: 3,
-                },
-                {
-                    id: 66,
-                    name: 'Ning',
-                    resultText: '',
-                    isWinner: false,
-                    status: '',
-                    seed: 6,
-                },
-            ],
-        },
-        {
-            id: 4,
-            nextMatchId: 6,
-            round: 1,
-            startTime: '18:00 26/6/2022',
-            state: 'SCHEDULED',
-            players: [
-                {
-                    id: 77,
-                    name: 'Hiep',
-                    resultText: '',
-                    isWinner: false,
-                    status: '',
-                    seed: 4,
-                },
-                {
-                    id: 88,
-                    name: 'Hieu',
-                    resultText: '',
-                    isWinner: false,
-                    status: '',
-                    seed: 5,
-                },
-            ],
-        },
-    ],
-    [
-        {
-            id: 5,
-            nextMatchId: 7,
-            round: 2,
-            startTime: '18:00 26/6/2022',
-            state: 'SCHEDULED',
-            players: [],
-        },
-        {
-            id: 6,
-            nextMatchId: 7,
-            round: 2,
-            startTime: '18:00 26/6/2022',
-            state: 'SCHEDULED',
-            players: [],
-        },
-    ],
-    [
-        {
-            id: 7,
-            nextMatchId: null,
-            round: 3,
-            startTime: '18:00 26/6/2022',
-            state: 'SCHEDULED',
-            players: [],
-        },
-    ],
-];
 
 const findPlayer = (array, id) => {
     let i, j;
@@ -177,7 +45,7 @@ const findPlayer = (array, id) => {
 
 function CustomMatchBracket(params) {
     console.log(params)
-    const [matches, setMatches] = useState(_matches);
+    // const [matches, setMatches] = useState(_matches);
     let i;
     let __matches = [];
     for (i = 1; i <= params.rounds; i++) {
@@ -293,7 +161,7 @@ function CustomMatchBracket(params) {
             console.log('khong the cap nhat ket quá')
         }
     }
-
+    console.log('reload')
     const handleUpdate = (data) => {
         console.log(data);
         if (data.score1 == data.score2) {
@@ -307,6 +175,11 @@ function CustomMatchBracket(params) {
             match.firstPoint = data.score1
             match.secondPoint = data.score2
             console.log(match);
+            console.log(__matches);
+            var merged = [].concat.apply([], __matches);
+            console.log(merged);
+            params.onUpdareResult(merged)
+            setMatch(match)
             updateRedsult(match)
             setOpen(false);
             reset({
@@ -418,7 +291,7 @@ function CustomMatchBracket(params) {
                     </div>
                 )}
             </Dialog>
-
+            <Typography variant="caption">*Chọn vào 1 cặp trận để cập nhật tỉ số</Typography>
             <div className={cx('theme', 'theme-dark')}>
                 <div className={cx('bracket', ' disable-image')}>
                     {__matches.map((matchs, index) =>

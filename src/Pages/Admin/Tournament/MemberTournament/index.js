@@ -66,8 +66,11 @@ function MemberTournament() {
 
     const fetchTournamentById = async (tournamentId) => {
         try {
-            const response = await adminTournamentAPI.getTournamentById(tournamentId);
-            setListWeightRange(response.data[0].competitiveTypes);
+
+            const response = await adminTournamentAPI.getAllCompetitiveType(tournamentId);
+            console.log(response.data[0])
+            setListWeightRange(response.data[0]);
+            setWeightRange(response.data[0][0].id);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -123,18 +126,29 @@ function MemberTournament() {
 
     const handleDialogOpen = () => {
         if (weightRange == 0) {
+            console.log('loz1')
             setOpenSnackBar(true);
             // setSnackBarStatus(false);
             snackBarStatus = false;
             dynamicAlert(snackBarStatus, 'Vui lòng chọn hạng cân trước khi tạo bảng đấu');
             return;
         }
-
+        console.log('loz2')
+        console.log(listPlayer)
         if (listPlayer && listPlayer.length == 0) {
+            console.log('loz3')
             spawnMatches(weightRange)
         }
-        //spawnMatches(weightRange)
-        //setOpen(true);
+        console.log(listPlayer)
+        if (listPlayer.length > 0) {
+            setOpen(true);
+        } else {
+            setOpenSnackBar(true);
+            // setSnackBarStatus(false);
+            snackBarStatus = false;
+            dynamicAlert(snackBarStatus, 'Không thể tạo bảng đấu do không đủ người');
+            return;
+        }
     }
 
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
@@ -195,10 +209,10 @@ function MemberTournament() {
                         >
                             Tạo bảng đấu
                         </Button>
-                        {listPlayer && <CreatePreview
+                        {listPlayer && listPlayer.length > 0 && <CreatePreview
                             // DialogOpen={true}
                             title="Tạo bảng đấu"
-                            params={{ listPlayer }}
+                            params={{ listPlayer, tournamentId }}
                             isOpen={open}
                             handleClose={handleDialogClose}
                             onSucess={() => {
@@ -214,7 +228,7 @@ function MemberTournament() {
                                 {listWeightRange &&
                                     listWeightRange.map((range) => (
                                         <MenuItem value={range.id} key={range.id}>
-                                            {range.weightMin} - {range.weightMax} Kg
+                                            {range.gender == 0 ? "Nam: " : 'Nữ: '}  {range.weightMin} - {range.weightMax} Kg
                                         </MenuItem>
                                     ))}
                             </Select>

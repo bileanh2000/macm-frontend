@@ -1,10 +1,11 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 import React, { useState } from 'react'
 import classNames from 'classnames/bind';
 
 import styles from './CreatePreview.module.scss';
 import { Box } from '@mui/system';
 import adminTournament from 'src/api/adminTournamentAPI';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
@@ -22,6 +23,7 @@ function CreatePreview({ title, params, isOpen, handleClose, onSucess }) {
     const [matches, setMatches] = useState(__matches)
     const [dragItem, setDragItem] = useState({});
     const [dragOverItem, setDragOverItem] = useState({});
+    const navigator = useNavigate()
 
     // const findPlayer = (array, id) => {
     //     let i, j;
@@ -116,6 +118,7 @@ function CreatePreview({ title, params, isOpen, handleClose, onSucess }) {
         console.log(matches[0])
         updateListMatchsPlayer(matches[0])
         handleClose && handleClose()
+        navigator({ pathname: `/admin/tournament/${params.tournamentId}/tournamentbracket` })
 
     }
 
@@ -137,6 +140,7 @@ function CreatePreview({ title, params, isOpen, handleClose, onSucess }) {
                         '& .MuiTextField-root': { mb: 2 },
                     }}
                 >
+                    <Typography variant="body1">*Kéo thả để chỉnh sửa thứ tự thi đấu của tuyển thủ</Typography>
                     <div className={cx('theme', 'theme-dark')}>
                         <div className={cx('bracket', ' disable-image')}>
                             {matches.map((matchs, index) =>
