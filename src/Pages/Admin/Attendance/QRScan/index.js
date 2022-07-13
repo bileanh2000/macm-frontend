@@ -6,16 +6,20 @@ import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import ErrorRoundedIcon from '@mui/icons-material/ErrorRounded';
 import { Box } from '@mui/system';
+import userApi from 'src/api/userApi';
 
 function QRScanner() {
     const [attendanceMessages, setAttendanceMessages] = useState('');
     const [qrStatus, setQrStatus] = useState(true);
+    const [test, setTest] = useState('null');
     const audioPlayer = useRef(null);
 
     const takeAttendance = async (studentId, status) => {
         try {
             const response = await adminAttendanceAPI.takeAttendance(studentId, status);
+            // const response = await userApi.updateUserStatus(studentId);
             console.log('diem danh thanh cong', response);
+            setTest(response.message);
         } catch (error) {
             console.log('error at attendance', error);
         }
@@ -31,12 +35,11 @@ function QRScanner() {
                         'Điểm danh cho "' + JSONResult.studentId + ' - ' + JSONResult.studentName + '" thành công!',
                     );
                     setQrStatus(true);
+                    takeAttendance(JSONResult.studentId, 1);
                 } else {
                     setAttendanceMessages('Mã QR không hợp lệ');
                     setQrStatus(false);
                 }
-
-                takeAttendance(JSONResult.studentId, 1);
             } catch (error) {
                 setAttendanceMessages('Mã QR không hợp lệ');
                 setQrStatus(false);
@@ -86,6 +89,9 @@ function QRScanner() {
                 )}
                 <Typography sx={{ fontWeight: 500 }}>{attendanceMessages}</Typography>
             </Box>
+            <Typography variant="body1" color="initial">
+                {JSON.stringify(test)}
+            </Typography>
         </Fragment>
     );
 }

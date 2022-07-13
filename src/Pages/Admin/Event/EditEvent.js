@@ -95,14 +95,14 @@ function EditEvent() {
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
             .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
-        amountPerRegister: Yup.number()
-            .required('Không được để trống trường này')
-            .typeError('Vui lòng nhập số')
-            .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
-        totalAmount: Yup.number()
-            .required('Không được để trống trường này')
-            .typeError('Vui lòng nhập số')
-            .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
+        // amountPerRegister: Yup.number()
+        //     .required('Không được để trống trường này')
+        //     .typeError('Vui lòng nhập số')
+        //     .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
+        // totalAmount: Yup.number()
+        //     .required('Không được để trống trường này')
+        //     .typeError('Vui lòng nhập số')
+        //     .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
         startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
         finishDate: Yup.date()
             .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được bé hơn ngày bắt đầu`)
@@ -268,6 +268,7 @@ function EditEvent() {
         fetchEventSchedule(id);
         fetchEventScheduleByEventId(id);
     }, [id]);
+
     const scheduleData = scheduleList.map((item) => {
         const container = {};
         container['id'] = item.id;
@@ -278,6 +279,14 @@ function EditEvent() {
 
         return container;
     });
+
+    useEffect(() => {
+        let titleWrapper = document.querySelectorAll('.fc-event-title');
+        let content = Array.prototype.map.call(titleWrapper, (i) => i.textContent);
+        titleWrapper = Array.prototype.map.call(titleWrapper, (i, index) => i.setAttribute('title', content[index]));
+        console.log(titleWrapper);
+    });
+
     return (
         <Fragment>
             {/* <Dialog
@@ -384,7 +393,7 @@ function EditEvent() {
                                     </Grid>
                                 </LocalizationProvider>
 
-                                <Controller
+                                {/* <Controller
                                     name="totalAmount"
                                     variant="outlined"
                                     defaultValue={scheduleList[0].event.totalAmountEstimated}
@@ -409,12 +418,12 @@ function EditEvent() {
                                             fullWidth
                                         />
                                     )}
-                                />
+                                /> */}
 
                                 {/* <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
                                 Dự kiến mỗi người phải đóng: 160k
                             </Typography> */}
-                                <Controller
+                                {/* <Controller
                                     name="amountPerRegister"
                                     variant="outlined"
                                     defaultValue={scheduleList[0].event.amountPerRegisterEstimated}
@@ -439,7 +448,7 @@ function EditEvent() {
                                             fullWidth
                                         />
                                     )}
-                                />
+                                /> */}
                                 {/* <TextField
                                 id="outlined-multiline-flexible"
                                 name="description"
@@ -625,7 +634,7 @@ function EditEvent() {
                                 locale="vie"
                                 height="60%"
                                 plugins={[dayGridPlugin, interactionPlugin]}
-                                defaultView="dayGridMonth"
+                                // defaultView="dayGridMonth"
                                 events={scheduleData}
                                 weekends={true}
                                 headerToolbar={{
@@ -643,6 +652,10 @@ function EditEvent() {
             {/* ); */}
             {/* })} */}
             {/* <MemberEvent /> */}
+
+            {/* <Helmet>
+                <script src="src/Components/Common/addTitleForSchedule.js" type="text/javascript" />
+            </Helmet> */}
         </Fragment>
     );
 }

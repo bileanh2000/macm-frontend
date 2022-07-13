@@ -39,7 +39,7 @@ const CustomTooltip = () => <div>hahaha</div>;
 function MemberChart() {
     return (
         <Fragment>
-            <Typography variant="h6" color="initial">
+            <Typography variant="h6" color="initial" sx={{ mb: 3.5 }}>
                 Thống kê số lượng CTV theo kỳ
             </Typography>
             {/* <ResponsiveContainer width="100%" height="100%">

@@ -43,6 +43,7 @@
         "recharts": "^2.1.12",
         "sweetalert": "^2.1.2",
         "web-vitals": "^2.1.4",
+        "webrtc-adapter": "^8.1.1",
         "yup": "^0.32.11"
     },
     "devDependencies": {
