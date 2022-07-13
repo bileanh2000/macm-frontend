@@ -47,6 +47,7 @@ const userApi = {
     },
     updateUserStatus: (params) => {
         const url = `/admin/hr/updatestatus?semester=${params.semester}&studentId=${params.studentId}`;
+        // const url = `/admin/hr/updatestatus?semester=Summer2022&studentId=${params}`;
         // const url = `/admin/hr/updatestatus`;
         return axiosClient.put(url);
     },

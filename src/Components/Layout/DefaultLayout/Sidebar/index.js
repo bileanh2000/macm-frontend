@@ -19,6 +19,7 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import { Toolbar } from '@mui/material';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 
 const cx = classNames.bind(styles);
 
@@ -39,9 +40,9 @@ function Sidebar() {
             <Toolbar />
             <ListItem button component={Link} to="/admin">
                 <ListItemIcon>
-                    <HomeRoundedIcon />
+                    <DashboardIcon />
                 </ListItemIcon>
-                <ListItemText primary="Trang Chủ" />
+                <ListItemText primary="Dashboard" />
             </ListItem>
             <Divider />
             <ListItem button onClick={handleClick}>
