@@ -69,6 +69,7 @@ import ViewEventSchedule from 'src/Pages/Admin/Event/ViewEventSchedule';
 import EditEventSchedule from 'src/Pages/Admin/Event/EditEventSchedule';
 import ReportFacility from 'src/Pages/Admin/Facility/ReportFacility';
 import QRScanner from 'src/Pages/Admin/Attendance/QRScan';
+import CheckAttendanceDate from 'src/Pages/Admin/Attendance/QRScan/CheckAttendanceDate';
 import AddMemberToEvent from 'src/Pages/Admin/Event/MenberEvent/AddMemberToEvent';
 
 const privateRouters = [
@@ -101,7 +102,7 @@ const privateRouters = [
     { path: '/admin/attendance', component: Attendance },
     { path: '/admin/attendance/take', component: TakeAttendance },
     { path: '/admin/attendance/report', component: ReportAttendance },
-    { path: '/admin/attendance/scanqrcode', component: QRScanner, layout: HeaderOnly },
+    { path: '/admin/attendance/scanqrcode', component: CheckAttendanceDate },
 
     //Club fee paths
     { path: '/admin/clubfee', component: ClubFee },
