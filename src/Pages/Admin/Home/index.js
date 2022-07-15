@@ -15,6 +15,7 @@ import dashboardApi from 'src/api/dashboardApi';
 import FeeReport from './Charts/Fee';
 import HowToRegRoundedIcon from '@mui/icons-material/HowToRegRounded';
 import semesterApi from 'src/api/semesterApi';
+import LoadingProgress from 'src/Components/LoadingProgress';
 
 export const CustomPersentStatus = ({ persent }) => {
     let bgColor = '#ccf5e7';
@@ -110,137 +111,145 @@ function Home() {
 
     return (
         <Fragment>
-            <Typography variant="h4" color="initial" sx={{ fontWeight: 500, mb: 2 }}>
-                Dashboard
-            </Typography>
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm={12} md={4}>
-                    <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
-                        <Box>
-                            <Typography variant="button" color="initial">
-                                Tổng số thành viên
-                            </Typography>
-                            <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                {memberReport[0] && memberReport[0].totalNumberUserInSemester}
-                            </Typography>
+            {memberReport[0] ? (
+                <Fragment>
+                    <Typography variant="h4" color="initial" sx={{ fontWeight: 500, mb: 2 }}>
+                        Dashboard
+                    </Typography>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={12} md={4}>
+                            <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                <Box>
+                                    <Typography variant="button" color="initial">
+                                        Tổng số thành viên
+                                    </Typography>
+                                    <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
+                                        {memberReport[0] && memberReport[0].totalNumberUserInSemester}
+                                    </Typography>
 
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <CustomPersentStatus
-                                    persent={
-                                        memberReport[0] &&
-                                        Math.floor(
-                                            (memberReport[0].totalNumberUserInSemester /
-                                                memberReport[1].totalNumberUserInSemester) *
-                                                100 -
-                                                100,
-                                        )
-                                    }
-                                />
-                                <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
-                                    so với kỳ trước
-                                </Typography>
-                            </Box>
-                        </Box>
-                        <Avatar sx={{ bgcolor: '#ff569b', width: 48, height: 48 }}>
-                            <PeopleIcon sx={{ fontSize: '2rem' }} />
-                        </Avatar>
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} sm={12} md={4}>
-                    <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
-                        <Box>
-                            <Typography variant="button" color="initial">
-                                Số thành viên active
-                            </Typography>
-                            <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                {memberReport[0] &&
-                                    memberReport[0].numberActiveInSemester +
-                                        `/` +
-                                        memberReport[0].totalNumberUserInSemester}
-                            </Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <CustomPersentStatus
+                                            persent={
+                                                memberReport[0] &&
+                                                Math.floor(
+                                                    (memberReport[0].totalNumberUserInSemester /
+                                                        memberReport[1].totalNumberUserInSemester) *
+                                                        100 -
+                                                        100,
+                                                )
+                                            }
+                                        />
+                                        <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
+                                            so với kỳ trước
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                                <Avatar sx={{ bgcolor: '#ff569b', width: 48, height: 48 }}>
+                                    <PeopleIcon sx={{ fontSize: '2rem' }} />
+                                </Avatar>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={4}>
+                            <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                <Box>
+                                    <Typography variant="button" color="initial">
+                                        Số thành viên active
+                                    </Typography>
+                                    <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
+                                        {memberReport[0] &&
+                                            memberReport[0].numberActiveInSemester +
+                                                `/` +
+                                                memberReport[0].totalNumberUserInSemester}
+                                    </Typography>
 
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <CustomPersentStatus
-                                    persent={
-                                        memberReport[0] &&
-                                        memberReport[1] &&
-                                        Math.floor(
-                                            (memberReport[0].numberActiveInSemester /
-                                                memberReport[0].totalNumberUserInSemester /
-                                                (memberReport[1].numberActiveInSemester /
-                                                    memberReport[1].totalNumberUserInSemester)) *
-                                                100 -
-                                                100,
-                                        )
-                                    }
-                                />
-                                <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
-                                    so với kỳ trước
-                                </Typography>
-                            </Box>
-                        </Box>
-                        <Avatar sx={{ bgcolor: '#35C0DE', width: 48, height: 48 }}>
-                            <HowToRegRoundedIcon sx={{ fontSize: '2rem' }} />
-                        </Avatar>
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} sm={12} md={4}>
-                    <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
-                        <Box>
-                            <Typography variant="button" color="initial">
-                                Tổng tiền quỹ
-                            </Typography>
-                            <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                {balanceInCurrentMonth[0] && balanceInCurrentMonth[0].balance.toLocaleString()} VND
-                            </Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <CustomPersentStatus
+                                            persent={
+                                                memberReport[0] &&
+                                                memberReport[1] &&
+                                                Math.floor(
+                                                    (memberReport[0].numberActiveInSemester /
+                                                        memberReport[0].totalNumberUserInSemester /
+                                                        (memberReport[1].numberActiveInSemester /
+                                                            memberReport[1].totalNumberUserInSemester)) *
+                                                        100 -
+                                                        100,
+                                                )
+                                            }
+                                        />
+                                        <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
+                                            so với kỳ trước
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                                <Avatar sx={{ bgcolor: '#35C0DE', width: 48, height: 48 }}>
+                                    <HowToRegRoundedIcon sx={{ fontSize: '2rem' }} />
+                                </Avatar>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={4}>
+                            <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
+                                <Box>
+                                    <Typography variant="button" color="initial">
+                                        Tổng tiền quỹ
+                                    </Typography>
+                                    <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
+                                        {balanceInCurrentMonth[0] && balanceInCurrentMonth[0].balance.toLocaleString()}{' '}
+                                        VND
+                                    </Typography>
 
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <CustomPersentStatus
-                                    persent={
-                                        balanceInLastMonth[0] &&
-                                        balanceInCurrentMonth[0] &&
-                                        Math.floor(
-                                            (balanceInCurrentMonth[0].balance / balanceInLastMonth[0].balance) * 100 -
-                                                100,
-                                        )
-                                    }
-                                />
-                                <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
-                                    so với tháng trước
-                                </Typography>
-                            </Box>
-                        </Box>
-                        <Avatar sx={{ bgcolor: '#16ce8e', width: 48, height: 48 }}>
-                            <AttachMoneyRoundedIcon sx={{ fontSize: '2rem' }} />
-                        </Avatar>
-                    </Paper>
-                </Grid>
-            </Grid>
-            <Grid container spacing={2} sx={{ mt: 0.5 }}>
-                <Grid item xs={12} md={9} order={{ xs: 2, md: 1 }}>
-                    <Paper elevation={2} sx={{ padding: '16px' }}>
-                        <Attendance />
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} md={3} order={{ xs: 1, md: 2 }}>
-                    <Paper elevation={2} sx={{ padding: '16px' }}>
-                        <UpNext />
-                    </Paper>
-                </Grid>
-            </Grid>
-            <Grid container spacing={2} sx={{ mt: 0.5 }}>
-                <Grid item xs={12} md={6}>
-                    <Paper elevation={2} sx={{ padding: '16px' }}>
-                        <MemberChart />
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                    <Paper elevation={2} sx={{ padding: '16px' }}>
-                        <FeeReport />
-                    </Paper>
-                </Grid>
-            </Grid>
-            <Grid container spacing={2} sx={{ mt: 0.5 }}></Grid>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <CustomPersentStatus
+                                            persent={
+                                                balanceInLastMonth[0] &&
+                                                balanceInCurrentMonth[0] &&
+                                                Math.floor(
+                                                    (balanceInCurrentMonth[0].balance / balanceInLastMonth[0].balance) *
+                                                        100 -
+                                                        100,
+                                                )
+                                            }
+                                        />
+                                        <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
+                                            so với tháng trước
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                                <Avatar sx={{ bgcolor: '#16ce8e', width: 48, height: 48 }}>
+                                    <AttachMoneyRoundedIcon sx={{ fontSize: '2rem' }} />
+                                </Avatar>
+                            </Paper>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                        <Grid item xs={12} md={9} order={{ xs: 2, md: 1 }}>
+                            <Paper elevation={2} sx={{ padding: '16px' }}>
+                                <Attendance />
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={3} order={{ xs: 1, md: 2 }}>
+                            <Paper elevation={2} sx={{ padding: '16px' }}>
+                                <UpNext />
+                            </Paper>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                        <Grid item xs={12} md={6}>
+                            <Paper elevation={2} sx={{ padding: '16px' }}>
+                                <MemberChart />
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <Paper elevation={2} sx={{ padding: '16px' }}>
+                                <FeeReport />
+                            </Paper>
+                        </Grid>
+                    </Grid>
+                    <Grid container spacing={2} sx={{ mt: 0.5 }}></Grid>
+                </Fragment>
+            ) : (
+                <LoadingProgress />
+            )}
         </Fragment>
     );
 }

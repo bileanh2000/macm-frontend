@@ -20,6 +20,14 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import { Toolbar } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
+import ContactPageIcon from '@mui/icons-material/ContactPage';
+import PaidIcon from '@mui/icons-material/Paid';
+import RuleIcon from '@mui/icons-material/Rule';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import FeedIcon from '@mui/icons-material/Feed';
+import CelebrationIcon from '@mui/icons-material/Celebration';
 
 function Sidebar() {
     const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -107,7 +115,7 @@ function Sidebar() {
                 onClick={(event) => handleListItemClick(event, 4)}
             >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <CalendarMonthIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Lịch Tập" />
             </ListItem>
@@ -120,7 +128,7 @@ function Sidebar() {
                 onClick={(event) => handleListItemClick(event, 5)}
             >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <HowToRegIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Điểm danh" />
             </ListItem>
@@ -133,7 +141,7 @@ function Sidebar() {
                 onClick={(event) => handleListItemClick(event, 6)}
             >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <ContactPageIcon />
                 </ListItemIcon>
                 <ListItemText primary="Trang Liên Hệ" />
             </ListItem>
@@ -146,7 +154,7 @@ function Sidebar() {
                 onClick={(event) => handleListItemClick(event, 7)}
             >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <PaidIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Chi Phí CLB" />
             </ListItem>
@@ -159,7 +167,7 @@ function Sidebar() {
                 onClick={(event) => handleListItemClick(event, 8)}
             >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <RuleIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Nội Quy" />
             </ListItem>
@@ -173,7 +181,7 @@ function Sidebar() {
                 onClick={(event) => handleListItemClick(event, 9)}
             >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <EmojiEventsIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Giải Đấu" />
             </ListItem>
@@ -186,7 +194,7 @@ function Sidebar() {
                 onClick={(event) => handleListItemClick(event, 10)}
             >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <FeedIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Tin Tức" />
             </ListItem>
@@ -199,7 +207,7 @@ function Sidebar() {
                 onClick={(event) => handleListItemClick(event, 11)}
             >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <CelebrationIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Sự Kiện" />
             </ListItem>

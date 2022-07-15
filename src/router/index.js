@@ -73,7 +73,6 @@ import CheckAttendanceDate from 'src/Pages/Admin/Attendance/QRScan/CheckAttendan
 import AddMemberToEvent from 'src/Pages/Admin/Event/MenberEvent/AddMemberToEvent';
 
 const privateRouters = [
-    { path: '/', component: LoginPage, layout: null },
     { path: '/:userId', component: UserProfile, layout: HeaderOnly },
     { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
     { path: '/home', component: Home, layout: HeaderOnly },
@@ -158,8 +157,10 @@ const privateRouters = [
     // Facility paths
     { path: '/admin/facility', component: Facility },
     { path: '/admin/facility/reports', component: ReportFacility },
+    //Login
+    { path: '/', component: LoginPage, layout: null },
 ];
 
-const publicRouters = [];
+const publicRouters = [{ path: '/', component: LoginPage, layout: null }];
 
 export { privateRouters, publicRouters };

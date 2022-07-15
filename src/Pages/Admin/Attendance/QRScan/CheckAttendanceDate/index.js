@@ -1,8 +1,11 @@
+import { Box } from '@mui/system';
 import moment from 'moment';
-import { useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
 import { useState } from 'react';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
+import CircularProgress from '@mui/material/CircularProgress';
 import QRScanner from '../index';
+import LoadingProgress from 'src/Components/LoadingProgress';
 
 function CheckAttendanceDate() {
     const [attendanceDateStatus, setAttendanceDateStatus] = useState(false);
@@ -24,7 +27,20 @@ function CheckAttendanceDate() {
     useEffect(() => {
         fetchCommonScheduleByDate(currentDate);
     });
-    return attendanceDateStatus ? <QRScanner /> : 'Hôm nay đéo có hoạt động cần điểm danh nhé nhé';
+    return (
+        // <Box sx={{ display: 'flex', height: '100%', width: '100wh', alignItems: 'center', justifyContent: 'center' }}>
+        <Fragment>
+            <Box>
+                {!attendanceDateStatus ? (
+                    <LoadingProgress />
+                ) : attendanceDateStatus ? (
+                    <QRScanner />
+                ) : (
+                    'Hôm nay không có hoạt động cần điểm danh!'
+                )}
+            </Box>
+        </Fragment>
+    );
 }
 
 export default CheckAttendanceDate;

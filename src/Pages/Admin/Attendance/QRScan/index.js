@@ -9,15 +9,25 @@ import { Box } from '@mui/system';
 import userApi from 'src/api/userApi';
 import { useSnackbar } from 'notistack';
 import moment from 'moment';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+
+const LIMIT_DATE = 1; //day
+const TIME_OUT = 10000; //ms
 
 function QRScanner() {
     const { enqueueSnackbar } = useSnackbar();
     const [attendanceMessages, setAttendanceMessages] = useState('');
     const [qrStatus, setQrStatus] = useState(true);
+    const [isSessionTime, setIsSessionTime] = useState(true);
     const [test, setTest] = useState('null');
     const audioPlayer = useRef(null);
-    const currentDate = new Date();
+    const now = new Date();
     const [tabHasFocus, setTabHasFocus] = useState(true);
+
+    const handleClickVariant = (message, variant) => () => {
+        // variant could be success, error, warning, info, or default
+        enqueueSnackbar(message, { variant });
+    };
 
     useEffect(() => {
         const handleFocus = () => {
@@ -28,6 +38,7 @@ function QRScanner() {
         const handleBlur = () => {
             console.log('Tab lost focus');
             setTabHasFocus(false);
+            // handleClickVariant('chuyển quả thẻ này để quét QR code', 'warning');
         };
 
         window.addEventListener('focus', handleFocus);
@@ -38,20 +49,61 @@ function QRScanner() {
             window.removeEventListener('blur', handleBlur);
         };
     }, []);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsSessionTime(false);
+            console.log('Initial timeout!');
+        }, TIME_OUT);
 
-    const handleClickVariant = (variant) => () => {
-        // variant could be success, error, warning, info, or default
-        enqueueSnackbar('Diem danh cho HE141277 - Lê Anh Tuấn Thanh Cong', { variant });
-        setTest('hahahaahahahah');
+        return () => clearTimeout(timer);
+    }, []);
+
+    const reload = () => {
+        window.location.reload();
     };
-
     const takeAttendance = async (studentId, status) => {
         try {
             const response = await adminAttendanceAPI.takeAttendance(studentId, status);
             // const response = await userApi.updateUserStatus(studentId);
+
+            let localData = [];
+            let setupTime = localStorage.getItem('setupTime');
+            if (setupTime == null) {
+                localStorage.setItem('setupTime', now);
+            } else {
+                if (now - setupTime > LIMIT_DATE) {
+                    localStorage.clear();
+                    localStorage.setItem('setupTime', now);
+                }
+            }
+
+            localData = JSON.parse(localStorage.getItem('attendanced')) || [];
+            if (localData.length === 0) {
+                localData.push(response.data[0]);
+            } else {
+                localData.map((item) => {
+                    if (item.studentId !== response.data[0].studentId) {
+                        return localData.push(response.data[0]);
+                    } else {
+                        return 0;
+                    }
+                });
+            }
+
+            localStorage.setItem('attendanced', JSON.stringify(localData));
+
+            if (response.data.length !== 0) {
+                enqueueSnackbar(
+                    'Điểm danh cho ' + response.data[0].studentId + ' - ' + response.data[0].name + ' thành công',
+                    {
+                        variant: 'success',
+                    },
+                );
+            }
+            console.log('data', localData);
             console.log('diem danh thanh cong', response);
-            handleClickVariant('success');
-            // setTest(response.message);
+
+            setTest(response.data);
         } catch (error) {
             console.log('error at attendance', error);
         }
@@ -62,50 +114,92 @@ function QRScanner() {
             audioPlayer.current.play();
             try {
                 let JSONResult = JSON.parse(result?.text);
+                let attendancedLocal = JSON.parse(localStorage.getItem('attendanced')) || [];
 
-                if (JSONResult.studentId !== undefined) {
-                    handleClickVariant('success');
+                let checkStudentId = attendancedLocal.filter(
+                    (value, index, self) => index === self.findIndex((t) => t.studentId === value.studentId),
+                );
+                if (attendancedLocal.filter((item) => item.studentId === JSONResult.studentId).length !== 0) {
+                    checkStudentId.filter((item) => {
+                        if (item.studentId === JSONResult.studentId) {
+                            console.log('da diem danh: ', item.studentId);
+                            enqueueSnackbar(item.studentId + ' - ' + item.name + ' đã được điểm danh!', {
+                                variant: 'warning',
+                                preventDuplicate: true,
+                            });
+                        }
+                    });
 
-                    // setAttendanceMessages(
-                    //     'Điểm danh cho "' + JSONResult.studentId + ' - ' + JSONResult.studentName + '" thành công!',
-                    // );
-
-                    // setQrStatus(true);
-                    // takeAttendance(JSONResult.studentId, 1);
+                    // setTest('Đã điểm danh cho thằng ' + JSONResult.studentId + 'rồi!');
+                } else if (JSONResult.studentId !== undefined) {
+                    takeAttendance(JSONResult.studentId, 1);
                 } else {
-                    setAttendanceMessages('Mã QR không hợp lệ');
-                    setQrStatus(false);
+                    enqueueSnackbar('Mã QR không hợp hệ', {
+                        variant: 'error',
+                    });
                 }
             } catch (error) {
-                setAttendanceMessages('Mã QR không hợp lệ');
-                setQrStatus(false);
+                enqueueSnackbar('Mã QR không hợp lệ error' + error, {
+                    variant: 'error',
+                });
+                console.log(error);
+                // setAttendanceMessages('Mã QR không hợp lệ');
+                // setQrStatus(false);
             }
         }
         if (!!error) {
             console.info(error);
         }
     };
+
+    const handleReset = () => {
+        reload();
+    };
     return (
         <Fragment>
+            <Dialog
+                open={!isSessionTime}
+                onClose={handleReset}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Hết thời gian sử dụng</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Reset lại tab này để tiếp tục quét QRCode
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleReset}>Reset</Button>
+                </DialogActions>
+            </Dialog>
             <Typography variant="h6" color="initial" sx={{ lineHeight: 1 }}>
-                Điểm danh cho buổi tập ngày: {moment(currentDate).format('DD/MM/YYYY')}
+                Điểm danh cho buổi tập ngày: {moment(now).format('DD/MM/YYYY')}
             </Typography>
-            {tabHasFocus ? <h2>focus ✅</h2> : <h2>does not focus ⛔️</h2>}
-            <button onClick={handleClickVariant('success')}>hien len di dmm</button>
+            <button onClick={handleClickVariant('hehehe', 'success')}>hien len di dmm</button>
 
             <audio ref={audioPlayer} src={qrSuccessSound} />
-            {tabHasFocus ? (
-                <QrReader
-                    constraints={{
-                        facingMode: 'environment',
-                    }}
-                    onResult={(result, error) => {
-                        onQrSuccess(result, error);
-                    }}
-                    style={{ width: '100%' }}
-                />
+            {isSessionTime ? (
+                tabHasFocus ? (
+                    <QrReader
+                        scanDelay={2000}
+                        constraints={{
+                            facingMode: 'environment',
+                        }}
+                        onResult={(result, error) => {
+                            onQrSuccess(result, error);
+                        }}
+                        style={{ width: '100%' }}
+                    />
+                ) : (
+                    <Typography variant="h5" color="initial">
+                        Chuyển sang thẻ này để quét QRCode
+                    </Typography>
+                )
             ) : (
-                ''
+                <Typography variant="h5" color="initial">
+                    Hết thời gian sử dụng, vui lòng reset lại tab này
+                </Typography>
             )}
 
             <Box

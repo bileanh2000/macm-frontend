@@ -1,14 +1,15 @@
 import { Routes, Route } from 'react-router-dom';
-import { privateRouters } from './router';
+import { privateRouters, publicRouters } from './router';
 import { DefaultLayout } from './Components/Layout';
 import { useEffect, useState, Fragment } from 'react';
 import productApi from './api/axiosClient';
 import { SnackbarProvider } from 'notistack';
+import Login from './Pages/Login';
 
 function App() {
-    // addTitleForSchedule();
+    const [login, setLogin] = useState({ authenticated: true, currentUser: null });
     return (
-        <SnackbarProvider maxSnack={5} autoHideDuration={5000}>
+        <SnackbarProvider maxSnack={4} autoHideDuration={5000} preventDuplicate>
             <div className="App">
                 <Routes>
                     {privateRouters.map((route, index) => {
