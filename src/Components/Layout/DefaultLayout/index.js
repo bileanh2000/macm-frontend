@@ -241,6 +241,7 @@ function DefaultLayout({ children }) {
                     flexGrow: 1,
                     p: 3,
                     width: { sm: `calc(100% - ${drawerWidth}px)` },
+                    position: 'relative',
                 }}
             >
                 <Toolbar />
