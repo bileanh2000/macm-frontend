@@ -21,7 +21,7 @@ import adminTournamentAPI from 'src/api/adminTournamentAPI';
 
 let snackBarStatus;
 
-function AddAdminTourament() {
+function AddAdminTourament({ value, index }) {
     let { tournamentId } = useParams();
     const [pageSize, setPageSize] = useState(10);
     const [userList, setUserList] = useState([]);
@@ -69,31 +69,27 @@ function AddAdminTourament() {
     }, [tournamentId]);
 
     const columns = [
-        { field: 'studentName', headerName: 'Tên', flex: 0.5 },
+        { field: 'studentName', headerName: 'Tên', flex: 0.8 },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
-            width: 150,
-            flex: 0.5,
+            flex: 0.6,
         },
         {
             field: 'roleInTournament',
             headerName: 'Vai trò mong muốn trong ban tổ chức',
-            width: 150,
-            flex: 0.8,
+            flex: 1,
         },
 
         {
             field: 'registerStatus',
             headerName: `Trạng thái`,
-            width: 150,
             flex: 0.5,
         },
         {
             field: 'actions',
             type: 'actions',
-            width: 100,
-            flex: 0.5,
+            flex: 1,
             cellClassName: 'actions',
             getActions: (params) => {
                 return [
@@ -180,7 +176,7 @@ function AddAdminTourament() {
         setUserList(newUser);
 
         handleCloseDialog();
-        navigate(-1);
+        // navigate(-1);
     };
     const CustomToolbar = () => {
         return (
@@ -198,7 +194,12 @@ function AddAdminTourament() {
     };
 
     return (
-        <div>
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+        >
             <Dialog
                 open={openDialog}
                 onClose={handleCloseDialog}
@@ -231,9 +232,6 @@ function AddAdminTourament() {
                     {customAlert.message}
                 </Alert>
             </Snackbar>
-            <Typography variant="h4" sx={{ mb: 3 }}>
-                Xét duyệt thành viên vào ban tổ chức giải đấu
-            </Typography>
             {active > 0 && total > 0 && (
                 <Typography variant="body1" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                     Số lượng thành viên trong ban tổ chức: {active}/{total}

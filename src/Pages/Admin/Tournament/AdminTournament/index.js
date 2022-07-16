@@ -1,15 +1,31 @@
-import { Box, Button, FormControl, Grid, MenuItem, Select, Typography } from '@mui/material';
+import { Box, Button, FormControl, Grid, MenuItem, Select, Tab, Tabs, Typography } from '@mui/material';
 import React, { Fragment, useState } from 'react';
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
+import AddAdminTourament from './AddAdminTourament';
 import AdminList from './AdminList';
+import UpdateAdminTournament from './UpdateAdminTournament';
+
+function a11yProps(index) {
+    return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`,
+    };
+}
 
 function AdminTournament() {
     let { tournamentId } = useParams();
     const [adminList, setAdminList] = useState([]);
     const [active, setActive] = useState(-1);
     const [total, setTotal] = useState(-1);
+    const [updateRoleDialog, setUpdateRoleDialog] = useState(false);
+    const [addAdminDialog, setAddAdminDialog] = useState(false);
+    const [value, setValue] = React.useState(0);
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
 
     const fetchAdminInTournament = async (params) => {
         try {
@@ -30,42 +46,18 @@ function AdminTournament() {
 
     return (
         <Fragment>
-            <Grid container spacing={2} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Grid item xs={6}>
-                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                        Danh sách thành viên ban tổ chức
-                    </Typography>
-                    {active > 0 && total > 0 && (
-                        <Typography variant="body2">
-                            Số lượng thành viên trong ban tổ chức: {active}/{total}
-                        </Typography>
-                    )}
-                </Grid>
-                <Grid item xs={6} container>
-                    <Grid item xs={6}>
-                        {' '}
-                        <Button
-                            variant="outlined"
-                            component={Link}
-                            to={`/admin/tournament/${tournamentId}/admin/update`}
-                            sx={{ mr: 2 }}
-                        >
-                            Cập nhật vai trò thành viên ban tổ chức
-                        </Button>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Button
-                            variant="outlined"
-                            component={Link}
-                            to={`/admin/tournament/${tournamentId}/admin/addadmin`}
-                            sx={{ mr: 2 }}
-                        >
-                            Xét duyệt thành viên vào ban tổ chức
-                        </Button>
-                    </Grid>
-                </Grid>
-            </Grid>
-            <AdminList data={adminList} />
+            <Box sx={{ width: '100%' }}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                        <Tab label="Danh sách ban tổ chức" {...a11yProps(0)} />
+                        <Tab label="Cập nhật vai trò" {...a11yProps(1)} />
+                        <Tab label="Xét duyệt yêu cầu tham gia" {...a11yProps(2)} />
+                    </Tabs>
+                </Box>
+                <AdminList data={adminList} active={active} total={total} value={value} index={0} />
+                <UpdateAdminTournament value={value} index={1} />
+                <AddAdminTourament value={value} index={2} />
+            </Box>
         </Fragment>
     );
 }

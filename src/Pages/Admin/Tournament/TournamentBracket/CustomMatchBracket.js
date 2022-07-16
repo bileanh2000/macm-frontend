@@ -1,4 +1,3 @@
-
 import React, { Fragment, useState } from 'react';
 import classNames from 'classnames/bind';
 import * as Yup from 'yup';
@@ -29,7 +28,6 @@ import styles from '../TournamentBracket/CustomMatchBracket.module.scss';
 
 const cx = classNames.bind(styles);
 
-
 const findPlayer = (array, id) => {
     let i, j;
     let player;
@@ -44,15 +42,15 @@ const findPlayer = (array, id) => {
 };
 
 function CustomMatchBracket(params) {
-    console.log(params)
+    console.log(params);
     // const [matches, setMatches] = useState(_matches);
     let i;
     let __matches = [];
     for (i = 1; i <= params.rounds; i++) {
-        const round = params.matches.filter(match => match.round == i)
+        const round = params.matches.filter((match) => match.round == i);
         __matches.push(round);
     }
-    console.log(__matches)
+    console.log(__matches);
 
     const [dragItem, setDragItem] = useState({});
     const [dragOverItem, setDragOverItem] = useState({});
@@ -97,7 +95,7 @@ function CustomMatchBracket(params) {
     // };
 
     const handleClickResult = (e, data) => {
-        console.log(data)
+        console.log(data);
         if (data.firstStudentId == null || data.secondStudentId == null) {
             return;
         }
@@ -156,12 +154,12 @@ function CustomMatchBracket(params) {
 
     const updateRedsult = async (params) => {
         try {
-            await adminTournament.updateResultMatch(params)
+            await adminTournament.updateResultMatch(params);
         } catch (error) {
-            console.log('khong the cap nhat ket quá')
+            console.log('khong the cap nhat ket quá');
         }
-    }
-    console.log('reload')
+    };
+    console.log('reload');
     const handleUpdate = (data) => {
         console.log(data);
         if (data.score1 == data.score2) {
@@ -172,22 +170,21 @@ function CustomMatchBracket(params) {
                 message: 'Điểm 2 người chơi không được bằng nhau',
             });
         } else {
-            match.firstPoint = data.score1
-            match.secondPoint = data.score2
+            match.firstPoint = data.score1;
+            match.secondPoint = data.score2;
             console.log(match);
             console.log(__matches);
             var merged = [].concat.apply([], __matches);
             console.log(merged);
-            params.onUpdareResult(merged)
-            setMatch(match)
-            updateRedsult(match)
+            params.onUpdareResult(merged);
+            setMatch(match);
+            updateRedsult(match);
             setOpen(false);
             reset({
                 score1: -1,
                 score2: -1,
             });
         }
-
     };
 
     const handleChange = (score, event) => {
@@ -280,8 +277,10 @@ function CustomMatchBracket(params) {
                                 score2 > 0 &&
                                 (score1 > score2 ? (
                                     <Typography>Nguời chiến thắng: {match.firstName} </Typography>
+                                ) : score1 < score2 ? (
+                                    <Typography>Nguời chiến thắng: {match.secondName} </Typography>
                                 ) : (
-                                    score1 < score2 ? <Typography>Nguời chiến thắng: {match.secondName} </Typography> : ''
+                                    ''
                                 ))}
                         </DialogContent>
                         <DialogActions>
@@ -294,9 +293,9 @@ function CustomMatchBracket(params) {
             <Typography variant="caption">*Chọn vào 1 cặp trận để cập nhật tỉ số</Typography>
             <div className={cx('theme', 'theme-dark')}>
                 <div className={cx('bracket', ' disable-image')}>
-                    {__matches.map((matchs, index) =>
+                    {__matches.map((matchs, index) => (
                         <div className={cx('column')} key={index}>
-                            {matchs.map(match =>
+                            {matchs.map((match) => (
                                 <div
                                     className={cx('match', 'winner-bottom', 'winner-top')}
                                     key={match.id}
@@ -304,15 +303,15 @@ function CustomMatchBracket(params) {
                                 >
                                     <div className={cx('match-top', 'team')}>
                                         <span className={cx('image')}></span>
-                                        <span className={cx('seed')}>{match.firstStudentId}</span>
-                                        <span className={cx('name')}>{match.firstName}</span>
-                                        <span className={cx('score')}>{match.firstPoint}</span>
+                                        <span className={cx('seed')}>{match.firstPlayer?.studentId}</span>
+                                        <span className={cx('name')}>{match.firstPlayer?.studentName}</span>
+                                        <span className={cx('score')}>{match.firstPlayer?.point}</span>
                                     </div>
                                     <div className={cx('match-bottom', 'team')}>
                                         <span className={cx('image')}></span>
-                                        <span className={cx('seed')}>{match.secondStudentId}</span>
-                                        <span className={cx('name')}>{match.secondName}</span>
-                                        <span className={cx('score')}>{match.secondPoint}</span>
+                                        <span className={cx('seed')}>{match.secondPlayer?.studentId}</span>
+                                        <span className={cx('name')}>{match.secondPlayer?.studentName}</span>
+                                        <span className={cx('score')}>{match.secondPlayer?.point}</span>
                                     </div>
                                     <div className={cx('match-lines')}>
                                         <div className={cx('line', 'one')}></div>
@@ -322,9 +321,9 @@ function CustomMatchBracket(params) {
                                         <div className={cx('line', 'one')}></div>
                                     </div>
                                 </div>
-                            )}
+                            ))}
                         </div>
-                    )}
+                    ))}
 
                     {/* <div className={cx('column')}>
                         {__matches[1].map((match, index) => (
@@ -415,8 +414,8 @@ function CustomMatchBracket(params) {
                         ))}
                     </div> */}
                 </div>
-            </div >
-        </Fragment >
+            </div>
+        </Fragment>
     );
 }
 
