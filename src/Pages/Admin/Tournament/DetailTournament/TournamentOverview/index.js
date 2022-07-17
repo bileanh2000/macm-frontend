@@ -82,13 +82,13 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index }) {
                         </Grid>
                         <Grid container columns={12} sx={{ mb: 2 }} spacing={2}>
                             <Grid item xs={4}>
-                                {/* <Paper elevation={3}>
+                                <Paper elevation={3}>
                                     {tournament.competitiveTypes.length > 0 && (
                                         <TableContainer sx={{ maxHeight: 440 }}>
                                             <Typography variant="body1">
                                                 <strong>Thi đấu đối kháng: </strong>
                                             </Typography>
-                                            <TableContainer aria-label="sticky table">
+                                            <Table stickyHeader aria-label="sticky table">
                                                 <TableHead>
                                                     <TableRow>
                                                         <StyledTableCell align="center">Giới tính</StyledTableCell>
@@ -107,10 +107,10 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index }) {
                                                         </StyledTableRow>
                                                     ))}
                                                 </TableBody>
-                                            </TableContainer>
+                                            </Table>
                                         </TableContainer>
                                     )}
-                                </Paper> */}
+                                </Paper>
                             </Grid>
                             <Grid item xs={8}>
                                 <Paper elevation={3}>
