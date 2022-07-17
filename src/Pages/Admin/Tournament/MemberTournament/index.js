@@ -1,17 +1,12 @@
 import { Alert, Box, Button, FormControl, MenuItem, Select, Snackbar, Typography } from '@mui/material';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import adminTournament from 'src/api/adminTournamentAPI';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
-import CreatePreview from './CreatePreview';
 import MemberList from './MemberList';
 
-
 function MemberTournament() {
-    let snackBarStatus;
     let { tournamentId } = useParams();
     const [type, setType] = useState(1);
-    const [open, setOpen] = useState(false);
     const [competitivePlayer, setCompetitivePlayer] = useState([]);
     const [exhibitionTeam, setExhibitionTeam] = useState([]);
     const [weightRange, setWeightRange] = useState(0);
@@ -19,7 +14,6 @@ function MemberTournament() {
     const [listWeightRange, setListWeightRange] = useState([]);
     const [listExhibitionType, setListExhibitionType] = useState([]);
     const [openSnackBar, setOpenSnackBar] = useState(false);
-    const [listPlayer, setListPlayer] = useState()
 
     const handleChangeType = (event) => {
         setType(event.target.value);
@@ -32,7 +26,6 @@ function MemberTournament() {
 
     const handleChangeWeight = (event) => {
         setWeightRange(event.target.value);
-        getListPlayerByCompetitiveID(event.target.value);
         let range;
         if (event.target.value === 0) {
             range = { weightMax: 0, weightMin: 0 };
@@ -66,9 +59,8 @@ function MemberTournament() {
 
     const fetchTournamentById = async (tournamentId) => {
         try {
-
             const response = await adminTournamentAPI.getAllCompetitiveType(tournamentId);
-            console.log(response.data[0])
+            console.log(response.data[0]);
             setListWeightRange(response.data[0]);
             setWeightRange(response.data[0][0].id);
         } catch (error) {
@@ -100,91 +92,8 @@ function MemberTournament() {
         fetchExhibitionType(tournamentId);
     }, [type]);
 
-    const getListPlayerByCompetitiveID = async (weightRange) => {
-        try {
-            const response = await adminTournament.previewMatchsPlayer(weightRange);
-            console.log(response.data)
-            setListPlayer(response.data)
-        } catch (error) {
-            console.log('Failed to fetch match: ', error);
-        }
-    }
-
-    const spawnMatches = async (weightRange) => {
-        try {
-            await adminTournament.spawnMatchs(weightRange);
-            getListPlayerByCompetitiveID(weightRange)
-            // setListPlayer(response.data)
-        } catch (error) {
-            console.log('Failed to fetch match: ', error);
-        }
-    }
-
-    const handleDialogClose = () => {
-        setOpen(false);
-    };
-
-    const handleDialogOpen = () => {
-        if (weightRange == 0) {
-            console.log('loz1')
-            setOpenSnackBar(true);
-            // setSnackBarStatus(false);
-            snackBarStatus = false;
-            dynamicAlert(snackBarStatus, 'Vui lòng chọn hạng cân trước khi tạo bảng đấu');
-            return;
-        }
-        console.log('loz2')
-        console.log(listPlayer)
-        if (listPlayer && listPlayer.length == 0) {
-            console.log('loz3')
-            spawnMatches(weightRange)
-        }
-        console.log(listPlayer)
-        if (listPlayer.length > 0) {
-            setOpen(true);
-        } else {
-            setOpenSnackBar(true);
-            // setSnackBarStatus(false);
-            snackBarStatus = false;
-            dynamicAlert(snackBarStatus, 'Không thể tạo bảng đấu do không đủ người');
-            return;
-        }
-    }
-
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpenSnackBar(false);
-    };
     return (
         <Fragment>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={3000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                     Danh sách thành viên tham gia
@@ -200,40 +109,27 @@ function MemberTournament() {
                 </FormControl>
                 {type === 1 ? (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                        <Button
-                            variant="outlined"
-                            // component={Link}
-                            // to={`/admin/tournament/${tournamentId}/tournamentbracket`}
-                            // sx={{ mr: 2 }}
-                            onClick={handleDialogOpen}
-                        >
-                            Tạo bảng đấu
-                        </Button>
-                        {listPlayer && listPlayer.length > 0 && <CreatePreview
-                            // DialogOpen={true}
-                            title="Tạo bảng đấu"
-                            params={{ listPlayer, tournamentId }}
-                            isOpen={open}
-                            handleClose={handleDialogClose}
-                            onSucess={() => {
-                                setOpen(false);
-                            }}
-                        />}
                         <FormControl size="small">
                             <Typography variant="caption">Hạng cân</Typography>
-                            <Select id="demo-simple-select" value={weightRange} displayEmpty onChange={handleChangeWeight}>
+                            <Select
+                                id="demo-simple-select"
+                                value={weightRange}
+                                displayEmpty
+                                onChange={handleChangeWeight}
+                            >
                                 <MenuItem value={0}>
                                     <em>Tất cả</em>
                                 </MenuItem>
                                 {listWeightRange &&
                                     listWeightRange.map((range) => (
                                         <MenuItem value={range.id} key={range.id}>
-                                            {range.gender == 0 ? "Nam: " : 'Nữ: '}  {range.weightMin} - {range.weightMax} Kg
+                                            {range.gender == 0 ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax}{' '}
+                                            Kg
                                         </MenuItem>
                                     ))}
                             </Select>
-                        </FormControl></Box>
-
+                        </FormControl>
+                    </Box>
                 ) : (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
                         <FormControl size="small">

@@ -1,4 +1,3 @@
-
 // https://fakestoreapi.com/docs
 
 import axiosClient from './axiosClient';
@@ -96,7 +95,7 @@ const adminTournament = {
 
     updateTournamentOrganizingCommitteeRole: (params) => {
         const url = `/tournament/headclub/updatetournamentorganizingcommitteerole`;
-        return axiosClient.get(url, params);
+        return axiosClient.put(url, params);
     },
 
     getAllExhibitionType: (tournamentId) => {
@@ -197,7 +196,6 @@ const adminTournament = {
     updateListMatchsPlayer: (params) => {
         const url = `/competitive/headclub/updatelistmatchsplayer`;
         return axiosClient.put(url, params);
-    }
+    },
 };
 export default adminTournament;
-

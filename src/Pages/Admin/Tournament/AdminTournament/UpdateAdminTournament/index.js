@@ -21,7 +21,7 @@ import adminTournamentAPI from 'src/api/adminTournamentAPI';
 
 let snackBarStatus;
 
-function UpdateAdminTournament() {
+function UpdateAdminTournament({ value, index }) {
     let { tournamentId } = useParams();
     let navigate = useNavigate();
 
@@ -66,10 +66,11 @@ function UpdateAdminTournament() {
                 setOpenSnackBar(true);
                 snackBarStatus = true;
                 dynamicAlert(snackBarStatus, res.message);
-                setTimeout(navigate(-1), 3000);
+                // setTimeout(navigate(-1), 3000);
             }
         });
-        navigate(-1);
+        setOpenDialog(false);
+        // navigate(-1);
     };
 
     const fetchAdminInTournament = async (params) => {
@@ -166,7 +167,12 @@ function UpdateAdminTournament() {
     };
 
     return (
-        <div>
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+        >
             <Dialog
                 open={openDialog}
                 onClose={handleCloseDialog}
@@ -199,8 +205,8 @@ function UpdateAdminTournament() {
                     {customAlert.message}
                 </Alert>
             </Snackbar>
-            <Typography variant="h4" sx={{ mb: 3 }}>
-                Cập nhật vai trò thành viên trong sự kiện
+            <Typography variant="caption" sx={{ mb: 3 }}>
+                Bấm vào vai trò của từng người để chỉnh sửa
             </Typography>
             <p></p>
             <Box
