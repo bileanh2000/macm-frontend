@@ -158,9 +158,11 @@ const privateRouters = [
     { path: '/admin/facility', component: Facility },
     { path: '/admin/facility/reports', component: ReportFacility },
     //Login
-    { path: '/', component: LoginPage, layout: null },
+    // { path: '/', component: LoginPage, layout: null },
 ];
 
-const publicRouters = [{ path: '/', component: LoginPage, layout: null }];
+const publicRouters = [
+    // { path: '/', component: LoginPage, layout: null }
+];
 
 export { privateRouters, publicRouters };

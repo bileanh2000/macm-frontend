@@ -24,7 +24,7 @@ import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
 
 const cx = classNames.bind(styles);
 const drawerWidth = 270;
-function DefaultLayout({ children }) {
+function DefaultLayout({ children, onLogout }) {
     // const { window } = props;
     const [mobileOpen, setMobileOpen] = React.useState(false);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -38,33 +38,7 @@ function DefaultLayout({ children }) {
         setAnchorElUser(null);
     };
     // const container = window !== undefined ? () => window().document.body : undefined;
-    const drawer = (
-        <div>
-            <Toolbar />
-            <Divider />
-            <List>
-                {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                    <ListItem key={text} disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-            </List>
-            <Divider />
-            <List>
-                {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                    <ListItem key={text} disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-            </List>
-        </div>
-    );
+
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -191,7 +165,7 @@ function DefaultLayout({ children }) {
                                 <MenuItem onClick={handleCloseUserMenu}>
                                     <Typography textAlign="center">hehe</Typography>
                                 </MenuItem>
-                                <MenuItem onClick={handleCloseUserMenu}>
+                                <MenuItem onClick={onLogout}>
                                     <Typography textAlign="center">Đăng xuất</Typography>
                                 </MenuItem>
                             </Menu>

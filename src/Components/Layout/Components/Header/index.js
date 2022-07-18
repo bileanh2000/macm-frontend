@@ -1,4 +1,3 @@
-
 import classNames from 'classnames/bind';
 import * as React from 'react';
 import styles from './Header.module.scss';
@@ -9,24 +8,21 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import Tooltip from '@mui/material/Tooltip';
 import AppBar from '@mui/material/AppBar';
-
-import Settings from '@mui/icons-material/Settings';
-import Logout from '@mui/icons-material/Logout';
-
 import Toolbar from '@mui/material/Toolbar';
 import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
+import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { ListItemIcon, ListItemText } from '@mui/material';
 
 const cx = classNames.bind(styles);
 
 const pages = ['1', '2', '3'];
 const settings = ['Tài khoản', 'Đăng xuất'];
 
-function Header() {
+function Header({ onLogout }) {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -159,11 +155,18 @@ function Header() {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-                                {settings.map((setting) => (
-                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                        <Typography textAlign="center">{setting}</Typography>
-                                    </MenuItem>
-                                ))}
+                                <MenuItem onClick={handleCloseUserMenu}>
+                                    <ListItemIcon>
+                                        <PersonIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Thông tin cá nhân</ListItemText>
+                                </MenuItem>
+                                <MenuItem onClick={onLogout}>
+                                    <ListItemIcon>
+                                        <LogoutIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Đăng xuất</ListItemText>
+                                </MenuItem>
                             </Menu>
                         </Box>
                     </Toolbar>
@@ -174,4 +177,3 @@ function Header() {
 }
 
 export default Header;
-
