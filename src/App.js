@@ -105,7 +105,8 @@ class App extends Component {
                     <Route
                         path="/"
                         // render={(props) => <Login authenticated={this.state.authenticated} {...props} />}
-                        element={this.state.authenticated ? <Navigate to="home" /> : <Login />}
+                        // element={this.state.authenticated ? <Navigate to="/home" /> : <Login />}
+                        element={<Login />}
                     ></Route>
                     <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />}></Route>
                     {privateRouters.map((route, index) => {
@@ -121,7 +122,7 @@ class App extends Component {
                                 key={index}
                                 path={route.path}
                                 element={
-                                    this.state.authenticated ? (
+                                    localStorage.getItem(ACCESS_TOKEN) ? (
                                         <Layout onLogout={this.handleLogout}>
                                             <Page />
                                         </Layout>

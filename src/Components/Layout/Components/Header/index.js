@@ -16,6 +16,10 @@ import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { ListItemIcon, ListItemText } from '@mui/material';
+import RuleIcon from '@mui/icons-material/Rule';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import ContactPageIcon from '@mui/icons-material/ContactPage';
+import CelebrationIcon from '@mui/icons-material/Celebration';
 
 const cx = classNames.bind(styles);
 
@@ -75,6 +79,7 @@ function Header({ onLogout }) {
                             >
                                 <MenuIcon />
                             </IconButton>
+                            {/* mobile */}
                             <Menu
                                 id="menu-appbar"
                                 anchorEl={anchorElNav}
@@ -93,11 +98,36 @@ function Header({ onLogout }) {
                                     display: { xs: 'block', md: 'none' },
                                 }}
                             >
-                                {pages.map((page) => (
+                                {/* {pages.map((page) => (
                                     <MenuItem key={page} onClick={handleCloseNavMenu}>
                                         <Typography textAlign="center">{page}</Typography>
                                     </MenuItem>
-                                ))}
+                                ))} */}
+                                <MenuItem onClick={handleCloseNavMenu}>
+                                    <ListItemIcon>
+                                        <CelebrationIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Sự kiện</ListItemText>
+                                </MenuItem>
+                                <MenuItem onClick={handleCloseNavMenu}>
+                                    <ListItemIcon>
+                                        <EmojiEventsIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Giải đấu</ListItemText>
+                                </MenuItem>
+                                <MenuItem onClick={handleCloseNavMenu}>
+                                    <ListItemIcon>
+                                        <RuleIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Nội quy</ListItemText>
+                                </MenuItem>
+
+                                <MenuItem onClick={handleCloseNavMenu}>
+                                    <ListItemIcon>
+                                        <ContactPageIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Liên hệ</ListItemText>
+                                </MenuItem>
                             </Menu>
                         </Box>
                         <SportsMartialArtsIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -119,8 +149,18 @@ function Header({ onLogout }) {
                         >
                             MACM
                         </Typography>
-                        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                            {pages.map((page) => (
+                        <Box
+                            sx={{
+                                height: '64px',
+                                mr: 3,
+                                flexGrow: 1,
+                                display: { xs: 'none', md: 'flex' },
+                                alignItems: 'center',
+                                textAlign: 'center',
+                                justifyContent: 'flex-end',
+                            }}
+                        >
+                            {/* {pages.map((page) => (
                                 <Button
                                     key={page}
                                     onClick={handleCloseNavMenu}
@@ -128,7 +168,32 @@ function Header({ onLogout }) {
                                 >
                                     {page}
                                 </Button>
-                            ))}
+                            ))} */}
+                            <MenuItem onClick={handleCloseNavMenu} sx={{ height: '64px' }}>
+                                <ListItemIcon>
+                                    <CelebrationIcon sx={{ color: 'white' }} />
+                                </ListItemIcon>
+                                <ListItemText>Sự kiện</ListItemText>
+                            </MenuItem>
+                            <MenuItem onClick={handleCloseNavMenu} sx={{ height: '64px' }}>
+                                <ListItemIcon>
+                                    <EmojiEventsIcon sx={{ color: 'white' }} />
+                                </ListItemIcon>
+                                <ListItemText>Giải đấu</ListItemText>
+                            </MenuItem>
+                            <MenuItem onClick={handleCloseNavMenu} sx={{ height: '64px' }}>
+                                <ListItemIcon>
+                                    <RuleIcon sx={{ color: 'white' }} />
+                                </ListItemIcon>
+                                <ListItemText>Nội quy</ListItemText>
+                            </MenuItem>
+
+                            <MenuItem onClick={handleCloseNavMenu} sx={{ height: '64px' }}>
+                                <ListItemIcon>
+                                    <ContactPageIcon sx={{ color: 'white' }} />
+                                </ListItemIcon>
+                                <ListItemText>Liên hệ</ListItemText>
+                            </MenuItem>
                         </Box>
                         <Box sx={{ flexGrow: 0 }}>
                             {/* <Tooltip title="Open settings"> */}

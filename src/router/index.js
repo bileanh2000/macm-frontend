@@ -71,6 +71,9 @@ import ReportFacility from 'src/Pages/Admin/Facility/ReportFacility';
 import QRScanner from 'src/Pages/Admin/Attendance/QRScan';
 import CheckAttendanceDate from 'src/Pages/Admin/Attendance/QRScan/CheckAttendanceDate';
 import AddMemberToEvent from 'src/Pages/Admin/Event/MenberEvent/AddMemberToEvent';
+import ForbiddenPage from 'src/Pages/ForbiddenPage';
+
+import EventListPage from 'src/Pages/User/Events';
 
 const privateRouters = [
     { path: '/:userId', component: UserProfile, layout: HeaderOnly },
@@ -159,6 +162,11 @@ const privateRouters = [
     { path: '/admin/facility/reports', component: ReportFacility },
     //Login
     // { path: '/', component: LoginPage, layout: null },
+    // 403 Page
+    { path: '/forbidden', component: ForbiddenPage, layout: null },
+
+    //User
+    { path: '/events', component: EventListPage, layout: HeaderOnly },
 ];
 
 const publicRouters = [
