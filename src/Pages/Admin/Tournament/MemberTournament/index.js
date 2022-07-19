@@ -1,6 +1,6 @@
-import { Box, Button, FormControl, MenuItem, Select, Typography } from '@mui/material';
+import { Alert, Box, Button, FormControl, MenuItem, Select, Snackbar, Typography } from '@mui/material';
 import React, { Fragment, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import MemberList from './MemberList';
 
@@ -13,6 +13,7 @@ function MemberTournament() {
     const [exhibitionType, setExhibitionType] = useState(0);
     const [listWeightRange, setListWeightRange] = useState([]);
     const [listExhibitionType, setListExhibitionType] = useState([]);
+    const [openSnackBar, setOpenSnackBar] = useState(false);
 
     const handleChangeType = (event) => {
         setType(event.target.value);
@@ -58,8 +59,10 @@ function MemberTournament() {
 
     const fetchTournamentById = async (tournamentId) => {
         try {
-            const response = await adminTournamentAPI.getTournamentById(tournamentId);
-            setListWeightRange(response.data[0].competitiveTypes);
+            const response = await adminTournamentAPI.getAllCompetitiveType(tournamentId);
+            console.log(response.data[0]);
+            setListWeightRange(response.data[0]);
+            setWeightRange(response.data[0][0].id);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -105,20 +108,28 @@ function MemberTournament() {
                     </Select>
                 </FormControl>
                 {type === 1 ? (
-                    <FormControl size="small">
-                        <Typography variant="caption">Hạng cân</Typography>
-                        <Select id="demo-simple-select" value={weightRange} displayEmpty onChange={handleChangeWeight}>
-                            <MenuItem value={0}>
-                                <em>Tất cả</em>
-                            </MenuItem>
-                            {listWeightRange &&
-                                listWeightRange.map((range) => (
-                                    <MenuItem value={range.id} key={range.id}>
-                                        {range.weightMin} - {range.weightMax} Kg
-                                    </MenuItem>
-                                ))}
-                        </Select>
-                    </FormControl>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
+                        <FormControl size="small">
+                            <Typography variant="caption">Hạng cân</Typography>
+                            <Select
+                                id="demo-simple-select"
+                                value={weightRange}
+                                displayEmpty
+                                onChange={handleChangeWeight}
+                            >
+                                <MenuItem value={0}>
+                                    <em>Tất cả</em>
+                                </MenuItem>
+                                {listWeightRange &&
+                                    listWeightRange.map((range) => (
+                                        <MenuItem value={range.id} key={range.id}>
+                                            {range.gender == 0 ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax}{' '}
+                                            Kg
+                                        </MenuItem>
+                                    ))}
+                            </Select>
+                        </FormControl>
+                    </Box>
                 ) : (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
                         <FormControl size="small">

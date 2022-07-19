@@ -95,7 +95,7 @@ const adminTournament = {
 
     updateTournamentOrganizingCommitteeRole: (params) => {
         const url = `/tournament/headclub/updatetournamentorganizingcommitteerole`;
-        return axiosClient.get(url, params);
+        return axiosClient.put(url, params);
     },
 
     getAllExhibitionType: (tournamentId) => {
@@ -116,6 +116,11 @@ const adminTournament = {
     acceptRequestToJoinOrganizingCommittee: (organizingCommitteeId) => {
         const url = `/tournament/headclub/acceptrequesttojoinorganizingcommittee/${organizingCommitteeId}`;
         return axiosClient.put(url);
+    },
+
+    getAllCompetitiveType: (tournamentId) => {
+        const url = `/tournament/treasurer/getallcompetitivetype/${tournamentId}`;
+        return axiosClient.get(url);
     },
 
     //Fee
@@ -152,30 +157,45 @@ const adminTournament = {
 
     ///////////////////////////
 
-    // getAllMemberEvent: (params, index) => {
-    //     const url = `/event/headculture/getmemberjoinevent/${params}?filterIndex=${index}&pageSize=1000&sortBy=id`;
-    //     return axiosClient.get(url);
-    // },
+    getListPlayerBracket: (competitiveTypeId, round) => {
+        const url = `/competitive/headclub/getlistplayerbracket/${competitiveTypeId}`;
+        return axiosClient.get(url, null, {
+            params: {
+                round: round,
+            },
+        });
+    },
 
-    // getAllMember: (params) => {
-    //     const url = `/event/headculture/getallmemberevent/${params}?pageNo=0&pageSize=1000&sortBy=id`;
-    //     return axiosClient.get(url);
-    // },
-    // getAllMemberCancel: (params) => {
-    //     const url = `/event/headculture/getallusercanceljoinevent/${params}?pageNo=0&pageSize=1000&sortBy=id`;
-    //     return axiosClient.get(url);
-    // },
-    // updateRoleEvent: (params) => {
-    //     const url = `/event/headculture/updateuserroleevent`;
-    //     return axiosClient.get(url, { params });
-    // },
-    // getListMemberToUpdate: (params) => {
-    //     const url = `/event/headculture/getlistmembereventtoupdaterole/${params}`;
-    //     return axiosClient.get(url);
-    // },
-    // updateMemberRole: (params) => {
-    //     const url = `/event/headculture/updatelistmembereventrole`;
-    //     return axiosClient.put(url, params);
-    // },
+    spawnMatchs: (competitiveTypeId, round) => {
+        const url = `/competitive/headclub/spawnmatchs/${competitiveTypeId}`;
+        return axiosClient.post(url, null, {
+            params: {
+                round: round,
+            },
+        });
+    },
+    updateResultMatch: (params) => {
+        const url = `/competitive/headclub/updateresultmatch/${params.id}`;
+        return axiosClient.put(url, null, {
+            params: {
+                firstPoint: params.firstPoint,
+                secondPoint: params.secondPoint,
+            },
+        });
+    },
+    listMatchs: (competitiveTypeId) => {
+        const url = `/competitive/headclub/listmatchs/${competitiveTypeId}`;
+        return axiosClient.get(url);
+    },
+
+    previewMatchsPlayer: (competitiveTypeId) => {
+        const url = `/competitive/headclub/previewmatchsplayer/${competitiveTypeId}`;
+        return axiosClient.post(url);
+    },
+
+    updateListMatchsPlayer: (params) => {
+        const url = `/competitive/headclub/updatelistmatchsplayer`;
+        return axiosClient.put(url, params);
+    },
 };
 export default adminTournament;

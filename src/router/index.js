@@ -4,6 +4,8 @@ import UserManagementPage from '../Pages/Admin/User-management';
 
 import UserProfile from 'src/Pages/User/Profile/UserProfile';
 import EditUserProfile from 'src/Pages/User/Profile/EditUserProfile';
+import UserTournament from 'src/Pages/User/Tournament';
+import UserTournamentDetail from 'src/Pages/User/Tournament/DetailTournament';
 
 import LoginPage from '../Pages/Login';
 import ClubFee from '../Pages/Admin/ClubFee';
@@ -80,6 +82,9 @@ import EventDetail from 'src/Pages/User/Events/EventDetail';
 const adminRouters = [
     { path: '/:userId', component: UserProfile, layout: HeaderOnly },
     { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
+    { path: '/tournament', component: UserTournament, layout: HeaderOnly },
+    { path: '/tournament/:tournamentId', component: UserTournamentDetail, layout: HeaderOnly },
+
     { path: '/home', component: Home, layout: HeaderOnly },
     { path: '/admin', component: AdminHomePage },
     { path: '/admin/headofdepartment', component: HeadOfDepartment },

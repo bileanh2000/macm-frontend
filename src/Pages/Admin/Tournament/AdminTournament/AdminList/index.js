@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { styled } from '@mui/material/styles';
 import { Button, Typography } from '@mui/material';
 
-function AdminList({ data }) {
+function AdminList({ data, value, index, active, total }) {
     const [pageSize, setPageSize] = useState(10);
 
     const columns = [
@@ -79,16 +79,11 @@ function AdminList({ data }) {
 
     function CustomToolbar() {
         return (
-            <GridToolbarContainer>
-                <Box
-                    sx={{
-                        p: 0.5,
-                        pb: 0,
-                    }}
-                >
-                    <GridToolbarQuickFilter />
-                </Box>
-            </GridToolbarContainer>
+            <Fragment>
+                <GridToolbarContainer>
+                    Số lượng thành viên trong ban tổ chức: {active}/{total}
+                </GridToolbarContainer>
+            </Fragment>
         );
     }
     const StyledGridOverlay = styled('div')(({ theme }) => ({
@@ -150,9 +145,14 @@ function AdminList({ data }) {
     }
     return (
         <Box
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
             sx={{
                 height: '70vh',
                 width: '100%',
+                mt: '1rem',
                 '& .status-rows': {
                     justifyContent: 'center !important',
                     minHeight: '0px !important',
