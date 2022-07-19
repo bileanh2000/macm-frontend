@@ -33,7 +33,7 @@ axiosClient.interceptors.response.use(
         // Handle errors
         if (error.response.status === 403) {
             // redirect to 403 page
-            window.location = '/403';
+            // window.location = '/forbidden';
             // <Navigate to="/403" />;
         }
         // throw error;

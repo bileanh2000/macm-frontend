@@ -20,6 +20,7 @@ import RuleIcon from '@mui/icons-material/Rule';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
 import CelebrationIcon from '@mui/icons-material/Celebration';
+import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
@@ -29,7 +30,12 @@ const settings = ['Tài khoản', 'Đăng xuất'];
 function Header({ onLogout }) {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const [selectedIndex, setSelectedIndex] = React.useState(1);
 
+    const handleListItemClick = (event, index) => {
+        setSelectedIndex(index);
+        console.log(index);
+    };
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
     };
@@ -54,7 +60,7 @@ function Header({ onLogout }) {
                             variant="h6"
                             noWrap
                             component="a"
-                            href="/"
+                            href="/home"
                             sx={{
                                 mr: 2,
                                 display: { xs: 'none', md: 'flex' },
@@ -103,7 +109,7 @@ function Header({ onLogout }) {
                                         <Typography textAlign="center">{page}</Typography>
                                     </MenuItem>
                                 ))} */}
-                                <MenuItem onClick={handleCloseNavMenu}>
+                                <MenuItem component={Link} to="/events" onClick={handleCloseNavMenu}>
                                     <ListItemIcon>
                                         <CelebrationIcon />
                                     </ListItemIcon>
@@ -135,7 +141,7 @@ function Header({ onLogout }) {
                             variant="h5"
                             noWrap
                             component="a"
-                            href=""
+                            href="/home"
                             sx={{
                                 mr: 2,
                                 display: { xs: 'flex', md: 'none' },
@@ -169,7 +175,13 @@ function Header({ onLogout }) {
                                     {page}
                                 </Button>
                             ))} */}
-                            <MenuItem onClick={handleCloseNavMenu} sx={{ height: '64px' }}>
+                            <MenuItem
+                                component={Link}
+                                to="/events"
+                                selected={selectedIndex === 0}
+                                onClick={(event) => handleListItemClick(event, 0)}
+                                sx={{ height: '64px' }}
+                            >
                                 <ListItemIcon>
                                     <CelebrationIcon sx={{ color: 'white' }} />
                                 </ListItemIcon>

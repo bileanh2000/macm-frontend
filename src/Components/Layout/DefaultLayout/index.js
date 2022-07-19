@@ -81,7 +81,7 @@ function DefaultLayout({ children, onLogout }) {
                             variant="h6"
                             noWrap
                             component="a"
-                            href="/"
+                            href="/home"
                             sx={{
                                 mr: 2,
                                 display: { xs: 'none', md: 'flex' },
@@ -112,7 +112,7 @@ function DefaultLayout({ children, onLogout }) {
                             variant="h5"
                             noWrap
                             component="a"
-                            href=""
+                            href="/home"
                             sx={{
                                 mr: 2,
                                 display: { xs: 'flex', md: 'none' },

@@ -98,7 +98,6 @@ const eventApi = {
         return axiosClient.get(url);
     },
 
-
     updateAfterEvent: (params) => {
         const url = `/event/headculture/updateafterevent/${params.id}`;
         return axiosClient.put(url, null, {
@@ -123,5 +122,23 @@ const eventApi = {
         return axiosClient.post(url, body);
     },
 
+    //User
+    registerEvent: (eventId, studentId) => {
+        const url = `/event/registertojoinevent/${eventId}/${studentId}`;
+        return axiosClient.post(url);
+    },
+    registerEventCommittee: (eventId, studentId, roleEventId) => {
+        const url = `/event/registertojoinorganizingcommittee/${eventId}/${studentId}/${roleEventId}`;
+        return axiosClient.post(url);
+    },
+    cancelJointEvent: (eventId, studentId) => {
+        const url = `/event/canceltojoinevent/${eventId}/${studentId}`;
+        return axiosClient.put(url);
+    },
+
+    getAllEventByStudentId: (studentId) => {
+        const url = `/event/getalleventbystudentid/${studentId}`;
+        return axiosClient.get(url);
+    },
 };
 export default eventApi;

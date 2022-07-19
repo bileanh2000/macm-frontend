@@ -1,5 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { privateRouters, publicRouters } from './router';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { adminRouters, userRouter } from './router';
 import { DefaultLayout } from './Components/Layout';
 import { useEffect, useState, Fragment, Component } from 'react';
 import productApi from './api/axiosClient';
@@ -12,6 +12,7 @@ import { ACCESS_TOKEN } from './constants';
 import PrivateRoute from './Components/Common/PrivateRoute';
 import OAuth2RedirectHandler from './oauth2/OAuth2RedirectHandler';
 import Home from './Pages/Admin/Home';
+import ErrorPage from './Pages/ErrorPage';
 
 // function App() {
 //     const [login, setLogin] = useState({ authenticated: true, currentUser: null });
@@ -45,8 +46,9 @@ import Home from './Pages/Admin/Home';
 //         </SnackbarProvider>
 //     );
 // }
-
 // export default App;
+// const USER_ROLE_ID = JSON.parse(localStorage.getItem('currentUser')).role.name || 10;
+
 class App extends Component {
     constructor(props) {
         super(props);
@@ -58,6 +60,7 @@ class App extends Component {
 
         this.loadCurrentlyLoggedInUser = this.loadCurrentlyLoggedInUser.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
+        // this.userRoleId = this.userRoleId.bind(this);
     }
 
     loadCurrentlyLoggedInUser() {
@@ -89,12 +92,35 @@ class App extends Component {
         });
         console.log('logout thanh cong');
     }
+    getCurrentUser() {
+        if (localStorage.getItem('currentUser')) {
+            return JSON.parse(localStorage.getItem('currentUser')).role.id;
+        }
+    }
+    isAdmin() {
+        if (
+            this.getCurrentUser() === 1 ||
+            this.getCurrentUser() === 2 ||
+            this.getCurrentUser() === 3 ||
+            this.getCurrentUser() === 4 ||
+            this.getCurrentUser() === 5 ||
+            this.getCurrentUser() === 6 ||
+            this.getCurrentUser() === 7 ||
+            this.getCurrentUser() === 8 ||
+            this.getCurrentUser() === 9
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     componentDidMount() {
         this.loadCurrentlyLoggedInUser();
     }
 
     render() {
+        // console.log('url path', UrlPath);
         if (this.state.loading) {
             return <LoadingProgress />;
         }
@@ -105,11 +131,11 @@ class App extends Component {
                     <Route
                         path="/"
                         // render={(props) => <Login authenticated={this.state.authenticated} {...props} />}
-                        // element={this.state.authenticated ? <Navigate to="/home" /> : <Login />}
-                        element={<Login />}
+                        element={this.state.authenticated ? <Navigate to="/home" /> : <Login />}
+                        // element={<Login />}
                     ></Route>
                     <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />}></Route>
-                    {privateRouters.map((route, index) => {
+                    {userRouter.map((route, index) => {
                         const Page = route.component;
                         let Layout = DefaultLayout;
                         if (route.layout) {
@@ -117,6 +143,7 @@ class App extends Component {
                         } else if (route.layout === null) {
                             Layout = Fragment;
                         }
+
                         return (
                             <Route
                                 key={index}
@@ -133,7 +160,37 @@ class App extends Component {
                             />
                         );
                     })}
+                    {this.isAdmin()
+                        ? adminRouters.map((route, index) => {
+                              const Page = route.component;
+                              let Layout = DefaultLayout;
+                              if (route.layout) {
+                                  Layout = route.layout;
+                              } else if (route.layout === null) {
+                                  Layout = Fragment;
+                              }
+
+                              return (
+                                  <Route
+                                      key={index}
+                                      path={route.path}
+                                      element={
+                                          localStorage.getItem(ACCESS_TOKEN) ? (
+                                              <Layout onLogout={this.handleLogout}>
+                                                  <Page />
+                                              </Layout>
+                                          ) : (
+                                              <Navigate to="/" />
+                                          )
+                                      }
+                                  />
+                              );
+                          })
+                        : null}
                 </Routes>
+                {/* {console.log(this.isAdmin())} */}
+                {/* {alert(JSON.parse(localStorage.getItem('currentUser')).role.id)} */}
+                {/* {window.location.pathname.startsWith('/admin') ? <Navigate to="/forbidden" /> : ''} */}
 
                 {/* <Alert stack={{ limit: 3 }} timeout={3000} position="top-right" effect="slide" offset={65} /> */}
             </div>

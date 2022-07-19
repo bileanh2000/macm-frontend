@@ -74,8 +74,10 @@ import AddMemberToEvent from 'src/Pages/Admin/Event/MenberEvent/AddMemberToEvent
 import ForbiddenPage from 'src/Pages/ForbiddenPage';
 
 import EventListPage from 'src/Pages/User/Events';
+import ErrorPage from 'src/Pages/ErrorPage';
+import EventDetail from 'src/Pages/User/Events/EventDetail';
 
-const privateRouters = [
+const adminRouters = [
     { path: '/:userId', component: UserProfile, layout: HeaderOnly },
     { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
     { path: '/home', component: Home, layout: HeaderOnly },
@@ -162,15 +164,19 @@ const privateRouters = [
     { path: '/admin/facility/reports', component: ReportFacility },
     //Login
     // { path: '/', component: LoginPage, layout: null },
+
+    //User
+];
+
+const userRouter = [
+    { path: '/events', component: EventListPage, layout: HeaderOnly },
+    { path: '/events/:id', component: EventDetail, layout: HeaderOnly },
+    { path: '/home', component: Home, layout: HeaderOnly },
     // 403 Page
     { path: '/forbidden', component: ForbiddenPage, layout: null },
 
-    //User
-    { path: '/events', component: EventListPage, layout: HeaderOnly },
+    // 404 Page
+    { path: '*', component: ErrorPage, layout: null },
 ];
 
-const publicRouters = [
-    // { path: '/', component: LoginPage, layout: null }
-];
-
-export { privateRouters, publicRouters };
+export { adminRouters, userRouter };
