@@ -22,6 +22,7 @@ import { Delete } from '@mui/icons-material';
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Box } from '@mui/system';
 
 function FightingCompetition(props) {
     const [datas, setDatas] = useState(props.data);
@@ -158,82 +159,109 @@ function FightingCompetition(props) {
     });
 
     return (
-        <Paper sx={{ width: '100%' }}>
-            {props.data.length > 0 && (
-                <TableContainer sx={{ maxHeight: 440 }}>
-                    <Table stickyHeader aria-label="sticky table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell align="center">Giới tính</TableCell>
-                                <TableCell align="center">Hạng cân</TableCell>
-                                <TableCell align="center"></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {datas.map((data) => (
-                                <TableRow key={data.id}>
-                                    <TableCell>{data.gender == 1 ? 'Nam' : 'Nữ'}</TableCell>
-                                    <TableCell>
-                                        {data.weightMin} - {data.weightMax} Kg
-                                    </TableCell>
-                                    <TableCell>
-                                        <IconButton
-                                            aria-label="delete"
-                                            onClick={() => {
-                                                // handleOpenDialog();
-                                                handleDelete(data.id);
-                                            }}
-                                        >
-                                            <Delete />
-                                        </IconButton>
-                                    </TableCell>
+        <Box>
+            <Paper elevation={3}>
+                {props.data.length > 0 && (
+                    <TableContainer sx={{ maxHeight: 440, m: 1, p: 1 }}>
+                        <Table stickyHeader aria-label="sticky table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="center">Giới tính</TableCell>
+                                    <TableCell align="center">Hạng cân</TableCell>
+                                    <TableCell align="center"></TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            )}
-            <Collapse in={isChecked}>
-                <InputLabel id="demo-simple-select-label">Giới tính</InputLabel>
-                <Select labelId="demo-simple-select-label" id="gender" value={gender} onChange={handleChange}>
-                    <MenuItem value={1}>Nam</MenuItem>
-                    <MenuItem value={0}>Nữ</MenuItem>
-                </Select>
-                <InputLabel>Hạng cân</InputLabel>
-                <TextField
-                    fullWidth
-                    type="number"
-                    id="outlined-basic"
-                    label="Min"
-                    variant="outlined"
-                    {...register('weightMin')}
-                    error={errors.weightMin ? true : false}
-                    helperText={errors.weightMin?.message}
-                />
-                <TextField
-                    type="number"
-                    id="outlined-basic"
-                    label="Max"
-                    variant="outlined"
-                    {...register('weightMax')}
-                    error={errors.weightMax ? true : false}
-                    helperText={errors.weightMax?.message}
-                    fullWidth
-                />
-                <Button variant="contained" color="success" onClick={handleSubmit(handleAddCompetition)}>
-                    Thêm
-                </Button>
-                <Button variant="contained" color="warning" onClick={handleCancel}>
-                    Hủy
-                </Button>
-            </Collapse>
-
+                            </TableHead>
+                            <TableBody>
+                                {datas.map((data) => (
+                                    <TableRow key={data.id}>
+                                        <TableCell align="center">{data.gender == 1 ? 'Nam' : 'Nữ'}</TableCell>
+                                        <TableCell align="center">
+                                            {data.weightMin} - {data.weightMax} Kg
+                                        </TableCell>
+                                        <TableCell>
+                                            <IconButton
+                                                aria-label="delete"
+                                                onClick={() => {
+                                                    // handleOpenDialog();
+                                                    handleDelete(data.id);
+                                                }}
+                                            >
+                                                <Delete />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )}
+            </Paper>
+            <Paper elevation={3}>
+                <Collapse in={isChecked}>
+                    <Grid container spacing={2} sx={{ p: 1 }}>
+                        <Grid item xs={12}>
+                            <InputLabel id="demo-simple-select-label">Giới tính</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="gender"
+                                value={gender}
+                                onChange={handleChange}
+                            >
+                                <MenuItem value={1}>Nam</MenuItem>
+                                <MenuItem value={0}>Nữ</MenuItem>
+                            </Select>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <InputLabel>Hạng cân</InputLabel>
+                        </Grid>
+                        <Grid item xs={12} container spacing={2}>
+                            <Grid item xs={6}>
+                                <TextField
+                                    fullWidth
+                                    type="number"
+                                    id="outlined-basic"
+                                    label="Min"
+                                    variant="outlined"
+                                    {...register('weightMin')}
+                                    error={errors.weightMin ? true : false}
+                                    helperText={errors.weightMin?.message}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    type="number"
+                                    id="outlined-basic"
+                                    label="Max"
+                                    variant="outlined"
+                                    {...register('weightMax')}
+                                    error={errors.weightMax ? true : false}
+                                    helperText={errors.weightMax?.message}
+                                    fullWidth
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button
+                                variant="contained"
+                                color="success"
+                                onClick={handleSubmit(handleAddCompetition)}
+                                sx={{ m: 1 }}
+                            >
+                                Thêm
+                            </Button>
+                            <Button variant="contained" color="warning" onClick={handleCancel}>
+                                Hủy
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Collapse>
+            </Paper>
             <Collapse in={!isChecked}>
-                <Fab color="primary" aria-label="add" onClick={() => setIsChecked(!isChecked)}>
+                <Fab color="primary" aria-label="add" onClick={() => setIsChecked(!isChecked)} size="medium">
                     <Add />
                 </Fab>
             </Collapse>
-        </Paper>
+        </Box>
     );
 }
 export default FightingCompetition;

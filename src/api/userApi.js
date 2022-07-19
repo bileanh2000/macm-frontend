@@ -1,4 +1,3 @@
-
 // https://fakestoreapi.com/docs
 
 import axiosClient from './axiosClient';
@@ -77,12 +76,19 @@ const userApi = {
     },
     generateQrCode: (params) => {
         const url = `/admin/hr/member/qrcode/create`;
-        return axiosClient.post(url, {
-            email: params.email,
-            studentId: params.studentId,
-            studentName: params.name,
-        }, null);
+        return axiosClient.post(
+            url,
+            {
+                email: params.email,
+                studentId: params.studentId,
+                studentName: params.name,
+            },
+            null,
+        );
+    },
+    getAllMember: () => {
+        const url = '/admin/hr/getallmemberandcollaborator';
+        return axiosClient.get(url);
     },
 };
 export default userApi;
-

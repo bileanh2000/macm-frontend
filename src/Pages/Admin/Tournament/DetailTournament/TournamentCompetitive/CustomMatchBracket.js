@@ -9,7 +9,11 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    FormControl,
     FormHelperText,
+    Grid,
+    MenuItem,
+    Select,
     Table,
     TableBody,
     TableCell,
@@ -22,45 +26,70 @@ import {
 } from '@mui/material';
 import NumberFormat from 'react-number-format';
 import { useParams } from 'react-router-dom';
+import moment from 'moment';
 
 import adminTournament from 'src/api/adminTournamentAPI';
 import styles from './CustomMatchBracket.module.scss';
 import { Box } from '@mui/system';
+import { DatePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { vi } from 'date-fns/locale';
+import { useSnackbar } from 'notistack';
 
 const cx = classNames.bind(styles);
 
-const findPlayer = (array, id) => {
-    let i, j;
-    let player;
-    for (i = 0; i < array.length; i++) {
-        for (j = 0; j < array[i].players.length; j++) {
-            if (array[i].players[j].id === id) {
-                player = array[i].players[j];
-            }
-        }
-    }
-    return player;
-};
-
 function CustomMatchBracket(params) {
-    console.log(params);
-    // const [matches, setMatches] = useState(_matches);
     let i;
     let __matches = [];
     for (i = 1; i <= params.rounds; i++) {
         const round = params.matches.filter((match) => match.round == i);
         __matches.push(round);
     }
+    const { enqueueSnackbar } = useSnackbar();
     const [matches, setMatches] = useState(__matches);
     const [dragItem, setDragItem] = useState({});
     const [dragOverItem, setDragOverItem] = useState({});
     const [open, setOpen] = useState(false);
+    const [openUpdateTime, setOpenUpdateTime] = useState(false);
     const [match, setMatch] = useState();
     const [score1, setScore1] = useState(-1);
     const [score2, setScore2] = useState(-1);
     const [isEdit, setEdit] = useState(false);
+    const [areaName, setAreaId] = useState();
 
-    console.log(params);
+    const handleChangeAreaName = (event) => {
+        setAreaId(event.target.value);
+    };
+
+    const validationSchema = Yup.object().shape({
+        ...(open && {
+            score1: Yup.number()
+                .required('Không được để trống trường này')
+                .typeError('Vui lòng nhập số')
+                .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+        }),
+        ...(open && {
+            score2: Yup.number()
+                .required('Không được để trống trường này')
+                .typeError('Vui lòng nhập số')
+                .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+        }),
+        ...(openUpdateTime && { date: Yup.string().nullable().required('Điền đi') }),
+        ...(openUpdateTime && { startTime: Yup.string().nullable().required('Điền đi') }),
+    });
+
+    const {
+        register,
+        handleSubmit,
+        control,
+        formState: { errors },
+        reset,
+        setFocus,
+        setError,
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+        mode: 'onBlur',
+    });
 
     const onDragStart = (e, match, index, isFirst) => {
         if (params.status !== 1) {
@@ -156,7 +185,9 @@ function CustomMatchBracket(params) {
 
     const updateListMatchesPlayer = async (params) => {
         try {
-            await adminTournament.updateListMatchsPlayer(params);
+            const res = await adminTournament.updateListMatchsPlayer(params);
+            let variant = 'success';
+            enqueueSnackbar(res.message, { variant });
         } catch (error) {
             console.log('Khong the update');
         }
@@ -181,51 +212,65 @@ function CustomMatchBracket(params) {
             setMatch(data);
             setOpen(true);
         } else if (params.status === 2) {
-            console.log('cap nhat time');
+            if (!params.matches[params.matches.length - 1].area) {
+                return;
+            }
+            setAreaId(data.area);
+            setMatch(data);
+            setOpenUpdateTime(true);
         }
     };
-
-    const validationSchema = Yup.object().shape({
-        score1: Yup.number()
-            .required('Không được để trống trường này')
-            .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
-        score2: Yup.number()
-            .required('Không được để trống trường này')
-            .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
-    });
-
-    const {
-        register,
-        handleSubmit,
-        control,
-        formState: { errors },
-        reset,
-        setFocus,
-        setError,
-    } = useForm({
-        resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
-    });
 
     const handleClose = () => {
         setOpen(false);
         reset({
-            score1: -1,
-            score2: -1,
+            score1: 0,
+            score2: 0,
         });
     };
 
     const updateRedsult = async (params) => {
         try {
-            await adminTournament.updateResultMatch(params);
+            const res = await adminTournament.updateResultMatch(params);
+            let variant = 'success';
+            enqueueSnackbar(res.message, { variant });
         } catch (error) {
-            console.log('khong the cap nhat ket quá');
+            let variant = 'error';
+            enqueueSnackbar('khong the cap nhat ket quá', { variant });
         }
     };
 
-    console.log('reload');
+    const updateTimeAndPlace = async (matchId, params) => {
+        try {
+            const res = await adminTournament.updateTimeAndPlaceMatch(matchId, params);
+            let variant = 'success';
+            enqueueSnackbar(res.message, { variant });
+        } catch (error) {
+            let variant = 'error';
+            enqueueSnackbar('khong the cap nhat thoi gian', { variant });
+        }
+    };
+
+    const handleCloseUpdateTime = () => {
+        setOpenUpdateTime(false);
+    };
+
+    const handleUpdateTime = (data) => {
+        console.log(data, areaName);
+        const date = moment(data.date).format('YYYY-MM-DD');
+        const time = moment(data.startTime).format('hh:mm:ss');
+        const dateTime = date + 'T' + time;
+        const areaId = params.areaList.filter((area) => area.name == areaName)[0];
+        const request = { time: dateTime, area: areaId };
+
+        match.time = dateTime;
+        updateTimeAndPlace(match.id, request);
+        var merged = [].concat.apply([], __matches);
+        console.log(merged);
+        params.onUpdareResult(merged);
+        handleCloseUpdateTime();
+    };
+
     const handleUpdate = (data) => {
         console.log(data);
         if (data.score1 == data.score2) {
@@ -236,19 +281,19 @@ function CustomMatchBracket(params) {
                 message: 'Điểm 2 người chơi không được bằng nhau',
             });
         } else {
-            match.firstPoint = data.score1;
-            match.secondPoint = data.score2;
+            match.firstPlayer.point = data.score1;
+            match.secondPlayer.point = data.score2;
             console.log(match);
             console.log(__matches);
+            setMatch(match);
+            updateRedsult(match);
             var merged = [].concat.apply([], __matches);
             console.log(merged);
             params.onUpdareResult(merged);
-            setMatch(match);
-            updateRedsult(match);
             setOpen(false);
             reset({
-                score1: -1,
-                score2: -1,
+                score1: 0,
+                score2: 0,
             });
         }
     };
@@ -275,7 +320,7 @@ function CustomMatchBracket(params) {
                                     </TableHead>
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell>{match.firstName}</TableCell>
+                                            <TableCell>{match.firstPlayer.studentName}</TableCell>
                                             <TableCell>
                                                 <Controller
                                                     name="score1"
@@ -306,7 +351,7 @@ function CustomMatchBracket(params) {
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell>{match.secondName}</TableCell>
+                                            <TableCell>{match.secondPlayer.studentName}</TableCell>
                                             <TableCell>
                                                 <Controller
                                                     name="score2"
@@ -342,9 +387,9 @@ function CustomMatchBracket(params) {
                             {score1 > 0 &&
                                 score2 > 0 &&
                                 (score1 > score2 ? (
-                                    <Typography>Nguời chiến thắng: {match.firstName} </Typography>
+                                    <Typography>Nguời chiến thắng: {match.firstPlayer.studentName} </Typography>
                                 ) : score1 < score2 ? (
-                                    <Typography>Nguời chiến thắng: {match.secondName} </Typography>
+                                    <Typography>Nguời chiến thắng: {match.secondPlayer.studentName} </Typography>
                                 ) : (
                                     ''
                                 ))}
@@ -356,7 +401,112 @@ function CustomMatchBracket(params) {
                     </div>
                 )}
             </Dialog>
-            <Typography variant="caption">*Chọn vào 1 cặp trận để cập nhật tỉ số</Typography>
+            <Dialog fullWidth maxWidth="md" open={openUpdateTime}>
+                {match && (
+                    <div>
+                        <DialogTitle>Thay đổi thời gian và địa điểm thi đấu</DialogTitle>
+                        <DialogContent>
+                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                                <Grid container spacing={3} columns={12}>
+                                    <Grid item xs={12} sm={4}>
+                                        <FormControl size="medium">
+                                            <Typography variant="caption">Sân thi đấu</Typography>
+                                            <Select
+                                                id="demo-simple-select"
+                                                value={areaName}
+                                                displayEmpty
+                                                onChange={handleChangeAreaName}
+                                            >
+                                                {params.areaList.map((area) => (
+                                                    <MenuItem value={area.name} key={area.id}>
+                                                        {area.name}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        <Controller
+                                            required
+                                            name="date"
+                                            control={control}
+                                            defaultValue={match.time ? match.time : null}
+                                            render={({
+                                                field: { onChange, value },
+                                                fieldState: { error, invalid },
+                                            }) => (
+                                                <DatePicker
+                                                    disablePast
+                                                    label="Ngày tháng"
+                                                    inputFormat="dd/MM/yyyy"
+                                                    disableFuture={false}
+                                                    value={value}
+                                                    onChange={(value) => onChange(value)}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            required
+                                                            id="outlined-disabled"
+                                                            error={invalid}
+                                                            helperText={invalid ? error.message : null}
+                                                            // id="startDate"
+                                                            variant="outlined"
+                                                            margin="dense"
+                                                            fullWidth
+                                                        />
+                                                    )}
+                                                />
+                                            )}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        <Controller
+                                            required
+                                            name="startTime"
+                                            control={control}
+                                            defaultValue={match.time ? match.time : null}
+                                            render={({
+                                                field: { onChange, value },
+                                                fieldState: { error, invalid },
+                                            }) => (
+                                                <TimePicker
+                                                    label="Thời gian bắt đầu"
+                                                    ampm={false}
+                                                    value={value}
+                                                    onChange={(value) => onChange(value)}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            required
+                                                            id="outlined-disabled"
+                                                            error={invalid}
+                                                            helperText={invalid ? error.message : null}
+                                                            // id="startDate"
+                                                            variant="outlined"
+                                                            margin="dense"
+                                                            fullWidth
+                                                        />
+                                                    )}
+                                                />
+                                            )}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </LocalizationProvider>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseUpdateTime}>Quay lại</Button>
+                            <Button onClick={handleSubmit(handleUpdateTime)}>Đồng ý</Button>
+                        </DialogActions>
+                    </div>
+                )}
+            </Dialog>
+            {params.status === 3 && <Typography variant="caption">*Chọn vào 1 cặp trận để cập nhật tỉ số</Typography>}
+            {params.status === 2 && params.matches[params.matches.length - 1].area && (
+                <Typography variant="caption">
+                    *Chọn vào 1 cặp trận để cập nhật thời gian và địa điểm thi đấu
+                </Typography>
+            )}
             {params.status === 1 ? (
                 <Box>
                     !isEdit ? <Button onClick={() => setEdit(true)}>Chỉnh sửa bảng đấu</Button>:{' '}
@@ -368,76 +518,172 @@ function CustomMatchBracket(params) {
             <div className={cx('theme', 'theme-dark')}>
                 <div className={cx('bracket', ' disable-image')}>
                     {matches.map((matchs, index) => (
+                        // <div>hi</div>
                         <div className={cx('column')} key={index}>
                             {matchs.map((match, i) =>
                                 index === 0 ? (
-                                    <div
-                                        className={cx('match', 'winner-top', 'winner-bottom')}
-                                        key={match.id}
-                                        onClick={(e) => handleClickResult(e, match)}
-                                    >
+                                    match.firstPlayer && match.secondPlayer ? (
                                         <div
-                                            className={cx('match-top', 'team', isEdit ? 'draggable' : '')}
-                                            draggable={isEdit ? 'true' : ''}
-                                            onDragOver={(e) => onDragOver(e)}
-                                            onDragStart={(e) =>
-                                                onDragStart(e, { firstPlayer: match.firstPlayer }, i, 0)
-                                            }
-                                            onDragEnd={() => onDragEnd()}
-                                            onDrop={(e) => onDragDrop(e, { firstPlayer: match.firstPlayer }, i, 0)}
+                                            className={cx('match', 'winner-top', 'winner-bottom')}
+                                            key={match.id}
+                                            onClick={(e) => handleClickResult(e, match)}
                                         >
-                                            <span className={cx('image')}></span>
-                                            <span className={cx('seed')}>{match.firstPlayer?.studentId}</span>
-                                            <span className={cx('name')}>{match.firstPlayer?.studentName}</span>
-                                            <span className={cx('score')}>{match.firstPlayer?.point}</span>
+                                            <div>
+                                                <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
+                                            </div>
+                                            <div
+                                                className={cx('match-top', 'team', isEdit ? 'draggable' : '')}
+                                                draggable={isEdit ? 'true' : ''}
+                                                onDragOver={(e) => onDragOver(e)}
+                                                onDragStart={(e) =>
+                                                    onDragStart(e, { firstPlayer: match.firstPlayer }, i, 0)
+                                                }
+                                                onDragEnd={() => onDragEnd()}
+                                                onDrop={(e) => onDragDrop(e, { firstPlayer: match.firstPlayer }, i, 0)}
+                                            >
+                                                <span className={cx('image')}></span>
+                                                {/* <span className={cx('seed')}>{match.firstPlayer?.studentId}</span> */}
+                                                <span className={cx('name')}>{match.firstPlayer?.studentName}</span>
+                                                <span className={cx('score')}>{match.firstPlayer?.point}</span>
+                                            </div>
+
+                                            <div
+                                                className={cx('match-bottom', 'team', isEdit ? 'draggable' : '')}
+                                                draggable={isEdit ? 'true' : ''}
+                                                onDragOver={(e) => onDragOver(e)}
+                                                onDragStart={(e) =>
+                                                    onDragStart(e, { secondPlayer: match.secondPlayer }, i, 1)
+                                                }
+                                                onDragEnd={() => onDragEnd()}
+                                                onDrop={(e) =>
+                                                    onDragDrop(e, { secondPlayer: match.secondPlayer }, i, 1)
+                                                }
+                                            >
+                                                <span className={cx('image')}></span>
+                                                {/* <span className={cx('seed')}>{match.secondPlayer?.studentId}</span> */}
+                                                <span className={cx('name')}>{match.secondPlayer?.studentName}</span>
+                                                <span className={cx('score')}>{match.secondPlayer?.point}</span>
+                                            </div>
+                                            <div className={cx('match-lines')}>
+                                                <div className={cx('line', 'one')}></div>
+                                                <div className={cx('line', 'two')}></div>
+                                            </div>
+                                            <div className={cx('match-lines', 'alt')}>
+                                                <div className={cx('line', 'one')}></div>
+                                            </div>
+                                            <div>
+                                                <small>
+                                                    {match.time
+                                                        ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
+                                                        : ''}
+                                                </small>
+                                            </div>
                                         </div>
+                                    ) : (
                                         <div
-                                            className={cx('match-bottom', 'team', isEdit ? 'draggable' : '')}
-                                            draggable={isEdit ? 'true' : ''}
-                                            onDragOver={(e) => onDragOver(e)}
-                                            onDragStart={(e) =>
-                                                onDragStart(e, { secondPlayer: match.secondPlayer }, i, 1)
-                                            }
-                                            onDragEnd={() => onDragEnd()}
-                                            onDrop={(e) => onDragDrop(e, { secondPlayer: match.secondPlayer }, i, 1)}
+                                            className={cx(
+                                                'match',
+                                                'winner-top',
+                                                'winner-bottom',
+                                                isEdit ? '' : 'hidden',
+                                            )}
+                                            key={match.id}
+                                            onClick={(e) => handleClickResult(e, match)}
                                         >
-                                            <span className={cx('image')}></span>
-                                            <span className={cx('seed')}>{match.secondPlayer?.studentId}</span>
-                                            <span className={cx('name')}>{match.secondPlayer?.studentName}</span>
-                                            <span className={cx('score')}>{match.secondPlayer?.point}</span>
+                                            <div>
+                                                <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
+                                            </div>
+
+                                            <div
+                                                className={cx('match-top', 'team', isEdit ? 'draggable' : '')}
+                                                draggable={isEdit ? 'true' : ''}
+                                                onDragOver={(e) => onDragOver(e)}
+                                                onDragStart={(e) =>
+                                                    onDragStart(e, { firstPlayer: match.firstPlayer }, i, 0)
+                                                }
+                                                onDragEnd={() => onDragEnd()}
+                                                onDrop={(e) => onDragDrop(e, { firstPlayer: match.firstPlayer }, i, 0)}
+                                            >
+                                                <span className={cx('image')}></span>
+                                                {/* <span className={cx('seed')}>{match.firstPlayer?.studentId}</span> */}
+                                                <span className={cx('name')}>{match.firstPlayer?.studentName}</span>
+                                                <span className={cx('score')}>{match.firstPlayer?.point}</span>
+                                            </div>
+
+                                            <div
+                                                className={cx('match-bottom', 'team', isEdit ? 'draggable' : '')}
+                                                draggable={isEdit ? 'true' : ''}
+                                                onDragOver={(e) => onDragOver(e)}
+                                                onDragStart={(e) =>
+                                                    onDragStart(e, { secondPlayer: match.secondPlayer }, i, 1)
+                                                }
+                                                onDragEnd={() => onDragEnd()}
+                                                onDrop={(e) =>
+                                                    onDragDrop(e, { secondPlayer: match.secondPlayer }, i, 1)
+                                                }
+                                            >
+                                                <span className={cx('image')}></span>
+                                                {/* <span className={cx('seed')}>{match.secondPlayer?.studentId}</span> */}
+                                                <span className={cx('name')}>{match.secondPlayer?.studentName}</span>
+                                                <span className={cx('score')}>{match.secondPlayer?.point}</span>
+                                            </div>
+                                            <div className={cx('match-lines')}>
+                                                <div className={cx('line', 'one')}></div>
+                                                <div className={cx('line', 'two')}></div>
+                                            </div>
+                                            <div className={cx('match-lines', 'alt')}>
+                                                <div className={cx('line', 'one')}></div>
+                                            </div>
+                                            <div>
+                                                <small>
+                                                    {match.time
+                                                        ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
+                                                        : ''}
+                                                </small>
+                                            </div>
                                         </div>
-                                        <div className={cx('match-lines')}>
-                                            <div className={cx('line', 'one')}></div>
-                                            <div className={cx('line', 'two')}></div>
-                                        </div>
-                                        <div className={cx('match-lines', 'alt')}>
-                                            <div className={cx('line', 'one')}></div>
-                                        </div>
-                                    </div>
+                                    )
                                 ) : (
                                     <div
                                         className={cx('match', 'winner-bottom', 'winner-top')}
                                         key={match.id}
                                         onClick={(e) => handleClickResult(e, match)}
                                     >
+                                        <div>
+                                            <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
+                                        </div>
                                         <div className={cx('match-top', 'team')}>
                                             <span className={cx('image')}></span>
-                                            <span className={cx('seed')}>{match.firstPlayer?.studentId}</span>
+                                            {/* <span className={cx('seed')}>{match.firstPlayer?.studentId}</span> */}
                                             <span className={cx('name')}>{match.firstPlayer?.studentName}</span>
                                             <span className={cx('score')}>{match.firstPlayer?.point}</span>
                                         </div>
                                         <div className={cx('match-bottom', 'team')}>
                                             <span className={cx('image')}></span>
-                                            <span className={cx('seed')}>{match.secondPlayer?.studentId}</span>
+                                            {/* <span className={cx('seed')}>{match.secondPlayer?.studentId}</span> */}
                                             <span className={cx('name')}>{match.secondPlayer?.studentName}</span>
                                             <span className={cx('score')}>{match.secondPlayer?.point}</span>
                                         </div>
+
                                         <div className={cx('match-lines')}>
                                             <div className={cx('line', 'one')}></div>
-                                            <div className={cx('line', 'two')}></div>
+                                            {index === __matches.length - 2 ? (
+                                                ''
+                                            ) : (
+                                                <div className={cx('line', 'two')}></div>
+                                            )}
                                         </div>
+
                                         <div className={cx('match-lines', 'alt')}>
                                             <div className={cx('line', 'one')}></div>
+                                        </div>
+
+                                        <div>
+                                            <small>
+                                                {match.time
+                                                    ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
+                                                    : ''}
+                                            </small>
                                         </div>
                                     </div>
                                 ),
