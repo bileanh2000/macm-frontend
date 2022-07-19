@@ -39,9 +39,7 @@ function Index() {
                             <Link to="/admin">Chuyển sang trang quản trị</Link>
                         </Button>
                     ) : (
-                        <Button>
-                            <Link to="/admin">Chuyển sang trang quản trị</Link>
-                        </Button>
+                        ''
                     )}
                 </Box>
 

@@ -31,12 +31,22 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import { useParams } from 'react-router-dom';
 import eventApi from 'src/api/eventApi';
+import { useSnackbar } from 'notistack';
 
 const ConfirmCancel = ({ isOpen, handleClose, onSucess, data }) => {
+    const { enqueueSnackbar } = useSnackbar();
     const [value, setValue] = useState(null);
     const [checked, setChecked] = useState(false);
     const now = new Date();
+    let { id } = useParams();
 
+    const handleCancelEvent = () => {
+        let studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
+        eventApi.cancelJointEvent(id, studentId).then((res) => {
+            console.log(res.message);
+            enqueueSnackbar(res.message, { variant: 'warning', preventDuplicate: true });
+        });
+    };
     return (
         <Fragment>
             <Dialog
@@ -55,7 +65,7 @@ const ConfirmCancel = ({ isOpen, handleClose, onSucess, data }) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Hủy</Button>
-                    <Button>Xác nhận</Button>
+                    <Button onClick={handleCancelEvent}>Xác nhận</Button>
                 </DialogActions>
             </Dialog>
         </Fragment>

@@ -28,7 +28,6 @@ function EventDetail() {
     const [scheduleList, setScheduleList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
-    let navigate = useNavigate();
     const now = new Date();
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
@@ -68,7 +67,7 @@ function EventDetail() {
     }, [id, studentId]);
 
     const checkEventJoined = () => {
-        if (eventJoined.filter((event) => event.id === id)) {
+        if (eventJoined.filter((event) => event.id == id).length !== 0) {
             return true;
         } else {
             return false;
