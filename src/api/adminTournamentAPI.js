@@ -18,8 +18,8 @@ const adminTournament = {
         return axiosClient.put(url, params);
     },
 
-    getAllTournament: (params) => {
-        const url = `/tournament/headclub/tournament/getall?semester=${params}`;
+    getAllTournament: (params, status) => {
+        const url = `/tournament/headclub/tournament/getall?semester=${params}&status=${status}`;
         return axiosClient.get(url);
     },
     getTournamentById: (params) => {
@@ -178,8 +178,8 @@ const adminTournament = {
         const url = `/competitive/headclub/updateresultmatch/${params.id}`;
         return axiosClient.put(url, null, {
             params: {
-                firstPoint: params.firstPoint,
-                secondPoint: params.secondPoint,
+                firstPoint: params.firstPlayer.point,
+                secondPoint: params.secondPlayer.point,
             },
         });
     },
@@ -195,6 +195,20 @@ const adminTournament = {
 
     updateListMatchsPlayer: (params) => {
         const url = `/competitive/headclub/updatelistmatchsplayer`;
+        return axiosClient.put(url, params);
+    },
+
+    spawnTimeAndArea: (tournamentId) => {
+        const url = `/competitive/headclub/spawntimeandarea/${tournamentId}`;
+        return axiosClient.post(url);
+    },
+
+    getAllArea: () => {
+        const url = `/area/headclub/getallarea`;
+        return axiosClient.get(url);
+    },
+    updateTimeAndPlaceMatch: (matchId, params) => {
+        const url = `/competitive/headclub/updatetimeandplacematch/${matchId}`;
         return axiosClient.put(url, params);
     },
 };

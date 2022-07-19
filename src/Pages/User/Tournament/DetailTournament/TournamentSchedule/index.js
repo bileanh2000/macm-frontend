@@ -5,6 +5,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { useParams } from 'react-router-dom';
 
 import adminTournament from 'src/api/adminTournamentAPI';
+import { Box } from '@mui/material';
 
 function TournamentSchedule() {
     let { tournamentId } = useParams();
@@ -37,22 +38,26 @@ function TournamentSchedule() {
     });
 
     return (
-        <FullCalendar
-            // initialDate={new Date('2022-09-01')}
-            initialDate={scheduleData[0] && new Date(scheduleData[0].date)}
-            locale="vie"
-            height="60%"
-            plugins={[dayGridPlugin, interactionPlugin]}
-            defaultView="dayGridMonth"
-            events={scheduleData}
-            weekends={true}
-            headerToolbar={{
-                left: 'title',
-                center: 'dayGridMonth,dayGridWeek',
-                right: 'prev next',
-                // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-            }}
-        />
+        <Box sx={{ mt: 2, mb: 2, p: 1, height: '30rem' }}>
+            {scheduleData && (
+                <FullCalendar
+                    // initialDate={new Date('2022-09-01')}
+                    initialDate={scheduleData[0] && new Date(scheduleData[0].date)}
+                    locale="vie"
+                    height="100%"
+                    plugins={[dayGridPlugin, interactionPlugin]}
+                    defaultView="dayGridMonth"
+                    events={scheduleData}
+                    weekends={true}
+                    headerToolbar={{
+                        left: 'title',
+                        center: 'dayGridMonth,dayGridWeek',
+                        right: 'prev next',
+                        // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                    }}
+                />
+            )}
+        </Box>
     );
 }
 

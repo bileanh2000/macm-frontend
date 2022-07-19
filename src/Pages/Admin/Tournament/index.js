@@ -10,6 +10,7 @@ import {
     Grid,
     IconButton,
     MenuItem,
+    Paper,
     TextField,
     Typography,
 } from '@mui/material';
@@ -30,14 +31,19 @@ function Tournament() {
     const [semesterList, setSemesterList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [tournamentOnclick, setTournamentOnclick] = useState({ name: '', id: '' });
+    const [status, setStatus] = useState(0);
 
     const handleChange = (event) => {
         setSemester(event.target.value);
     };
 
-    const getListTournamentBySemester = async (params) => {
+    const handleChangeStatus = (event) => {
+        setStatus(event.target.value);
+    };
+
+    const getListTournamentBySemester = async (params, status) => {
         try {
-            const response = await adminTournamentAPI.getAllTournament(params);
+            const response = await adminTournamentAPI.getAllTournament(params, status);
             setTouraments(response.data);
             // setTotal(response.totalPage);
             // setPageSize(response.pageSize);
@@ -58,8 +64,8 @@ function Tournament() {
     };
 
     useEffect(() => {
-        getListTournamentBySemester(semester);
-    }, [semester]);
+        getListTournamentBySemester(semester, status);
+    }, [semester, status]);
 
     useEffect(() => {
         fetchSemester();
@@ -89,77 +95,90 @@ function Tournament() {
     );
 
     return (
-        <Box>
-            <Dialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa sự kiện "${tournamentOnclick.name}"?`}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        "{tournamentOnclick.name}" sẽ được xóa khỏi danh sách sự kiện!
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog}>Từ chối</Button>
-                    <Button onClick={handleDelete(tournamentOnclick.id)} autoFocus>
-                        Đồng ý
+        <Paper elevation={3}>
+            <Box sx={{ m: 1, p: 1, height: '80vh' }}>
+                <Dialog
+                    open={openDialog}
+                    onClose={handleCloseDialog}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa sự kiện "${tournamentOnclick.name}"?`}</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            "{tournamentOnclick.name}" sẽ được xóa khỏi danh sách sự kiện!
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDialog}>Từ chối</Button>
+                        <Button onClick={handleDelete(tournamentOnclick.id)} autoFocus>
+                            Đồng ý
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
+                        Quản lý giải đấu
+                    </Typography>
+                    <Button
+                        variant="outlined"
+                        sx={{ maxHeight: '50px', minHeight: '50px' }}
+                        component={Link}
+                        to={'./create'}
+                        startIcon={<AddCircle />}
+                    >
+                        Tạo giải đấu
                     </Button>
-                </DialogActions>
-            </Dialog>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
-                    Quản lý giải đấu
-                </Typography>
-                <Button
-                    variant="outlined"
-                    sx={{ maxHeight: '50px', minHeight: '50px' }}
-                    component={Link}
-                    to={'./create'}
-                    startIcon={<AddCircle />}
-                >
-                    Tạo giải đấu
-                </Button>
-            </Box>
-            <Box>
-                <TextField
-                    id="outlined-select-currency"
-                    select
-                    size="small"
-                    label="Chọn kỳ"
-                    value={semester}
-                    onChange={handleChange}
-                >
-                    {semesterList.map((option) => (
-                        <MenuItem key={option.id} value={option.name}>
-                            {option.name}
-                        </MenuItem>
-                    ))}
-                </TextField>
-            </Box>
-            {tournaments && tournaments.length === 0 ? (
-                <Typography variant="h5" sx={{ textAlign: 'center', mt: 3 }}>
-                    KHÔNG CÓ GIẢI ĐẤU NÀO TRONG KỲ
-                </Typography>
-            ) : (
-                ''
-            )}
-            <Box component="div">
-                {tournaments ? (
-                    tournaments.map((tournament) => {
-                        return (
-                            <li key={tournament.id}>
-                                <div className={cx('tournaments')}>
-                                    <div>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <TextField
+                        id="outlined-select-currency"
+                        select
+                        size="small"
+                        label="Chọn kỳ"
+                        value={semester}
+                        onChange={handleChange}
+                    >
+                        {semesterList.map((option) => (
+                            <MenuItem key={option.id} value={option.name}>
+                                {option.name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                    <TextField
+                        id="outlined-select-currency"
+                        select
+                        size="small"
+                        label="Trạng thái sự kiện"
+                        value={status}
+                        onChange={handleChangeStatus}
+                    >
+                        <MenuItem value={0}>Tất cả</MenuItem>
+                        <MenuItem value={1}>Đã kết thúc</MenuItem>
+                        <MenuItem value={2}>Đang diễn ra</MenuItem>
+                        <MenuItem value={3}>Sắp diễn ra</MenuItem>
+                    </TextField>
+                </Box>
+                {tournaments && tournaments.length === 0 ? (
+                    <Typography variant="h5" sx={{ textAlign: 'center', mt: 3 }}>
+                        KHÔNG CÓ GIẢI ĐẤU NÀO
+                    </Typography>
+                ) : (
+                    ''
+                )}
+                <Grid container spacing={2}>
+                    {tournaments ? (
+                        tournaments.map((tournament) => {
+                            return (
+                                <Grid item xs={12} sm={6} key={tournament.id}>
+                                    <Paper elevation={3}>
                                         <Box component={Link} to={`${tournament.id}`}>
                                             <div className={cx('tournament-list')}>
                                                 <div className={cx('tournament-status')}>
                                                     {/* <p className={cx('upcoming')}> */}
-                                                    {tournament.status === 'Chưa diễn ra' ? (
+                                                    {tournament.status === 3 ? (
                                                         <p className={cx('upcoming')}>Sắp diễn ra</p>
-                                                    ) : tournament.status === 'Đang diễn ra' ? (
+                                                    ) : tournament.status === 2 ? (
                                                         <p className={cx('going-on')}>Đang diễn ra</p>
                                                     ) : (
                                                         <p className={cx('closed')}>Đã kết thúc</p>
@@ -198,24 +217,16 @@ function Tournament() {
                                                 <Edit />
                                             </IconButton>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <Button component={Link} to={`${tournament.id}/admin`}>
-                                            Danh sách ban tổ chức
-                                        </Button>
-                                        <Button component={Link} to={`${tournament.id}/members`}>
-                                            Danh sách vận động viên
-                                        </Button>
-                                    </div>
-                                </div>
-                            </li>
-                        );
-                    })
-                ) : (
-                    <Typography sx={{ textAlign: 'center' }}>Hiện đang không có giải đấu nào</Typography>
-                )}
+                                    </Paper>
+                                </Grid>
+                            );
+                        })
+                    ) : (
+                        <Typography sx={{ textAlign: 'center' }}>Hiện đang không có giải đấu nào</Typography>
+                    )}
+                </Grid>
             </Box>
-        </Box>
+        </Paper>
     );
 }
 

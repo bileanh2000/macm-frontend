@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment } from 'react';
 import {
     Grid,
     Paper,
@@ -10,100 +10,119 @@ import {
     TableRow,
     Typography,
 } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
+import { tableCellClasses } from '@mui/material/TableCell';
 
-import adminTournament from 'src/api/adminTournamentAPI';
+function TournamentOverview({ tournament, value, index }) {
+    const StyledTableCell = styled(TableCell)(({ theme }) => ({
+        [`&.${tableCellClasses.head}`]: {
+            backgroundColor: theme.palette.common.black,
+            color: theme.palette.common.white,
+        },
+        [`&.${tableCellClasses.body}`]: {
+            fontSize: 14,
+        },
+    }));
 
-function TournamentOverview() {
-    let { tournamentId } = useParams();
-    const [tournament, setTournament] = useState([]);
-
-    const getTournamentById = async (tournamentId) => {
-        try {
-            const response = await adminTournament.getTournamentById(tournamentId);
-            console.log(response.data);
-            setTournament(response.data);
-        } catch (error) {
-            console.log('Lấy dữ liệu thất bại', error);
-        }
-    };
-    useEffect(() => {
-        getTournamentById(tournamentId);
-        window.scrollTo({ behavior: 'smooth', top: '0px' });
-    }, [tournamentId]);
+    const StyledTableRow = styled(TableRow)(({ theme }) => ({
+        '&:nth-of-type(odd)': {
+            backgroundColor: theme.palette.action.hover,
+        },
+        // hide last border
+        '&:last-child td, &:last-child th': {
+            border: 0,
+        },
+    }));
 
     return (
-        <Fragment>
-            {tournament &&
-                tournament.map((item) => {
-                    return (
-                        <Fragment key={item.id}>
-                            <Grid container columns={12} sx={{ mt: 2 }} spacing={2}>
-                                <Grid item xs={7}>
-                                    <Typography>Tên giải đấu</Typography>
-                                    <Typography>Nội dung</Typography>
-                                </Grid>
-                            </Grid>
-                            <Paper elevation={3}>
-                                {item.competitiveTypes.length > 0 && (
-                                    <TableContainer sx={{ maxHeight: 440 }}>
-                                        <Typography variant="h6">
-                                            <strong>Thi đấu đối kháng: </strong>
-                                        </Typography>
-                                        <TableContainer stickyHeader aria-label="sticky table">
-                                            <TableHead>
-                                                <TableRow>
-                                                    <TableCell align="center">Giới tính</TableCell>
-                                                    <TableCell align="center">Hạng cân</TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {item.competitiveTypes.map((data) => (
-                                                    <TableRow key={data.id}>
-                                                        <TableCell align="center">
-                                                            {data.gender === 1 ? 'Nam' : 'Nữ'}
-                                                        </TableCell>
-                                                        <TableCell align="center">
-                                                            {data.weightMin} - {data.weightMax} Kg
-                                                        </TableCell>
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+        >
+            {tournament && (
+                <Fragment>
+                    <Grid container columns={12} sx={{ mt: 2, ml: 0 }} spacing={2}>
+                        <Grid item xs={12}>
+                            <Typography variant="h4">{tournament.name}</Typography>
+                            <Typography variant="body1">{tournament.description}</Typography>
+                            <Typography variant="h5">Hạng mục thi đấu:</Typography>
+                        </Grid>
+                        <Grid container columns={12} sx={{ mb: 2 }} spacing={2}>
+                            <Grid item xs={4}>
+                                <Paper elevation={3}>
+                                    {tournament.competitiveTypes.length > 0 && (
+                                        <TableContainer sx={{ maxHeight: 440 }}>
+                                            <Typography variant="body1">
+                                                <strong>Thi đấu đối kháng: </strong>
+                                            </Typography>
+                                            <Table stickyHeader aria-label="sticky table">
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <StyledTableCell align="center">Giới tính</StyledTableCell>
+                                                        <StyledTableCell align="center">Hạng cân</StyledTableCell>
                                                     </TableRow>
-                                                ))}
-                                            </TableBody>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {tournament.competitiveTypes.map((data) => (
+                                                        <StyledTableRow key={data.id}>
+                                                            <StyledTableCell align="center">
+                                                                {data.gender === 1 ? 'Nam' : 'Nữ'}
+                                                            </StyledTableCell>
+                                                            <StyledTableCell align="center">
+                                                                {data.weightMin} - {data.weightMax} Kg
+                                                            </StyledTableCell>
+                                                        </StyledTableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
                                         </TableContainer>
-                                    </TableContainer>
-                                )}
-                            </Paper>
-                            <Paper elevation={3}>
-                                {item.exhibitionTypes.length > 0 && (
-                                    <TableContainer sx={{ maxHeight: 440 }}>
-                                        <Typography variant="h6">
-                                            <strong>Thi đấu biểu diễn: </strong>
-                                        </Typography>
-                                        <Table stickyHeader aria-label="sticky table">
-                                            <TableHead>
-                                                <TableRow>
-                                                    <TableCell align="center">Nội dung thi đấu</TableCell>
-                                                    <TableCell align="center">Số lượng nữ</TableCell>
-                                                    <TableCell align="center">Số lượng nam</TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {item.exhibitionTypes.map((data) => (
-                                                    <TableRow key={data.id}>
-                                                        <TableCell align="center">{data.name}</TableCell>
-                                                        <TableCell align="center">{data.numberFemale}</TableCell>
-                                                        <TableCell align="center">{data.numberMale}</TableCell>
+                                    )}
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={8}>
+                                <Paper elevation={3}>
+                                    {tournament.exhibitionTypes.length > 0 && (
+                                        <TableContainer sx={{ maxHeight: 440 }}>
+                                            <Typography variant="body1">
+                                                <strong>Thi đấu biểu diễn: </strong>
+                                            </Typography>
+                                            <Table aria-label="sticky table">
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <StyledTableCell align="center">
+                                                            Nội dung thi đấu
+                                                        </StyledTableCell>
+                                                        <StyledTableCell align="center">Số lượng nữ</StyledTableCell>
+                                                        <StyledTableCell align="center">Số lượng nam</StyledTableCell>
                                                     </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
-                                )}
-                            </Paper>
-                        </Fragment>
-                    );
-                })}
-        </Fragment>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {tournament.exhibitionTypes.map((data) => (
+                                                        <StyledTableRow key={data.id}>
+                                                            <StyledTableCell align="center">
+                                                                {data.name}
+                                                            </StyledTableCell>
+                                                            <StyledTableCell align="center">
+                                                                {data.numberFemale}
+                                                            </StyledTableCell>
+                                                            <StyledTableCell align="center">
+                                                                {data.numberMale}
+                                                            </StyledTableCell>
+                                                        </StyledTableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    )}
+                                </Paper>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Fragment>
+            )}
+        </div>
     );
 }
 export default TournamentOverview;
