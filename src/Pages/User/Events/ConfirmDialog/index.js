@@ -43,8 +43,11 @@ const ConfirmCancel = ({ isOpen, handleClose, onSucess, data }) => {
     const handleCancelEvent = () => {
         let studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
         eventApi.cancelJointEvent(id, studentId).then((res) => {
-            console.log(res.message);
-            enqueueSnackbar(res.message, { variant: 'warning', preventDuplicate: true });
+            console.log(res);
+            enqueueSnackbar(res.message, { variant: 'success', preventDuplicate: true });
+            handleClose();
+            onSucess && onSucess(res.data[0].event.id);
+            // onSucess && onSucess(true);
         });
     };
     return (

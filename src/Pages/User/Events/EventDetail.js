@@ -20,6 +20,8 @@ import interactionPlugin from '@fullcalendar/interaction';
 import RegisterEventDialog from './RegisterEventDialog';
 import LoadingProgress from 'src/Components/LoadingProgress';
 import ConfirmCancel from './ConfirmDialog';
+import { FormatColorReset } from '@mui/icons-material';
+import { useSnackbar } from 'notistack';
 
 function EventDetail() {
     let { id } = useParams();
@@ -28,6 +30,7 @@ function EventDetail() {
     const [scheduleList, setScheduleList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [isJoined, setIsJoined] = useState(false);
     const now = new Date();
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
@@ -46,7 +49,7 @@ function EventDetail() {
     const getListEventJoined = async (studentId) => {
         try {
             const response = await eventApi.getAllEventByStudentId(studentId);
-            console.log(`List event by student Id`, response);
+            console.log(`List event joined by student Id`, response.data);
             setEventJoined(response.data);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
@@ -61,18 +64,34 @@ function EventDetail() {
             console.log('That bai roi huhu ', error);
         }
     };
+
+    const checkEventJoined = () => {
+        if (eventJoined.length !== 0) {
+            if (eventJoined.find((item) => item.eventId === parseInt(id))) {
+                console.log('dung cmnd');
+                setIsJoined(true);
+            } else {
+                console.log('sai cmnd');
+                setIsJoined(false);
+            }
+        } else {
+            setIsJoined(false);
+        }
+    };
     useEffect(() => {
         fetchEventSchedule(id);
         getListEventJoined(studentId);
-    }, [id, studentId]);
+    }, [id]);
+    useEffect(() => {
+        checkEventJoined();
+        console.log(isJoined);
+        console.log('Event joined in useEffect', eventJoined);
+    }, [eventJoined]);
 
-    const checkEventJoined = () => {
-        if (eventJoined.filter((event) => event.id == id).length !== 0) {
-            return true;
-        } else {
-            return false;
-        }
-    };
+    useEffect(() => {
+        console.log('categoryList', eventJoined);
+    }, [eventJoined]);
+
     const handleRegisterEventDeadline = () => {
         if (event[0]) {
             if (new Date(event[0].registrationMemberDeadline) > now) {
@@ -82,13 +101,6 @@ function EventDetail() {
             }
         }
     };
-    // const handleRegisterCommitteeEventDeadline = () => {
-    //     if (new Date(event[0].registrationOrganizingCommitteeDeadline) > now) {
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // };
     const scheduleData = scheduleList.map((item) => {
         const container = {};
         container['id'] = item.id;
@@ -118,12 +130,22 @@ function EventDetail() {
                         setOpenDialog(false);
                     }}
                     data={event[0]}
+                    onSucess={(newEvent) => {
+                        console.log('newEvent', newEvent);
+                        eventJoined && setEventJoined([newEvent, ...eventJoined]);
+                        // setChange(deleteEventId);
+                    }}
                 />
             )}
             <ConfirmCancel
                 isOpen={openConfirmDialog}
                 handleClose={() => {
                     setOpenConfirmDialog(false);
+                }}
+                onSucess={(deleteEventId) => {
+                    console.log('deleteEventId', deleteEventId);
+                    eventJoined && setEventJoined((prev) => prev.filter((item) => item.eventId !== deleteEventId));
+                    // setChange(deleteEventId);
                 }}
             />
             {scheduleList[0] && (
@@ -134,7 +156,7 @@ function EventDetail() {
                         </Typography>
                         <Box>
                             {new Date(scheduleList[0].date) > new Date() ? (
-                                !checkEventJoined() ? (
+                                !isJoined ? (
                                     <Fragment>
                                         <Button
                                             variant="outlined"
