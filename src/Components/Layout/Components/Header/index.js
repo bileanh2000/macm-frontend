@@ -1,4 +1,3 @@
-
 import classNames from 'classnames/bind';
 import * as React from 'react';
 import styles from './Header.module.scss';
@@ -9,27 +8,34 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import Tooltip from '@mui/material/Tooltip';
 import AppBar from '@mui/material/AppBar';
-
-import Settings from '@mui/icons-material/Settings';
-import Logout from '@mui/icons-material/Logout';
-
 import Toolbar from '@mui/material/Toolbar';
 import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
+import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { ListItemIcon, ListItemText } from '@mui/material';
+import RuleIcon from '@mui/icons-material/Rule';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import ContactPageIcon from '@mui/icons-material/ContactPage';
+import CelebrationIcon from '@mui/icons-material/Celebration';
+import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
 const pages = ['1', '2', '3'];
 const settings = ['Tài khoản', 'Đăng xuất'];
 
-function Header() {
+function Header({ onLogout }) {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const [selectedIndex, setSelectedIndex] = React.useState(1);
 
+    const handleListItemClick = (event, index) => {
+        setSelectedIndex(index);
+        console.log(index);
+    };
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
     };
@@ -54,7 +60,7 @@ function Header() {
                             variant="h6"
                             noWrap
                             component="a"
-                            href="/"
+                            href="/home"
                             sx={{
                                 mr: 2,
                                 display: { xs: 'none', md: 'flex' },
@@ -79,6 +85,7 @@ function Header() {
                             >
                                 <MenuIcon />
                             </IconButton>
+                            {/* mobile */}
                             <Menu
                                 id="menu-appbar"
                                 anchorEl={anchorElNav}
@@ -97,11 +104,36 @@ function Header() {
                                     display: { xs: 'block', md: 'none' },
                                 }}
                             >
-                                {pages.map((page) => (
+                                {/* {pages.map((page) => (
                                     <MenuItem key={page} onClick={handleCloseNavMenu}>
                                         <Typography textAlign="center">{page}</Typography>
                                     </MenuItem>
-                                ))}
+                                ))} */}
+                                <MenuItem component={Link} to="/events" onClick={handleCloseNavMenu}>
+                                    <ListItemIcon>
+                                        <CelebrationIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Sự kiện</ListItemText>
+                                </MenuItem>
+                                <MenuItem onClick={handleCloseNavMenu}>
+                                    <ListItemIcon>
+                                        <EmojiEventsIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Giải đấu</ListItemText>
+                                </MenuItem>
+                                <MenuItem onClick={handleCloseNavMenu}>
+                                    <ListItemIcon>
+                                        <RuleIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Nội quy</ListItemText>
+                                </MenuItem>
+
+                                <MenuItem onClick={handleCloseNavMenu}>
+                                    <ListItemIcon>
+                                        <ContactPageIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Liên hệ</ListItemText>
+                                </MenuItem>
                             </Menu>
                         </Box>
                         <SportsMartialArtsIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -109,7 +141,7 @@ function Header() {
                             variant="h5"
                             noWrap
                             component="a"
-                            href=""
+                            href="/home"
                             sx={{
                                 mr: 2,
                                 display: { xs: 'flex', md: 'none' },
@@ -123,8 +155,18 @@ function Header() {
                         >
                             MACM
                         </Typography>
-                        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                            {pages.map((page) => (
+                        <Box
+                            sx={{
+                                height: '64px',
+                                mr: 3,
+                                flexGrow: 1,
+                                display: { xs: 'none', md: 'flex' },
+                                alignItems: 'center',
+                                textAlign: 'center',
+                                justifyContent: 'flex-end',
+                            }}
+                        >
+                            {/* {pages.map((page) => (
                                 <Button
                                     key={page}
                                     onClick={handleCloseNavMenu}
@@ -132,7 +174,38 @@ function Header() {
                                 >
                                     {page}
                                 </Button>
-                            ))}
+                            ))} */}
+                            <MenuItem
+                                component={Link}
+                                to="/events"
+                                selected={selectedIndex === 0}
+                                onClick={(event) => handleListItemClick(event, 0)}
+                                sx={{ height: '64px' }}
+                            >
+                                <ListItemIcon>
+                                    <CelebrationIcon sx={{ color: 'white' }} />
+                                </ListItemIcon>
+                                <ListItemText>Sự kiện</ListItemText>
+                            </MenuItem>
+                            <MenuItem onClick={handleCloseNavMenu} sx={{ height: '64px' }}>
+                                <ListItemIcon>
+                                    <EmojiEventsIcon sx={{ color: 'white' }} />
+                                </ListItemIcon>
+                                <ListItemText>Giải đấu</ListItemText>
+                            </MenuItem>
+                            <MenuItem onClick={handleCloseNavMenu} sx={{ height: '64px' }}>
+                                <ListItemIcon>
+                                    <RuleIcon sx={{ color: 'white' }} />
+                                </ListItemIcon>
+                                <ListItemText>Nội quy</ListItemText>
+                            </MenuItem>
+
+                            <MenuItem onClick={handleCloseNavMenu} sx={{ height: '64px' }}>
+                                <ListItemIcon>
+                                    <ContactPageIcon sx={{ color: 'white' }} />
+                                </ListItemIcon>
+                                <ListItemText>Liên hệ</ListItemText>
+                            </MenuItem>
                         </Box>
                         <Box sx={{ flexGrow: 0 }}>
                             {/* <Tooltip title="Open settings"> */}
@@ -159,11 +232,18 @@ function Header() {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-                                {settings.map((setting) => (
-                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                        <Typography textAlign="center">{setting}</Typography>
-                                    </MenuItem>
-                                ))}
+                                <MenuItem onClick={handleCloseUserMenu}>
+                                    <ListItemIcon>
+                                        <PersonIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Thông tin cá nhân</ListItemText>
+                                </MenuItem>
+                                <MenuItem onClick={onLogout}>
+                                    <ListItemIcon>
+                                        <LogoutIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Đăng xuất</ListItemText>
+                                </MenuItem>
                             </Menu>
                         </Box>
                     </Toolbar>
@@ -174,4 +254,3 @@ function Header() {
 }
 
 export default Header;
-

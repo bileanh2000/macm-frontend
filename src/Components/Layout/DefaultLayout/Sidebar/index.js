@@ -20,17 +20,22 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import { Toolbar } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-
-const cx = classNames.bind(styles);
-
-// const style = {
-//     width: '100%',
-//     maxWidth: 260,
-//     bgcolor: 'background.paper',
-// };
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
+import ContactPageIcon from '@mui/icons-material/ContactPage';
+import PaidIcon from '@mui/icons-material/Paid';
+import RuleIcon from '@mui/icons-material/Rule';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import FeedIcon from '@mui/icons-material/Feed';
+import CelebrationIcon from '@mui/icons-material/Celebration';
 
 function Sidebar() {
+    const [selectedIndex, setSelectedIndex] = React.useState(1);
     const [open, setOpen] = React.useState(false);
+
+    const handleListItemClick = (event, index) => {
+        setSelectedIndex(index);
+    };
 
     const handleClick = () => {
         setOpen(!open);
@@ -38,7 +43,13 @@ function Sidebar() {
     return (
         <List>
             <Toolbar />
-            <ListItem button component={Link} to="/admin">
+            <ListItem
+                button
+                component={Link}
+                to="/admin"
+                selected={selectedIndex === 0}
+                onClick={(event) => handleListItemClick(event, 0)}
+            >
                 <ListItemIcon>
                     <DashboardIcon />
                 </ListItemIcon>
@@ -54,13 +65,27 @@ function Sidebar() {
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                    <ListItem button sx={{ pl: 4 }} component={Link} to="/admin/member">
+                    <ListItem
+                        button
+                        sx={{ pl: 4 }}
+                        component={Link}
+                        to="/admin/member"
+                        selected={selectedIndex === 1}
+                        onClick={(event) => handleListItemClick(event, 1)}
+                    >
                         <ListItemIcon>
                             <PeopleAltRoundedIcon />
                         </ListItemIcon>
                         <ListItemText primary="Thành viên và CTV" />
                     </ListItem>
-                    <ListItem button sx={{ pl: 4 }} component={Link} to="/admin/headofdepartment">
+                    <ListItem
+                        button
+                        sx={{ pl: 4 }}
+                        component={Link}
+                        to="/admin/headofdepartment"
+                        selected={selectedIndex === 2}
+                        onClick={(event) => handleListItemClick(event, 2)}
+                    >
                         <ListItemIcon>
                             <PsychologyIcon />
                         </ListItemIcon>
@@ -69,66 +94,120 @@ function Sidebar() {
                 </List>
             </Collapse>
             <Divider />
-            <ListItem button component={Link} to="/admin/facility">
+            <ListItem
+                button
+                component={Link}
+                to="/admin/facility"
+                selected={selectedIndex === 3}
+                onClick={(event) => handleListItemClick(event, 3)}
+            >
                 <ListItemIcon>
                     <InventoryIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Cơ Sở Vật Chất" />
             </ListItem>
             <Divider />
-            <ListItem button component={Link} to="/admin/trainingschedules">
+            <ListItem
+                button
+                component={Link}
+                to="/admin/trainingschedules"
+                selected={selectedIndex === 4}
+                onClick={(event) => handleListItemClick(event, 4)}
+            >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <CalendarMonthIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Lịch Tập" />
             </ListItem>
             <Divider />
-            <ListItem button component={Link} to="/admin/attendance">
+            <ListItem
+                button
+                component={Link}
+                to="/admin/attendance"
+                selected={selectedIndex === 5}
+                onClick={(event) => handleListItemClick(event, 5)}
+            >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <HowToRegIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Điểm danh" />
             </ListItem>
             <Divider />
-            <ListItem button component={Link} to="/admin/contact">
+            <ListItem
+                button
+                component={Link}
+                to="/admin/contact"
+                selected={selectedIndex === 6}
+                onClick={(event) => handleListItemClick(event, 6)}
+            >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <ContactPageIcon />
                 </ListItemIcon>
                 <ListItemText primary="Trang Liên Hệ" />
             </ListItem>
             <Divider />
-            <ListItem button component={Link} to="/admin/clubfee">
+            <ListItem
+                button
+                component={Link}
+                to="/admin/clubfee"
+                selected={selectedIndex === 7}
+                onClick={(event) => handleListItemClick(event, 7)}
+            >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <PaidIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Chi Phí CLB" />
             </ListItem>
             <Divider />
-            <ListItem button component={Link} to="/admin/rules">
+            <ListItem
+                button
+                component={Link}
+                to="/admin/rules"
+                selected={selectedIndex === 8}
+                onClick={(event) => handleListItemClick(event, 8)}
+            >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <RuleIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Nội Quy" />
             </ListItem>
             <Divider />
 
-            <ListItem button component={Link} to="/admin/tournament">
+            <ListItem
+                button
+                component={Link}
+                to="/admin/tournament"
+                selected={selectedIndex === 9}
+                onClick={(event) => handleListItemClick(event, 9)}
+            >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <EmojiEventsIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Giải Đấu" />
             </ListItem>
             <Divider />
-            <ListItem button component={Link} to="/admin/news">
+            <ListItem
+                button
+                component={Link}
+                to="/admin/news"
+                selected={selectedIndex === 10}
+                onClick={(event) => handleListItemClick(event, 10)}
+            >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <FeedIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Tin Tức" />
             </ListItem>
             <Divider />
-            <ListItem button component={Link} to="/admin/events">
+            <ListItem
+                button
+                component={Link}
+                to="/admin/events"
+                selected={selectedIndex === 11}
+                onClick={(event) => handleListItemClick(event, 11)}
+            >
                 <ListItemIcon>
-                    <PeopleAltRoundedIcon />
+                    <CelebrationIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Sự Kiện" />
             </ListItem>

@@ -5,13 +5,12 @@ import styles from './DefaultLayout.module.scss';
 
 const cx = classNames.bind(styles);
 
-function DefaultLayout({ children }) {
+function DefaultLayout({ children, onLogout }) {
     return (
         <div>
-            <Header />
+            <Header onLogout={onLogout} />
 
             <div className={cx('container')}>
-                {/* <DrawerHeader /> */}
                 <div className={cx('content')}>{children}</div>
             </div>
         </div>

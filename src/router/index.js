@@ -73,9 +73,13 @@ import ReportFacility from 'src/Pages/Admin/Facility/ReportFacility';
 import QRScanner from 'src/Pages/Admin/Attendance/QRScan';
 import CheckAttendanceDate from 'src/Pages/Admin/Attendance/QRScan/CheckAttendanceDate';
 import AddMemberToEvent from 'src/Pages/Admin/Event/MenberEvent/AddMemberToEvent';
+import ForbiddenPage from 'src/Pages/ForbiddenPage';
 
-const privateRouters = [
-    { path: '/', component: LoginPage, layout: null },
+import EventListPage from 'src/Pages/User/Events';
+import ErrorPage from 'src/Pages/ErrorPage';
+import EventDetail from 'src/Pages/User/Events/EventDetail';
+
+const adminRouters = [
     { path: '/:userId', component: UserProfile, layout: HeaderOnly },
     { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
     { path: '/tournament', component: UserTournament, layout: HeaderOnly },
@@ -163,8 +167,21 @@ const privateRouters = [
     // Facility paths
     { path: '/admin/facility', component: Facility },
     { path: '/admin/facility/reports', component: ReportFacility },
+    //Login
+    // { path: '/', component: LoginPage, layout: null },
+
+    //User
 ];
 
-const publicRouters = [];
+const userRouter = [
+    { path: '/events', component: EventListPage, layout: HeaderOnly },
+    { path: '/events/:id', component: EventDetail, layout: HeaderOnly },
+    { path: '/home', component: Home, layout: HeaderOnly },
+    // 403 Page
+    { path: '/forbidden', component: ForbiddenPage, layout: null },
 
-export { privateRouters, publicRouters };
+    // 404 Page
+    { path: '*', component: ErrorPage, layout: null },
+];
+
+export { adminRouters, userRouter };
