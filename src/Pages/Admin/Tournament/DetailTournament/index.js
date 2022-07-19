@@ -155,7 +155,7 @@ function DetailTournament() {
     };
 
     return (
-        <Fragment>
+        <Box sx={{ m: 1, p: 1, height: '80vh' }}>
             <Dialog
                 open={openDialog}
                 onClose={handleCloseDialog}
@@ -239,7 +239,7 @@ function DetailTournament() {
                     </Paper>
                 </Fragment>
             )}
-        </Fragment>
+        </Box>
     );
 }
 

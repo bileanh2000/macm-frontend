@@ -13,6 +13,7 @@ function TournamentCompetitive() {
     const [listWeightRange, setListWeightRange] = useState([]);
     const [listPlayer, setListPlayer] = useState();
     const [rounds, setRounds] = useState();
+    const [areaList, setAreaList] = useState();
     const [tournamentStatus, setTournamentStatus] = useState(-1);
 
     const handleChangeCompetitiveId = (event) => {
@@ -20,10 +21,20 @@ function TournamentCompetitive() {
         getListPlayerByCompetitiveID(event.target.value);
     };
 
+    const getAllArea = async () => {
+        try {
+            const response = await adminTournament.getAllArea();
+            setAreaList(response.data);
+        } catch (error) {
+            console.log('Khong the lay danh sach san dau');
+        }
+    };
+
     const getListPlayerByCompetitiveID = async (weightRange) => {
         try {
             const response = await adminTournament.listMatchs(weightRange);
             setListPlayer(response.data);
+            console.log('lay data', response.data);
             setTournamentStatus(response.code);
             setRounds(response.totalResult);
         } catch (error) {
@@ -72,16 +83,37 @@ function TournamentCompetitive() {
         }
     };
 
-    const handleDialogUpdateBracket = () => {};
+    const spawnTimeAndArea = async () => {
+        try {
+            await adminTournament.spawnTimeAndArea(tournamentId);
+            getListPlayerByCompetitiveID(competitiveId);
+        } catch (error) {
+            console.log('Failed to spawn time: ', error);
+        }
+    };
 
-    const handleDialogUpdateTime = () => {};
+    const handleDialogUpdateTime = () => {
+        spawnTimeAndArea();
+    };
 
     const UpdateResultHandler = (newMatches) => {
-        // setMatches(newMatches);
+        setListPlayer(newMatches);
+        console.log(newMatches);
+        console.log('load lai di dm');
+        const timer = setTimeout(() => {
+            console.log('load lai ddeo');
+            getListPlayerByCompetitiveID(competitiveId);
+        }, 1000);
+        timer();
+        console.log('loz');
+        clearTimeout(timer);
+
+        // window.location.reload();
     };
 
     useEffect(() => {
         fetchTournamentById(tournamentId);
+        getAllArea();
     }, [tournamentId]);
 
     return (
@@ -91,12 +123,11 @@ function TournamentCompetitive() {
                     Bảng đấu
                 </Typography>
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                <Box>
+            {/* <Box>
                     <Typography variant="body1">Nội dung thi đấu đối kháng</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                    {tournamentStatus == 0 ? (
+                </Box> */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
+                {/* {tournamentStatus == 0 ? (
                         <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2 }}>
                             Tạo bảng đấu
                         </Button>
@@ -110,34 +141,58 @@ function TournamentCompetitive() {
                         </Button>
                     ) : (
                         ''
-                    )}
-                    <FormControl size="small">
-                        <Typography variant="caption">Hạng cân</Typography>
-                        <Select
-                            id="demo-simple-select"
-                            value={competitiveId}
-                            displayEmpty
-                            onChange={handleChangeCompetitiveId}
-                        >
-                            {listWeightRange &&
-                                listWeightRange.map((range) => (
-                                    <MenuItem value={range.id} key={range.id}>
-                                        {range.gender == 0 ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
-                                    </MenuItem>
-                                ))}
-                        </Select>
-                    </FormControl>
-                </Box>
+                    )} */}
+                <FormControl size="small">
+                    <Typography variant="caption">Hạng cân</Typography>
+                    <Select
+                        id="demo-simple-select"
+                        value={competitiveId}
+                        displayEmpty
+                        onChange={handleChangeCompetitiveId}
+                    >
+                        {listWeightRange &&
+                            listWeightRange.map((range) => (
+                                <MenuItem value={range.id} key={range.id}>
+                                    {range.gender == 0 ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
+                                </MenuItem>
+                            ))}
+                    </Select>
+                </FormControl>
             </Box>
-            {listPlayer && listPlayer.length > 0 ? (
-                <CustomMatchBracket
-                    matches={listPlayer}
-                    rounds={rounds}
-                    status={tournamentStatus}
-                    onUpdareResult={UpdateResultHandler}
-                />
+            {listPlayer && areaList && listPlayer.length > 0 ? (
+                <div>
+                    {tournamentStatus == 2 ? (
+                        listPlayer[listPlayer.length - 1].area ? (
+                            ''
+                        ) : (
+                            <Button variant="outlined" onClick={handleDialogUpdateTime} sx={{ mr: 2, float: 'right' }}>
+                                Cập nhật thời gian thi đấu
+                            </Button>
+                        )
+                    ) : (
+                        ''
+                    )}
+                    <CustomMatchBracket
+                        matches={listPlayer}
+                        rounds={rounds}
+                        status={tournamentStatus}
+                        areaList={areaList}
+                        onUpdareResult={UpdateResultHandler}
+                    />
+                </div>
+            ) : tournamentStatus == 1 ? (
+                <Box sx={{ d: 'flex' }}>
+                    <Typography variant="body1">Hạng cân này hiện đang chưa có tuyển thủ</Typography>
+                    <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2, float: 'right' }}>
+                        Tạo bảng đấu
+                    </Button>
+                </Box>
             ) : (
-                <Typography variant="body1">Hạng cân này hiện đang chưa có tuyển thủ</Typography>
+                <Box sx={{ d: 'flex' }}>
+                    <Typography variant="body1" sx={{ m: 'auto' }}>
+                        Hạng cân này không tổ chức
+                    </Typography>
+                </Box>
             )}
         </Fragment>
     );
