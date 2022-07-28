@@ -28,6 +28,7 @@ const pages = ['1', '2', '3'];
 const settings = ['Tài khoản', 'Đăng xuất'];
 
 function Header({ onLogout }) {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -115,7 +116,7 @@ function Header({ onLogout }) {
                                     </ListItemIcon>
                                     <ListItemText>Sự kiện</ListItemText>
                                 </MenuItem>
-                                <MenuItem onClick={handleCloseNavMenu}>
+                                <MenuItem component={Link} to="/tournament" onClick={handleCloseNavMenu}>
                                     <ListItemIcon>
                                         <EmojiEventsIcon />
                                     </ListItemIcon>
@@ -187,7 +188,13 @@ function Header({ onLogout }) {
                                 </ListItemIcon>
                                 <ListItemText>Sự kiện</ListItemText>
                             </MenuItem>
-                            <MenuItem onClick={handleCloseNavMenu} sx={{ height: '64px' }}>
+                            <MenuItem
+                                component={Link}
+                                to="/tournament"
+                                selected={selectedIndex === 1}
+                                onClick={(event) => handleListItemClick(event, 1)}
+                                sx={{ height: '64px' }}
+                            >
                                 <ListItemIcon>
                                     <EmojiEventsIcon sx={{ color: 'white' }} />
                                 </ListItemIcon>
@@ -232,7 +239,12 @@ function Header({ onLogout }) {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-                                <MenuItem onClick={handleCloseUserMenu}>
+                                <MenuItem
+                                    component={Link}
+                                    to={`/${user.studentId}`}
+                                    sx={{ height: '64px' }}
+                                    onClick={handleCloseUserMenu}
+                                >
                                     <ListItemIcon>
                                         <PersonIcon />
                                     </ListItemIcon>

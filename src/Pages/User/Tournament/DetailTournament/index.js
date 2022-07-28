@@ -23,6 +23,7 @@ import { Box } from '@mui/system';
 import { useCallback, useState, Fragment, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Delete, Edit } from '@mui/icons-material';
+
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import TournamentOverview from './TournamentOverview';
 import TournamentSchedule from './TournamentSchedule';
@@ -31,6 +32,8 @@ import TournamentExhibition from './TournamentExhibition';
 import AdminTournament from './AdminTournament';
 import MemberTournament from './MemberTournament';
 import RegisterPlayer from './RegisterPlayer';
+import userTournamentAPI from 'src/api/userTournamentAPI';
+import { useSnackbar } from 'notistack';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -64,14 +67,17 @@ function a11yProps(index) {
 
 function DetailTournament() {
     let { tournamentId } = useParams();
+    const user = JSON.parse(localStorage.getItem('currentUser'));
     const [tournament, setTournament] = useState();
+    const { enqueueSnackbar } = useSnackbar();
     const [active, setActive] = useState(0);
     const [scheduleList, setScheduleList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [openDialogAdmin, setOpenDialogAdmin] = useState(false);
     const [value, setValue] = useState(0);
-    const [valueRadio, setValueRadio] = useState();
+    const [valueRadio, setValueRadio] = useState(0);
     const [error, setError] = useState(false);
+    const [roleInTournament, setRoleInTournament] = useState([]);
     const [helperText, setHelperText] = useState('Vui lòng chọn vai trò');
 
     const handleChange = (event, newValue) => {
@@ -114,11 +120,33 @@ function DetailTournament() {
         event.preventDefault();
 
         if (valueRadio) {
-            setHelperText('You got it!');
+            // setHelperText('You got it!');
+            console.log(valueRadio);
+            registerToJoinOrganizingCommittee(tournamentId, user.studentId, valueRadio);
             setError(false);
         } else {
             setHelperText('Please select an option.');
             setError(true);
+        }
+    };
+
+    const registerToJoinOrganizingCommittee = async (tournamentId, studentId, roleId) => {
+        try {
+            const response = userTournamentAPI.registerToJoinOrganizingCommittee(tournamentId, studentId, roleId);
+            let variant = response.data > 0 ? 'success' : 'error';
+            enqueueSnackbar(response.message, { variant });
+        } catch (error) {
+            let variant = 'error';
+            enqueueSnackbar(error, { variant });
+        }
+    };
+
+    const getRoleInTournament = async () => {
+        try {
+            const response = await userTournamentAPI.getAllOrginizingCommitteeRole();
+            setRoleInTournament(response.data);
+        } catch (error) {
+            console.log('Khong the lay duoc role', error);
         }
     };
 
@@ -158,6 +186,10 @@ function DetailTournament() {
         window.scrollTo({ behavior: 'smooth', top: '0px' });
     }, [tournamentId]);
 
+    useEffect(() => {
+        getRoleInTournament();
+    }, []);
+
     const scheduleData = scheduleList.map((item) => {
         const container = {};
         container['id'] = item.id;
@@ -171,38 +203,9 @@ function DetailTournament() {
 
     return (
         <Box sx={{ m: 1, p: 1, height: '80vh' }}>
-            {/* <Dialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">Đăng kí tham gia giải đấu</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        <Typography sx={{ m: 1 }}>
-                            <strong>Họ và tên: </strong> Nguyễn Văn A{' '}
-                        </Typography>
-                        <Typography sx={{ m: 1 }}>
-                            <strong>Mã SV: </strong> HE123456{' '}
-                        </Typography>
-                        <Typography sx={{ m: 1 }}>
-                            <strong>Ngày sinh: </strong> 28-2-2202{' '}
-                        </Typography>
-                        <Typography sx={{ m: 1 }}>
-                            <strong>Giới tính: </strong> Nam{' '}
-                        </Typography>
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
-                    <Button onClick={handleRegister} autoFocus>
-                        Đồng ý
-                    </Button>
-                </DialogActions>
-            </Dialog> */}
             <RegisterPlayer
                 title="Cập nhật cơ sở vật chất"
+                userInformation={user}
                 isOpen={openDialog}
                 handleClose={() => {
                     setOpenDialog(false);
@@ -221,16 +224,23 @@ function DetailTournament() {
                     </DialogContentText>
                     <form onSubmit={handleSubmit}>
                         <FormControl sx={{ m: 3 }} error={error} variant="standard">
-                            <RadioGroup
-                                aria-labelledby="demo-error-radios"
-                                name="quiz"
-                                value={valueRadio}
-                                onChange={handleRadioChange}
-                            >
-                                <FormControlLabel value={0} control={<Radio />} label="Ban Văn Hóa" />
-                                <FormControlLabel value={1} control={<Radio />} label="Ban Truyền Thông" />
-                                <FormControlLabel value={2} control={<Radio />} label="Ban Hậu Cần" />
-                            </RadioGroup>
+                            {roleInTournament && (
+                                <RadioGroup
+                                    aria-labelledby="demo-error-radios"
+                                    name="quiz"
+                                    value={valueRadio}
+                                    onChange={handleRadioChange}
+                                >
+                                    {roleInTournament.map((role, index) => (
+                                        <FormControlLabel
+                                            key={index}
+                                            value={role.id}
+                                            control={<Radio />}
+                                            label={role.name}
+                                        />
+                                    ))}
+                                </RadioGroup>
+                            )}
                             <FormHelperText>{helperText}</FormHelperText>
                             <Box sx={{ display: 'flex', alignContent: 'space-between' }}>
                                 <Button sx={{ mt: 1, mr: 1 }} type="submit" variant="outlined">

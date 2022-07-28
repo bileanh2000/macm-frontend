@@ -80,10 +80,10 @@ import ErrorPage from 'src/Pages/ErrorPage';
 import EventDetail from 'src/Pages/User/Events/EventDetail';
 
 const adminRouters = [
-    { path: '/:userId', component: UserProfile, layout: HeaderOnly },
-    { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
-    { path: '/tournament', component: UserTournament, layout: HeaderOnly },
-    { path: '/tournament/:tournamentId', component: UserTournamentDetail, layout: HeaderOnly },
+    // { path: '/:userId', component: UserProfile, layout: HeaderOnly },
+    // { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
+    // { path: '/tournament', component: UserTournament, layout: HeaderOnly },
+    // { path: '/tournament/:tournamentId', component: UserTournamentDetail, layout: HeaderOnly },
 
     { path: '/home', component: Home, layout: HeaderOnly },
     { path: '/admin', component: AdminHomePage },
@@ -177,6 +177,10 @@ const userRouter = [
     { path: '/events', component: EventListPage, layout: HeaderOnly },
     { path: '/events/:id', component: EventDetail, layout: HeaderOnly },
     { path: '/home', component: Home, layout: HeaderOnly },
+    { path: '/:userId', component: UserProfile, layout: HeaderOnly },
+    { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
+    { path: '/tournament', component: UserTournament, layout: HeaderOnly },
+    { path: '/tournament/:tournamentId', component: UserTournamentDetail, layout: HeaderOnly },
     // 403 Page
     { path: '/forbidden', component: ForbiddenPage, layout: null },
 
