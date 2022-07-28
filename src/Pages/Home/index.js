@@ -1,16 +1,17 @@
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Button, Grid, Paper, Typography } from '@mui/material';
 import React, { Fragment, useEffect } from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import News from './News/News';
 import Schedule from './Schedule/Schedule';
 import PaymentNotification from './PaymentNotification';
+import News from './News/News';
+import userApi from 'src/api/userApi';
 
 function Index() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [userName, setUserName] = useState(false);
     const roleId = JSON.parse(localStorage.getItem('currentUser')).role.id;
-    // setUserName(JSON.parse(localStorage.getItem('currentUser')).name);
+
     useEffect(() => {
         if (
             roleId === 1 ||
@@ -29,8 +30,8 @@ function Index() {
 
     return (
         <Fragment>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                <Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
+                {/* <Box>
                     <Typography variant="h5" component="span">
                         Xin chào, {JSON.parse(localStorage.getItem('currentUser')).name}
                     </Typography>
@@ -41,16 +42,22 @@ function Index() {
                     ) : (
                         ''
                     )}
-                </Box>
+                </Box> */}
 
                 <PaymentNotification />
                 {/* <Typography variant="h6">Bạn đéo cần phải đóng tiền kỳ này</Typography> */}
             </Box>
             <Grid container spacing={2}>
-                <Grid item xs={4}>
-                    <News />
+                <Grid item md={2} xs={12}>
+                    <News
+                        name={JSON.parse(localStorage.getItem('currentUser')).name}
+                        studentId={JSON.parse(localStorage.getItem('currentUser')).studentId}
+                        roleName={JSON.parse(localStorage.getItem('currentUser')).role.name}
+                        email={JSON.parse(localStorage.getItem('currentUser')).email}
+                        isAdmin={isAdmin}
+                    />
                 </Grid>
-                <Grid item xs={8} style={{ paddingRight: 16 }}>
+                <Grid item md={10} xs={12}>
                     <Schedule />
                 </Grid>
             </Grid>

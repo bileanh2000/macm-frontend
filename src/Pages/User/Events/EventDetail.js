@@ -204,17 +204,6 @@ function EventDetail() {
                                         <p>{scheduleList[0].event.description}</p>
                                     </Typography>
                                 </div>
-                                <Box>
-                                    {new Date(scheduleList[0].date) > new Date() ? (
-                                        <Fragment>
-                                            <Button variant="outlined" component={Link} to={`edit`}>
-                                                Đăng ký tham gia
-                                            </Button>
-                                        </Fragment>
-                                    ) : (
-                                        ''
-                                    )}
-                                </Box>
                             </Box>
                         </Grid>
                         <Grid item xs={7} sx={{ minHeight: '755px' }}>

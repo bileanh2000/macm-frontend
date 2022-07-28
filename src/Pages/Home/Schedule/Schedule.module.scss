@@ -53,3 +53,47 @@
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
+
+.absent {
+    display: flex;
+    justify-content: center;
+    width: fit-content;
+    padding: 5px;
+    border-radius: 10px;
+    // color: #259323;
+    // background-color: #c4fdc3b6;
+    background-color: #fc6262;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.attend {
+    display: flex;
+    justify-content: center;
+    width: fit-content;
+    padding: 5px;
+    border-radius: 10px;
+    // color: #259323;
+    // background-color: #c4fdc3b6;
+    background-color: #56f000;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+.not-yet {
+    display: flex;
+    justify-content: center;
+    width: fit-content;
+    padding: 5px;
+    border-radius: 10px;
+    // color: #259323;
+    // background-color: #c4fdc3b6;
+    background-color: #1f67ed;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}

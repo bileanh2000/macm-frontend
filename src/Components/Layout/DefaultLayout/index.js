@@ -42,37 +42,6 @@ function DefaultLayout({ children, onLogout }) {
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            {/* <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-                <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        edge="start"
-                        onClick={handleDrawerToggle}
-                        sx={{ mr: 2, display: { md: 'none' } }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography
-                        variant="h5"
-                        noWrap
-                        component="a"
-                        href=""
-                        sx={{
-                            mr: 2,
-                            display: { xs: 'flex', md: 'none' },
-                            flexGrow: 1,
-                            fontFamily: 'monospace',
-                            fontWeight: 700,
-                            letterSpacing: '.3rem',
-                            color: 'inherit',
-                            textDecoration: 'none',
-                        }}
-                    >
-                        MACM
-                    </Typography>
-                </Toolbar>
-            </AppBar> */}
             <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                 <Box sx={{ padding: '0px 16px 0px 16px' }}>
                     <Toolbar disableGutters>
@@ -224,15 +193,5 @@ function DefaultLayout({ children, onLogout }) {
         </Box>
     );
 }
-// return (
-//     <div>
-//         {/* <Header />
-
-//         <div className={cx('container')}>
-//             <Sidebar />
-//             <div className={cx('content')}>{children}</div>
-//         </div> */}
-//     </div>
-// );
 
 export default DefaultLayout;

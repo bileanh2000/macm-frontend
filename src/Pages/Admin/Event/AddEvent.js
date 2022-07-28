@@ -59,6 +59,17 @@ function AddEvent() {
         setOpen(true);
     };
 
+    useEffect(() => {
+        window.addEventListener(
+            'beforeunload',
+            (ev) => {
+                ev.preventDefault();
+                return (ev.returnValue = 'Are you sure you want to close?');
+            },
+            [],
+        );
+    });
+
     const handleCreate = () => {
         const params = {
             name: submitData.name,
@@ -68,6 +79,10 @@ function AddEvent() {
             totalAmountEstimated: submitData.cost,
             IsContinuous: submitData.IsContinuous,
             amountFromClub: submitData.amountFromClub,
+            registrationMemberDeadline: moment(submitData.registrationMemberDeadline).format('YYYY-MM-DDTHH:mm:ss'),
+            registrationOrganizingCommitteeDeadline: moment(submitData.registrationOrganizingCommitteeDeadline).format(
+                'YYYY-MM-DDTHH:mm:ss',
+            ),
         };
         console.log(params);
 
@@ -138,6 +153,8 @@ function AddEvent() {
         }),
         startDate: Yup.string().nullable().required('Không được để trống trường này'),
         finishDate: Yup.string().nullable().required('Không được để trống trường này'),
+        registrationMemberDeadline: Yup.string().nullable().required('Không được để trống trường này'),
+        registrationOrganizingCommitteeDeadline: Yup.string().nullable().required('Không được để trống trường này'),
     });
 
     const {
@@ -166,6 +183,9 @@ function AddEvent() {
             cost: data.cost,
             amount_per_register: data.amountPerRegister,
             amountFromClub: data.amountFromClub,
+            registrationMemberDeadline: data.registrationMemberDeadline,
+            registrationOrganizingCommitteeDeadline: data.registrationOrganizingCommitteeDeadline,
+
             // IsContinuous: isChecked,
         };
         setSubmitData(dataSubmit);
@@ -190,7 +210,7 @@ function AddEvent() {
                 // dynamicAlert(snackBarStatus, res.message);
             }
         });
-        console.log(dataSubmit);
+        console.log('submit form data', dataSubmit);
     };
     const EventSchedule = previewData.map((item, index) => {
         const container = {};
@@ -438,6 +458,38 @@ function AddEvent() {
                                         />
                                     )}
                                 />
+                                <Controller
+                                    required
+                                    name="registrationMemberDeadline"
+                                    control={control}
+                                    defaultValue={null}
+                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        <DateTimePicker
+                                            label="Deadline đăng ký tham gia"
+                                            // disablePast
+                                            ampm={false}
+                                            value={value}
+                                            onChange={(value) => onChange(value)}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    sx={{
+                                                        marginTop: '0px !important',
+                                                        marginBottom: '16px !important',
+                                                    }}
+                                                    {...params}
+                                                    required
+                                                    id="outlined-disabled"
+                                                    error={invalid}
+                                                    helperText={invalid ? error.message : null}
+                                                    // id="startDate"
+                                                    variant="outlined"
+                                                    margin="dense"
+                                                    fullWidth
+                                                />
+                                            )}
+                                        />
+                                    )}
+                                />
                             </Grid>
                             <Grid item xs={6}>
                                 <Controller
@@ -480,6 +532,38 @@ function AddEvent() {
                                     render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                         <TimePicker
                                             label="Thời gian kết thúc"
+                                            ampm={false}
+                                            value={value}
+                                            onChange={(value) => onChange(value)}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    sx={{
+                                                        marginTop: '0px !important',
+                                                        marginBottom: '16px !important',
+                                                    }}
+                                                    {...params}
+                                                    required
+                                                    id="outlined-disabled"
+                                                    error={invalid}
+                                                    helperText={invalid ? error.message : null}
+                                                    // id="startDate"
+                                                    variant="outlined"
+                                                    margin="dense"
+                                                    fullWidth
+                                                />
+                                            )}
+                                        />
+                                    )}
+                                />
+                                <Controller
+                                    required
+                                    name="registrationOrganizingCommitteeDeadline"
+                                    control={control}
+                                    defaultValue={null}
+                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        <DateTimePicker
+                                            label="Deadline đăng ký ban tổ chức"
+                                            // disablePast
                                             ampm={false}
                                             value={value}
                                             onChange={(value) => onChange(value)}
