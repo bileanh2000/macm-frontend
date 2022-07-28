@@ -31,11 +31,13 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import { useParams } from 'react-router-dom';
 import eventApi from 'src/api/eventApi';
+import { useSnackbar } from 'notistack';
 
 const RegisterEventDialog = ({ isOpen, handleClose, onSucess, data }) => {
     const [value, setValue] = useState(null);
     const [checked, setChecked] = useState(false);
     const now = new Date();
+    const { enqueueSnackbar } = useSnackbar();
 
     let { id } = useParams();
 
@@ -55,6 +57,7 @@ const RegisterEventDialog = ({ isOpen, handleClose, onSucess, data }) => {
             return false;
         }
     };
+
     const handleRegisterCommitteeEventDeadline = () => {
         if (new Date(data.registrationOrganizingCommitteeDeadline) > now) {
             return true;
@@ -84,10 +87,16 @@ const RegisterEventDialog = ({ isOpen, handleClose, onSucess, data }) => {
         if (value) {
             eventApi.registerEventCommittee(id, studentId, value).then((res) => {
                 console.log('registerEventCommittee', res);
+                onSucess && onSucess(res.data[0]);
+                enqueueSnackbar(res.message, { variant: 'success', preventDuplicate: true });
+                handleClose();
             });
         } else {
             eventApi.registerEvent(id, studentId).then((res) => {
                 console.log('registerEvent', res);
+                enqueueSnackbar(res.message, { variant: 'success', preventDuplicate: true });
+                onSucess && onSucess(res.data[0]);
+                handleClose();
             });
         }
     };
