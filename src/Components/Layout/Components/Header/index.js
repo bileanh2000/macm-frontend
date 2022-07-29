@@ -471,14 +471,21 @@ function Header({ onLogout }) {
                                                                     </Avatar>
                                                                 )}
                                                             </ListItemAvatar>
-                                                            <ListItemText
-                                                                sx={{ whiteSpace: 'normal' }}
-                                                                primary={news.message}
-                                                                // secondary={moment(news.createdOn).format(
-                                                                //     'DD/MM/YYYY - HH:MM',
-                                                                // )}
-                                                                secondary={moment(news.createdOn).fromNow()}
-                                                            />
+                                                            <Tooltip
+                                                                title={moment(news.createdOn).format(
+                                                                    'ddd, DD/MM/YYYY - HH:MM',
+                                                                )}
+                                                            >
+                                                                <ListItemText
+                                                                    sx={{ whiteSpace: 'normal' }}
+                                                                    primary={news.message}
+                                                                    // secondary={moment(news.createdOn).format(
+                                                                    //     'DD/MM/YYYY - HH:MM',
+                                                                    // )}
+                                                                    secondary={moment(news.createdOn).fromNow()}
+                                                                />
+                                                            </Tooltip>
+
                                                             {!news.read ? (
                                                                 <CircleIcon
                                                                     sx={{ fontSize: '0.9rem', color: '#2e89ff' }}
