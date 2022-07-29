@@ -33,7 +33,7 @@ function EventList() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [events, setEvents] = useState([]);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(0);
     const [semester, setSemester] = useState('Summer2022');
     const [monthInSemester, setMonthInSemester] = useState([]);
     const [month, setMonth] = useState(0);
@@ -51,7 +51,8 @@ function EventList() {
         try {
             const response = await eventApi.getEventBySemesterAndStudentId(studentId, month, page, semester);
             setEvents(response.data);
-            console.log('getListEventsBySemester', response.data);
+            console.log('getListEventsBySemester', response);
+            setPageSize(Math.ceil(response.totalResult / 5));
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
@@ -339,7 +340,7 @@ function EventList() {
                     </Grid>
                     <Box>
                         <Pagination
-                            count={events && Math.floor(events.length / 5) + 1}
+                            count={pageSize}
                             // count={3}
                             page={page}
                             color="primary"

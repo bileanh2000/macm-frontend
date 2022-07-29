@@ -22,6 +22,7 @@ import LoadingProgress from 'src/Components/LoadingProgress';
 import ConfirmCancel from './ConfirmDialog';
 import { FormatColorReset } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
+import moment from 'moment';
 
 function EventDetail() {
     let { id } = useParams();
@@ -187,19 +188,39 @@ function EventDetail() {
                         <Grid item xs={5}>
                             <Box sx={{ marginTop: '16px' }}>
                                 <div>
-                                    <Typography variant="h6">
+                                    <Typography sx={{ fontSize: '20px' }}>
                                         <strong>Dự kiến số tiền mỗi người phải đóng: </strong>
                                         {scheduleList[0].event.amountPerRegisterEstimated.toLocaleString('en-US')} VND
                                     </Typography>
                                 </div>
                                 <div>
-                                    <Typography variant="h6">
+                                    <Typography sx={{ fontSize: '20px' }}>
                                         <strong>Số người ban tổ chức: </strong>
                                         {scheduleList[0].event.maxQuantityComitee}
                                     </Typography>
                                 </div>
                                 <div>
-                                    <Typography variant="h6">
+                                    <Typography sx={{ fontSize: '20px' }}>
+                                        <strong>Deadline đăng ký: </strong>
+                                        <div>
+                                            {moment(scheduleList[0].event.registrationMemberDeadline).format(
+                                                `HH:mm:ss - DD/MM/YYYY`,
+                                            )}
+                                        </div>
+                                    </Typography>
+                                </div>
+                                <div>
+                                    <Typography sx={{ fontSize: '20px' }}>
+                                        <strong>Deadline đăng ký thành viên ban tổ chức: </strong>
+                                        <div>
+                                            {moment(
+                                                scheduleList[0].event.registrationOrganizingCommitteeDeadline,
+                                            ).format(`HH:mm:ss - DD/MM/YYYY`)}
+                                        </div>
+                                    </Typography>
+                                </div>
+                                <div>
+                                    <Typography sx={{ fontSize: '20px' }}>
                                         <strong>Nội dung: </strong>
                                         <p>{scheduleList[0].event.description}</p>
                                     </Typography>
