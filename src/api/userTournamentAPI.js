@@ -1,4 +1,5 @@
 import axiosClient from './axiosClient';
+
 const userTournamentAPI = {
     registerToJoinOrganizingCommittee: (tournamentId, studentId, roleId) => {
         const url = `/tournament/registertojoinorganizingcommittee/${tournamentId}/${studentId}/${roleId}`;

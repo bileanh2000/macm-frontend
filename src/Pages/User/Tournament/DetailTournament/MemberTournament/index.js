@@ -4,8 +4,8 @@ import { Link, useParams } from 'react-router-dom';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import MemberList from './MemberList';
 
-function MemberTournament() {
-    let snackBarStatus;
+function MemberTournament(props) {
+    // console.log(props);
     let { tournamentId } = useParams();
     const [type, setType] = useState(1);
     const [competitivePlayer, setCompetitivePlayer] = useState([]);

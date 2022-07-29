@@ -1,7 +1,6 @@
-import { Box, Button, FormControl, Grid, MenuItem, Select, Typography } from '@mui/material';
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import AdminList from './AdminList';
 
