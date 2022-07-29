@@ -13,6 +13,7 @@ import { ACCESS_TOKEN } from './constants';
 import OAuth2RedirectHandler from './oauth2/OAuth2RedirectHandler';
 import Home from './Pages/Admin/Home';
 import ErrorPage from './Pages/ErrorPage';
+import Notification from './Pages/Notification';
 
 // function App() {
 //     const [login, setLogin] = useState({ authenticated: true, currentUser: null });
@@ -135,6 +136,12 @@ class App extends Component {
                             element={this.state.authenticated ? <Navigate to="/home" /> : <Login />}
                             // element={<Login />}
                         ></Route>
+                        {/* <Route
+                            path="/notifications"
+                            // render={(props) => <Login authenticated={this.state.authenticated} {...props} />}
+                            element={<Notification />}
+                            // element={<Login />}
+                        ></Route> */}
                         <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />}></Route>
                         {userRouter.map((route, index) => {
                             const Page = route.component;

@@ -1,81 +1,63 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
-import { Grid, Pagination, Stack } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Avatar, Box, Button, Grid, Menu, MenuItem, Pagination, Paper, Stack, Typography } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 
 import styles from './News.module.scss';
-import adminNewsAPI from 'src/api/adminNewsAPI';
+import userApi from 'src/api/userApi';
 
 const cx = classNames.bind(styles);
-
-function News() {
-    const [newsList, setNews] = useState([]);
-    const navigator = useNavigate();
-
-    const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
-
-    const fetchNewsList = async (pageNo) => {
-        try {
-            const response = await adminNewsAPI.getAllNotification(pageNo);
-            console.log(response);
-            setNews(response.data);
-            setTotal(response.totalPage);
-        } catch (error) {
-            console.log('Lấy dữ liệu news thất bại');
-        }
-    };
+function News({ name, studentId, roleName, email, isAdmin }) {
+    const [qrCode, setQrCode] = useState('');
 
     useEffect(() => {
-        fetchNewsList(page - 1);
-        window.scrollTo({ behavior: 'smooth', top: '0px' });
-    }, [page]);
-
-    const handleChange = (event, value) => {
-        setPage(value);
-    };
-
-    const onClickNotification = (news) => {
-        if (news.notificationType == 1) {
-            navigator({ pathname: `/events/${news.notificationTypeId}` });
-        } else if (news.notificationType == 0) {
-            navigator({ pathname: `/tournament/${news.notificationTypeId}` });
-        } else {
-            return;
-        }
-    };
+        const generateQrCode = async () => {
+            try {
+                const params = {
+                    email: email,
+                    studentId: studentId,
+                    name: name,
+                    date: new Date(),
+                };
+                const response = await userApi.generateQrCode(params);
+                console.log('QRCode', response);
+                console.log('QRCode', response.data);
+                setQrCode(response.data);
+            } catch (error) {
+                console.log('failed when generateQrCode', error);
+            }
+        };
+        generateQrCode();
+    }, []);
 
     return (
-        <div className={cx('news-container')}>
-            <h2>Thông báo</h2>
+        <Paper>
+            <img src={qrCode} alt="qrcode" width="100%" />
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                    padding: '0px 0px 8px 0px',
+                    alignItems: 'center',
+                }}
+            >
+                <Typography>{roleName}</Typography>
+                <Typography>{studentId}</Typography>
+                <Typography>{name}</Typography>
 
-            {newsList.map((news, index) => (
-                <div className={cx('news-item')} key={index} onClick={() => onClickNotification(news)}>
-                    <Grid container spacing={1} className={cx('news-title')}>
-                        <Grid item xs={10}>
-                            <h3> * {news.message}</h3>
-                        </Grid>
-                        <Grid item xs={2} className={cx('news-tag')}>
-                            <small>
-                                {news.notificationType == 0
-                                    ? 'Giải đấu'
-                                    : news.notificationType == 1
-                                    ? 'Sự kiện'
-                                    : 'Lịch tập'}
-                            </small>
-                        </Grid>
-                    </Grid>
-                    <div className={cx('news-time')}>
-                        <small>{news.time}</small>
-                    </div>
-                </div>
-            ))}
-            {total > 1 && (
-                <Stack spacing={2}>
-                    <Pagination count={total} page={page} onChange={handleChange} />
-                </Stack>
-            )}
-        </div>
+                {isAdmin ? (
+                    <>
+                        <Button>
+                            <Link to="/admin/attendance">Điểm danh</Link>
+                        </Button>
+                        <Button>
+                            <Link to="/admin">Chuyển sang trang quản trị</Link>
+                        </Button>
+                    </>
+                ) : null}
+            </Box>
+        </Paper>
     );
 }
 

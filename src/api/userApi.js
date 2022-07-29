@@ -90,5 +90,14 @@ const userApi = {
         const url = '/admin/hr/getallmemberandcollaborator';
         return axiosClient.get(url);
     },
+    getAllAttendanceStatus: (studentId) => {
+        const url = `/admin/hr/getallattendancestatusofuser/${studentId}`;
+        return axiosClient.get(url);
+    },
+
+    getAllAttendanceStatusBySemester: (studentId, semester) => {
+        const url = `/admin/headtechnique/getallattendancestatusbystudentidandsemester/${studentId}?semester=${semester}`;
+        return axiosClient.get(url);
+    },
 };
 export default userApi;

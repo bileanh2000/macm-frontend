@@ -11,6 +11,10 @@ const eventApi = {
         const url = `/event/geteventsbysemester?month=${month}&pageNo=${page}&pageSize=5&semester=${semester}`;
         return axiosClient.get(url);
     },
+    getEventBySemesterAndStudentId: (studentId, month, page, semester) => {
+        const url = `/event/geteventsbysemesterandstudentid/${studentId}?month=${month}&pageNo=${page}&pageSize=5&semester=${semester}`;
+        return axiosClient.get(url);
+    },
 
     createPreviewEvent: (params) => {
         const url = '/eventschedule/headculture/createpreview/';

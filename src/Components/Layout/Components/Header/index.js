@@ -15,24 +15,86 @@ import Button from '@mui/material/Button';
 import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { ListItemIcon, ListItemText } from '@mui/material';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import CircleIcon from '@mui/icons-material/Circle';
+import { useGlobalState, setGlobalState } from 'src/state';
+
+import {
+    Badge,
+    Divider,
+    Grid,
+    List,
+    ListItemAvatar,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Pagination,
+    Paper,
+    Stack,
+    ToggleButton,
+    ToggleButtonGroup,
+    Tooltip,
+} from '@mui/material';
 import RuleIcon from '@mui/icons-material/Rule';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import { Link } from 'react-router-dom';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import moment from 'moment';
+import adminNewsAPI from 'src/api/adminNewsAPI';
+import { useNavigate } from 'react-router-dom';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+// import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
+import notificationApi from 'src/api/notificationApi';
 
 const cx = classNames.bind(styles);
-
-const pages = ['1', '2', '3'];
-const settings = ['Tài khoản', 'Đăng xuất'];
 
 function Header({ onLogout }) {
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
+    const [anchorEl, setAnchorEl] = React.useState(false);
+    const [newsList, setNews] = React.useState([]);
+    const navigator = useNavigate();
+    const [checked, setChecked] = React.useState(false);
+    const [totalUnRead, setTotalUnRead] = React.useState(0);
+    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
+    const [notiStatus, setNotiStatus] = React.useState(0);
+    const [totalNotification] = useGlobalState('totalNotification');
 
+    const [page, setPage] = React.useState(1);
+    const [total, setTotal] = React.useState(0);
+    const open = Boolean(anchorEl);
+    // let notiCount = localStorage.getItem('notiCount');
+
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up('md'));
+
+    const fetchNewsList = async (studentId, pageNo) => {
+        try {
+            const response = await notificationApi.getAllNotification(studentId, pageNo);
+            console.log('fetch list notifications', response);
+            setTotalUnRead(response.totalDeactive);
+            setNews(response.data);
+            setTotal(response.totalPage);
+        } catch (error) {
+            console.log('Lấy dữ liệu news thất bại');
+        }
+    };
+
+    React.useEffect(() => {
+        fetchNewsList(studentId, page - 1);
+        // window.scrollTo({ behavior: 'smooth', top: '0px' });
+    }, [page]);
+
+    const handleClickAway = () => {
+        setChecked(false);
+    };
     const handleListItemClick = (event, index) => {
         setSelectedIndex(index);
         console.log(index);
@@ -51,9 +113,58 @@ function Header({ onLogout }) {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
+    const handleClickNotification = () => {
+        setChecked((prev) => !prev);
+    };
+
+    const handleChange = (event, value) => {
+        setPage(value);
+    };
+    const handleMarkAllRead = () => {
+        setNews((prev) => {
+            return prev.map((item) => {
+                console.log(item);
+                item.read = true;
+                return item;
+            });
+        });
+        setTotalUnRead(0);
+        notificationApi.markAllNotificationAsRead(studentId).then((response) => {
+            console.log('mark all notification', response);
+        });
+    };
+
+    const onClickNotification = (news) => {
+        if (!news.read) {
+            setTotalUnRead((prev) => prev - 1);
+        }
+        notificationApi.markNotificationAsRead(news.id, studentId).then((response) => {
+            console.log('mark notification', response);
+        });
+        news['read'] = true;
+
+        setNews((prev) => {
+            return prev.map((prevNew) => {
+                if (prevNew.id === news.id) {
+                    return {
+                        ...prevNew,
+                    };
+                }
+                return prevNew;
+            });
+        });
+        console.log(news);
+        if (news.notificationType == 1) {
+            navigator({ pathname: `/events/${news.notificationTypeId}` });
+        } else if (news.notificationType == 0) {
+            navigator({ pathname: `/tournament/${news.notificationTypeId}` });
+        } else {
+            return;
+        }
+    };
     return (
         <header className={cx('wrapper')}>
-            <AppBar position="static">
+            <AppBar position="fixed">
                 <Box sx={{ padding: '0px 16px 0px 16px' }}>
                     <Toolbar disableGutters>
                         <SportsMartialArtsIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
@@ -105,11 +216,6 @@ function Header({ onLogout }) {
                                     display: { xs: 'block', md: 'none' },
                                 }}
                             >
-                                {/* {pages.map((page) => (
-                                    <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                        <Typography textAlign="center">{page}</Typography>
-                                    </MenuItem>
-                                ))} */}
                                 <MenuItem component={Link} to="/events" onClick={handleCloseNavMenu}>
                                     <ListItemIcon>
                                         <CelebrationIcon />
@@ -137,6 +243,7 @@ function Header({ onLogout }) {
                                 </MenuItem>
                             </Menu>
                         </Box>
+
                         <SportsMartialArtsIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
                         <Typography
                             variant="h5"
@@ -167,15 +274,6 @@ function Header({ onLogout }) {
                                 justifyContent: 'flex-end',
                             }}
                         >
-                            {/* {pages.map((page) => (
-                                <Button
-                                    key={page}
-                                    onClick={handleCloseNavMenu}
-                                    sx={{ my: 2, color: 'white', display: 'block' }}
-                                >
-                                    {page}
-                                </Button>
-                            ))} */}
                             <MenuItem
                                 component={Link}
                                 to="/events"
@@ -214,6 +312,179 @@ function Header({ onLogout }) {
                                 <ListItemText>Liên hệ</ListItemText>
                             </MenuItem>
                         </Box>
+                        <ClickAwayListener onClickAway={handleClickAway}>
+                            <Box>
+                                {matches ? (
+                                    <IconButton
+                                        id="basic-button"
+                                        sx={{ color: 'white', mr: 2 }}
+                                        // onClick={handleClickNotification}
+                                        onClick={handleClickNotification}
+                                    >
+                                        <Badge
+                                            sx={{
+                                                '& .MuiBadge-badge': {
+                                                    backgroundColor: '#FF4444',
+                                                },
+                                            }}
+                                            badgeContent={totalUnRead}
+                                        >
+                                            <NotificationsIcon />
+                                        </Badge>
+                                    </IconButton>
+                                ) : (
+                                    // Mobile ----------------
+                                    <IconButton
+                                        id="basic-button"
+                                        sx={{ color: 'white', mr: 2 }}
+                                        component={Link}
+                                        to="/notifications"
+                                    >
+                                        <Badge
+                                            sx={{
+                                                '& .MuiBadge-badge': {
+                                                    backgroundColor: '#FF4444',
+                                                },
+                                            }}
+                                            badgeContent={totalNotification}
+                                        >
+                                            <NotificationsIcon />
+                                        </Badge>
+                                    </IconButton>
+                                )}
+
+                                {/* <Grow in={checked}> */}
+                                {checked ? (
+                                    <Paper elevation={3} sx={{ position: 'absolute', top: '58px', right: '0px' }}>
+                                        <Box sx={{ padding: '16px 8px 8px 8px' }}>
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                }}
+                                            >
+                                                <h2 style={{ marginLeft: '8px' }}>Thông báo</h2>
+                                                <Tooltip title="Đánh dấu tất cả đã đọc" placement="left">
+                                                    <IconButton
+                                                        aria-label="more"
+                                                        id="long-button"
+                                                        aria-haspopup="true"
+                                                        onClick={handleMarkAllRead}
+                                                    >
+                                                        <DoneAllIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Box>
+                                            <Box className={cx('noti-switch')} sx={{ padding: '8px 8px 5px 8px' }}>
+                                                {/* <span
+                                                    className={cx('all')}
+                                                    onClick={(e) => {
+                                                        setNotiStatus(0);
+                                                        e.currentTarget.classList.add('active');
+                                                    }}
+                                                >
+                                                    Tất cả
+                                                </span>
+                                                <span
+                                                    onClick={() => {
+                                                        setNotiStatus(1);
+                                                    }}
+                                                    className={cx('unread')}
+                                                >
+                                                    Chưa đọc
+                                                </span> */}
+                                                <ToggleButtonGroup
+                                                    color="primary"
+                                                    value={notiStatus}
+                                                    exclusive
+                                                    onChange={(event, newNotiStatus) => {
+                                                        if (newNotiStatus !== null) {
+                                                            setNotiStatus(newNotiStatus);
+                                                            console.log(newNotiStatus);
+                                                        }
+                                                    }}
+                                                >
+                                                    <ToggleButton
+                                                        value={0}
+                                                        sx={{
+                                                            p: 1,
+                                                            borderRadius: '10px !important',
+                                                            border: 'none',
+                                                            textTransform: 'none',
+                                                            mr: 1,
+                                                        }}
+                                                    >
+                                                        Tất cả
+                                                    </ToggleButton>
+                                                    <ToggleButton
+                                                        value={1}
+                                                        sx={{
+                                                            p: 1,
+                                                            borderRadius: '10px !important',
+                                                            border: 'none',
+                                                            textTransform: 'none',
+                                                        }}
+                                                    >
+                                                        Chưa đọc
+                                                    </ToggleButton>
+                                                </ToggleButtonGroup>
+                                            </Box>
+
+                                            <List sx={{ width: 400 }}>
+                                                {newsList.map((news, index) => (
+                                                    <React.Fragment key={index}>
+                                                        <ListItemButton
+                                                            onClick={() => onClickNotification(news)}
+                                                            sx={{ whiteSpace: 'normal' }}
+                                                        >
+                                                            <ListItemAvatar>
+                                                                {news.notificationType === 0 ? (
+                                                                    <Avatar sx={{ backgroundColor: '#f9d441' }}>
+                                                                        <EmojiEventsIcon />
+                                                                    </Avatar>
+                                                                ) : news.notificationType === 1 ? (
+                                                                    <Avatar sx={{ backgroundColor: '#16ce8e' }}>
+                                                                        <CelebrationIcon />
+                                                                    </Avatar>
+                                                                ) : news.notificationType === 2 ? (
+                                                                    <Avatar sx={{ backgroundColor: '#409bf5' }}>
+                                                                        <SportsMartialArtsIcon />
+                                                                    </Avatar>
+                                                                ) : (
+                                                                    <Avatar sx={{ backgroundColor: '#ff4444' }}>
+                                                                        <PriorityHighIcon />
+                                                                    </Avatar>
+                                                                )}
+                                                            </ListItemAvatar>
+                                                            <ListItemText
+                                                                sx={{ whiteSpace: 'normal' }}
+                                                                primary={news.message}
+                                                                secondary={moment(news.createdOn).format(
+                                                                    'DD/MM/YYYY - HH:MM',
+                                                                )}
+                                                            />
+                                                            {!news.read ? (
+                                                                <CircleIcon
+                                                                    sx={{ fontSize: '0.9rem', color: '#2e89ff' }}
+                                                                />
+                                                            ) : null}
+                                                        </ListItemButton>
+                                                        <Divider variant="inset" component="li" />
+                                                    </React.Fragment>
+                                                ))}
+                                            </List>
+                                            <Stack spacing={2}>
+                                                <Pagination count={total} page={page} onChange={handleChange} />
+                                            </Stack>
+                                        </Box>
+                                    </Paper>
+                                ) : null}
+
+                                {/* </Grow> */}
+                            </Box>
+                        </ClickAwayListener>
+
                         <Box sx={{ flexGrow: 0 }}>
                             {/* <Tooltip title="Open settings"> */}
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

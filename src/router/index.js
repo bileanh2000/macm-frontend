@@ -78,6 +78,8 @@ import ForbiddenPage from 'src/Pages/ForbiddenPage';
 import EventListPage from 'src/Pages/User/Events';
 import ErrorPage from 'src/Pages/ErrorPage';
 import EventDetail from 'src/Pages/User/Events/EventDetail';
+import Notification from 'src/Pages/Notification';
+import AttendanceReport from 'src/Pages/Home/AttendanceReport';
 
 const adminRouters = [
     // { path: '/:userId', component: UserProfile, layout: HeaderOnly },
@@ -169,6 +171,8 @@ const adminRouters = [
     { path: '/admin/facility/reports', component: ReportFacility },
     //Login
     // { path: '/', component: LoginPage, layout: null },
+    // Notifications
+    { path: '/notifications', component: Notification, layout: HeaderOnly },
 
     //User
 ];
@@ -186,6 +190,13 @@ const userRouter = [
 
     // 404 Page
     { path: '*', component: ErrorPage, layout: null },
+
+    // Notifications
+    { path: '/notifications', component: Notification, layout: HeaderOnly },
+
+    //Attendance Report
+
+    { path: '/report/attendance', component: AttendanceReport, layout: HeaderOnly },
 ];
 
 export { adminRouters, userRouter };

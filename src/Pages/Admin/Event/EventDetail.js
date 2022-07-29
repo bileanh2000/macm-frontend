@@ -83,7 +83,7 @@ function EventDetail() {
         const container = {};
         container['id'] = item.id;
         container['date'] = item.date;
-        container['title'] = item.event.name + ' - ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['title'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
         container['backgroundColor'] = '#5ba8f5';
 

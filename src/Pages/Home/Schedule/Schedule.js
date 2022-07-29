@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -8,15 +7,27 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { Square } from '@mui/icons-material';
 import trainingSchedule from 'src/api/trainingScheduleApi';
 import styles from './Schedule.module.scss';
-import { Box, FormControl, MenuItem, Paper, Select } from '@mui/material';
+import { Box, Button, FormControl, MenuItem, Paper, Select, Tooltip, Typography } from '@mui/material';
+import userApi from 'src/api/userApi';
+import styled from '@emotion/styled';
+import ReactDOM from 'react-dom';
 
 const cx = classNames.bind(styles);
 
+export const StyleWrapper = styled.div`
+    .fc-event-past {
+        background-color: none !important;
+    }
+    // .fc-event::after {
+    //     content: 'hahaah';
+    // }
+`;
 function Schedule() {
     const nowDate = new Date();
     const [type, setType] = useState(-1);
     const [commonList, setCommonList] = useState([]);
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
+    const [calendarView, setCalendarView] = useState('dayGridWeek');
 
     const handleChange = (event) => {
         setType(event.target.value);
@@ -32,9 +43,9 @@ function Schedule() {
         setMonthAndYear({ month: currentMonth, year: currentYear });
         console.log(currentMonth, currentYear);
     };
-    const fetchCommonScheduleBySemester = async (type) => {
+    const fetchCommonScheduleBySemester = async (type, studentId) => {
         try {
-            const response = await trainingSchedule.commonSchedule();
+            const response = await userApi.getAllAttendanceStatus(studentId);
             console.log('Thanh cong roi: ', response);
             if (type === -1) {
                 setCommonList(response.data);
@@ -47,84 +58,156 @@ function Schedule() {
         }
     };
     useEffect(() => {
-        fetchCommonScheduleBySemester(type);
+        fetchCommonScheduleBySemester(type, JSON.parse(localStorage.getItem('currentUser')).studentId);
     }, [type]);
 
     const scheduleData = commonList.map((item) => {
         const container = {};
         container['id'] = item.id;
         container['date'] = item.date;
-        container['title'] = item.title + ' - ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['title'] = item.title;
+        container['time'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['description'] = item.title + ' ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
         container['type'] = item.type;
+        container['status'] = item.status;
 
-        container['backgroundColor'] = item.type === 0 ? '#5ba8f5' : item.type === 1 ? '#37ff9f' : '#F58171';
+        // 0 la vang, 1 la co mat, 2 chua diem danh
+        container['backgroundColor'] = item.status === 0 ? '#fc6262' : item.status === 1 ? '#56f000' : '#fff';
 
         return container;
     });
 
+    const renderEventContent = (eventInfo) => {
+        // console.log(eventInfo);
+        return (
+            <Tooltip title={eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time} placement="top">
+                {calendarView === 'dayGridWeek' ? (
+                    <Box sx={{ backgroundColor: '#fff', height: '100%' }}>
+                        <Box sx={{ ml: 0.5 }} className={cx('tooltip')}>
+                            {/* <p className={cx('tooltiptext')}>
+     
+ </p> */}
+                            {/* <b>{eventInfo.timeText}</b> */}
+                            <div className={cx('event-title')}>
+                                {eventInfo.event.title} <br />
+                                {eventInfo.event.extendedProps.time}
+                            </div>
+
+                            {eventInfo.event.extendedProps.status === 0 ? (
+                                <div className={cx('absent')}>Vắng mặt</div>
+                            ) : eventInfo.event.extendedProps.status === 1 ? (
+                                <div className={cx('attend')}>Có mặt</div>
+                            ) : (
+                                <div className={cx('not-yet')}>Not yet</div>
+                            )}
+                        </Box>
+                    </Box>
+                ) : (
+                    <Box>
+                        <Box sx={{ ml: 0.5 }} className={cx('tooltip')}>
+                            {/* <p className={cx('tooltiptext')}>
+
+</p> */}
+                            {/* <b>{eventInfo.timeText}</b> */}
+                            <div className={cx('event-title')}>
+                                {eventInfo.event.title} <br />
+                                {eventInfo.event.extendedProps.time}
+                            </div>
+                        </Box>
+                    </Box>
+                )}
+            </Tooltip>
+        );
+    };
+
     return (
-        <Paper className={cx('schedule-container')}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Box>
-                    <h2>Lịch của câu lạc bộ</h2>
-                    <FormControl size="medium">
-                        <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChange}>
-                            <MenuItem value={-1}>
-                                <em>Tất cả</em>
-                            </MenuItem>
-                            <MenuItem value={0}>Tập luyện</MenuItem>
-                            <MenuItem value={1}>Sự kiện</MenuItem>
-                            <MenuItem value={2}>Giải đấu</MenuItem>
-                        </Select>
-                    </FormControl>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+        <StyleWrapper>
+            <Paper sx={{ padding: '20px' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <Box sx={{ display: 'flex' }}>
+                        <Typography variant="h5" sx={{ fontWeight: '500', mr: 2 }}>
+                            Hoạt động
+                        </Typography>
+                        <FormControl size="small">
+                            <Select
+                                id="demo-simple-select"
+                                value={type}
+                                displayEmpty
+                                onChange={handleChange}
+                                variant="outlined"
+                            >
+                                <MenuItem value={-1}>
+                                    <em>Tất cả</em>
+                                </MenuItem>
+                                <MenuItem value={0}>Tập luyện</MenuItem>
+                                <MenuItem value={1}>Sự kiện</MenuItem>
+                                <MenuItem value={2}>Giải đấu</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+                    {calendarView !== 'dayGridWeek' ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
                         <Square sx={{ color: '#BBBBBB', mr: 0.5 }} />
                         <span>Lịch trong quá khứ</span>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
                         <Square sx={{ color: '#5BA8F5', mr: 0.5 }} />
                         <span>Tập luyện</span>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                        <Square sx={{ color: '#37ff9f', mr: 0.5 }} />
-                        <span>Sự kiện</span>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                        <Square sx={{ color: '#F58171', mr: 0.5 }} />
-                        <span>Giải đấu</span>
-                    </Box>
+                    </Box> */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                                <Square sx={{ color: '#fc6262', mr: 0.5 }} />
+                                <span>Vắng mặt</span>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                                <Square sx={{ color: '#56f000', mr: 0.5 }} />
+                                <span>Có mặt</span>
+                            </Box>
+                        </Box>
+                    ) : null}
                 </Box>
-            </Box>
-            <div>
-                <div className={cx('schedule-container')}>
-                    <div className={cx('schedule-content')}>
-                        {scheduleData.length > 0 && (
-                            <FullCalendar
-                                locale="vie"
-                                height="100%"
-                                initialView="dayGridWeek"
-                                plugins={[dayGridPlugin, interactionPlugin]}
-                                events={scheduleData}
-                                weekends={true}
-                                headerToolbar={{
-                                    left: 'title',
-                                    center: 'dayGridMonth,dayGridWeek',
-                                    right: 'prev next today',
-                                }}
-                                datesSet={(dateInfo) => {
-                                    getMonthInCurrentTableView(dateInfo.start);
-                                }}
-                            />
-                        )}
+                <div>
+                    <div className={cx('schedule-container')}>
+                        <div className={cx('schedule-content')}>
+                            {scheduleData.length > 0 && (
+                                <FullCalendar
+                                    locale="vie"
+                                    height="100%"
+                                    initialView="dayGridWeek"
+                                    plugins={[dayGridPlugin, interactionPlugin]}
+                                    events={scheduleData}
+                                    weekends={true}
+                                    // eventMouseEnter={(infor) => {
+                                    //     console.log('hover', infor);
+                                    // }}
+                                    // eventMouseLeave={(infor) => {
+                                    //     console.log('leave', infor);
+                                    // }}
+                                    eventContent={renderEventContent}
+                                    headerToolbar={{
+                                        left: 'title',
+                                        center: 'dayGridMonth,dayGridWeek',
+                                        right: 'prev next today',
+                                    }}
+                                    datesSet={(dateInfo) => {
+                                        console.log(dateInfo.view.type);
+                                        setCalendarView(dateInfo.view.type);
+                                        getMonthInCurrentTableView(dateInfo.start);
+                                    }}
+                                />
+                            )}
+                        </div>
+                        <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button>
+                                <Link to="/report/attendance">Xem báo cáo điểm danh</Link>
+                            </Button>
+                        </Box>
                     </div>
                 </div>
-            </div>
-        </Paper>
+            </Paper>
+        </StyleWrapper>
     );
 }
 
 export default Schedule;
-
