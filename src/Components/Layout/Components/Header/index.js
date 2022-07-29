@@ -20,6 +20,7 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useGlobalState, setGlobalState } from 'src/state';
+import 'moment/locale/vi';
 
 import {
     Badge,
@@ -66,7 +67,7 @@ function Header({ onLogout }) {
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
     const [notiStatus, setNotiStatus] = React.useState(0);
     const [totalNotification] = useGlobalState('totalNotification');
-
+    moment().locale('vi');
     const [page, setPage] = React.useState(1);
     const [total, setTotal] = React.useState(0);
     const open = Boolean(anchorEl);
@@ -340,16 +341,29 @@ function Header({ onLogout }) {
                                         component={Link}
                                         to="/notifications"
                                     >
-                                        <Badge
-                                            sx={{
-                                                '& .MuiBadge-badge': {
-                                                    backgroundColor: '#FF4444',
-                                                },
-                                            }}
-                                            badgeContent={totalNotification}
-                                        >
-                                            <NotificationsIcon />
-                                        </Badge>
+                                        {totalNotification !== 0 ? (
+                                            <Badge
+                                                sx={{
+                                                    '& .MuiBadge-badge': {
+                                                        backgroundColor: '#FF4444',
+                                                    },
+                                                }}
+                                                badgeContent={totalNotification}
+                                            >
+                                                <NotificationsIcon />
+                                            </Badge>
+                                        ) : (
+                                            <Badge
+                                                sx={{
+                                                    '& .MuiBadge-badge': {
+                                                        backgroundColor: '#FF4444',
+                                                    },
+                                                }}
+                                                badgeContent={totalUnRead}
+                                            >
+                                                <NotificationsIcon />
+                                            </Badge>
+                                        )}
                                     </IconButton>
                                 )}
 
@@ -460,9 +474,10 @@ function Header({ onLogout }) {
                                                             <ListItemText
                                                                 sx={{ whiteSpace: 'normal' }}
                                                                 primary={news.message}
-                                                                secondary={moment(news.createdOn).format(
-                                                                    'DD/MM/YYYY - HH:MM',
-                                                                )}
+                                                                // secondary={moment(news.createdOn).format(
+                                                                //     'DD/MM/YYYY - HH:MM',
+                                                                // )}
+                                                                secondary={moment(news.createdOn).fromNow()}
                                                             />
                                                             {!news.read ? (
                                                                 <CircleIcon
