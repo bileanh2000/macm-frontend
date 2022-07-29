@@ -28,6 +28,7 @@ function Schedule() {
     const [commonList, setCommonList] = useState([]);
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
     const [calendarView, setCalendarView] = useState('dayGridWeek');
+    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
     const handleChange = (event) => {
         setType(event.target.value);
@@ -58,7 +59,7 @@ function Schedule() {
         }
     };
     useEffect(() => {
-        fetchCommonScheduleBySemester(type, JSON.parse(localStorage.getItem('currentUser')).studentId);
+        fetchCommonScheduleBySemester(type, studentId);
     }, [type]);
 
     const scheduleData = commonList.map((item) => {
