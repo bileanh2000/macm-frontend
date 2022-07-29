@@ -19,6 +19,7 @@ import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CircleIcon from '@mui/icons-material/Circle';
+import { useGlobalState, setGlobalState } from 'src/state';
 
 import {
     Badge,
@@ -32,6 +33,8 @@ import {
     Pagination,
     Paper,
     Stack,
+    ToggleButton,
+    ToggleButtonGroup,
     Tooltip,
 } from '@mui/material';
 import RuleIcon from '@mui/icons-material/Rule';
@@ -46,6 +49,7 @@ import { useNavigate } from 'react-router-dom';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 // import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
+import notificationApi from 'src/api/notificationApi';
 
 const cx = classNames.bind(styles);
 
@@ -57,18 +61,24 @@ function Header({ onLogout }) {
     const [newsList, setNews] = React.useState([]);
     const navigator = useNavigate();
     const [checked, setChecked] = React.useState(false);
+    const [totalUnRead, setTotalUnRead] = React.useState(0);
+    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
+    const [notiStatus, setNotiStatus] = React.useState(0);
+    const [totalNotification] = useGlobalState('totalNotification');
 
     const [page, setPage] = React.useState(1);
     const [total, setTotal] = React.useState(0);
     const open = Boolean(anchorEl);
+    // let notiCount = localStorage.getItem('notiCount');
 
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
 
-    const fetchNewsList = async (pageNo) => {
+    const fetchNewsList = async (studentId, pageNo) => {
         try {
-            const response = await adminNewsAPI.getAllNotification(pageNo);
-            console.log(response);
+            const response = await notificationApi.getAllNotification(studentId, pageNo);
+            console.log('fetch list notifications', response);
+            setTotalUnRead(response.totalDeactive);
             setNews(response.data);
             setTotal(response.totalPage);
         } catch (error) {
@@ -77,7 +87,7 @@ function Header({ onLogout }) {
     };
 
     React.useEffect(() => {
-        fetchNewsList(page - 1);
+        fetchNewsList(studentId, page - 1);
         // window.scrollTo({ behavior: 'smooth', top: '0px' });
     }, [page]);
 
@@ -109,7 +119,40 @@ function Header({ onLogout }) {
     const handleChange = (event, value) => {
         setPage(value);
     };
+    const handleMarkAllRead = () => {
+        setNews((prev) => {
+            return prev.map((item) => {
+                console.log(item);
+                item.read = true;
+                return item;
+            });
+        });
+        setTotalUnRead(0);
+        notificationApi.markAllNotificationAsRead(studentId).then((response) => {
+            console.log('mark all notification', response);
+        });
+    };
+
     const onClickNotification = (news) => {
+        if (!news.read) {
+            setTotalUnRead((prev) => prev - 1);
+        }
+        notificationApi.markNotificationAsRead(news.id, studentId).then((response) => {
+            console.log('mark notification', response);
+        });
+        news['read'] = true;
+
+        setNews((prev) => {
+            return prev.map((prevNew) => {
+                if (prevNew.id === news.id) {
+                    return {
+                        ...prevNew,
+                    };
+                }
+                return prevNew;
+            });
+        });
+        console.log(news);
         if (news.notificationType == 1) {
             navigator({ pathname: `/events/${news.notificationTypeId}` });
         } else if (news.notificationType == 0) {
@@ -271,18 +314,33 @@ function Header({ onLogout }) {
                                         // onClick={handleClickNotification}
                                         onClick={handleClickNotification}
                                     >
-                                        <Badge color="secondary" badgeContent={2}>
+                                        <Badge
+                                            sx={{
+                                                '& .MuiBadge-badge': {
+                                                    backgroundColor: '#FF4444',
+                                                },
+                                            }}
+                                            badgeContent={totalUnRead}
+                                        >
                                             <NotificationsIcon />
                                         </Badge>
                                     </IconButton>
                                 ) : (
+                                    // Mobile ----------------
                                     <IconButton
                                         id="basic-button"
                                         sx={{ color: 'white', mr: 2 }}
                                         component={Link}
                                         to="/notifications"
                                     >
-                                        <Badge color="secondary" badgeContent={1}>
+                                        <Badge
+                                            sx={{
+                                                '& .MuiBadge-badge': {
+                                                    backgroundColor: '#FF4444',
+                                                },
+                                            }}
+                                            badgeContent={totalNotification}
+                                        >
                                             <NotificationsIcon />
                                         </Badge>
                                     </IconButton>
@@ -305,11 +363,65 @@ function Header({ onLogout }) {
                                                         aria-label="more"
                                                         id="long-button"
                                                         aria-haspopup="true"
-                                                        onClick={() => console.log(test)}
+                                                        onClick={handleMarkAllRead}
                                                     >
                                                         <DoneAllIcon />
                                                     </IconButton>
                                                 </Tooltip>
+                                            </Box>
+                                            <Box className={cx('noti-switch')} sx={{ padding: '8px 8px 5px 8px' }}>
+                                                {/* <span
+                                                    className={cx('all')}
+                                                    onClick={(e) => {
+                                                        setNotiStatus(0);
+                                                        e.currentTarget.classList.add('active');
+                                                    }}
+                                                >
+                                                    Tất cả
+                                                </span>
+                                                <span
+                                                    onClick={() => {
+                                                        setNotiStatus(1);
+                                                    }}
+                                                    className={cx('unread')}
+                                                >
+                                                    Chưa đọc
+                                                </span> */}
+                                                <ToggleButtonGroup
+                                                    color="primary"
+                                                    value={notiStatus}
+                                                    exclusive
+                                                    onChange={(event, newNotiStatus) => {
+                                                        if (newNotiStatus !== null) {
+                                                            setNotiStatus(newNotiStatus);
+                                                            console.log(newNotiStatus);
+                                                        }
+                                                    }}
+                                                >
+                                                    <ToggleButton
+                                                        value={0}
+                                                        sx={{
+                                                            p: 1,
+                                                            borderRadius: '10px !important',
+                                                            border: 'none',
+                                                            textTransform: 'none',
+                                                            mr: 1,
+                                                        }}
+                                                    >
+                                                        Tất cả
+                                                    </ToggleButton>
+                                                    <ToggleButton
+                                                        value={1}
+                                                        sx={{
+                                                            p: 1,
+                                                            borderRadius: '10px !important',
+                                                            border: 'none',
+                                                            textTransform: 'none',
+                                                        }}
+                                                    >
+                                                        Chưa đọc
+                                                    </ToggleButton>
+                                                </ToggleButtonGroup>
                                             </Box>
 
                                             <List sx={{ width: 400 }}>
@@ -345,7 +457,11 @@ function Header({ onLogout }) {
                                                                     'DD/MM/YYYY - HH:MM',
                                                                 )}
                                                             />
-                                                            <CircleIcon sx={{ fontSize: '0.9rem', color: '#2e89ff' }} />
+                                                            {!news.read ? (
+                                                                <CircleIcon
+                                                                    sx={{ fontSize: '0.9rem', color: '#2e89ff' }}
+                                                                />
+                                                            ) : null}
                                                         </ListItemButton>
                                                         <Divider variant="inset" component="li" />
                                                     </React.Fragment>

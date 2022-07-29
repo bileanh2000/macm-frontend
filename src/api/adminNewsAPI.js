@@ -1,4 +1,3 @@
-
 import axiosClient from './axiosClient';
 
 const adminNewsAPI = {
@@ -34,15 +33,6 @@ const adminNewsAPI = {
         return axiosClient.put(url, null, {
             params: {
                 status: data.status,
-            },
-        });
-    },
-    getAllNotification: (pageNo) => {
-        const url = `notification/getallnotification`;
-        return axiosClient.get(url, {
-            params: {
-                pageNo: pageNo,
-                pageSize: '5'
             },
         });
     },

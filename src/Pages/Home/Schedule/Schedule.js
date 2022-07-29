@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -7,7 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { Square } from '@mui/icons-material';
 import trainingSchedule from 'src/api/trainingScheduleApi';
 import styles from './Schedule.module.scss';
-import { Box, FormControl, MenuItem, Paper, Select, Tooltip, Typography } from '@mui/material';
+import { Box, Button, FormControl, MenuItem, Paper, Select, Tooltip, Typography } from '@mui/material';
 import userApi from 'src/api/userApi';
 import styled from '@emotion/styled';
 import ReactDOM from 'react-dom';
@@ -198,6 +198,11 @@ function Schedule() {
                                 />
                             )}
                         </div>
+                        <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button>
+                                <Link to="/report/attendance">Xem báo cáo điểm danh</Link>
+                            </Button>
+                        </Box>
                     </div>
                 </div>
             </Paper>

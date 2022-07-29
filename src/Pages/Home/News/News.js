@@ -47,9 +47,14 @@ function News({ name, studentId, roleName, email, isAdmin }) {
                 <Typography>{name}</Typography>
 
                 {isAdmin ? (
-                    <Button>
-                        <Link to="/admin">Chuyển sang trang quản trị</Link>
-                    </Button>
+                    <>
+                        <Button>
+                            <Link to="/admin/attendance">Điểm danh</Link>
+                        </Button>
+                        <Button>
+                            <Link to="/admin">Chuyển sang trang quản trị</Link>
+                        </Button>
+                    </>
                 ) : null}
             </Box>
         </Paper>

@@ -18,42 +18,80 @@ import React from 'react';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
-import adminNewsAPI from 'src/api/adminNewsAPI';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import CircleIcon from '@mui/icons-material/Circle';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import { useNavigate } from 'react-router-dom';
+import notificationApi from 'src/api/notificationApi';
+import { useGlobalState, setGlobalState } from 'src/state';
 
 function Notification() {
     const [newsList, setNews] = React.useState([]);
     const [page, setPage] = React.useState(1);
     const [total, setTotal] = React.useState(0);
     const navigator = useNavigate();
-    const fetchNewsList = async (pageNo) => {
+    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
+    const [totalNotification, setTotalNotification] = useGlobalState('totalNotification');
+
+    const fetchNewsList = async (studentId, pageNo) => {
         try {
-            const response = await adminNewsAPI.getAllNotification(pageNo);
-            console.log(response);
+            const response = await notificationApi.getAllNotification(studentId, pageNo);
+            console.log('fetch Notification', response);
+            setGlobalState('totalNotification', response.totalDeactive);
             setNews(response.data);
             setTotal(response.totalPage);
         } catch (error) {
-            console.log('Lấy dữ liệu news thất bại');
+            console.log('Lấy dữ liệu Notification thất bại');
         }
     };
     const handleChange = (event, value) => {
         setPage(value);
     };
     React.useEffect(() => {
-        fetchNewsList(page - 1);
+        fetchNewsList(studentId, page - 1);
         // window.scrollTo({ behavior: 'smooth', top: '0px' });
     }, [page]);
+
+    const handleMarkAllRead = () => {
+        setNews((prev) => {
+            return prev.map((item) => {
+                console.log(item);
+                item.read = true;
+                return item;
+            });
+        });
+        setTotalNotification(0);
+        notificationApi.markAllNotificationAsRead(studentId).then((response) => {
+            console.log('mark all notification', response);
+        });
+    };
     const onClickNotification = (news) => {
-        if (news.notificationType == 1) {
-            navigator({ pathname: `/events/${news.notificationTypeId}` });
-        } else if (news.notificationType == 0) {
-            navigator({ pathname: `/tournament/${news.notificationTypeId}` });
-        } else {
-            return;
+        if (!news.read) {
+            setTotalNotification((prev) => prev - 1);
         }
+        notificationApi.markNotificationAsRead(news.id, studentId).then((response) => {
+            console.log('mark notification', response);
+        });
+
+        news['read'] = true;
+        setNews((prev) => {
+            return prev.map((prevNew) => {
+                if (prevNew.id === news.id) {
+                    return {
+                        ...prevNew,
+                    };
+                }
+                return prevNew;
+            });
+        });
+        console.log(news);
+        // if (news.notificationType == 1) {
+        //     navigator({ pathname: `/events/${news.notificationTypeId}` });
+        // } else if (news.notificationType == 0) {
+        //     navigator({ pathname: `/tournament/${news.notificationTypeId}` });
+        // } else {
+        //     return;
+        // }
     };
     return (
         <Paper elevation={3} sx={{}}>
@@ -67,12 +105,7 @@ function Notification() {
                 >
                     <h2 style={{ marginLeft: '8px' }}>Thông báo</h2>
                     <Tooltip title="Đánh dấu tất cả đã đọc" placement="left">
-                        <IconButton
-                            aria-label="more"
-                            id="long-button"
-                            aria-haspopup="true"
-                            onClick={() => console.log(test)}
-                        >
+                        <IconButton aria-label="more" id="long-button" aria-haspopup="true" onClick={handleMarkAllRead}>
                             <DoneAllIcon />
                         </IconButton>
                     </Tooltip>
@@ -105,7 +138,7 @@ function Notification() {
                                     primary={news.message}
                                     secondary={moment(news.createdOn).format('DD/MM/YYYY - HH:MM')}
                                 />
-                                <CircleIcon sx={{ fontSize: '0.9rem', color: '#2e89ff' }} />
+                                {!news.read ? <CircleIcon sx={{ fontSize: '0.9rem', color: '#2e89ff' }} /> : null}
                             </ListItemButton>
                             <Divider variant="inset" component="li" />
                         </React.Fragment>
