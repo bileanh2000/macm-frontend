@@ -233,7 +233,7 @@ function DetailTournament() {
                                 <AdminTournament />
                             </TabPanel>
                             <TabPanel value={value} index={5}>
-                                <MemberTournament />
+                                <MemberTournament tournament={tournament} />
                             </TabPanel>
                         </Container>
                     </Paper>

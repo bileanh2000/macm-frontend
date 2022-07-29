@@ -123,6 +123,15 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
+    addNewCompetitivePlayer: (tournamentId, userId, weight) => {
+        const url = `/competitive/headclub/addnewcompetitiveplayer/${tournamentId}`;
+        return axiosClient.post(url, null, { params: { userId: userId, weight: weight } });
+    },
+    registerTeam: (exhibitionTypeId, params) => {
+        const url = `/exhibition/headclub/registerexhibitionteam/${exhibitionTypeId}`;
+        return axiosClient.post(url, params.listStudentId, { params: { name: params.teamName } });
+    },
+
     //Fee
 
     getAllTournamentOrganizingCommitteePaymentStatus: (tournamentId) => {
@@ -210,6 +219,37 @@ const adminTournament = {
     updateTimeAndPlaceMatch: (matchId, params) => {
         const url = `/competitive/headclub/updatetimeandplacematch/${matchId}`;
         return axiosClient.put(url, params);
+    },
+
+    //////////// Exhibition
+    getListExhibitionType: (tournamentId) => {
+        const url = `/exhibition/getlistexhibitiontype/${tournamentId}`;
+        return axiosClient.get(url);
+    },
+
+    getExhibitionResult: (data) => {
+        const url = '/exhibition/getlistexhibitionresult';
+        return axiosClient.get(url, { params: { date: data.date, exhibitionTypeId: data.exhibitionType } });
+    },
+
+    getTeamByType: (tournamentId) => {
+        const url = `/exhibition/headclub/getteambytype/${tournamentId}`;
+        return axiosClient.get(url);
+    },
+
+    getTop3TeamByType: (exhibitionTypeId) => {
+        const url = `/exhibition/headclub/gettop3teambytype/${exhibitionTypeId}`;
+        return axiosClient.get(url);
+    },
+
+    // registerTeam: (exhibitionTypeId, data) => {
+    //     const url = `/exhibition/headclub/registerexhibitionteam/${exhibitionTypeId}`;
+    //     return axiosClient.post(url, data);
+    // },
+
+    spawnTimeAndAreaEx: (tournamentId) => {
+        const url = `/exhibition/headclub/spawntimeandarea/${tournamentId}`;
+        return axiosClient.post(url);
     },
 };
 export default adminTournament;

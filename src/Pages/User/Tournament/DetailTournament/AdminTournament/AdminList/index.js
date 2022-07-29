@@ -17,51 +17,51 @@ function AdminList({ data }) {
             flex: 0.6,
         },
         { field: 'role', headerName: 'Vai trò trong sự kiện', width: 150, flex: 1 },
-        { field: 'registerStatus', headerName: 'Trạng thái', width: 150, flex: 1 },
-        {
-            field: 'paymentStatus',
-            headerName: 'Đóng tiền',
-            flex: 0.5,
-            renderCell: (cellValues) => {
-                return (
-                    <Button
-                        sx={{
-                            ...(cellValues.row.paymentStatus === 'Đã đóng'
-                                ? {
-                                      backgroundColor: '#00AD31',
-                                      boxShadow: 'none',
-                                      width: '112px',
-                                      '&:hover': {
-                                          backgroundColor: '#00AD31',
-                                          boxShadow: 'none',
-                                      },
-                                      '&:active': {
-                                          boxShadow: 'none',
-                                          backgroundColor: '#00AD31',
-                                      },
-                                  }
-                                : {
-                                      backgroundColor: '#ff3838',
-                                      boxShadow: 'none',
-                                      width: '112px',
-                                      '&:hover': {
-                                          backgroundColor: '#ff3838',
-                                          boxShadow: 'none',
-                                      },
-                                      '&:active': {
-                                          boxShadow: 'none',
-                                          backgroundColor: '#ff3838',
-                                      },
-                                  }),
-                        }}
-                        variant="contained"
-                        color="primary"
-                    >
-                        {cellValues.row.paymentStatus}
-                    </Button>
-                );
-            },
-        },
+        // { field: 'registerStatus', headerName: 'Trạng thái', width: 150, flex: 1 },
+        // {
+        //     field: 'paymentStatus',
+        //     headerName: 'Đóng tiền',
+        //     flex: 0.5,
+        //     renderCell: (cellValues) => {
+        //         return (
+        //             <Button
+        //                 sx={{
+        //                     ...(cellValues.row.paymentStatus === 'Đã đóng'
+        //                         ? {
+        //                               backgroundColor: '#00AD31',
+        //                               boxShadow: 'none',
+        //                               width: '112px',
+        //                               '&:hover': {
+        //                                   backgroundColor: '#00AD31',
+        //                                   boxShadow: 'none',
+        //                               },
+        //                               '&:active': {
+        //                                   boxShadow: 'none',
+        //                                   backgroundColor: '#00AD31',
+        //                               },
+        //                           }
+        //                         : {
+        //                               backgroundColor: '#ff3838',
+        //                               boxShadow: 'none',
+        //                               width: '112px',
+        //                               '&:hover': {
+        //                                   backgroundColor: '#ff3838',
+        //                                   boxShadow: 'none',
+        //                               },
+        //                               '&:active': {
+        //                                   boxShadow: 'none',
+        //                                   backgroundColor: '#ff3838',
+        //                               },
+        //                           }),
+        //                 }}
+        //                 variant="contained"
+        //                 color="primary"
+        //             >
+        //                 {cellValues.row.paymentStatus}
+        //             </Button>
+        //         );
+        //     },
+        // },
     ];
 
     const rowsUser =
@@ -72,8 +72,8 @@ function AdminList({ data }) {
             container['studentName'] = item.userName;
             container['studentId'] = item.userStudentId;
             container['role'] = item.roleTournamentDto.name;
-            container['registerStatus'] = item.registerStatus;
-            container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
+            // container['registerStatus'] = item.registerStatus;
+            // container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
             return container;
         });
 
