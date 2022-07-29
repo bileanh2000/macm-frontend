@@ -157,8 +157,10 @@ function Header({ onLogout }) {
         console.log(news);
         if (news.notificationType == 1) {
             navigator({ pathname: `/events/${news.notificationTypeId}` });
+            setChecked(false);
         } else if (news.notificationType == 0) {
             navigator({ pathname: `/tournament/${news.notificationTypeId}` });
+            setChecked(false);
         } else {
             return;
         }
