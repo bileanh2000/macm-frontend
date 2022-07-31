@@ -14,13 +14,17 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
 import UpdatePerformanceCompetition from './UpdatePerformanceCompetition';
 import adminTournament from 'src/api/adminTournamentAPI';
 import UpdateFightingCompetition from './UpdateFightingCompetition';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { vi } from 'date-fns/locale';
+import moment from 'moment';
 
-function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess }) {
+function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess, startTime }) {
     console.log(data);
     const { enqueueSnackbar } = useSnackbar();
     const [datasFightingCompetition, setDataFightingCompetition] = useState(data.competitiveTypes);
@@ -41,14 +45,23 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess 
         finishDate: Yup.date()
             .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được bé hơn ngày bắt đầu`)
             .typeError('Vui lòng không để trống trường này'),
+        dateCommitteeDeadline: Yup.date()
+            .max(startTime, ({ min }) => `Hạn đăng kí không được để sau ngày bắt đầu ${startTime}`)
+            .typeError('Vui lòng không để trống trường này'),
+        datePlayerDeadline: Yup.date()
+            .max(startTime, ({ min }) => `Hạn đăng kí không được để sau ngày bắt đầu ${startTime}`)
+            .typeError('Vui lòng không để trống trường này'),
     });
 
     const onUpdateTournament = (data) => {
+        console.log(data);
         let dataSubmit = {
             competitiveTypesDto: datasFightingCompetition,
             exhibitionTypesDto: datasPerformanceCompetition,
             name: data.tournamentName,
             description: data.description,
+            registrationOrganizingCommitteeDeadline: moment(data.dateCommitteeDeadline).format('YYYY-MM-DDTHH:mm:ss'),
+            registrationPlayerDeadline: moment(data.datePlayerDeadline).format('YYYY-MM-DDTHH:mm:ss'),
         };
         adminTournament.updateTournament(dataSubmit, tournamentId).then((res) => {
             if (res.data.length != 0) {
@@ -163,6 +176,84 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess 
                                         </Grid>
                                     </Grid>
                                 </Grid>
+                                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                                    <Grid item xs={5}>
+                                        <Controller
+                                            required
+                                            name="datePlayerDeadline"
+                                            control={control}
+                                            defaultValue={data.registrationPlayerDeadline}
+                                            render={({
+                                                field: { onChange, value },
+                                                fieldState: { error, invalid },
+                                            }) => (
+                                                <DatePicker
+                                                    label="Hạn đăng kí cho người chơi"
+                                                    inputFormat="dd/MM/yyyy"
+                                                    disablePast
+                                                    ampm={false}
+                                                    value={value}
+                                                    onChange={(value) => onChange(value)}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            sx={{
+                                                                marginTop: '0px !important',
+                                                                marginBottom: '16px !important',
+                                                            }}
+                                                            {...params}
+                                                            required
+                                                            id="outlined-disabled"
+                                                            error={invalid}
+                                                            helperText={invalid ? error.message : null}
+                                                            // id="startDate"
+                                                            variant="outlined"
+                                                            margin="dense"
+                                                            fullWidth
+                                                        />
+                                                    )}
+                                                />
+                                            )}
+                                        />
+                                        <Controller
+                                            required
+                                            name="dateCommitteeDeadline"
+                                            inputFormat="dd/MM/yyyy"
+                                            control={control}
+                                            defaultValue={data.registrationOrganizingCommitteeDeadline}
+                                            render={({
+                                                field: { onChange, value },
+                                                fieldState: { error, invalid },
+                                            }) => (
+                                                <DatePicker
+                                                    label="Hạn đăng kí tham gia ban tổ chức"
+                                                    // minDate={startTime}
+                                                    disablePast
+                                                    ampm={false}
+                                                    inputFormat="dd/MM/yyyy"
+                                                    value={value}
+                                                    onChange={(value) => onChange(value)}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            sx={{
+                                                                marginTop: '0px !important',
+                                                                marginBottom: '16px !important',
+                                                            }}
+                                                            {...params}
+                                                            required
+                                                            id="outlined-disabled"
+                                                            error={invalid}
+                                                            helperText={invalid ? error.message : null}
+                                                            // id="startDate"
+                                                            variant="outlined"
+                                                            margin="dense"
+                                                            fullWidth
+                                                        />
+                                                    )}
+                                                />
+                                            )}
+                                        />
+                                    </Grid>
+                                </LocalizationProvider>
                             </Grid>
                         </Box>
                     </DialogContent>

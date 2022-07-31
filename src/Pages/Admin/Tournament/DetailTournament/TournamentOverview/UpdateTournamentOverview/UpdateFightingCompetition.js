@@ -100,7 +100,7 @@ function UpdateFightingCompetition(props) {
         } else {
             if (checkWeight(gender, data.weightMin, data.weightMax)) {
                 console.log('female', weightRangeFemale, 'male', weightRangeMale);
-                const newData = [...datas, { ...data, gender, id: Math.random() }];
+                const newData = [...datas, { ...data, gender: gender == 1 ? true : false, id: Math.random() }];
                 setDatas(newData);
                 props.onAddFightingCompetition(newData);
                 console.log(newData);
@@ -194,7 +194,7 @@ function UpdateFightingCompetition(props) {
                         <TableBody>
                             {datas.map((data) => (
                                 <TableRow key={data.id}>
-                                    <TableCell>{data.gender == 1 ? 'Nam' : 'Nữ'}</TableCell>
+                                    <TableCell>{data.gender === 1 ? 'Nam' : 'Nữ'}</TableCell>
                                     <TableCell>
                                         {data.weightMin} - {data.weightMax} Kg
                                     </TableCell>

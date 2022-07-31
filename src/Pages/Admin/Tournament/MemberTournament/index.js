@@ -83,6 +83,7 @@ function MemberTournament({ tournament }) {
     const fetchCompetitivePlayer = async (params, weightRange) => {
         try {
             const response = await adminTournamentAPI.getAllCompetitivePlayer(params, weightRange);
+            console.log(response.data);
             setCompetitivePlayer(response.data);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
@@ -139,8 +140,8 @@ function MemberTournament({ tournament }) {
                                     {listWeightRange &&
                                         listWeightRange.map((range) => (
                                             <MenuItem value={range.id} key={range.id}>
-                                                {range.gender == 0 ? 'Nam: ' : 'Nữ: '} {range.weightMin} -{' '}
-                                                {range.weightMax} Kg
+                                                {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax}{' '}
+                                                Kg
                                             </MenuItem>
                                         ))}
                                 </Select>
@@ -187,7 +188,10 @@ function MemberTournament({ tournament }) {
                     handleClose={() => {
                         setOpenDialog(false);
                     }}
-                    onSucess={(newItem) => {
+                    onSuccess={(newItem) => {
+                        if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
+                            return;
+                        }
                         setCompetitivePlayer([newItem, ...competitivePlayer]);
                         setOpenDialog(false);
                     }}
@@ -198,7 +202,7 @@ function MemberTournament({ tournament }) {
                     handleClose={() => {
                         setOpenDialogExhibition(false);
                     }}
-                    onSucess={(newItem) => {
+                    onSuccess={(newItem) => {
                         setExhibitionTeam([newItem, ...exhibitionTeam]);
                         setOpenDialogExhibition(false);
                     }}

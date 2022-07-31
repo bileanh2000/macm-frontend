@@ -219,6 +219,7 @@ function DetailTournament() {
                                 onUpdateTournament={handleUpdateTournament}
                                 value={value}
                                 index={0}
+                                startTime={scheduleList[0].date}
                             />
                             <TabPanel value={value} index={1}>
                                 <TournamentSchedule />

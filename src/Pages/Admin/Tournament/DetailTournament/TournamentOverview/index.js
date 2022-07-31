@@ -16,7 +16,7 @@ import { tableCellClasses } from '@mui/material/TableCell';
 import { Edit } from '@mui/icons-material';
 import UpdateTournamentOverview from './UpdateTournamentOverview';
 
-function TournamentOverview({ tournament, onUpdateTournament, value, index }) {
+function TournamentOverview({ tournament, onUpdateTournament, value, index, startTime }) {
     const [openEditDialog, setOpenEditDialog] = useState(false);
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -77,6 +77,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index }) {
                                         onUpdateTournament(newItem);
                                         setOpenEditDialog(false);
                                     }}
+                                    startTime={startTime}
                                 />
                             )}
                         </Grid>
@@ -99,7 +100,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index }) {
                                                     {tournament.competitiveTypes.map((data) => (
                                                         <StyledTableRow key={data.id}>
                                                             <StyledTableCell align="center">
-                                                                {data.gender === 1 ? 'Nam' : 'Nữ'}
+                                                                {data.gender ? 'Nam' : 'Nữ'}
                                                             </StyledTableCell>
                                                             <StyledTableCell align="center">
                                                                 {data.weightMin} - {data.weightMax} Kg
