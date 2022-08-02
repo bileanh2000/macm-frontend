@@ -18,6 +18,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import * as Yup from 'yup';
+import { useSnackbar } from 'notistack';
 
 // import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 // import DateFnsUtils from '@date-io/date-fns';
@@ -25,6 +26,7 @@ import * as Yup from 'yup';
 
 function UserDetailEdit() {
     let { userId } = useParams();
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [userDetail, setUserDetail] = useState([]);
     const [age, setAge] = useState('');
     const [openSnackBar, setOpenSnackBar] = useState(false);
@@ -254,17 +256,11 @@ function UserDetailEdit() {
             console.log('1', res);
             console.log('2', res.data);
             if (res.data.length !== 0) {
-                setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
+                enqueueSnackbar(res.message, { variant: 'success' });
                 navigate(-1);
             } else {
                 console.log('huhu');
-                setOpenSnackBar(true);
-                // setSnackBarStatus(false);
-                snackBarStatus = false;
-                dynamicAlert(snackBarStatus, res.message);
+                enqueueSnackbar(res.message, { variant: 'error' });
             }
         });
         console.log('form submit', data);

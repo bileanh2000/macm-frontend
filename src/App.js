@@ -68,7 +68,6 @@ class App extends Component {
         this.setState({
             loading: true,
         });
-
         getCurrentUser()
             .then((response) => {
                 this.setState({
@@ -92,6 +91,7 @@ class App extends Component {
             currentUser: null,
         });
         console.log('logout thanh cong');
+        localStorage.removeItem('alreadyVisited');
     }
     getCurrentUser() {
         if (localStorage.getItem('currentUser')) {
@@ -133,9 +133,20 @@ class App extends Component {
                         <Route
                             path="/"
                             // render={(props) => <Login authenticated={this.state.authenticated} {...props} />}
-                            element={this.state.authenticated ? <Navigate to="/home" /> : <Login />}
+                            element={
+                                this.state.authenticated ? (
+                                    <Navigate to="/home" />
+                                ) : (
+                                    <Login authenticated={this.state.authenticated} />
+                                )
+                            }
                             // element={<Login />}
                         ></Route>
+                        {/* <Route
+                            path="/"
+                            render={(props) => <Login authenticated={this.state.authenticated} {...props} />}
+                            // element={(props) => <Login authenticated={this.state.authenticated} {...props} />}
+                        ></Route> */}
                         {/* <Route
                             path="/notifications"
                             // render={(props) => <Login authenticated={this.state.authenticated} {...props} />}

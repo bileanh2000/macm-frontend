@@ -174,8 +174,10 @@ function Header({ onLogout }) {
                         <Typography
                             variant="h6"
                             noWrap
-                            component="a"
-                            href="/home"
+                            component={Link}
+                            to="/home"
+                            // href="/home"
+
                             sx={{
                                 mr: 2,
                                 display: { xs: 'none', md: 'flex' },
@@ -251,8 +253,10 @@ function Header({ onLogout }) {
                         <Typography
                             variant="h5"
                             noWrap
-                            component="a"
-                            href="/home"
+                            // component="a"
+                            // href="/home"
+                            component={Link}
+                            to="/home"
                             sx={{
                                 mr: 2,
                                 display: { xs: 'flex', md: 'none' },

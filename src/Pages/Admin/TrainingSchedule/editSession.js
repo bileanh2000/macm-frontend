@@ -12,7 +12,10 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
 import eventApi from 'src/api/eventApi';
+import { useSnackbar } from 'notistack';
+
 function UpdateSchedule() {
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const currentDate = new Date();
     const { scheduleId } = useParams();
 
@@ -42,17 +45,7 @@ function UpdateSchedule() {
     const fetchSchedule = async (date) => {
         try {
             const response = await trainingSchedule.getTrainingSessionByDate(date);
-            // console.log(
-            //     'Thanh cong roi: ',
-            //     response.data.filter((item) => item.id === parseInt(scheduleId)),
-            // );
-            // console.log(response.data);
-
-            // console.log('scheduleId ', scheduleId);
-            // let dataSelected = response.data.filter((item) => item.id === parseInt(scheduleId));
-            // let dateSelected = dataSelected[0].date;
             setScheduleList(response.data);
-            // setSelectedDate(new Date(dateSelected));
         } catch (error) {
             console.log('That bai roi huhu ', error);
         }
@@ -77,6 +70,7 @@ function UpdateSchedule() {
             console.log('1', res);
             console.log('2', res.data);
             console.log('3', res.message);
+            enqueueSnackbar(res.message, { variant: 'success' });
         });
         setTimeout(navigate(-1), 50000);
     };
@@ -90,24 +84,7 @@ function UpdateSchedule() {
         mode: 'onBlur',
         defaultValues: {},
     });
-    const [openSnackBar, setOpenSnackBar] = useState(false);
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    let snackBarStatus;
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
 
-        setOpenSnackBar(false);
-    };
     let navigate = useNavigate();
     const onSubmit = async (data) => {
         data = {
@@ -120,17 +97,13 @@ function UpdateSchedule() {
             console.log('1', res);
             console.log('2', res.data);
             if (res.data.length != 0) {
-                setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
+                enqueueSnackbar(res.message, { variant: 'success' });
+
                 navigate(`/admin/trainingschedules`);
             } else {
                 console.log('huhu');
-                setOpenSnackBar(true);
-                // setSnackBarStatus(false);
-                snackBarStatus = false;
-                dynamicAlert(snackBarStatus, res.message);
+
+                enqueueSnackbar(res.message, { variant: 'error' });
             }
         });
         console.log('form submit', data);
@@ -140,21 +113,6 @@ function UpdateSchedule() {
     // };
     return (
         <Box>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
             <Dialog
                 open={open}
                 onClose={handleClose}

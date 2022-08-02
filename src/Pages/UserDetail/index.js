@@ -10,6 +10,7 @@ import Avatar from '@mui/material/Avatar';
 function UserDetail() {
     let { userId } = useParams();
     const [userDetail, setUserDetail] = useState([]);
+
     useEffect(() => {
         const fetchUserDetail = async () => {
             try {

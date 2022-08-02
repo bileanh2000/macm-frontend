@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Fragment, useEffect, useState } from 'react';
 import userApi from 'src/api/userApi';
 import { Box } from '@mui/system';
@@ -22,13 +22,15 @@ import { DatePicker, LocalizationProvider, TimePicker } from '@mui/x-date-picker
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
 import moment from 'moment';
+import { useSnackbar } from 'notistack';
 
 function AddUser() {
-    const [openSnackBar, setOpenSnackBar] = useState(false);
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
     const [listStudentId, setListStudentId] = useState();
     const [listEmail, setListEmailId] = useState();
     const [listPhone, setListPhone] = useState();
-    let snackBarStatus;
+    let navigate = useNavigate();
 
     useEffect(() => {
         const fetchUserList = async () => {
@@ -142,23 +144,7 @@ function AddUser() {
         resolver: yupResolver(validationSchema),
         mode: 'onBlur',
     });
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
 
-        setOpenSnackBar(false);
-    };
-
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
     const onSubmit = async (data) => {
         const dataFormat = {
             currentAddress: 'Dom D',
@@ -175,16 +161,11 @@ function AddUser() {
             console.log('1', res);
             console.log('2', res.data);
             if (res.data.length != 0) {
-                setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
+                enqueueSnackbar(res.message, { variant: 'success' });
+                navigate(-1);
             } else {
                 console.log('huhu');
-                setOpenSnackBar(true);
-                // setSnackBarStatus(false);
-                snackBarStatus = false;
-                dynamicAlert(snackBarStatus, res.message);
+                enqueueSnackbar(res.message, { variant: 'error' });
             }
         });
 
@@ -193,22 +174,6 @@ function AddUser() {
 
     return (
         <Fragment>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
-
             <Typography variant="h4" component="div" sx={{ marginBottom: '16px' }}>
                 Thêm thành viên mới
             </Typography>
