@@ -34,7 +34,7 @@ function TournamentCompetitive() {
         try {
             const response = await adminTournament.listMatchs(weightRange);
             setListPlayer(response.data);
-            console.log('lay data', response.data);
+            console.log('lay data', response);
             setTournamentStatus(response.code);
             setRounds(response.totalResult);
         } catch (error) {
@@ -153,7 +153,7 @@ function TournamentCompetitive() {
                         {listWeightRange &&
                             listWeightRange.map((range) => (
                                 <MenuItem value={range.id} key={range.id}>
-                                    {range.gender == 0 ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
+                                    {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
                                 </MenuItem>
                             ))}
                     </Select>

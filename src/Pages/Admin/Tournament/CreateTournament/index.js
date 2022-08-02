@@ -167,6 +167,8 @@ function CreateTourament() {
             feePlayerPay: data.feePlayerPay,
             numOfOrganizingCommitee: data.numOfOrganizingCommitee,
             numOfParticipants: data.numOfParticipants,
+            dateCommitteeDeadline: moment(data.dateCommitteeDeadline).format('YYYY-MM-DDTHH:mm:ss'),
+            datePlayerDeadline: moment(data.datePlayerDeadline).format('YYYY-MM-DDTHH:mm:ss'),
             totalAmountFromClubEstimate:
                 data.cost -
                 (data.numOfOrganizingCommitee * data.feeOrganizingCommiteePay +

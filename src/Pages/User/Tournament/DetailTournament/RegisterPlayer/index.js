@@ -35,6 +35,7 @@ import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
 
 function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess }) {
+    console.log(userInformation);
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [type, setType] = useState(1);
@@ -244,16 +245,16 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
             <DialogTitle id="alert-dialog-title">Đăng kí tham gia giải đấu</DialogTitle>
             <DialogContent>
                 <Typography sx={{ m: 1 }}>
-                    <strong>Họ và tên: </strong> Nguyễn Văn A{' '}
+                    <strong>Họ và tên: </strong> {userInformation.name}
                 </Typography>
                 <Typography sx={{ m: 1 }}>
-                    <strong>Mã SV: </strong> HE123456{' '}
+                    <strong>Mã SV: </strong> {userInformation.studentId}
                 </Typography>
                 <Typography sx={{ m: 1 }}>
-                    <strong>Ngày sinh: </strong> 28-2-2202{' '}
+                    <strong>Ngày sinh: </strong> {userInformation.dateOfBirth}
                 </Typography>
                 <Typography sx={{ m: 1 }}>
-                    <strong>Giới tính: </strong> Nam{' '}
+                    <strong>Giới tính: </strong> {userInformation.gender ? 'Nam' : 'Nữ'}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', m: 2 }}>
                     <FormControl size="small" sx={{ mr: 1 }}>

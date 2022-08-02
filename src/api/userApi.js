@@ -87,7 +87,7 @@ const userApi = {
         );
     },
     getAllMember: () => {
-        const url = '/admin/hr/getallmemberandcollaborator';
+        const url = '/admin/hr/getallactivememberandcollaborator';
         return axiosClient.get(url);
     },
     getAllAttendanceStatus: (studentId) => {

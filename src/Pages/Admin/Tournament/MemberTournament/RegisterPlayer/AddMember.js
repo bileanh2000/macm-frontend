@@ -37,7 +37,7 @@ function AddMember(props) {
                                     style={{ marginRight: 8 }}
                                     checked={selected}
                                 />
-                                {option.studentId} - {option.name}
+                                {option.studentId} - {option.studentName}
                             </li>
                         )}
                         style={{ width: 500 }}

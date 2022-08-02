@@ -170,7 +170,7 @@ function Tournament() {
                     {tournaments ? (
                         tournaments.map((tournament) => {
                             return (
-                                <Grid item xs={12} sm={6} key={tournament.id}>
+                                <Grid item xs={12} sm={12} key={tournament.id}>
                                     <Paper elevation={3}>
                                         <Box component={Link} to={`${tournament.id}`}>
                                             <div className={cx('tournament-list')}>

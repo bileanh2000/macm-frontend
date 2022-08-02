@@ -39,10 +39,8 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
     const { enqueueSnackbar } = useSnackbar();
     const [player, setPlayer] = useState([]);
     const [weightRange, setWeightRange] = useState(0);
-    const [gender, setGender] = useState(0);
+    const [gender, setGender] = useState();
     const [listWeightRange, setListWeightRange] = useState([]);
-    const [dataMale, setDataMale] = useState([]);
-    const [dataFemale, setDateFemale] = useState([]);
     const [minWeight, setMinWeight] = useState();
     const [maxWeight, setMaxWeight] = useState();
     const [allMember, setAllMember] = useState();
@@ -112,14 +110,22 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
 
     const handleRegister = (data) => {
         // const params = { userId: player[0].id, competitiveTypeId: weightRange, weight: data.weight, tournamentId };
-        if (player.length == 0) {
+        if (player.length === 0) {
             let variant = 'error';
             enqueueSnackbar('Vui lòng chọn thông tin người chơi', { variant });
             return;
         }
         console.log(tournamentId, player[0].id, data.weight);
         addNewCompetitivePlayer(tournamentId, player[0].id, data.weight);
-        onSuccess && onSuccess(player);
+        const newPlayer = {
+            playerGender: player[0].gender,
+            playerName: player[0].studentName,
+            playerStudentId: player[0].studentId,
+            weight: data.weight,
+            weightMax: maxWeight,
+            weightMin: minWeight,
+        };
+        onSuccess && onSuccess(newPlayer);
         setPlayer([]);
         reset({
             weight: '',
@@ -165,7 +171,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
                         <AddMember
                             data={player}
                             onAddPlayer={AddPlayerHandler}
-                            allMember={allMember.filter((member) => member.gender == gender)}
+                            allMember={allMember.filter((member) => member.gender === gender)}
                         />
                     )}
                     <FormControl size="small">
@@ -174,7 +180,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
                             {listWeightRange &&
                                 listWeightRange.map((range) => (
                                     <MenuItem value={range.id} key={range.id}>
-                                        {range.gender == 0 ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
+                                        {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
                                     </MenuItem>
                                 ))}
                         </Select>
@@ -199,10 +205,8 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
                                             {player.map((data, index) => (
                                                 <TableRow key={index}>
                                                     <TableCell align="center">{data.studentId}</TableCell>
-                                                    <TableCell align="center">{data.name}</TableCell>
-                                                    <TableCell align="center">
-                                                        {data.gender == 0 ? 'Nam' : 'Nữ'}
-                                                    </TableCell>
+                                                    <TableCell align="center">{data.studentName}</TableCell>
+                                                    <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
