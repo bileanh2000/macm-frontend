@@ -83,7 +83,7 @@ function ClubFund() {
     }, []);
 
     useEffect(() => {
-        isRender && fetchClubFundReport();
+        isRender && fetchClubFundReport() && fetchFunClub();
         console.log('re-render');
         setIsRender(false);
     }, [isRender, clubFundReport]);
@@ -103,7 +103,7 @@ function ClubFund() {
 
     const handleUpdate = (data) => {
         console.log(type, data, isRender);
-        type === 0 ? withdrawFromClubFund(data.amount, data.note) : depositToClubFund(type, data.note);
+        type === 0 ? withdrawFromClubFund(data.amount, data.note) : depositToClubFund(data.amount, data.note);
         //setClubFundReport([]);
 
         handleClose();
