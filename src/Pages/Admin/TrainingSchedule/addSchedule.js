@@ -36,9 +36,11 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useNavigate } from 'react-router-dom';
 import semesterApi from 'src/api/semesterApi';
+import { useSnackbar } from 'notistack';
 
 function AddSchedule() {
     moment().locale('vi');
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [open, setOpen] = useState(false);
     const [startDate, setStartDate] = useState();
     const [endDate, setEndDate] = useState(new Date());
@@ -169,11 +171,11 @@ function AddSchedule() {
             console.log('2', res.data);
 
             if (res.data.length != 0) {
-                setOpenSnackBar(true);
+                // setOpenSnackBar(true);
                 // setSnackBarStatus(true);
                 // snackBarStatus = true;
                 // dynamicAlert(snackBarStatus, res.message);
-                // setPreviewData(res.data);
+                setPreviewData(res.data);
                 setOpen(true);
             } else {
                 console.log('huhu');
@@ -190,12 +192,7 @@ function AddSchedule() {
             console.log('2', res.data);
 
             if (res.data.length != 0) {
-                setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
-                // setPreviewData(res.data);
-                // setOpen(true);
+                enqueueSnackbar('Tạo thành công lịch tập', { variant: 'success' });
                 navigate(-1);
             } else {
                 console.log('huhu');
@@ -300,7 +297,8 @@ function AddSchedule() {
                                     required
                                     name="startDate"
                                     control={control}
-                                    defaultValue={tomorrow}
+                                    // defaultValue={tomorrow}
+                                    defaultValue=""
                                     render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                         <DatePicker
                                             disablePast
@@ -367,7 +365,8 @@ function AddSchedule() {
                                     inputFormat="DD/MM/YYYY"
                                     control={control}
                                     // defaultValue="2022-09-04"
-                                    defaultValue={currentSemester[0].endDate}
+                                    // defaultValue={currentSemester[0].endDate}
+                                    defaultValue=""
                                     render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                         <DatePicker
                                             label="Ngày kết thúc"

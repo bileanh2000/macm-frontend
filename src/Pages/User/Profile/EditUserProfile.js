@@ -165,10 +165,10 @@ function EditUserProfile() {
     }
     function uniquePhone(message) {
         return this.test('uniquePhone', message, function (value) {
-            // const index = listPhone.indexOf(value);
-            // if (index > -1) {
-            //     listPhone.splice(index, 1);
-            // }
+            const index = listPhone.indexOf(value);
+            if (index > -1) {
+                listPhone.splice(index, 1);
+            }
             let filterPhone = listPhone.filter((i) => i === value.toString());
             const { path, createError } = this;
 
@@ -414,9 +414,10 @@ function EditUserProfile() {
                                 {...register('studentId')}
                                 //error={errors.studentId ? true : false}
                                 //helperText={errors.studentId?.message}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
+                                // InputProps={{
+                                //     readOnly: true,
+                                // }}
+                                disabled
                             />
                             <TextField
                                 required

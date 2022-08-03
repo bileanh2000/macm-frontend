@@ -22,11 +22,12 @@ import { useForm, Controller } from 'react-hook-form';
 
 import { useState } from 'react';
 import vi from 'date-fns/locale/vi';
-import { useEffect } from 'react';
-import { Paper } from '@mui/material';
 import trainingScheduleApi from 'src/api/trainingScheduleApi';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
+
 function AddSchedule() {
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     moment().locale('vi');
     let { date } = useParams();
     let navigate = useNavigate();
@@ -42,25 +43,7 @@ function AddSchedule() {
         mode: 'onBlur',
     });
 
-    const [openSnackBar, setOpenSnackBar] = useState(false);
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    let snackBarStatus;
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setOpenSnackBar(false);
-    };
     const onSubmit = (data) => {
-        // setSubmitData(moment(new Date(data.startDate)).format('yyyy-MM-DD'));
         const dataFormat = {
             date: moment(new Date(data.date)).format('yyyy-MM-DD'),
             startTime: moment(new Date(data.startTime)).format('HH:mm:ss'),
@@ -70,40 +53,18 @@ function AddSchedule() {
             console.log('1', res);
             console.log('2', res.data);
             if (res.data.length != 0) {
-                setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
+                enqueueSnackbar(res.message, { variant: 'success' });
                 navigate(-1);
             } else {
                 console.log('huhu');
-                setOpenSnackBar(true);
-                // setSnackBarStatus(false);
-                snackBarStatus = false;
-                dynamicAlert(snackBarStatus, res.message);
+                enqueueSnackbar(res.message, { variant: 'error' });
             }
         });
         console.log('form submit', dataFormat);
     };
 
-    const [timePicked, setTimePicked] = useState(null);
     return (
         <Box>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
             <form noValidate onSubmit={handleSubmit(onSubmit)} className="signup-form">
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                     <Typography variant="h4" component="div" sx={{ marginBottom: '16px', fontWeight: '700' }}>

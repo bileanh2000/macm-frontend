@@ -15,9 +15,11 @@ const request = (options) => {
     return fetch(options.url, options).then((response) =>
         response.json().then((json) => {
             if (!response.ok) {
+                // localStorage.setItem('alreadyLogged', 'false');
                 return Promise.reject(json);
             }
             localStorage.setItem('currentUser', JSON.stringify(json));
+            // localStorage.setItem('alreadyLogged', 'true');
 
             return json;
         }),

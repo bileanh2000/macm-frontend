@@ -99,5 +99,9 @@ const userApi = {
         const url = `/admin/headtechnique/getallattendancestatusbystudentidandsemester/${studentId}?semester=${semester}`;
         return axiosClient.get(url);
     },
+    getAllRole: () => {
+        const url = `/role/getroles`;
+        return axiosClient.get(url);
+    },
 };
 export default userApi;

@@ -12,7 +12,7 @@ import moment from 'moment';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 
 const LIMIT_DATE = 1; //day
-const TIME_OUT = 10000; //ms
+const TIME_OUT = 100000; //ms
 
 function QRScanner() {
     const { enqueueSnackbar } = useSnackbar();
