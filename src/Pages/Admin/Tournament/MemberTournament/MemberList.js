@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
-import clsx from 'clsx';
 import { styled } from '@mui/material/styles';
-import { Button } from '@mui/material';
 
 function MemberList({ data, type }) {
+    console.log('member list', data);
     const [pageSize, setPageSize] = useState(10);
 
     let columns;

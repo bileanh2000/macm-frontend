@@ -1,20 +1,33 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { Box, Button, FormControl, MenuItem, Paper, Select, Typography } from '@mui/material';
+import {
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControl,
+    MenuItem,
+    Select,
+    Typography,
+} from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useParams } from 'react-router-dom';
 
 import CustomMatchBracket from './CustomMatchBracket';
 import adminTournament from 'src/api/adminTournamentAPI';
 
-function TournamentCompetitive() {
+function TournamentCompetitive({ tournamentStatus }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [competitiveId, setCompetitiveId] = useState(0);
     const [listWeightRange, setListWeightRange] = useState([]);
-    const [listPlayer, setListPlayer] = useState();
+    const [listPlayer, setListPlayer] = useState([]);
     const [rounds, setRounds] = useState();
     const [areaList, setAreaList] = useState();
-    const [tournamentStatus, setTournamentStatus] = useState(-1);
+    const [open, setOpen] = useState(false);
+    // const [tournamentStatus, setTournamentStatus] = useState(-1);
 
     const handleChangeCompetitiveId = (event) => {
         setCompetitiveId(event.target.value);
@@ -35,7 +48,7 @@ function TournamentCompetitive() {
             const response = await adminTournament.listMatchs(weightRange);
             setListPlayer(response.data);
             console.log('lay data', response);
-            setTournamentStatus(response.code);
+            // setTournamentStatus(response.code);
             setRounds(response.totalResult);
         } catch (error) {
             console.log('Failed to fetch match: ', error);
@@ -44,9 +57,10 @@ function TournamentCompetitive() {
 
     const spawnMatches = async (weightRange) => {
         try {
-            await adminTournament.spawnMatchs(weightRange);
+            const response = await adminTournament.spawnMatchs(weightRange);
             getListPlayerByCompetitiveID(weightRange);
             // setListPlayer(response.data)
+            enqueueSnackbar(response.message);
         } catch (error) {
             console.log('Failed to fetch match: ', error);
         }
@@ -70,25 +84,36 @@ function TournamentCompetitive() {
             enqueueSnackbar('Vui lòng chọn hạng cân trước khi tạo bảng đấu', { varian });
             return;
         }
-        console.log(listPlayer);
+        // console.log(listPlayer);
         if (listPlayer && listPlayer.length == 0) {
             console.log('loz3');
             spawnMatches(competitiveId);
+            console.log('loz4');
         }
-        console.log(listPlayer);
-        if (listPlayer && listPlayer.length > 0) {
-        } else {
-            enqueueSnackbar('Không thể tạo bảng đấu do không đủ người', { error: 'error' });
-            return;
-        }
+        // console.log(listPlayer);
+        // if (listPlayer && listPlayer.length > 0) {
+        // } else {
+        //     enqueueSnackbar('Không thể tạo bảng đấu do không đủ người', { error: 'error' });
+        //     return;
+        // }
     };
 
     const spawnTimeAndArea = async () => {
         try {
-            await adminTournament.spawnTimeAndArea(tournamentId);
+            const response = await adminTournament.spawnTimeAndArea(tournamentId);
             getListPlayerByCompetitiveID(competitiveId);
+            enqueueSnackbar(response.message);
         } catch (error) {
             console.log('Failed to spawn time: ', error);
+        }
+    };
+
+    const confirmListMatchsPlayer = async () => {
+        try {
+            const response = await adminTournament.confirmListMatchsPlayer(tournamentId);
+            enqueueSnackbar(response.message);
+        } catch (error) {
+            console.log('Failed to confirm match: ', error);
         }
     };
 
@@ -96,52 +121,54 @@ function TournamentCompetitive() {
         spawnTimeAndArea();
     };
 
+    const handleDialogConfirmMatch = () => {
+        setOpen(true);
+    };
+    const handleCancel = () => {
+        setOpen(false);
+    };
+
+    const handleOk = () => {
+        confirmListMatchsPlayer();
+        handleCancel();
+    };
+
     const UpdateResultHandler = (newMatches) => {
         setListPlayer(newMatches);
-        console.log(newMatches);
-        console.log('load lai di dm');
-        const timer = setTimeout(() => {
-            console.log('load lai ddeo');
-            getListPlayerByCompetitiveID(competitiveId);
-        }, 1000);
-        timer();
-        console.log('loz');
-        clearTimeout(timer);
-
-        // window.location.reload();
+        // getListPlayerByCompetitiveID(competitiveId);
     };
 
     useEffect(() => {
         fetchTournamentById(tournamentId);
         getAllArea();
-    }, [tournamentId]);
+    }, []);
 
+    console.log('gui data', listPlayer);
     return (
         <Fragment>
+            <Dialog maxWidth="xs" open={open}>
+                <DialogTitle>Xác nhận</DialogTitle>
+                <DialogContent dividers>
+                    <DialogContentText>
+                        Bạn có chắc chắn muốn sử dụng thứ tự thi đấu này và cập nhật thời gian?
+                    </DialogContentText>
+                    <Typography variant="caption">
+                        Sau khi xác nhận sẽ không thay đổi vị trí thi đấu của các tuyển thủ nữa!
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button autoFocus onClick={handleCancel}>
+                        Hủy bỏ
+                    </Button>
+                    <Button onClick={handleOk}>Đồng ý</Button>
+                </DialogActions>
+            </Dialog>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                     Bảng đấu
                 </Typography>
             </Box>
-            {/* <Box>
-                    <Typography variant="body1">Nội dung thi đấu đối kháng</Typography>
-                </Box> */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                {/* {tournamentStatus == 0 ? (
-                        <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2 }}>
-                            Tạo bảng đấu
-                        </Button>
-                    ) : tournamentStatus == 1 ? (
-                        <Button variant="outlined" onClick={handleDialogUpdateBracket} sx={{ mr: 2 }}>
-                            Cập nhật bảng đấu
-                        </Button>
-                    ) : tournamentStatus == 2 ? (
-                        <Button variant="outlined" onClick={handleDialogUpdateTime} sx={{ mr: 2 }}>
-                            Cập nhật thời gian thi đấu
-                        </Button>
-                    ) : (
-                        ''
-                    )} */}
                 <FormControl size="small">
                     <Typography variant="caption">Hạng cân</Typography>
                     <Select
@@ -158,6 +185,11 @@ function TournamentCompetitive() {
                             ))}
                     </Select>
                 </FormControl>
+                {tournamentStatus == 1 && listPlayer.length > 0 && (
+                    <Button variant="outlined" onClick={handleDialogConfirmMatch} sx={{ mr: 2, float: 'right' }}>
+                        Xác nhận và cập nhật thời gian cho bảng đấu
+                    </Button>
+                )}
             </Box>
             {listPlayer && areaList && listPlayer.length > 0 ? (
                 <div>
@@ -174,23 +206,26 @@ function TournamentCompetitive() {
                     )}
                     <CustomMatchBracket
                         matches={listPlayer}
+                        competitiveId={competitiveId}
                         rounds={rounds}
                         status={tournamentStatus}
                         areaList={areaList}
-                        onUpdareResult={UpdateResultHandler}
+                        onUpdateResult={UpdateResultHandler}
                     />
                 </div>
             ) : tournamentStatus == 1 ? (
-                <Box sx={{ d: 'flex' }}>
-                    <Typography variant="body1">Hạng cân này hiện đang chưa có tuyển thủ</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body1" sx={{ m: '0 auto' }}>
+                        Thể thức này chưa có bảng thi đấu
+                    </Typography>
                     <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2, float: 'right' }}>
                         Tạo bảng đấu
                     </Button>
                 </Box>
             ) : (
-                <Box sx={{ d: 'flex' }}>
+                <Box sx={{ display: 'flex' }}>
                     <Typography variant="body1" sx={{ m: 'auto' }}>
-                        Hạng cân này không tổ chức
+                        Thể thức này chưa tổ chức
                     </Typography>
                 </Box>
             )}

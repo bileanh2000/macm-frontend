@@ -240,6 +240,10 @@ $light-score-color-override: #9fafbf;
             font-size: 14px;
         }
     }
+
+    .draggable {
+        cursor: grab;
+    }
 }
 
 // Dark Theme
@@ -288,6 +292,9 @@ $dark-score-winner-color-override: #03d9ce;
         .score {
             color: $dark-score-color-override;
         }
+    }
+    .draggable {
+        cursor: grab;
     }
 
     // Sizing

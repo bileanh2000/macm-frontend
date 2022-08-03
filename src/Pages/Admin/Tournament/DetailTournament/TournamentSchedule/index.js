@@ -23,7 +23,7 @@ import { useSnackbar } from 'notistack';
 
 import adminTournament from 'src/api/adminTournamentAPI';
 
-function TournamentSchedule() {
+function TournamentSchedule({ isUpdate }) {
     const nowDate = new Date();
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
@@ -36,7 +36,6 @@ function TournamentSchedule() {
     const fetchTournamentSchedule = async (params) => {
         try {
             const response = await adminTournament.getTournamentSchedule(params);
-            console.log('Thanh cong roi: ', response);
             setScheduleList(response.data);
         } catch (error) {
             console.log('That bai roi huhu ', error);
@@ -189,21 +188,23 @@ function TournamentSchedule() {
     });
 
     return (
-        <Box sx={{ mt: 2, mb: 2, p: 1, height: '30rem' }}>
-            <Box component="div">
-                <Button
-                    variant="outlined"
-                    component="div"
-                    startIcon={!isEdit ? <Edit /> : <Cancel />}
-                    sx={{ float: 'right' }}
-                    onClick={() => setEdit((prev) => !prev)}
-                >
-                    {isEdit ? 'Hủy' : 'Chỉnh sửa lịch'}
-                </Button>
-                <Typography variant="caption">
-                    {isEdit ? 'Để chỉnh sửa, vui lòng chọn 1 ngày trên lịch' : ''}
-                </Typography>
-            </Box>
+        <Box sx={{ mt: 1, mb: 2, height: '35rem', display: 'flex', flexDirection: 'column' }}>
+            {!isUpdate && (
+                <Box component="div" sx={{ mb: 2 }}>
+                    <Button
+                        variant="outlined"
+                        component="div"
+                        startIcon={!isEdit ? <Edit /> : <Cancel />}
+                        sx={{ float: 'right' }}
+                        onClick={() => setEdit((prev) => !prev)}
+                    >
+                        {isEdit ? 'Hủy' : 'Chỉnh sửa lịch'}
+                    </Button>
+                    <Typography variant="caption">
+                        {isEdit ? '*Để chỉnh sửa, vui lòng chọn 1 ngày trên lịch' : ''}
+                    </Typography>
+                </Box>
+            )}
 
             {scheduleUpdate && (
                 <Dialog fullWidth maxWidth="lg" open={open}>
@@ -276,31 +277,33 @@ function TournamentSchedule() {
                     </DialogActions>
                 </Dialog>
             )}
-            <FullCalendar
-                // initialDate={new Date('2022-09-01')}
-                initialDate={scheduleData[0] && new Date(scheduleData[0].date)}
-                locale="vie"
-                height="100%"
-                plugins={[dayGridPlugin, interactionPlugin]}
-                defaultView="dayGridMonth"
-                events={scheduleData}
-                weekends={true}
-                headerToolbar={{
-                    left: 'title',
-                    center: 'dayGridMonth,dayGridWeek',
-                    right: 'prev next',
-                    // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                }}
-                datesSet={(dateInfo) => {
-                    getMonthInCurrentTableView(dateInfo.start);
-                }}
-                eventClick={(args) => {
-                    navigateToUpdate(args.event.id, args.event.start, args.event.startStr);
-                }}
-                dateClick={function (arg) {
-                    navigateToCreate(arg.dateStr, arg.date);
-                }}
-            />
+            {scheduleList[0] && (
+                <FullCalendar
+                    // initialDate={new Date('2022-09-01')}
+                    initialDate={scheduleData[0] && new Date(scheduleData[0].date)}
+                    locale="vie"
+                    height="100%"
+                    plugins={[dayGridPlugin, interactionPlugin]}
+                    defaultView="dayGridMonth"
+                    events={scheduleData}
+                    weekends={true}
+                    headerToolbar={{
+                        left: 'title',
+                        center: 'dayGridMonth,dayGridWeek',
+                        right: 'prev next',
+                        // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                    }}
+                    datesSet={(dateInfo) => {
+                        getMonthInCurrentTableView(dateInfo.start);
+                    }}
+                    eventClick={(args) => {
+                        navigateToUpdate(args.event.id, args.event.start, args.event.startStr);
+                    }}
+                    dateClick={function (arg) {
+                        navigateToCreate(arg.dateStr, arg.date);
+                    }}
+                />
+            )}
         </Box>
     );
 }

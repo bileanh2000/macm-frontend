@@ -174,7 +174,7 @@ function FightingCompetition(props) {
                             <TableBody>
                                 {datas.map((data) => (
                                     <TableRow key={data.id}>
-                                        <TableCell align="center">{data.gender == 1 ? 'Nam' : 'Nữ'}</TableCell>
+                                        <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
                                         <TableCell align="center">
                                             {data.weightMin} - {data.weightMax} Kg
                                         </TableCell>

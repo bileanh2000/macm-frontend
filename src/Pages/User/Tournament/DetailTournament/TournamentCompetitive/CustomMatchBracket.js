@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import moment from 'moment';
 
@@ -14,6 +14,10 @@ function CustomMatchBracket(params) {
         __matches.push(round);
     }
     const [matches, setMatches] = useState(__matches);
+
+    useEffect(() => {
+        setMatches(__matches);
+    }, [params.matches]);
 
     return (
         <Fragment>

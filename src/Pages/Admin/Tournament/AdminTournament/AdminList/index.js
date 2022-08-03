@@ -79,11 +79,19 @@ function AdminList({ data, value, index, active, total }) {
 
     function CustomToolbar() {
         return (
-            <Fragment>
-                <GridToolbarContainer>
+            <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
+                <Box
+                    sx={{
+                        p: 0.5,
+                        pb: 0,
+                    }}
+                >
+                    <GridToolbarQuickFilter />
+                </Box>
+                <Box>
                     Số lượng thành viên trong ban tổ chức: {active}/{total}
-                </GridToolbarContainer>
-            </Fragment>
+                </Box>
+            </GridToolbarContainer>
         );
     }
     const StyledGridOverlay = styled('div')(({ theme }) => ({
@@ -139,7 +147,7 @@ function AdminList({ data, value, index, active, total }) {
                         </g>
                     </g>
                 </svg>
-                <Box sx={{ mt: 1 }}>No Rows</Box>
+                <Box sx={{ mt: 1 }}>Danh sách trống</Box>
             </StyledGridOverlay>
         );
     }
@@ -176,25 +184,19 @@ function AdminList({ data, value, index, active, total }) {
                 },
             }}
         >
-            {data.length > 0 ? (
-                <DataGrid
-                    loading={data.length === 0}
-                    disableSelectionOnClick={true}
-                    rows={rowsUser}
-                    columns={columns}
-                    pageSize={pageSize}
-                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                    rowsPerPageOptions={[10, 20, 30]}
-                    components={{
-                        Toolbar: CustomToolbar,
-                        NoRowsOverlay: CustomNoRowsOverlay,
-                    }}
-                />
-            ) : (
-                <Typography variant="body1" sx={{ mb: 3, margin: 'auto' }}>
-                    Chưa có thành viên trong ban tổ chức
-                </Typography>
-            )}
+            <DataGrid
+                // loading={data.length === 0}
+                disableSelectionOnClick={true}
+                rows={rowsUser}
+                columns={columns}
+                pageSize={pageSize}
+                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                rowsPerPageOptions={[10, 20, 30]}
+                components={{
+                    Toolbar: CustomToolbar,
+                    NoRowsOverlay: CustomNoRowsOverlay,
+                }}
+            />
         </Box>
     );
 }

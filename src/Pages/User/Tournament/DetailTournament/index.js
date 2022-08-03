@@ -120,6 +120,9 @@ function DetailTournament() {
             setHelperText('Please select an option.');
             setError(true);
         }
+        setValueRadio();
+        setHelperText(' ');
+        setOpenDialogAdmin(false);
     };
 
     const registerToJoinOrganizingCommittee = async (tournamentId, studentId, roleId) => {
@@ -192,6 +195,7 @@ function DetailTournament() {
     const getAllOrginizingCommitteeRole = async () => {
         try {
             const response = await userTournamentAPI.getAllUserOrganizingCommittee(tournamentId, user.studentId);
+            console.log(response.data);
             setIsJoinAdmin(response.data);
         } catch (error) {
             console.log('Loi roi', error);
@@ -250,6 +254,8 @@ function DetailTournament() {
                 handleClose={() => {
                     setOpenDialog(false);
                 }}
+                isJoinCompetitive={isJoinCompetitive}
+                isJoinExhibition={isJoinExhibition}
             />
             <Dialog
                 open={openDialogAdmin}
@@ -293,19 +299,14 @@ function DetailTournament() {
                         </FormControl>
                     </form>
                 </DialogContent>
-                <DialogActions>
-                    {/* <Button onClick={handleCloseDialogAdmin}>Hủy bỏ</Button>
-                    <Button onClick={handleRegisterAdmin} autoFocus>
-                        Đồng ý
-                    </Button> */}
-                </DialogActions>
+                {/* <DialogActions></DialogActions> */}
             </Dialog>
             {tournament && scheduleData.length > 0 && (
                 <Fragment>
                     <Paper elevation={3}>
                         <Container maxWidth="xl">
                             <Grid container spacing={2}>
-                                <Grid item xs={12} sm={8}>
+                                <Grid item xs={12} sm={7}>
                                     <Typography variant="h4" sx={{ fontSize: 'bold' }}>
                                         {tournament.name}
                                     </Typography>
@@ -313,29 +314,24 @@ function DetailTournament() {
                                         {scheduleData[0].date} - {scheduleData[scheduleData.length - 1].date}
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={12} sm={4}>
-                                    {new Date(scheduleList[0].date) > new Date() ? (
-                                        <Fragment>
-                                            {isJoinAdmin.length == 0 &&
-                                                !(isJoinCompetitive.length > 0 && isJoinExhibition.length > 0) && (
-                                                    <Button
-                                                        variant="outlined"
-                                                        // startIcon={<Edit />}
-                                                        onClick={() => handleOpenDialog(true)}
-                                                        {...(handleRegisterDeadline(0)
-                                                            ? { disabled: false }
-                                                            : { disabled: true })}
-                                                        sx={{ mr: 2 }}
-                                                    >
-                                                        {handleRegisterDeadline(0)
-                                                            ? 'Đăng kí thi đấu'
-                                                            : 'Hết hạn đăng ký thi đấu'}
-                                                    </Button>
-                                                )}
-
-                                            {isJoinAdmin.length == 0 &&
-                                                isJoinCompetitive.length == 0 &&
-                                                isJoinExhibition.length == 0 && (
+                                {new Date(scheduleList[0].date) > new Date() ? (
+                                    <Grid item xs={12} sm={5}>
+                                        {isJoinAdmin.length === 0 ? (
+                                            <Box sx={{ display: 'flex', alignContent: 'space-between' }}>
+                                                <Button
+                                                    variant="outlined"
+                                                    // startIcon={<Edit />}
+                                                    onClick={() => handleOpenDialog(true)}
+                                                    {...(handleRegisterDeadline(0)
+                                                        ? { disabled: false }
+                                                        : { disabled: true })}
+                                                    sx={{ mr: 2 }}
+                                                >
+                                                    {handleRegisterDeadline(0)
+                                                        ? 'Đăng kí thi đấu'
+                                                        : 'Hết hạn đăng ký thi đấu'}
+                                                </Button>
+                                                {isJoinCompetitive.length === 0 && isJoinExhibition.length === 0 && (
                                                     <Button
                                                         variant="outlined"
                                                         // startIcon={<Edit />}
@@ -350,32 +346,16 @@ function DetailTournament() {
                                                             : 'Hết hạn đăng ký ban tổ chức'}
                                                     </Button>
                                                 )}
-                                        </Fragment>
-                                    ) : (
-                                        ''
-                                    )}
-
-                                    {/* {new Date(tournament[0].date) > new Date() ? ( && (
-                                        <Box sx={{ display: 'flex', alignContent: 'space-between' }}>
-                                            <Button
-                                                variant="outlined"
-                                                startIcon={<Edit />}
-                                                onClick={() => handleOpenDialog(true)}
-                                                sx={{ float: 'right', mr: 2 }}
-                                            >
-                                                Đăng kí thi đấu
-                                            </Button>
-                                            <Button
-                                                variant="outlined"
-                                                startIcon={<Edit />}
-                                                onClick={() => handleOpenDialogAdmin(true)}
-                                                sx={{ float: 'right' }}
-                                            >
-                                                Đăng kí vào ban tổ chức
-                                            </Button>
-                                        </Box>
-                                    )} */}
-                                </Grid>
+                                            </Box>
+                                        ) : (
+                                            <Typography variant="h4" sx={{ fontSize: 'bold' }}>
+                                                "Bạn là thành viên ban tổ chức"
+                                            </Typography>
+                                        )}
+                                    </Grid>
+                                ) : (
+                                    ''
+                                )}
                             </Grid>
                             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                 <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
