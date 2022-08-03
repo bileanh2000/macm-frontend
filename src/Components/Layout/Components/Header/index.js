@@ -87,11 +87,24 @@ function Header({ onLogout }) {
             console.log('Lấy dữ liệu news thất bại');
         }
     };
+    const fetchUnreadNotification = async (studentId, pageNo) => {
+        try {
+            const response = await notificationApi.getAllNotificationUnread(studentId, pageNo);
+            console.log('fetchUnreadNotification', response);
+            setNews(response.data);
+            setTotal(response.totalPage);
+        } catch (error) {
+            console.error('Lấy dữ liệu news thất bại');
+        }
+    };
 
     React.useEffect(() => {
-        fetchNewsList(studentId, page - 1);
-        // window.scrollTo({ behavior: 'smooth', top: '0px' });
-    }, [page]);
+        if (notiStatus) {
+            fetchUnreadNotification(studentId, page - 1);
+        } else {
+            fetchNewsList(studentId, page - 1);
+        }
+    }, [notiStatus, page]);
 
     const handleClickAway = () => {
         setChecked(false);
@@ -397,23 +410,6 @@ function Header({ onLogout }) {
                                                 </Tooltip>
                                             </Box>
                                             <Box className={cx('noti-switch')} sx={{ padding: '8px 8px 5px 8px' }}>
-                                                {/* <span
-                                                    className={cx('all')}
-                                                    onClick={(e) => {
-                                                        setNotiStatus(0);
-                                                        e.currentTarget.classList.add('active');
-                                                    }}
-                                                >
-                                                    Tất cả
-                                                </span>
-                                                <span
-                                                    onClick={() => {
-                                                        setNotiStatus(1);
-                                                    }}
-                                                    className={cx('unread')}
-                                                >
-                                                    Chưa đọc
-                                                </span> */}
                                                 <ToggleButtonGroup
                                                     color="primary"
                                                     value={notiStatus}
@@ -516,10 +512,7 @@ function Header({ onLogout }) {
                         <Box sx={{ flexGrow: 0 }}>
                             {/* <Tooltip title="Open settings"> */}
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar
-                                    alt="Remy Sharp"
-                                    src="https://congcaphe.com/_next/static/images/vn-66e76189e15384f6034e56f129991d96.png"
-                                />
+                                <Avatar alt="avatar" src={user.image} />
                             </IconButton>
                             {/* </Tooltip> */}
                             <Menu
@@ -541,7 +534,7 @@ function Header({ onLogout }) {
                                 <MenuItem
                                     component={Link}
                                     to={`/${user.studentId}`}
-                                    sx={{ height: '64px' }}
+                                    // sx={{ height: '64px' }}
                                     onClick={handleCloseUserMenu}
                                 >
                                     <ListItemIcon>

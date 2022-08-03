@@ -14,6 +14,8 @@ import {
     gridPageSelector,
     gridPageCountSelector,
     gridPageSizeSelector,
+    GridFooterContainer,
+    GridFooter,
 } from '@mui/x-data-grid';
 import {
     Alert,
@@ -70,51 +72,21 @@ const fileTypes = ['CSV', 'JPG', 'png'];
 const Input = styled('input')({
     display: 'none',
 });
-// function DragDrop() {
-//     const [aFile, setAFile] = useState(null);
 
-//     const handleChange = async (file) => {
-//         setAFile(file);
-//     };
-
-//     useEffect(() => {
-//         console.log(aFile);
-//     }, [aFile]);
-
-//     return (
-//         <div className="dragdrop">
-//             <FileUploader
-//                 multiple={true}
-//                 onTypeError={(err) => console.log(err)}
-//                 name="file"
-//                 types={fileTypes}
-//                 handleChange={handleChange}
-//             />
-//             <p>{aFile ? `File name: ${aFile[0].name}` : ''}</p>
-//         </div>
-//     );
-// }
-// bat onchange lay api theo ky, day stage de disable field action
 function MemberAndCollaborator() {
+    const token = localStorage[`accessToken`];
     let navigate = useNavigate();
     const [userList, setUserList] = useState([]);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(30);
     const [openUploadFile, setOpenUploadFile] = useState(false);
     const [semester, setSemester] = useState('Summer2022');
     const [editable, setEditable] = useState(false);
     const [checked, setChecked] = useState(false);
     const [gender, setGender] = useState('');
-    // const [onChangeSearch, setOnChangeSearch] = useState({
-    //     dateFrom: '',
-    //     dateTo: '',
-    //     email: '',
-    //     gender: '',
-    //     generation: '',
-    //     isActive: '',
-    //     name: '',
-    //     roleId: '',
-    //     studentId: '',
-    // });
+    const [userData, setUserData] = useState([]);
+    const [selectionModel, setSelectionModel] = useState([]);
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [emailList, setEmailList] = useState([]);
 
     const onChangeSearch = {
         dateFrom: '',
@@ -128,14 +100,6 @@ function MemberAndCollaborator() {
         studentId: '',
     };
 
-    const callApi = (val, fieldBy) => {
-        onChangeSearch[fieldBy] = val;
-        console.log('callApi', onChangeSearch);
-    };
-
-    const handleChangeGender = (event) => {
-        setGender(event.target.value);
-    };
     const toggleFilter = () => {
         setChecked((prev) => !prev);
     };
@@ -156,6 +120,7 @@ function MemberAndCollaborator() {
             const response = await userApi.getAllUserBySemester(params);
             console.log(response);
             setUserList(response.data);
+            setUserData(response.data);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -176,6 +141,13 @@ function MemberAndCollaborator() {
         // fetchUserList();
         fetchUserListBySemester(semester);
     }, [semester]);
+
+    useEffect(() => {
+        let emails = selectedRows.map((item) => item.email);
+        console.info('email', emails);
+        setEmailList(emails);
+    }, [selectedRows]);
+
     const {
         register,
         control,
@@ -282,10 +254,9 @@ function MemberAndCollaborator() {
         return item.active === true;
     }).length;
 
-    console.log(countActive);
     const rowsUser = userList.map((item, index) => {
         const container = {};
-        container['id'] = index + 1;
+        container['id'] = item.id;
         container['name'] = item.name;
         container['email'] = item.email;
         container['gender'] = item.gender ? 'Nam' : 'Nữ';
@@ -302,7 +273,6 @@ function MemberAndCollaborator() {
     const editUser = useCallback(
         (studentId) => () => {
             setTimeout(() => {
-                // setRows((prevRows) => prevRows.filter((row) => row.id !== id));
                 console.log(studentId);
                 let path = `${studentId}/edit`;
                 navigate(path);
@@ -341,6 +311,7 @@ function MemberAndCollaborator() {
             .post('https://capstone-project-macm.herokuapp.com/api/admin/hr/users/import', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`,
                 },
             })
             .then((res) => {
@@ -367,23 +338,22 @@ function MemberAndCollaborator() {
         const dataFormat = {
             dateFrom: data.startDate === null ? '' : moment(new Date(data.startDate)).format('yyyy-MM-DD'),
             dateTo: data.endDate === null ? '' : moment(new Date(data.endDate)).format('yyyy-MM-DD'),
-            email: data.email,
             gender: data.gender,
             generation: data.generation,
             isActive: data.isActive,
-            name: data.name,
             roleId: data.roleId,
-            studentId: data.studentId,
         };
 
         userApi
-            .searchByMultipleField(dataFormat, userList)
+            .searchByMultipleField(dataFormat, userData && userData)
             .then((res) => {
-                console.log('1', res);
-                console.log('1', res.datadata);
+                console.log('filter', res);
+                console.log('filter data', res.data);
+                setUserList(res.data);
+                toggleFilter();
             })
             .catch((error) => {
-                console.log(error.response);
+                console.error('failed when filter', error.response);
             });
         console.log(dataFormat);
     };
@@ -392,29 +362,34 @@ function MemberAndCollaborator() {
         console.log('exportExcel');
         axios({
             url: 'https://capstone-project-macm.herokuapp.com/api/admin/hr/users/export', //your url
-            method: 'GET',
+            method: 'POST',
+            ...(selectedRows.length > 0 ? { data: selectedRows } : { data: userList }),
+            // data: selectedRows,
+
             responseType: 'blob', // important
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
         }).then((response) => {
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'hahahaahahah.xlsx'); //or any other extension
+            link.setAttribute('download', 'MACM - Danh sách thành viên.xlsx'); //or any other extension
             document.body.appendChild(link);
             link.click();
         });
     };
-    useEffect(() => {
-        console.log('haha', onChangeSearch);
-    }, [onChangeSearch]);
+
     function CustomToolbar() {
         return (
             <Fragment>
                 <GridToolbarContainer>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <GridToolbarColumnsButton />
-                        <Button startIcon={<FilterListIcon />} size="small" onClick={toggleFilter}>
-                            BỘ LỌC TÌM KIẾM
+                        {/* <GridToolbarColumnsButton /> */}
+                        <Button startIcon={<FilterListIcon />} size="small" onClick={toggleFilter} sx={{ mr: 1 }}>
+                            BỘ LỌC
                         </Button>
+                        <GridToolbarQuickFilter />
                     </Box>
 
                     <Typography variant="button" color="initial" sx={{ marginLeft: 'auto', marginRight: '1rem' }}>
@@ -422,25 +397,51 @@ function MemberAndCollaborator() {
                     </Typography>
                 </GridToolbarContainer>
                 {/* <ClickAwayListener onClickAway={handleClickAway}> */}
-                <Grow in={checked}>
-                    <Box
-                        component="form"
-                        onSubmit={handleSubmit(filterSubmit)}
-                        sx={{
-                            position: 'absolute',
-                            zIndex: '2',
-                            backgroundColor: 'white',
-                            top: '90px',
-                            padding: '10px 20px 30px 20px',
-                            boxShadow: 5,
-                            borderRadius: '3px',
-                            maxWidth: '450px',
-                            '& .MuiTextField-root': { mb: 2 },
-                        }}
-                    >
-                        <Grid container spacing={3}>
-                            <Grid item xs={6}>
-                                <TextField
+
+                {/* </ClickAwayListener> */}
+                {/* <Box>
+                </Box> */}
+            </Fragment>
+        );
+    }
+    const CustomFooter = () => {
+        return (
+            <GridFooterContainer>
+                {/* <a href="http://">Gửi email cho ({selectedRows.length}) người đã chọn</a> */}
+                <a href={`mailto:` + emailList.toString()} style={{ marginLeft: '10px' }}>
+                    {selectedRows.length > 0 ? `Gửi email cho (${selectedRows.length}) người đã chọn` : ''}
+                </a>
+                <GridFooter
+                    sx={{
+                        border: 'none', // To delete double border.
+                    }}
+                />
+            </GridFooterContainer>
+        );
+    };
+
+    return (
+        <Fragment>
+            <Grow in={checked}>
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit(filterSubmit)}
+                    sx={{
+                        position: 'absolute',
+                        top: '264px',
+                        left: '32px',
+                        zIndex: '2',
+                        backgroundColor: 'white',
+                        padding: '10px 20px 30px 20px',
+                        boxShadow: 5,
+                        borderRadius: '3px',
+                        maxWidth: '450px',
+                        '& .MuiTextField-root': { mb: 2 },
+                    }}
+                >
+                    <Grid container spacing={3}>
+                        <Grid item xs={6}>
+                            {/* <TextField
                                     fullWidth
                                     id="standard-basic"
                                     label="Tên"
@@ -451,8 +452,8 @@ function MemberAndCollaborator() {
                                         // console.log(onChangeSearch);
                                     }}
                                     // {...register('name')}
-                                />
-                                <TextField
+                                /> */}
+                            {/* <TextField
                                     fullWidth
                                     id="standard-basic"
                                     label="Mã sinh viên"
@@ -463,88 +464,89 @@ function MemberAndCollaborator() {
                                         onChangeSearch.studentId = e.target.value;
                                         // console.log(onChangeSearch);
                                     }}
+                                /> */}
+                            <TextField
+                                fullWidth
+                                id="standard-select-currency"
+                                select
+                                label="Gen"
+                                // onChange={handleChangeGender}
+                                defaultValue=""
+                                variant="standard"
+                                size="small"
+                                {...register('generation')}
+                                // onChange={(e) => {
+                                //     onChangeSearch.generation = e.target.value;
+                                //     // console.log(onChangeSearch);
+                                // }}
+                            >
+                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value="1">1</MenuItem>
+                                <MenuItem value="2">2</MenuItem>
+                                <MenuItem value="3">3</MenuItem>
+                                <MenuItem value="4">4</MenuItem>
+                                <MenuItem value="5">5</MenuItem>
+                            </TextField>
+
+                            <TextField
+                                fullWidth
+                                id="standard-select-currency"
+                                select
+                                label="Trạng thái"
+                                // onChange={handleChangeGender}
+                                defaultValue=""
+                                variant="standard"
+                                size="small"
+                                {...register('isActive')}
+                                // onChange={(e) => {
+                                //     onChangeSearch.isActive = e.target.value;
+                                //     // console.log(onChangeSearch);
+                                // }}
+                            >
+                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value="true">Active</MenuItem>
+                                <MenuItem value="false">Deactive</MenuItem>
+                            </TextField>
+                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                                <Controller
+                                    name="startDate"
+                                    control={control}
+                                    defaultValue={null}
+                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        <DatePicker
+                                            label="Từ ngày"
+                                            // views={['year', 'month', 'day']}
+                                            disableFuture
+                                            // maxDate={new Date('2022-06-12')}
+                                            views={['year', 'month', 'day']}
+                                            ampm={false}
+                                            value={value}
+                                            // onChange={(value) => callApi(value, 'dateFrom')}
+                                            onChange={(value) => {
+                                                onChange(value);
+                                                // onChangeSearch.dateFrom =
+                                                //     value === null ? '' : moment(value).format('yyyy-MM-DD');
+                                                // console.log(onChangeSearch);
+                                            }}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    id="outlined-disabled"
+                                                    error={invalid}
+                                                    helperText={invalid ? error.message : null}
+                                                    // id="startDate"
+                                                    variant="standard"
+                                                    margin="dense"
+                                                    fullWidth
+                                                />
+                                            )}
+                                        />
+                                    )}
                                 />
-                                <TextField
-                                    fullWidth
-                                    id="standard-select-currency"
-                                    select
-                                    label="Gen"
-                                    // onChange={handleChangeGender}
-                                    defaultValue=""
-                                    variant="standard"
-                                    size="small"
-                                    // {...register('generation')}
-                                    onChange={(e) => {
-                                        onChangeSearch.generation = e.target.value;
-                                        // console.log(onChangeSearch);
-                                    }}
-                                >
-                                    <MenuItem value="">Tất cả</MenuItem>
-                                    <MenuItem value="1">1</MenuItem>
-                                    <MenuItem value="2">2</MenuItem>
-                                    <MenuItem value="3">3</MenuItem>
-                                    <MenuItem value="3">4</MenuItem>
-                                    <MenuItem value="3">5</MenuItem>
-                                </TextField>
-                                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                                    <Controller
-                                        name="startDate"
-                                        control={control}
-                                        defaultValue={null}
-                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                            <DatePicker
-                                                label="Từ ngày"
-                                                // views={['year', 'month', 'day']}
-                                                disableFuture
-                                                // maxDate={new Date('2022-06-12')}
-                                                views={['year', 'month', 'day']}
-                                                ampm={false}
-                                                value={value}
-                                                onChange={(value) => callApi(value, 'dateFrom')}
-                                                // onChange={(value) => {
-                                                //     onChange(value);
-                                                //     onChangeSearch.dateFrom =
-                                                //         value === null ? '' : moment(value).format('yyyy-MM-DD');
-                                                //     console.log(onChangeSearch);
-                                                // }}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        id="outlined-disabled"
-                                                        error={invalid}
-                                                        helperText={invalid ? error.message : null}
-                                                        // id="startDate"
-                                                        variant="standard"
-                                                        margin="dense"
-                                                        fullWidth
-                                                    />
-                                                )}
-                                            />
-                                        )}
-                                    />
-                                </LocalizationProvider>
-                                <TextField
-                                    fullWidth
-                                    id="standard-select-currency"
-                                    select
-                                    label="Trạng thái"
-                                    // onChange={handleChangeGender}
-                                    defaultValue=""
-                                    variant="standard"
-                                    size="small"
-                                    // {...register('isActive')}
-                                    onChange={(e) => {
-                                        onChangeSearch.isActive = e.target.value;
-                                        // console.log(onChangeSearch);
-                                    }}
-                                >
-                                    <MenuItem value="">Tất cả</MenuItem>
-                                    <MenuItem value="true">Active</MenuItem>
-                                    <MenuItem value="false">Deactive</MenuItem>
-                                </TextField>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
+                            </LocalizationProvider>
+                        </Grid>
+                        <Grid item xs={6}>
+                            {/* <TextField
                                     fullWidth
                                     id="standard-basic"
                                     label="Email"
@@ -555,104 +557,96 @@ function MemberAndCollaborator() {
                                         onChangeSearch.email = e.target.value;
                                         // console.log(onChangeSearch);
                                     }}
+                                /> */}
+                            <TextField
+                                fullWidth
+                                id="standard-select-currency"
+                                select
+                                label="Giới tính"
+                                // onChange={handleChangeGender}
+                                defaultValue=""
+                                variant="standard"
+                                size="small"
+                                {...register('gender')}
+                                // onChange={(e) => {
+                                //     onChangeSearch.gender = e.target.value;
+                                //     // console.log(onChangeSearch);
+                                // }}
+                            >
+                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value="true">Nam</MenuItem>
+                                <MenuItem value="false">Nữ</MenuItem>
+                            </TextField>
+                            <TextField
+                                fullWidth
+                                id="standard-select-currency"
+                                select
+                                label="Vai trò"
+                                // onChange={handleChangeGender}
+                                defaultValue=""
+                                variant="standard"
+                                size="small"
+                                {...register('roleId')}
+                                // onChange={(e) => {
+                                //     onChangeSearch.roleId = e.target.value;
+                                //     // console.log(onChangeSearch);
+                                // }}
+                            >
+                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value={10}>Ban truyền thông</MenuItem>
+                                <MenuItem value={11}>Ban văn hóa</MenuItem>
+                                <MenuItem value={12}>Ban chuyên môn</MenuItem>
+                                <MenuItem value={13}>CTV Ban truyền thông</MenuItem>
+                                <MenuItem value={14}>CTV Ban văn hóa</MenuItem>
+                                <MenuItem value={15}>CTV Ban chuyên môn</MenuItem>
+                            </TextField>
+                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                                <Controller
+                                    name="endDate"
+                                    control={control}
+                                    defaultValue={null}
+                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        <DatePicker
+                                            label="Đến ngày"
+                                            // views={['year', 'month', 'day']}
+                                            disableFuture
+                                            // maxDate={new Date('2022-06-12')}
+                                            views={['year', 'month', 'day']}
+                                            ampm={false}
+                                            value={value}
+                                            onChange={(value) => {
+                                                onChange(value);
+                                                // onChangeSearch.dateTo =
+                                                //     value === null ? '' : moment(value).format('yyyy-MM-DD');
+                                                // console.log(onChangeSearch);
+                                            }}
+                                            // onChange={(value) => callApi(value, 'dateTo')}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    id="outlined-disabled"
+                                                    error={invalid}
+                                                    helperText={invalid ? error.message : null}
+                                                    // id="startDate"
+                                                    variant="standard"
+                                                    margin="dense"
+                                                    fullWidth
+                                                />
+                                            )}
+                                        />
+                                    )}
                                 />
-                                <TextField
-                                    fullWidth
-                                    id="standard-select-currency"
-                                    select
-                                    label="Giới tính"
-                                    // onChange={handleChangeGender}
-                                    defaultValue=""
-                                    variant="standard"
-                                    size="small"
-                                    // {...register('gender')}
-                                    onChange={(e) => {
-                                        onChangeSearch.gender = e.target.value;
-                                        // console.log(onChangeSearch);
-                                    }}
-                                >
-                                    <MenuItem value="">Tất cả</MenuItem>
-                                    <MenuItem value="true">Nam</MenuItem>
-                                    <MenuItem value="false">Nữ</MenuItem>
-                                </TextField>
-                                <TextField
-                                    fullWidth
-                                    id="standard-select-currency"
-                                    select
-                                    label="Vai trò"
-                                    // onChange={handleChangeGender}
-                                    defaultValue=""
-                                    variant="standard"
-                                    size="small"
-                                    // {...register('roleId')}
-                                    onChange={(e) => {
-                                        onChangeSearch.roleId = e.target.value;
-                                        // console.log(onChangeSearch);
-                                    }}
-                                >
-                                    <MenuItem value="">Tất cả</MenuItem>
-                                    <MenuItem value={10}>Ban truyền thông</MenuItem>
-                                    <MenuItem value={11}>Ban văn hóa</MenuItem>
-                                    <MenuItem value={12}>Ban chuyên môn</MenuItem>
-                                    <MenuItem value={13}>CTV Ban truyền thông</MenuItem>
-                                    <MenuItem value={14}>CTV Ban văn hóa</MenuItem>
-                                    <MenuItem value={15}>CTV Ban chuyên môn</MenuItem>
-                                </TextField>
-                                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                                    <Controller
-                                        name="endDate"
-                                        control={control}
-                                        defaultValue={null}
-                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                            <DatePicker
-                                                label="Đến ngày"
-                                                // views={['year', 'month', 'day']}
-                                                disableFuture
-                                                // maxDate={new Date('2022-06-12')}
-                                                views={['year', 'month', 'day']}
-                                                ampm={false}
-                                                value={value}
-                                                // onChange={(value) => {
-                                                //     onChange(value);
-                                                //     onChangeSearch.dateTo =
-                                                //         value === null ? '' : moment(value).format('yyyy-MM-DD');
-                                                //     console.log(onChangeSearch);
-                                                // }}
-                                                onChange={(value) => callApi(value, 'dateTo')}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        id="outlined-disabled"
-                                                        error={invalid}
-                                                        helperText={invalid ? error.message : null}
-                                                        // id="startDate"
-                                                        variant="standard"
-                                                        margin="dense"
-                                                        fullWidth
-                                                    />
-                                                )}
-                                            />
-                                        )}
-                                    />
-                                </LocalizationProvider>
-                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                                    <Button variant="contained" type="submit">
-                                        Lọc
-                                    </Button>
-                                </Box>
-                            </Grid>
+                            </LocalizationProvider>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                                <Button variant="contained" type="submit">
+                                    Lọc
+                                </Button>
+                            </Box>
                         </Grid>
-                    </Box>
-                </Grow>
-                {/* </ClickAwayListener> */}
-                {/* <Box>
-                </Box> */}
-            </Fragment>
-        );
-    }
+                    </Grid>
+                </Box>
+            </Grow>
 
-    return (
-        <Fragment>
             <Snackbar
                 open={openSnackBar}
                 autoHideDuration={5000}
@@ -686,6 +680,7 @@ function MemberAndCollaborator() {
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                 Quản lý Thành viên và Cộng tác viên
             </Typography>
+
             <Box sx={{ marginBottom: 2, display: 'flex', justifyContent: 'space-between' }}>
                 <Box>
                     <TextField
@@ -724,11 +719,12 @@ function MemberAndCollaborator() {
                         Thêm danh sách thành viên
                     </Button>
                     <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} onClick={exportExcel}>
-                        Xuất File Excel
+                        Xuất Excel {selectedRows.length > 0 ? `đã chọn (${selectedRows.length})` : `toàn bộ danh sách`}
                     </Button>
                 </Box>
             </Box>
             {/* <div style={{ height: '70vh', width: '100%' }}> */}
+
             <Box
                 sx={{
                     height: '70vh',
@@ -736,13 +732,14 @@ function MemberAndCollaborator() {
                 }}
             >
                 <DataGrid
-                    loading={!userList.length}
-                    disableSelectionOnClick={true}
+                    // loading={!userList.length}
+                    // disableSelectionOnClick={true}
+                    checkboxSelection
                     rows={rowsUser}
                     columns={columns}
                     pageSize={pageSize}
                     onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                    rowsPerPageOptions={[10, 20, 30]}
+                    rowsPerPageOptions={[30, 50, 70]}
                     onCellDoubleClick={(param) => {
                         handleOnClick(param.row);
                     }}
@@ -753,6 +750,15 @@ function MemberAndCollaborator() {
                     components={{
                         Toolbar: CustomToolbar,
                         // Pagination: CustomPagination,
+                        Footer: CustomFooter,
+                    }}
+                    onSelectionModelChange={(ids) => {
+                        setSelectionModel(ids);
+                        const selectedIDs = new Set(ids);
+                        const selectedRows = userList && userList.filter((row) => selectedIDs.has(row.id));
+                        setSelectedRows(selectedRows);
+                        // console.log(selectedRows);
+                        console.log('selected', selectedRows);
                     }}
                 />
             </Box>

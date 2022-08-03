@@ -25,6 +25,17 @@ const notificationApi = {
         return axiosClient.put(url);
     },
 
+    getAllNotificationUnread: (studentId, pageNo) => {
+        const url = `notification/getallunreadnotificationbystudentid/${studentId}`;
+        return axiosClient.get(url, {
+            params: {
+                pageNo: pageNo,
+                pageSize: '5',
+            },
+        });
+    },
+    // /api/notification/getallunreadnotificationbystudentid/{studentId}
+
     // /api/notification/marknotificationasread/{notificationId}/{studentId}
 };
 export default notificationApi;
