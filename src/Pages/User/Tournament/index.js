@@ -25,11 +25,11 @@ function Tournament() {
         setStatus(event.target.value);
     };
 
-    const getListTournamentBySemester = async (params, status) => {
+    const getListTournamentBySemester = async (studentId, params, status) => {
         try {
-            const response = await userTournamentAPI.getAllTournamentByStudentId(user.studentId, params, status);
+            const response = await userTournamentAPI.getAllTournamentByStudentId(studentId, params, status);
             setTournaments(response.data);
-            console.log('hahahaah', response.data);
+            // console.log('hahahaah', response.data);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
@@ -38,15 +38,15 @@ function Tournament() {
     const fetchSemester = async () => {
         try {
             const response = await semesterApi.getTop3Semester();
-            console.log('Thanh cong roi, semester: ', response);
+            // console.log('Thanh cong roi, semester: ', response);
             setSemesterList(response.data);
         } catch (error) {
             console.log('That bai roi huhu, semester: ', error);
         }
     };
     useEffect(() => {
-        getListTournamentBySemester(semester, status);
-    }, [semester, status]);
+        getListTournamentBySemester(user.studentId, semester, status);
+    }, [semester, status, user.studentId]);
 
     useEffect(() => {
         fetchSemester();
