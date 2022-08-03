@@ -37,7 +37,10 @@ function AddMember(props) {
                                 value={user}
                                 isOptionEqualToValue={(option, value) => option.studentId === value.studentId}
                                 onChange={(event, newValue) => {
-                                    setUser([...newValue.filter((option) => fixedOptions.indexOf(option) === -1)]);
+                                    setUser([
+                                        ...fixedOptions,
+                                        ...newValue.filter((option) => fixedOptions.indexOf(option) === -1),
+                                    ]);
                                 }}
                                 // freeSolo={user.length > 3 ? false : true}
                                 getOptionDisabled={(options) =>
@@ -99,8 +102,15 @@ function AddMember(props) {
                 ''
             ) : (
                 <Collapse in={!isChecked}>
-                    <Fab color="primary" aria-label="add" onClick={() => setIsChecked(!isChecked)} size="medium">
+                    <Fab
+                        color="primary"
+                        variant="extended"
+                        aria-label="add"
+                        onClick={() => setIsChecked(!isChecked)}
+                        size="medium"
+                    >
                         <Add />
+                        Thêm người chơi
                     </Fab>
                 </Collapse>
             )}

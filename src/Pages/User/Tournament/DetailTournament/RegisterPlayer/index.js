@@ -368,7 +368,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                                 />
                             )}
                         </Box>
-                        <Paper elevation={3} sx={{ width: '100%' }}>
+                        <Paper elevation={3} sx={{ width: '100%', mt: 2 }}>
                             {dataMale.length > 0 && (
                                 <TableContainer sx={{ maxHeight: 440 }}>
                                     <Table stickyHeader aria-label="sticky table">
@@ -423,7 +423,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                                 />
                             )}
                         </Box>
-                        <Paper elevation={3} sx={{ width: '100%' }}>
+                        <Paper elevation={3} sx={{ width: '100%', mt: 2 }}>
                             {dataFemale.length > 0 && (
                                 <TableContainer sx={{ maxHeight: 440 }}>
                                     <Table stickyHeader aria-label="sticky table">
