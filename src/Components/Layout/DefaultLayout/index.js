@@ -21,11 +21,14 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Avatar, Menu, MenuItem, Tooltip } from '@mui/material';
 import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
+import { Link } from 'react-router-dom';
+import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const cx = classNames.bind(styles);
 const drawerWidth = 270;
 function DefaultLayout({ children, onLogout }) {
-    // const { window } = props;
+    const user = JSON.parse(localStorage.getItem('currentUser'));
     const [mobileOpen, setMobileOpen] = React.useState(false);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const handleDrawerToggle = () => {
@@ -109,10 +112,7 @@ function DefaultLayout({ children, onLogout }) {
                         <Box sx={{ flexGrow: 0 }}>
                             <Tooltip title="Open settings">
                                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    <Avatar
-                                        alt="Remy Sharp"
-                                        src="https://congcaphe.com/_next/static/images/vn-66e76189e15384f6034e56f129991d96.png"
-                                    />
+                                    <Avatar alt="avatar" src={user.image} />
                                 </IconButton>
                             </Tooltip>
                             <Menu
@@ -131,11 +131,22 @@ function DefaultLayout({ children, onLogout }) {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-                                <MenuItem onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">hehe</Typography>
+                                <MenuItem
+                                    component={Link}
+                                    to={`/${user.studentId}`}
+                                    // sx={{ height: '64px' }}
+                                    onClick={handleCloseUserMenu}
+                                >
+                                    <ListItemIcon>
+                                        <PersonIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Thông tin cá nhân</ListItemText>
                                 </MenuItem>
                                 <MenuItem onClick={onLogout}>
-                                    <Typography textAlign="center">Đăng xuất</Typography>
+                                    <ListItemIcon>
+                                        <LogoutIcon />
+                                    </ListItemIcon>
+                                    <ListItemText>Đăng xuất</ListItemText>
                                 </MenuItem>
                             </Menu>
                         </Box>

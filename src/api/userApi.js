@@ -60,10 +60,10 @@ const userApi = {
     },
     searchByMultipleField: (params, data) => {
         const url = `/admin/hr/viceheadclub/member/search`;
-        return axiosClient.get(url, data, {
+        return axiosClient.post(url, data, {
             params: {
-                dateFrom: params.startDate,
-                dateTo: params.endDate,
+                dateFrom: params.dateFrom,
+                dateTo: params.dateTo,
                 email: params.email,
                 gender: params.gender,
                 generation: params.generation,
