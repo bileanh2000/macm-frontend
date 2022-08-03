@@ -36,6 +36,12 @@ const trainingScheduleApi = {
             },
         });
     },
+
+    getCommonSessionByDate: (date) => {
+        const url = `/commonschedule/getcommonsessionbydate`;
+        return axiosClient.get(url, { params: { date: date } });
+    },
+
     commonSchedule: () => {
         const url = `/commonschedule/getcommonschedule`;
         return axiosClient.get(url);

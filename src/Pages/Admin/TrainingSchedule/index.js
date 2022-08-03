@@ -121,7 +121,8 @@ function TrainingSchedule() {
     const navigateToUpdate = (params, date) => {
         console.log(date, nowDate);
         const filterEventClicked = commonList.filter((item) => item.date === moment(date).format('YYYY-MM-DD'));
-        if (filterEventClicked[0] && filterEventClicked[0].type !== 0) {
+        console.log(filterEventClicked);
+        if (filterEventClicked[0] && filterEventClicked[0].type !== 0 && filterEventClicked[0].type !== 1) {
             return;
         }
         if (

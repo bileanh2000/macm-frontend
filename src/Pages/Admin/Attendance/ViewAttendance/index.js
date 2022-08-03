@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useLocation } from 'react-router-dom';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 
-function ViewAttendance(data) {
+function ViewAttendance({ data }) {
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
     const [totalActive, setTotalActive] = useState();
@@ -17,18 +17,25 @@ function ViewAttendance(data) {
     const location = useLocation();
 
     console.log(data);
+    let _type = location.state?.type;
+    if (!_type) _type = data.type;
 
     let _trainingScheduleId = location.state?.id;
     if (!_trainingScheduleId) _trainingScheduleId = data.trainingScheduleId;
 
     let _nowDate = location.state?.date;
     if (!_nowDate) _nowDate = data.date;
-    // console.log(_nowDate);
 
-    const getAttendanceByStudentId = async () => {
+    const checkAttendanceByScheduleId = async () => {
         try {
             console.log(_trainingScheduleId);
-            const response = await adminAttendanceAPI.getAttendanceByStudentId(_trainingScheduleId);
+            let response;
+            if (_type == 0) {
+                response = await adminAttendanceAPI.checkAttendanceByScheduleId(_trainingScheduleId);
+            }
+            if (_type == 1) {
+                response = await adminAttendanceAPI.getAttendanceByEventId(_trainingScheduleId);
+            }
             console.log(response);
             setUserList(response.data);
             setTotalActive(response.totalActive);
@@ -39,7 +46,7 @@ function ViewAttendance(data) {
     };
 
     useEffect(() => {
-        getAttendanceByStudentId();
+        checkAttendanceByScheduleId();
     }, []);
 
     let snackBarStatus;
