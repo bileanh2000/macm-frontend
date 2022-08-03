@@ -1,36 +1,20 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-    Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Grid,
-    IconButton,
-    MenuItem,
-    Paper,
-    TextField,
-    Typography,
-} from '@mui/material';
-import { Delete, Edit, AddCircle } from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
+import { Box, Grid, MenuItem, Paper, TextField, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import moment from 'moment';
 
 import styles from '../Tournament/Tournament.module.scss';
-import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import semesterApi from 'src/api/semesterApi';
-import moment from 'moment';
+import userTournamentAPI from 'src/api/userTournamentAPI';
 
 const cx = classNames.bind(styles);
 
 function Tournament() {
-    const [tournaments, setTouraments] = useState();
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const [tournaments, setTournaments] = useState();
     const [semester, setSemester] = useState('Summer2022');
     const [semesterList, setSemesterList] = useState([]);
-    const [openDialog, setOpenDialog] = useState(false);
-    const [tournamentOnclick, setTournamentOnclick] = useState({ name: '', id: '' });
     const [status, setStatus] = useState(0);
 
     const handleChange = (event) => {
@@ -41,13 +25,11 @@ function Tournament() {
         setStatus(event.target.value);
     };
 
-    const getListTournamentBySemester = async (params, status) => {
+    const getListTournamentBySemester = async (studentId, params, status) => {
         try {
-            const response = await adminTournamentAPI.getAllTournament(params, status);
-            setTouraments(response.data);
-            // setTotal(response.totalPage);
-            // setPageSize(response.pageSize);
-            console.log('hahahaah', response.data);
+            const response = await userTournamentAPI.getAllTournamentByStudentId(studentId, params, status);
+            setTournaments(response.data);
+            // console.log('hahahaah', response.data);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
@@ -56,15 +38,15 @@ function Tournament() {
     const fetchSemester = async () => {
         try {
             const response = await semesterApi.getTop3Semester();
-            console.log('Thanh cong roi, semester: ', response);
+            // console.log('Thanh cong roi, semester: ', response);
             setSemesterList(response.data);
         } catch (error) {
             console.log('That bai roi huhu, semester: ', error);
         }
     };
     useEffect(() => {
-        getListTournamentBySemester(semester, status);
-    }, [semester, status]);
+        getListTournamentBySemester(user.studentId, semester, status);
+    }, [semester, status, user.studentId]);
 
     useEffect(() => {
         fetchSemester();

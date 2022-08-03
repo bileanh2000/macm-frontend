@@ -81,7 +81,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
 
     const getAllMember = async () => {
         try {
-            const response = await userApi.getAllMember();
+            const response = await adminTournament.listUserNotJoinCompetitive(tournamentId);
             console.log(response.data);
             setAllMember(response.data);
         } catch (error) {
@@ -119,7 +119,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
         addNewCompetitivePlayer(tournamentId, player[0].id, data.weight);
         const newPlayer = {
             playerGender: player[0].gender,
-            playerName: player[0].studentName,
+            playerName: player[0].name,
             playerStudentId: player[0].studentId,
             weight: data.weight,
             weightMax: maxWeight,
@@ -205,7 +205,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
                                             {player.map((data, index) => (
                                                 <TableRow key={index}>
                                                     <TableCell align="center">{data.studentId}</TableCell>
-                                                    <TableCell align="center">{data.studentName}</TableCell>
+                                                    <TableCell align="center">{data.name}</TableCell>
                                                     <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
                                                 </TableRow>
                                             ))}

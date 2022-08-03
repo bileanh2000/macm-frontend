@@ -69,7 +69,6 @@ function a11yProps(index) {
 function DetailTournament() {
     let { tournamentId } = useParams();
     const [tournament, setTournament] = useState();
-    const [active, setActive] = useState(0);
     const [scheduleList, setScheduleList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [value, setValue] = useState(0);
@@ -83,19 +82,14 @@ function DetailTournament() {
         setOpenDialog(false);
     };
 
-    const handleOpenDialog = () => {
-        setOpenDialog(true);
-    };
-
-    const fetchAdminInTournament = async (params) => {
-        try {
-            const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
-            console.log(response);
-            setActive(response.totalActive);
-        } catch (error) {
-            console.log('Failed to fetch admin list: ', error);
-        }
-    };
+    // const fetchAdminInTournament = async (params) => {
+    //     try {
+    //         const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
+    //         console.log(response);
+    //     } catch (error) {
+    //         console.log('Failed to fetch admin list: ', error);
+    //     }
+    // };
 
     const getTournamentById = async (tournamentId) => {
         try {
@@ -118,7 +112,7 @@ function DetailTournament() {
 
     useEffect(() => {
         getTournamentById(tournamentId);
-        fetchAdminInTournament(tournamentId);
+        // fetchAdminInTournament(tournamentId);
         fetchTournamentSchedule(tournamentId);
         window.scrollTo({ behavior: 'smooth', top: '0px' });
     }, [tournamentId]);
@@ -135,7 +129,18 @@ function DetailTournament() {
     });
     console.log(tournament);
 
-    const { control } = useForm({});
+    const checkUpdate = () => {
+        const nowDate = new Date();
+        if (
+            new Date(tournament.registrationOrganizingCommitteeDeadline) <= nowDate ||
+            new Date(tournament.registrationPlayerDeadline) <= nowDate
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+    const isUpdate = tournament && checkUpdate();
 
     const handleDelete = useCallback(
         (id) => () => {
@@ -188,26 +193,15 @@ function DetailTournament() {
                                         {scheduleData[0].date} - {scheduleData[scheduleData.length - 1].date}
                                     </Typography>
                                 </Grid>
-                                {/* <Grid item xs={12} sm={4}>
-                                    <Button
-                                        variant="outlined"
-                                        startIcon={<Edit />}
-                                        component={Link}
-                                        to={`update`}
-                                        sx={{ float: 'right' }}
-                                    >
-                                        Chỉnh sửa thông tin
-                                    </Button>
-                                </Grid> */}
                             </Grid>
                             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                 <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
-                                    <Tab label="Tổng quan" {...a11yProps(0)} />
-                                    <Tab label="Lịch thi đấu" {...a11yProps(1)} />
-                                    <Tab label="Bảng đấu đối kháng" {...a11yProps(2)} />
-                                    <Tab label="Bảng đấu biểu diễn" {...a11yProps(3)} />
-                                    <Tab label="Danh sách ban tổ chức" {...a11yProps(4)} />
-                                    <Tab label="Danh sách người chơi" {...a11yProps(5)} />
+                                    <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
+                                    <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />
+                                    {isUpdate && <Tab label="Bảng đấu đối kháng" {...a11yProps(2)} value={2} />}
+                                    {isUpdate && <Tab label="Bảng đấu biểu diễn" {...a11yProps(3)} value={3} />}
+                                    <Tab label="Danh sách ban tổ chức" {...a11yProps(4)} value={4} />
+                                    <Tab label="Danh sách người chơi" {...a11yProps(5)} value={5} />
                                 </Tabs>
                             </Box>
                         </Container>
@@ -220,21 +214,22 @@ function DetailTournament() {
                                 value={value}
                                 index={0}
                                 startTime={scheduleList[0].date}
+                                isUpdate={isUpdate}
                             />
                             <TabPanel value={value} index={1}>
-                                <TournamentSchedule />
+                                <TournamentSchedule isUpdate={isUpdate} />
                             </TabPanel>
                             <TabPanel value={value} index={2}>
-                                <TournamentCompetitive />
+                                <TournamentCompetitive tournamentStatus={tournament.status} />
                             </TabPanel>
                             <TabPanel value={value} index={3}>
-                                <TournamentExhibition />
+                                <TournamentExhibition tournamentStatus={tournament.status} />
                             </TabPanel>
                             <TabPanel value={value} index={4}>
-                                <AdminTournament />
+                                <AdminTournament isUpdate={isUpdate} />
                             </TabPanel>
                             <TabPanel value={value} index={5}>
-                                <MemberTournament tournament={tournament} />
+                                <MemberTournament tournament={tournament} isUpdate={isUpdate} />
                             </TabPanel>
                         </Container>
                     </Paper>

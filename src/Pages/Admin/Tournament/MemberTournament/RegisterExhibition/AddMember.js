@@ -39,7 +39,7 @@ function AddMember(props) {
                                 }}
                                 // freeSolo={user.length > 3 ? false : true}
                                 getOptionDisabled={(options) =>
-                                    props.gender == 0
+                                    props.gender === 0
                                         ? user.length >= props.numberMale
                                             ? true
                                             : false
@@ -57,7 +57,7 @@ function AddMember(props) {
                                             style={{ marginRight: 8 }}
                                             checked={selected}
                                         />
-                                        {option.studentId} - {option.name}
+                                        {option.studentId} - {option.studentName}
                                     </li>
                                 )}
                                 style={{ width: 500 }}
@@ -78,7 +78,7 @@ function AddMember(props) {
                     </Grid>
                 </Collapse>
             </Paper>
-            {(props.gender == 0 && props.numberMale == 0) || (props.gender == 1 && props.numberFemale == 0) ? (
+            {(props.gender && props.numberMale == 0) || (props.gender == false && props.numberFemale == 0) ? (
                 ''
             ) : (
                 <Collapse in={!isChecked}>

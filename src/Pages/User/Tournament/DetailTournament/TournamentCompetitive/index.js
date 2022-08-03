@@ -6,6 +6,7 @@ import adminTournament from 'src/api/adminTournamentAPI';
 import CustomMatchBracket from './CustomMatchBracket';
 
 function TournamentCompetitive({ competitive }) {
+    console.log(competitive);
     let { tournamentId } = useParams();
     const [competitiveId, setCompetitiveId] = useState(0);
     const [listWeightRange, setListWeightRange] = useState([]);
@@ -52,35 +53,29 @@ function TournamentCompetitive({ competitive }) {
                     Bảng đấu
                 </Typography>
             </Box>
-            {competitive.length > 0 ? (
-                ''
-            ) : (
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                    <FormControl size="small">
-                        <Typography variant="caption">Hạng cân</Typography>
-                        <Select
-                            id="demo-simple-select"
-                            value={competitiveId}
-                            displayEmpty
-                            onChange={handleChangeCompetitiveId}
-                        >
-                            {listWeightRange &&
-                                listWeightRange.map((range) => (
-                                    <MenuItem value={range.id} key={range.id}>
-                                        {range.gender == 0 ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
-                                    </MenuItem>
-                                ))}
-                        </Select>
-                    </FormControl>
-                </Box>
-            )}
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
+                <FormControl size="small">
+                    <Typography variant="caption">Hạng cân</Typography>
+                    <Select
+                        id="demo-simple-select"
+                        value={competitiveId}
+                        displayEmpty
+                        onChange={handleChangeCompetitiveId}
+                    >
+                        {listWeightRange &&
+                            listWeightRange.map((range) => (
+                                <MenuItem value={range.id} key={range.id}>
+                                    {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
+                                </MenuItem>
+                            ))}
+                    </Select>
+                </FormControl>
+            </Box>
+
             {listPlayer && listPlayer.length > 0 ? (
                 <div>
-                    {competitive.length > 0 ? (
-                        <CustomMatchBracket matches={competitive} rounds={rounds} />
-                    ) : (
-                        <CustomMatchBracket matches={listPlayer} rounds={rounds} />
-                    )}
+                    <CustomMatchBracket matches={listPlayer} rounds={rounds} />
                 </div>
             ) : (
                 <Box sx={{ d: 'flex' }}>
