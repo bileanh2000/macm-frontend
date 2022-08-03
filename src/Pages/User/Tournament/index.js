@@ -1,36 +1,20 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-    Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Grid,
-    IconButton,
-    MenuItem,
-    Paper,
-    TextField,
-    Typography,
-} from '@mui/material';
-import { Delete, Edit, AddCircle } from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
+import { Box, Grid, MenuItem, Paper, TextField, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import moment from 'moment';
 
 import styles from '../Tournament/Tournament.module.scss';
-import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import semesterApi from 'src/api/semesterApi';
-import moment from 'moment';
+import userTournamentAPI from 'src/api/userTournamentAPI';
 
 const cx = classNames.bind(styles);
 
 function Tournament() {
-    const [tournaments, setTouraments] = useState();
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const [tournaments, setTournaments] = useState();
     const [semester, setSemester] = useState('Summer2022');
     const [semesterList, setSemesterList] = useState([]);
-    const [openDialog, setOpenDialog] = useState(false);
-    const [tournamentOnclick, setTournamentOnclick] = useState({ name: '', id: '' });
     const [status, setStatus] = useState(0);
 
     const handleChange = (event) => {
@@ -43,10 +27,8 @@ function Tournament() {
 
     const getListTournamentBySemester = async (params, status) => {
         try {
-            const response = await adminTournamentAPI.getAllTournament(params, status);
-            setTouraments(response.data);
-            // setTotal(response.totalPage);
-            // setPageSize(response.pageSize);
+            const response = await userTournamentAPI.getAllTournamentByStudentId(user.studentId, params, status);
+            setTournaments(response.data);
             console.log('hahahaah', response.data);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);

@@ -109,11 +109,11 @@ function CreateTourament() {
     const handleChangeOverride = (event) => {
         setChecked(event.target.checked);
         if (event.target.checked) {
-            setIsOverride(2);
+            setIsOverride(3);
             setDisabled(false);
         } else {
             setDisabled(true);
-            setIsOverride(0);
+            setIsOverride(2);
         }
     };
 
@@ -184,7 +184,7 @@ function CreateTourament() {
                 console.log(res.data);
                 setPreviewData(dataSubmit);
                 setPreviewTournament(res.data);
-                checkOveride(res.data);
+                checkOverride(res.data);
                 setOpen(true);
             } else {
                 console.log('huhu');
@@ -199,30 +199,36 @@ function CreateTourament() {
         container['date'] = item.date;
         container['title'] = item.title + '-' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
-        console.log(isOverride);
-        container['backgroundColor'] = isOverride === -1 || isOverride === 0 ? '#5ba8f5' : '#ff3d00';
-        //container['isOverride'] = item.title.contain('Trùng với') ? true : false;
+        container['backgroundColor'] = item.existed ? '#ff3d00' : '#5ba8f5';
         return container;
     });
 
-    console.log(TournamentSchedule);
-
-    const checkOveride = (TournamentSchedule) => {
-        TournamentSchedule.map((item) => {
+    const checkOverride = (TournamentSchedule) => {
+        const arrayCheck = TournamentSchedule.map((item) => {
             if (item.title.toString() === 'Trùng với Lịch tập') {
-                setDisabled(true);
-                setIsOverride(0);
-                return 0;
+                return 2;
             } else if (item.title.toString().includes('Trùng với')) {
-                setDisabled(true);
-                setIsOverride(1);
                 return 1;
             } else {
-                setDisabled(false);
-                setIsOverride(-1);
                 return -1;
             }
         });
+        console.log('arrayCheck', arrayCheck);
+        if (arrayCheck.find((item) => item === 1)) {
+            console.log('check', 1);
+            setDisabled(true);
+            setIsOverride(1);
+        } else {
+            if (arrayCheck.find((item) => item === 2)) {
+                console.log('check', 2);
+                setDisabled(true);
+                setIsOverride(2);
+            } else {
+                console.log('check', -1);
+                setDisabled(false);
+                setIsOverride(-1);
+            }
+        }
     };
 
     const {
@@ -235,6 +241,7 @@ function CreateTourament() {
         mode: 'onBlur',
     });
 
+    console.log('hien thi switch', isOverride);
     return (
         <Paper elevation={3}>
             <Container maxWidth="lg" sx={{ pb: 2, pt: 1 }}>
@@ -259,7 +266,7 @@ function CreateTourament() {
                                         right: 'prev next today',
                                     }}
                                 />
-                                {(isOverride === 0 || isOverride === 2) && (
+                                {(isOverride === 3 || isOverride === 2) && (
                                     <FormControlLabel
                                         sx={{ marginLeft: '1px' }}
                                         control={

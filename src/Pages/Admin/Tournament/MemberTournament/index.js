@@ -6,8 +6,8 @@ import MemberList from './MemberList';
 import RegisterExhibition from './RegisterExhibition';
 import RegisterPlayer from './RegisterPlayer';
 
-function MemberTournament({ tournament }) {
-    console.log(tournament);
+function MemberTournament({ tournament, isUpdate }) {
+    console.log(isUpdate);
     let { tournamentId } = useParams();
     const [type, setType] = useState(1);
     const [competitivePlayer, setCompetitivePlayer] = useState([]);
@@ -123,9 +123,11 @@ function MemberTournament({ tournament }) {
                 {type === 1 ? (
                     tournament.competitiveTypes.length > 0 ? (
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                            <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialog(true)}>
-                                Thêm người chơi thi đấu đối kháng
-                            </Button>
+                            {!isUpdate && (
+                                <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialog(true)}>
+                                    Thêm người chơi thi đấu đối kháng
+                                </Button>
+                            )}
                             <FormControl size="small">
                                 <Typography variant="caption">Hạng cân</Typography>
                                 <Select
@@ -154,9 +156,11 @@ function MemberTournament({ tournament }) {
                     )
                 ) : tournament.exhibitionTypes.length > 0 ? (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                        <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialogExhibition(true)}>
-                            Thêm người chơi thi đấu biểu diễn
-                        </Button>
+                        {!isUpdate && (
+                            <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialogExhibition(true)}>
+                                Thêm người chơi thi đấu biểu diễn
+                            </Button>
+                        )}
                         <FormControl size="small">
                             <Typography variant="caption">Thể thức thi đấu</Typography>
                             <Select
@@ -202,8 +206,8 @@ function MemberTournament({ tournament }) {
                     handleClose={() => {
                         setOpenDialogExhibition(false);
                     }}
-                    onSuccess={(newItem) => {
-                        setExhibitionTeam([newItem, ...exhibitionTeam]);
+                    onSuccess={() => {
+                        fetchExhibitionTeam(tournamentId, exhibitionType);
                         setOpenDialogExhibition(false);
                     }}
                 />

@@ -34,19 +34,21 @@ import { Delete } from '@mui/icons-material';
 import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
 
-function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess }) {
-    console.log(userInformation);
+function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCompetitive, isJoinExhibition }) {
+    const userInfo = { ...userInformation, studentName: userInformation.name };
+    // const userInfo = { gender: true, studentId: 'HE150001', studentName: 'dam van toan 22' };
+    // console.log(userInfo);
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [type, setType] = useState(1);
     const [weightRange, setWeightRange] = useState(0);
     const [exhibitionType, setExhibitionType] = useState(0);
-    const [numnberMale, setNumberMale] = useState();
+    const [numberMale, setNumberMale] = useState();
     const [numberFemale, setNumberFemale] = useState();
     const [listWeightRange, setListWeightRange] = useState([]);
     const [listExhibitionType, setListExhibitionType] = useState([]);
-    const [dataMale, setDataMale] = useState([]);
-    const [dataFemale, setDateFemale] = useState([]);
+    const [dataMale, setDataMale] = useState(userInformation.gender ? [userInfo] : []);
+    const [dataFemale, setDateFemale] = useState(userInformation.gender ? [] : [userInfo]);
     const [minWeight, setMinWeight] = useState();
     const [maxWeight, setMaxWeight] = useState();
     const [allMember, setAllMember] = useState();
@@ -64,14 +66,14 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
     };
 
     const validationSchema = Yup.object().shape({
-        ...(type == 1 && {
+        ...(type === 1 && {
             weight: Yup.number()
                 .required('Không được để trống trường này')
                 .typeError('Vui lòng nhập số')
                 .min(minWeight, `Vui lòng nhập hạng cân trong khoảng ${minWeight} - ${maxWeight} Kg`)
                 .max(maxWeight, `Vui lòng nhập hạng cân trong khoảng ${minWeight} - ${maxWeight} Kg`),
         }),
-        ...(type == 2 && {
+        ...(type === 2 && {
             teamName: Yup.string().required('Không được để trống trường này'),
         }),
     });
@@ -130,17 +132,20 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
     const fetchExhibitionType = async (tournamentId) => {
         try {
             const response = await adminTournament.getAllExhibitionType(tournamentId);
-            setListExhibitionType(response.data);
-            setExhibitionType(response.data[0].id);
-            setNumberMale(response.data[0].numberMale);
-            setNumberFemale(response.data[0].numberFemale);
+            let exhibitionType = response.data.filter((exhibitionType) =>
+                userInformation.gender ? exhibitionType.numberMale > 0 : exhibitionType.numberFemale > 0,
+            );
+            setListExhibitionType(exhibitionType);
+            setExhibitionType(exhibitionType[0].id);
+            setNumberMale(exhibitionType[0].numberMale);
+            setNumberFemale(exhibitionType[0].numberFemale);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
     };
-    const registerToJoinTournamentCompetitveType = async (tournamentId, studentId, params) => {
+    const registerToJoinTournamentCompetitiveType = async (tournamentId, studentId, params) => {
         try {
-            const response = await userTournamentAPI.registerToJoinTournamentCompetitveType(
+            const response = await userTournamentAPI.registerToJoinTournamentCompetitiveType(
                 tournamentId,
                 studentId,
                 params,
@@ -153,10 +158,10 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
         }
     };
 
-    const registerToJoinTournamentExhibitionType = async (ournamentId, studentId, params) => {
+    const registerToJoinTournamentExhibitionType = async (tournamentId, studentId, params) => {
         try {
             const response = await userTournamentAPI.registerToJoinTournamentExhibitionType(
-                ournamentId,
+                tournamentId,
                 studentId,
                 params,
             );
@@ -169,8 +174,8 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
     };
 
     const handleCloseDialog = () => {
-        setDataMale([]);
-        setDateFemale([]);
+        setDataMale(userInformation.gender ? [userInfo] : []);
+        setDateFemale(userInformation.gender ? [] : [userInfo]);
         reset({
             weight: '',
             teamName: '',
@@ -183,7 +188,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
         if (type == 1) {
             const params = { ...data, competitiveTypeId: weightRange };
             console.log(params);
-            registerToJoinTournamentCompetitveType(tournamentId, userInformation.studentId, params);
+            registerToJoinTournamentCompetitiveType(tournamentId, userInformation.studentId, params);
         } else {
             const params = { teamMember, teamName: data.teamName, exhibitionTypeId: exhibitionType };
             console.log(params);
@@ -195,7 +200,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
     const handleDelete = (data) => {
         let newData;
         console.log(data);
-        if (data.gender == 0) {
+        if (data.gender) {
             newData = dataMale.filter((d) => {
                 return d.studentId !== data.studentId;
             });
@@ -213,11 +218,13 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
     const fetchCompetitiveType = async (tournamentId) => {
         try {
             const response = await adminTournament.getAllCompetitiveType(tournamentId);
-            console.log(response.data[0]);
-            setListWeightRange(response.data[0]);
-            setWeightRange(response.data[0][0].id);
-            setMinWeight(response.data[0][0].weightMin);
-            setMaxWeight(response.data[0][0].weightMax);
+            const listWeightByGender = response.data[0].filter(
+                (weightRange) => weightRange.gender == userInformation.gender,
+            );
+            setListWeightRange(listWeightByGender);
+            setWeightRange(listWeightByGender[0].id);
+            setMinWeight(listWeightByGender[0].weightMin);
+            setMaxWeight(listWeightByGender[0].weightMax);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -227,7 +234,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
         fetchCompetitiveType(tournamentId);
         fetchExhibitionType(tournamentId);
         // getAllMember();
-    }, [type]);
+    }, [tournamentId]);
 
     useEffect(() => {
         getAllMember();
@@ -242,7 +249,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
-            <DialogTitle id="alert-dialog-title">Đăng kí tham gia giải đấu</DialogTitle>
+            <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
             <DialogContent>
                 <Typography sx={{ m: 1 }}>
                     <strong>Họ và tên: </strong> {userInformation.name}
@@ -265,25 +272,31 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
                         </Select>
                     </FormControl>
                     {type === 1 ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                            <FormControl size="small">
-                                <Typography variant="caption">Hạng cân</Typography>
-                                <Select
-                                    id="demo-simple-select"
-                                    value={weightRange}
-                                    displayEmpty
-                                    onChange={handleChangeWeight}
-                                >
-                                    {listWeightRange &&
-                                        listWeightRange.map((range) => (
-                                            <MenuItem value={range.id} key={range.id}>
-                                                {range.gender == 0 ? 'Nam: ' : 'Nữ: '} {range.weightMin} -{' '}
-                                                {range.weightMax} Kg
-                                            </MenuItem>
-                                        ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
+                        isJoinCompetitive.length == 0 ? (
+                            <Box
+                                sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}
+                            >
+                                <FormControl size="small">
+                                    <Typography variant="caption">Hạng cân</Typography>
+                                    <Select
+                                        id="demo-simple-select"
+                                        value={weightRange}
+                                        displayEmpty
+                                        onChange={handleChangeWeight}
+                                    >
+                                        {listWeightRange &&
+                                            listWeightRange.map((range) => (
+                                                <MenuItem value={range.id} key={range.id}>
+                                                    {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} -{' '}
+                                                    {range.weightMax} Kg
+                                                </MenuItem>
+                                            ))}
+                                    </Select>
+                                </FormControl>
+                            </Box>
+                        ) : (
+                            <Typography variant="caption">Bạn đã đăng kí tham gia thi đấu rồi</Typography>
+                        )
                     ) : (
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
                             <FormControl size="small">
@@ -305,7 +318,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
                         </Box>
                     )}
                 </Box>
-                {type == 1 && (
+                {type == 1 && isJoinCompetitive.length == 0 && (
                     <Grid container spacing={2}>
                         <Grid item xs={5}>
                             <Typography sx={{ m: 1 }}>
@@ -336,22 +349,22 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
                             label="Tên đội"
                             variant="outlined"
                             {...register('teamName')}
-                            // onChange={checkValidWeight}
                             error={errors.teamName ? true : false}
                             helperText={errors.teamName?.message}
                             required
                         />
                         <Box>
                             <Typography sx={{ m: 1 }}>
-                                <strong>Số lượng nam: </strong> {numnberMale}
+                                <strong>Số lượng nam: </strong> {numberMale}
                             </Typography>
-                            {dataMale.length < numnberMale && (
+                            {dataMale.length < numberMale && (
                                 <AddMember
                                     data={dataMale}
                                     onAddMale={AddMaleHandler}
-                                    numberMale={numnberMale}
+                                    numberMale={numberMale}
                                     gender={0}
-                                    allMember={allMember.filter((male) => male.gender == 0)}
+                                    allMember={allMember.filter((male) => male.gender === true)}
+                                    fixedOptions={userInfo.gender ? userInfo : []}
                                 />
                             )}
                         </Box>
@@ -371,20 +384,22 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
                                             {dataMale.map((data, index) => (
                                                 <TableRow key={index}>
                                                     <TableCell align="center">{data.studentId}</TableCell>
-                                                    <TableCell align="center">{data.name}</TableCell>
-                                                    <TableCell align="center">
-                                                        {data.gender == 0 ? 'Nam' : 'Nữ'}
-                                                    </TableCell>
+                                                    <TableCell align="center">{data.studentName}</TableCell>
+                                                    <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
                                                     <TableCell>
-                                                        <IconButton
-                                                            aria-label="delete"
-                                                            onClick={() => {
-                                                                // handleOpenDialog();
-                                                                handleDelete(data);
-                                                            }}
-                                                        >
-                                                            <Delete />
-                                                        </IconButton>
+                                                        {data.studentId === userInformation.studentId ? (
+                                                            ''
+                                                        ) : (
+                                                            <IconButton
+                                                                aria-label="delete"
+                                                                onClick={() => {
+                                                                    // handleOpenDialog();
+                                                                    handleDelete(data);
+                                                                }}
+                                                            >
+                                                                <Delete />
+                                                            </IconButton>
+                                                        )}
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
@@ -403,7 +418,8 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
                                     onAddFemale={AddFemaleHandler}
                                     numberFemale={numberFemale}
                                     gender={1}
-                                    allMember={allMember.filter((male) => male.gender == 1)}
+                                    allMember={allMember.filter((male) => male.gender === false)}
+                                    fixedOptions={userInfo.gender ? [] : userInfo}
                                 />
                             )}
                         </Box>
@@ -423,20 +439,22 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, onSuccess
                                             {dataFemale.map((data, index) => (
                                                 <TableRow key={index}>
                                                     <TableCell align="center">{data.studentId}</TableCell>
-                                                    <TableCell align="center">{data.name}</TableCell>
-                                                    <TableCell align="center">
-                                                        {data.gender == 0 ? 'Nam' : 'Nữ'}
-                                                    </TableCell>
+                                                    <TableCell align="center">{data.studentName}</TableCell>
+                                                    <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
                                                     <TableCell>
-                                                        <IconButton
-                                                            aria-label="delete"
-                                                            onClick={() => {
-                                                                // handleOpenDialog();
-                                                                handleDelete(data);
-                                                            }}
-                                                        >
-                                                            <Delete />
-                                                        </IconButton>
+                                                        {data.studentId === userInformation.studentId ? (
+                                                            ''
+                                                        ) : (
+                                                            <IconButton
+                                                                aria-label="delete"
+                                                                onClick={() => {
+                                                                    // handleOpenDialog();
+                                                                    handleDelete(data);
+                                                                }}
+                                                            >
+                                                                <Delete />
+                                                            </IconButton>
+                                                        )}
                                                     </TableCell>
                                                 </TableRow>
                                             ))}

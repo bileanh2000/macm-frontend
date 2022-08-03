@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import {
     Button,
     Grid,
@@ -16,7 +16,7 @@ import { tableCellClasses } from '@mui/material/TableCell';
 import { Edit } from '@mui/icons-material';
 import UpdateTournamentOverview from './UpdateTournamentOverview';
 
-function TournamentOverview({ tournament, onUpdateTournament, value, index, startTime }) {
+function TournamentOverview({ tournament, onUpdateTournament, value, index, startTime, isUpdate }) {
     const [openEditDialog, setOpenEditDialog] = useState(false);
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -55,14 +55,16 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                             <Typography variant="h5">Hạng mục thi đấu:</Typography>
                         </Grid>
                         <Grid item xs={5}>
-                            <Button
-                                variant="outlined"
-                                startIcon={<Edit />}
-                                sx={{ float: 'right' }}
-                                onClick={() => setOpenEditDialog(true)}
-                            >
-                                Chỉnh sửa
-                            </Button>
+                            {!isUpdate && (
+                                <Button
+                                    variant="outlined"
+                                    startIcon={<Edit />}
+                                    sx={{ float: 'right' }}
+                                    onClick={() => setOpenEditDialog(true)}
+                                >
+                                    Chỉnh sửa
+                                </Button>
+                            )}
                             {openEditDialog && (
                                 <UpdateTournamentOverview
                                     // DialogOpen={true}

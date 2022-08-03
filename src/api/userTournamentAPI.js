@@ -1,14 +1,21 @@
 import axiosClient from './axiosClient';
 
 const userTournamentAPI = {
+    getAllTournamentByStudentId: (studentId, semester, status) => {
+        const url = `/tournament/getalltournamentbystudentid/${studentId}?semester=${semester}&status=${status}`;
+        return axiosClient.get(url);
+    },
+
     registerToJoinOrganizingCommittee: (tournamentId, studentId, roleId) => {
         const url = `/tournament/registertojoinorganizingcommittee/${tournamentId}/${studentId}/${roleId}`;
         return axiosClient.post(url);
     },
 
-    registerToJoinTournamentCompetitveType: (tournamentId, studentId, params) => {
+    registerToJoinTournamentCompetitiveType: (tournamentId, studentId, params) => {
         const url = `/tournament/registertojointournamentcompetitivetype/${tournamentId}/${studentId}`;
-        return axiosClient.post(url, null, { params: { studentId: params.studentId, weight: params.weight } });
+        return axiosClient.post(url, null, {
+            params: { competitiveTypeId: params.competitiveTypeId, weight: params.weight },
+        });
     },
     registerToJoinTournamentExhibitionType: (tournamentId, studentId, params) => {
         const url = `/tournament/registertojointournamentexhibitiontype/${tournamentId}/${studentId}`;

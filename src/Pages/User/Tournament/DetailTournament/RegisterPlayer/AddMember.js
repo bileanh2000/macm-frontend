@@ -1,16 +1,18 @@
 import { Add, CheckBox, CheckBoxOutlineBlank } from '@mui/icons-material';
-import { Autocomplete, Box, Button, Checkbox, Collapse, Fab, Grid, Paper, TextField } from '@mui/material';
-import React, { useState } from 'react';
+import { Autocomplete, Box, Button, Checkbox, Chip, Collapse, Fab, Grid, Paper, TextField } from '@mui/material';
+import React, { Fragment, useState } from 'react';
 
 const icon = <CheckBoxOutlineBlank fontSize="small" />;
 const checkedIcon = <CheckBox fontSize="small" />;
 
 function AddMember(props) {
     const [isChecked, setIsChecked] = useState(false);
+    const fixedOptions = [props.fixedOptions];
+    // const fixedOptions = [{ gender: true, studentId: 'HE150001', studentName: 'dam van toan 22' }];
     const [user, setUser] = useState(props.data);
 
     const handleAddMember = () => {
-        if (props.gender == 0) {
+        if (props.gender === 0) {
             props.onAddMale(user);
         } else {
             props.onAddFemale(user);
@@ -35,11 +37,11 @@ function AddMember(props) {
                                 value={user}
                                 isOptionEqualToValue={(option, value) => option.studentId === value.studentId}
                                 onChange={(event, newValue) => {
-                                    setUser(newValue);
+                                    setUser([...newValue.filter((option) => fixedOptions.indexOf(option) === -1)]);
                                 }}
                                 // freeSolo={user.length > 3 ? false : true}
                                 getOptionDisabled={(options) =>
-                                    props.gender == 0
+                                    props.gender === 0
                                         ? user.length >= props.numberMale
                                             ? true
                                             : false
@@ -57,9 +59,24 @@ function AddMember(props) {
                                             style={{ marginRight: 8 }}
                                             checked={selected}
                                         />
-                                        {option.studentId} - {option.name}
+                                        {option.studentId} - {option.studentName}
                                     </li>
                                 )}
+                                renderTags={(tagValue, getTagProps) =>
+                                    tagValue.map((option, index) => (
+                                        <Fragment key={index}>
+                                            <Chip
+                                                label={option.studentId}
+                                                {...getTagProps({ index })}
+                                                disabled={
+                                                    fixedOptions.findIndex((fo) => fo.studentId == option.studentId) !==
+                                                    -1
+                                                }
+                                            />
+                                            {console.log(option)}
+                                        </Fragment>
+                                    ))
+                                }
                                 style={{ width: 500 }}
                                 renderInput={(params) => (
                                     <TextField {...params} label="Thành viên" placeholder="Thêm thành viên" />
@@ -78,7 +95,7 @@ function AddMember(props) {
                     </Grid>
                 </Collapse>
             </Paper>
-            {(props.gender == 0 && props.numberMale == 0) || (props.gender == 1 && props.numberFemale == 0) ? (
+            {(props.gender && props.numberMale == 0) || (props.gender == false && props.numberFemale == 0) ? (
                 ''
             ) : (
                 <Collapse in={!isChecked}>

@@ -123,15 +123,6 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
-    addNewCompetitivePlayer: (tournamentId, userId, weight) => {
-        const url = `/competitive/headclub/addnewcompetitiveplayer/${tournamentId}`;
-        return axiosClient.post(url, null, { params: { userId: userId, weight: weight } });
-    },
-    registerTeam: (exhibitionTypeId, params) => {
-        const url = `/exhibition/headclub/registerexhibitionteam/${exhibitionTypeId}`;
-        return axiosClient.post(url, params.listStudentId, { params: { name: params.teamName } });
-    },
-
     //Fee
 
     getAllTournamentOrganizingCommitteePaymentStatus: (tournamentId) => {
@@ -165,6 +156,21 @@ const adminTournament = {
     },
 
     ///////////////////////////
+
+    listUserNotJoinCompetitive: (tournamentId) => {
+        const url = `competitive/headclub/listusernotjoincompetitive/${tournamentId}`;
+        return axiosClient.get(url);
+    },
+
+    confirmListMatchsPlayer: (tournamentId) => {
+        const url = `/competitive/headclub/confirmlistmatchsplayer/${tournamentId}`;
+        return axiosClient.put(url);
+    },
+
+    addNewCompetitivePlayer: (tournamentId, userId, weight) => {
+        const url = `/competitive/headclub/addnewcompetitiveplayer/${tournamentId}`;
+        return axiosClient.post(url, null, { params: { userId: userId, weight: weight } });
+    },
 
     getListPlayerBracket: (competitiveTypeId, round) => {
         const url = `/competitive/headclub/getlistplayerbracket/${competitiveTypeId}`;
@@ -229,7 +235,7 @@ const adminTournament = {
 
     getExhibitionResult: (data) => {
         const url = '/exhibition/getlistexhibitionresult';
-        return axiosClient.get(url, { params: { date: data.date, exhibitionTypeId: data.exhibitionType } });
+        return axiosClient.get(url, { params: { date: '', exhibitionTypeId: data.exhibitionType } });
     },
 
     getTeamByType: (tournamentId) => {
@@ -242,14 +248,18 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
-    // registerTeam: (exhibitionTypeId, data) => {
-    //     const url = `/exhibition/headclub/registerexhibitionteam/${exhibitionTypeId}`;
-    //     return axiosClient.post(url, data);
-    // },
+    registerTeam: (exhibitionTypeId, params) => {
+        const url = `/exhibition/headclub/registerexhibitionteam/${exhibitionTypeId}`;
+        return axiosClient.post(url, params.listStudentId, { params: { name: params.teamName } });
+    },
 
     spawnTimeAndAreaEx: (tournamentId) => {
         const url = `/exhibition/headclub/spawntimeandarea/${tournamentId}`;
         return axiosClient.post(url);
+    },
+    updateExhibitionResult: (exhibitionTeamId, score) => {
+        const url = `/exhibition/headclub/updateexhibitionresult/${exhibitionTeamId}`;
+        return axiosClient.put(url, null, { params: { score: score } });
     },
 };
 export default adminTournament;

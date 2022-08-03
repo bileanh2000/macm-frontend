@@ -68,7 +68,7 @@ function TournamentOverview({ tournament, value, index }) {
                                                     {tournament.competitiveTypes.map((data) => (
                                                         <StyledTableRow key={data.id}>
                                                             <StyledTableCell align="center">
-                                                                {data.gender === 1 ? 'Nam' : 'Nữ'}
+                                                                {data.gender ? 'Nam' : 'Nữ'}
                                                             </StyledTableCell>
                                                             <StyledTableCell align="center">
                                                                 {data.weightMin} - {data.weightMax} Kg

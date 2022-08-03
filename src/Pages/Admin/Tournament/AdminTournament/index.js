@@ -55,8 +55,8 @@ function AdminTournament() {
                     </Tabs>
                 </Box>
                 <AdminList data={adminList} active={active} total={total} value={value} index={0} />
-                <UpdateAdminTournament value={value} index={1} />
-                <AddAdminTourament value={value} index={2} />
+                <UpdateAdminTournament value={value} active={active} total={total} index={1} />
+                <AddAdminTourament value={value} active={active} total={total} index={2} />
             </Box>
         </Fragment>
     );

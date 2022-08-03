@@ -7,7 +7,7 @@ import moment from 'moment';
 import adminTournament from 'src/api/adminTournamentAPI';
 import TableMatch from './TableMatch';
 
-function TournamentExhibition() {
+function TournamentExhibition({ tournamentStatus }) {
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
 
     let { tournamentId } = useParams();
@@ -15,7 +15,7 @@ function TournamentExhibition() {
     const [exhibitionType, setExhibitionType] = useState(0);
     const [exhibitionTeam, setExhibitionTeam] = useState([]);
     const [listExhibitionType, setListExhibitionType] = useState([]);
-    const [tournamentStatus, setTournamentStatus] = useState(-1);
+    // const [tournamentStatus, setTournamentStatus] = useState(-1);
 
     const handleChangeExhibitionType = (event) => {
         console.log(event.target.value);
@@ -37,7 +37,7 @@ function TournamentExhibition() {
             setListExhibitionType(response.data);
             setExhibitionType(response.data[0].id);
             getExhibitionResult(response.data[0].id, nowDate);
-            setTournamentStatus(response.code);
+            // setTournamentStatus(response.code);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -55,7 +55,6 @@ function TournamentExhibition() {
     const getExhibitionResult = async (exhibitionType, date) => {
         try {
             const response = await adminTournament.getExhibitionResult({ exhibitionType, date });
-            console.log(response);
             setExhibitionTeam(response.data);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
@@ -64,16 +63,17 @@ function TournamentExhibition() {
 
     const spawnTimeAndArea = async () => {
         try {
-            await adminTournament.spawnTimeAndAreaEx(tournamentId);
+            const response = await adminTournament.spawnTimeAndAreaEx(tournamentId);
             getExhibitionResult(exhibitionType, nowDate);
+            enqueueSnackbar(response.message);
         } catch (error) {
             console.log('Failed to spawn time: ', error);
         }
     };
 
     useEffect(() => {
-        getExhibitionResult(exhibitionType == 0 ? 0 : exhibitionType, nowDate);
         fetchExhibitionType(tournamentId);
+        getExhibitionResult(exhibitionType, nowDate);
     }, [tournamentId]);
 
     const handleDialogCreate = () => {
@@ -82,20 +82,18 @@ function TournamentExhibition() {
             enqueueSnackbar('Vui lòng chọn hạng cân trước khi tạo bảng đấu', { varian });
             return;
         }
-        console.log(exhibitionTeam);
         if (exhibitionTeam && exhibitionTeam.length == 0) {
             console.log('loz3');
             spawnTimeAndArea(exhibitionType);
         }
-        console.log(exhibitionTeam);
-        if (exhibitionTeam && exhibitionTeam.length > 0) {
-        } else {
-            enqueueSnackbar('Không thể tạo bảng đấu do không đủ người', { error: 'error' });
-            return;
-        }
     };
     const handleDialogUpdateTime = () => {
         //spawnTimeAndArea();
+    };
+
+    const UpdateResultHandler = (newMatches) => {
+        setExhibitionTeam(newMatches);
+        // getExhibitionResult(exhibitionType, nowDate);
     };
 
     return (
@@ -105,25 +103,8 @@ function TournamentExhibition() {
                     Bảng đấu biểu diễn
                 </Typography>
             </Box>
-            {/* <Box>
-                <Typography variant="body1">Nội dung thi đấu đối kháng</Typography>
-            </Box> */}
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                {/* {tournamentStatus == 0 ? (
-                    <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2 }}>
-                        Tạo bảng đấu
-                    </Button>
-                ) : tournamentStatus == 1 ? (
-                    <Button variant="outlined" onClick={handleDialogUpdateBracket} sx={{ mr: 2 }}>
-                        Cập nhật bảng đấu
-                    </Button>
-                ) : tournamentStatus == 2 ? (
-                    <Button variant="outlined" onClick={handleDialogUpdateTime} sx={{ mr: 2 }}>
-                        Cập nhật thời gian thi đấu
-                    </Button>
-                ) : (
-                    ''
-                )} */}
                 <FormControl size="small">
                     <Typography variant="caption">Thể thức thi đấu</Typography>
                     <Select
@@ -157,13 +138,12 @@ function TournamentExhibition() {
                     <TableMatch
                         matches={exhibitionTeam}
                         status={tournamentStatus}
-                        // areaList={areaList}
-                        // onUpdareResult={UpdateResultHandler}
+                        onUpdateResult={UpdateResultHandler}
                     />
                 </div>
             ) : tournamentStatus == 1 ? (
-                <Box sx={{ d: 'flex' }}>
-                    <Typography variant="body1">Thể thức thi đấu này hiện đang chưa có tuyển thủ</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body1">Thể thức thi đấu đang chưa có lịch thi đấu</Typography>
                     <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2, float: 'right' }}>
                         Tạo bảng đấu
                     </Button>

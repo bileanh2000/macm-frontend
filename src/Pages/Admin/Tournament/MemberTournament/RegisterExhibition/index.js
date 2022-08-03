@@ -87,7 +87,6 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
     const getAllMember = async () => {
         try {
             const response = await userApi.getAllMember();
-            console.log('all member', response.data);
             setAllMember(response.data);
         } catch (error) {
             console.log('khong the lay data');
@@ -131,12 +130,10 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
         const listStudentId = teamMember.map((student) => student.studentId);
 
         const params = { listStudentId, teamName: data.teamName, exhibitionTypeId: exhibitionType };
-        console.log(params);
 
         registerTeam(exhibitionType, params);
-        onSuccess && onSuccess(teamMember);
+        onSuccess && onSuccess();
         handleCloseDialog();
-        // handleClose && handleClose();
     };
 
     const handleDelete = (data) => {
@@ -146,13 +143,11 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
             newData = dataMale.filter((d) => {
                 return d.studentId !== data.studentId;
             });
-            console.log(newData);
             setDataMale(newData);
         } else {
             newData = dataFemale.filter((d) => {
                 return d.studentId !== data.studentId;
             });
-            console.log(newData);
             setDateFemale(newData);
         }
     };
@@ -214,7 +209,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
                                 required
                             />
                             <Grid container spacing={2}>
-                                <Grid item xs={6} md={12}>
+                                <Grid item xs={12} md={6}>
                                     <Box>
                                         <Typography sx={{ m: 1 }}>
                                             <strong>Số lượng nam: </strong> {numberMale}
@@ -225,7 +220,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
                                                 onAddMale={AddMaleHandler}
                                                 numberMale={numberMale}
                                                 gender={0}
-                                                allMember={allMember.filter((male) => male.gender == 0)}
+                                                allMember={allMember.filter((male) => male.gender === true)}
                                             />
                                         )}
                                     </Box>
@@ -245,9 +240,9 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
                                                         {dataMale.map((data, index) => (
                                                             <TableRow key={index}>
                                                                 <TableCell align="center">{data.studentId}</TableCell>
-                                                                <TableCell align="center">{data.name}</TableCell>
+                                                                <TableCell align="center">{data.studentName}</TableCell>
                                                                 <TableCell align="center">
-                                                                    {data.gender == 0 ? 'Nam' : 'Nữ'}
+                                                                    {data.gender ? 'Nam' : 'Nữ'}
                                                                 </TableCell>
                                                                 <TableCell>
                                                                     <IconButton
@@ -268,7 +263,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
                                         )}
                                     </Paper>
                                 </Grid>
-                                <Grid item xs={6} md={12}>
+                                <Grid item xs={12} md={6}>
                                     <Box>
                                         <Typography sx={{ m: 1 }}>
                                             <strong>Số lượng nữ: </strong> {numberFemale}
@@ -279,7 +274,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
                                                 onAddFemale={AddFemaleHandler}
                                                 numberFemale={numberFemale}
                                                 gender={1}
-                                                allMember={allMember.filter((male) => male.gender == 1)}
+                                                allMember={allMember.filter((male) => male.gender === false)}
                                             />
                                         )}
                                     </Box>
@@ -299,9 +294,9 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
                                                         {dataFemale.map((data, index) => (
                                                             <TableRow key={index}>
                                                                 <TableCell align="center">{data.studentId}</TableCell>
-                                                                <TableCell align="center">{data.name}</TableCell>
+                                                                <TableCell align="center">{data.studentName}</TableCell>
                                                                 <TableCell align="center">
-                                                                    {data.gender == 0 ? 'Nam' : 'Nữ'}
+                                                                    {data.gender ? 'Nam' : 'Nữ'}
                                                                 </TableCell>
                                                                 <TableCell>
                                                                     <IconButton

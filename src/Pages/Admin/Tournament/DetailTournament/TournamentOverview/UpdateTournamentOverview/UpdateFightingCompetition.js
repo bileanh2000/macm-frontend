@@ -44,7 +44,7 @@ function UpdateFightingCompetition(props) {
                 for (i = data.weightMin; i < data.weightMax; i = i + 0.5) {
                     newWeightRange.push(i);
                 }
-                if (data.gender === 0) {
+                if (!data.gender) {
                     setWeightRangeFemale(weightRangeFemale.concat(newWeightRange));
                 } else {
                     setWeightRangeMale(weightRangeMale.concat(newWeightRange));
@@ -194,7 +194,7 @@ function UpdateFightingCompetition(props) {
                         <TableBody>
                             {datas.map((data) => (
                                 <TableRow key={data.id}>
-                                    <TableCell>{data.gender === 1 ? 'Nam' : 'Nữ'}</TableCell>
+                                    <TableCell>{data.gender ? 'Nam' : 'Nữ'}</TableCell>
                                     <TableCell>
                                         {data.weightMin} - {data.weightMax} Kg
                                     </TableCell>
