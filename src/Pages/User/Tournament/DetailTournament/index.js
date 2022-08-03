@@ -325,7 +325,7 @@ function DetailTournament() {
                                                     {...(handleRegisterDeadline(0)
                                                         ? { disabled: false }
                                                         : { disabled: true })}
-                                                    sx={{ mr: 2 }}
+                                                    sx={{ mr: 2, float: 'right' }}
                                                 >
                                                     {handleRegisterDeadline(0)
                                                         ? 'Đăng kí thi đấu'
@@ -339,7 +339,7 @@ function DetailTournament() {
                                                         {...(handleRegisterDeadline(1)
                                                             ? { disabled: false }
                                                             : { disabled: true })}
-                                                        // sx={{ float: 'right' }}
+                                                        sx={{ float: 'right' }}
                                                     >
                                                         {handleRegisterDeadline(1)
                                                             ? 'Đăng kí vào ban tổ chức'
