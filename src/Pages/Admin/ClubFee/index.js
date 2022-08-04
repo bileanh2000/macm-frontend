@@ -86,6 +86,25 @@ function ClubFee() {
                         <Typography variant="h6">Phí giải đấu</Typography>
                     </Box>
                 </Grid>
+                <Grid item xs={4}>
+                    <Box
+                        sx={{
+                            minHeight: 250,
+                            backgroundColor: 'antiquewhite',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            '&:hover': {
+                                backgroundColor: 'primary.main',
+                                opacity: [0.9, 0.8, 0.7],
+                            },
+                        }}
+                        component={Link}
+                        to={{ pathname: './fund' }}
+                    >
+                        <Typography variant="h6">Quỹ câu lạc bộ</Typography>
+                    </Box>
+                </Grid>
             </Grid>
         </Fragment>
     );

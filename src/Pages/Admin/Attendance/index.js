@@ -7,6 +7,8 @@ import moment from 'moment';
 
 function Attendance() {
     const location = useLocation();
+    const [type, setType] = useState(0);
+
     moment().locale('vi');
 
     const _trainingScheduleId = location.state?.id;
@@ -18,15 +20,14 @@ function Attendance() {
     if (!_nowDate) _nowDate = nowDate;
     const date = moment(new Date(_nowDate)).format('DD/MM/yyyy');
 
+    console.log(trainingScheduleId, date);
     const getSessionByDate = async () => {
         try {
-            console.log(date);
-            const response = await adminAttendanceAPI.getTrainingSessionByDate(date);
-            console.log(response.data);
+            const response = await adminAttendanceAPI.getCommonSessionByDate(date);
             if (!_trainingScheduleId && response.data.length > 0) {
-                console.log(response.data[0].id);
                 setTrainingScheduleId(response.data[0].id);
             }
+            setType(response.data[0].type);
         } catch (error) {
             console.log('dm', error);
         }
@@ -34,7 +35,8 @@ function Attendance() {
 
     useEffect(() => {
         getSessionByDate();
-    }, [trainingScheduleId]);
+    }, []);
+
     return (
         <Paper elevation={3} sx={{ p: 1 }}>
             <Button variant="contained" color="success" sx={{ float: 'right', m: 2 }}>
@@ -42,11 +44,15 @@ function Attendance() {
                     Thống kê thành viên tham gia buổi tập
                 </Link>
             </Button>
-            {trainingScheduleId && (
+            {trainingScheduleId && type && (
                 <Container maxWidth="xl">
-                    <ViewAttendance data={{ trainingScheduleId, date }} />
+                    <ViewAttendance data={{ trainingScheduleId, date, type }} />
                     <Button variant="outlined" sx={{ color: 'black' }}>
-                        <Link sx={{ color: 'black' }} to="./take" state={{ id: trainingScheduleId, date: date }}>
+                        <Link
+                            sx={{ color: 'black' }}
+                            to="./take"
+                            state={{ id: trainingScheduleId, date: date, type: type }}
+                        >
                             Điểm danh
                         </Link>
                     </Button>

@@ -2,7 +2,7 @@ import axios from 'axios';
 import axiosClient from './axiosClient';
 
 const adminAttendanceAPI = {
-    getAttendanceByStudentId: (trainingScheduleId) => {
+    checkAttendanceByScheduleId: (trainingScheduleId) => {
         const url = `/admin/headtechnique/checkattendance/${trainingScheduleId}`;
         return axiosClient.get(url);
     },
@@ -27,6 +27,11 @@ const adminAttendanceAPI = {
     getAttendanceByEventId: (eventId) => {
         const url = `/event/headculture/checkattendance/${eventId}`;
         return axiosClient.get(url);
+    },
+
+    takeAttendanceEvent: (memberEventId, status) => {
+        const url = `/event/headculture/takeattendanceevent/${memberEventId}`;
+        return axiosClient.get(url, { params: { status: status } });
     },
 
     //common

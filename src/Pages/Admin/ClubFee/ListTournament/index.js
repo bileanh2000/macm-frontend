@@ -47,7 +47,7 @@ function ListTournament() {
 
     const getListTournamentBySemester = async (params) => {
         try {
-            const response = await adminTournamentAPI.getAllTournament(params);
+            const response = await adminTournamentAPI.getAllTournament(params, 0);
             console.log(response.data);
             setTournaments(response.data);
         } catch (error) {
