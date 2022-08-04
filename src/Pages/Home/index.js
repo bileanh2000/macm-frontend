@@ -19,6 +19,7 @@ import News from './News/News';
 
 import { getAllRole } from 'src/Roles/index';
 import { IfAllGranted, IfAuthorized } from 'react-authorization';
+import ForbiddenPage from '../ForbiddenPage';
 
 function Index() {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -59,13 +60,6 @@ function Index() {
 
     return (
         <Fragment>
-            {/* <IfAllGranted
-                expected={['ROLE_HeadClub']}
-                actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
-                unauthorized={<h3>You shall not pass!</h3>}
-            >
-                <div className="panel">Child with restricted access.</div>
-            </IfAllGranted> */}
             <Dialog
                 open={openNotificationDialog}
                 onClose={handleCloseNotificationDialog}

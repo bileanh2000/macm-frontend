@@ -144,5 +144,7 @@ const eventApi = {
         const url = `/event/getalleventbystudentid/${studentId}`;
         return axiosClient.get(url);
     },
+
+    // getAllOnGoingEvent:{}=>
 };
 export default eventApi;

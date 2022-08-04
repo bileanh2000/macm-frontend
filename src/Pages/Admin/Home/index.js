@@ -114,7 +114,7 @@ function Home() {
             {memberReport[0] ? (
                 <Fragment>
                     <Typography variant="h4" color="initial" sx={{ fontWeight: 500, mb: 2 }}>
-                        Dashboard
+                        Tổng Quan
                     </Typography>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={12} md={4}>

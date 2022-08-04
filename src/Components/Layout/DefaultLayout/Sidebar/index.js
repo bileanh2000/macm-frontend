@@ -53,7 +53,7 @@ function Sidebar() {
                 <ListItemIcon>
                     <DashboardIcon />
                 </ListItemIcon>
-                <ListItemText primary="Dashboard" />
+                <ListItemText primary="Tổng Quan" />
             </ListItem>
             <Divider />
             <ListItem button onClick={handleClick}>
