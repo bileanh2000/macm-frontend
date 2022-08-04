@@ -47,7 +47,7 @@ function TournamentOverview({ tournament, value, index }) {
                         <Grid item xs={12}>
                             <Typography variant="h4">{tournament.name}</Typography>
                             <Typography variant="body1">{tournament.description}</Typography>
-                            <Typography variant="h5">Hạng mục thi đấu:</Typography>
+                            <Typography variant="h6">Hạng mục thi đấu:</Typography>
                         </Grid>
                         <Grid container columns={12} sx={{ mb: 2 }} spacing={2}>
                             <Grid item xs={4}>

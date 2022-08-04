@@ -6,6 +6,7 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Divider,
     Grid,
     InputAdornment,
     Paper,
@@ -26,7 +27,7 @@ import { useCallback, useState, Fragment, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import { Controller, useForm } from 'react-hook-form';
-import { Edit } from '@mui/icons-material';
+import { Edit, EmojiEvents } from '@mui/icons-material';
 import NumberFormat from 'react-number-format';
 
 import TournamentOverview from './TournamentOverview';
@@ -184,17 +185,36 @@ function DetailTournament() {
                 <Fragment>
                     <Paper elevation={3}>
                         <Container maxWidth="lg">
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} sm={8}>
+                            <Box sx={{ display: 'flex', pt: 1 }}>
+                                <Box>
+                                    <Box
+                                        sx={{
+                                            backgroundColor: '#F0F0F0',
+                                            padding: 0.8,
+                                            mr: 2,
+                                            borderRadius: '10px',
+                                            width: '4em',
+                                            height: '4em',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            flex: 1,
+                                        }}
+                                    >
+                                        <EmojiEvents fontSize="large" sx={{ color: '#0ACE70' }} />
+                                    </Box>
+                                </Box>
+                                <Box>
                                     <Typography variant="h4" sx={{ fontSize: 'bold' }}>
                                         {tournament.name}
                                     </Typography>
                                     <Typography variant="caption" sx={{ fontSize: 'bold' }}>
                                         {scheduleData[0].date} - {scheduleData[scheduleData.length - 1].date}
                                     </Typography>
-                                </Grid>
-                            </Grid>
-                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                </Box>
+                            </Box>
+                            <Divider />
+                            <Box>
                                 <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
                                     <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
                                     <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />

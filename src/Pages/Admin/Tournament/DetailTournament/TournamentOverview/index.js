@@ -52,7 +52,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                         <Grid item xs={7}>
                             <Typography variant="h4">{tournament.name}</Typography>
                             <Typography variant="body1">{tournament.description}</Typography>
-                            <Typography variant="h5">Hạng mục thi đấu:</Typography>
+                            <Typography variant="h6">Hạng mục thi đấu:</Typography>
                         </Grid>
                         <Grid item xs={5}>
                             {!isUpdate && (
@@ -83,8 +83,8 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                                 />
                             )}
                         </Grid>
-                        <Grid container columns={12} sx={{ mb: 2 }} spacing={2}>
-                            <Grid item xs={4}>
+                        <Grid container columns={12} sx={{ mb: 2, ml: -4 }} spacing={6}>
+                            <Grid item xs={12} md={4}>
                                 <Paper elevation={3}>
                                     {tournament.competitiveTypes.length > 0 && (
                                         <TableContainer sx={{ maxHeight: 440 }}>
@@ -115,7 +115,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                                     )}
                                 </Paper>
                             </Grid>
-                            <Grid item xs={8}>
+                            <Grid item xs={12} md={8}>
                                 <Paper elevation={3}>
                                     {tournament.exhibitionTypes.length > 0 && (
                                         <TableContainer sx={{ maxHeight: 440 }}>

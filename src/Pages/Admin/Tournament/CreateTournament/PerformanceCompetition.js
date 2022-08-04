@@ -145,10 +145,10 @@ function PerformanceCompetition(props) {
                                     fullWidth
                                     type="number"
                                     id="outlined-basic"
-                                    label="Số lượng nam"
+                                    label="Số lượng nam mỗi đội"
                                     variant="outlined"
                                     {...register('numberMale')}
-                                    error={errors.male ? true : false}
+                                    error={errors.numberMale ? true : false}
                                     helperText={errors.numberMale?.message}
                                 />
                             </Grid>
@@ -156,10 +156,10 @@ function PerformanceCompetition(props) {
                                 <TextField
                                     type="number"
                                     id="outlined-basic"
-                                    label="Số lượng nữ"
+                                    label="Số lượng nữ mỗi đội"
                                     variant="outlined"
                                     {...register('numberFemale')}
-                                    error={errors.female ? true : false}
+                                    error={errors.numberMale ? true : false}
                                     helperText={errors.numberFemale?.message}
                                     fullWidth
                                 />
@@ -182,8 +182,15 @@ function PerformanceCompetition(props) {
                 </Collapse>
             </Paper>
             <Collapse in={!isChecked}>
-                <Fab color="primary" aria-label="add" onClick={() => setIsChecked(!isChecked)} size="medium">
+                <Fab
+                    color="primary"
+                    variant="extended"
+                    aria-label="add"
+                    onClick={() => setIsChecked(!isChecked)}
+                    size="medium"
+                >
                     <Add />
+                    Thêm người chơi
                 </Fab>
             </Collapse>
         </Box>

@@ -65,7 +65,7 @@ function TournamentExhibition({ tournamentStatus }) {
         try {
             const response = await adminTournament.spawnTimeAndAreaEx(tournamentId);
             getExhibitionResult(exhibitionType, nowDate);
-            enqueueSnackbar(response.message);
+            enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.log('Failed to spawn time: ', error);
         }
