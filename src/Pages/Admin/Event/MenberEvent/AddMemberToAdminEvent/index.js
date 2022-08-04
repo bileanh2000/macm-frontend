@@ -19,34 +19,7 @@ import { useForm } from 'react-hook-form';
 import eventApi from 'src/api/eventApi';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-let snackBarStatus;
-
-// const _memberList = [
-//     {
-//         id: 10,
-//         studentName: 'Duong Thanh Tung',
-//         studentId: 'HE123456',
-//         attendanceStatus: true,
-//         role: { roleId: 2, roleName: 'Thành viên ban văn hóa' },
-//         paymentStatus: true,
-//     },
-//     {
-//         id: 20,
-//         studentName: 'Pham Minh Duc',
-//         studentId: 'HE456789',
-//         attendanceStatus: true,
-//         role: { roleId: 1, roleName: 'Thành viên ban truyền thông' },
-//         paymentStatus: true,
-//     },
-//     {
-//         id: 30,
-//         studentName: 'Dam Van Toan',
-//         studentId: 'HE987654',
-//         attendanceStatus: true,
-//         role: { roleId: 3, roleName: 'Thành viên ban hậu cần' },
-//         paymentStatus: true,
-//     },
-// ];
+import { useSnackbar } from 'notistack';
 
 const roles = [
     { roleId: 1, roleName: 'Thành viên tham gia' },
@@ -61,6 +34,7 @@ function AddMemberToAdminEvent() {
     const [userList, setUserList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [openSnackBar, setOpenSnackBar] = useState(false);
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     let navigate = useNavigate();
     const handleCloseSnackBar = (event, reason) => {
@@ -194,13 +168,11 @@ function AddMemberToAdminEvent() {
         eventApi.updateMemberRole(userList).then((res) => {
             console.log(res);
             console.log(res.data);
-            if (res.message === 'Cập nhật chức vụ cho thành viên trong sự kiện thành công') {
-                setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
-                setTimeout(navigate(-1), 3000);
-            }
+            enqueueSnackbar(res.message, { variant: 'success' });
+            navigate(-1);
+            // if (res.message === 'Cập nhật chức vụ cho thành viên trong sự kiện thành công') {
+
+            // }
         });
     };
     const CustomToolbar = () => {

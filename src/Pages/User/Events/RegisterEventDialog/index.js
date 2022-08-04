@@ -87,8 +87,13 @@ const RegisterEventDialog = ({ isOpen, handleClose, onSucess, data }) => {
         if (value) {
             eventApi.registerEventCommittee(id, studentId, value).then((res) => {
                 console.log('registerEventCommittee', res);
-                onSucess && onSucess(res.data[0]);
-                enqueueSnackbar(res.message, { variant: 'success', preventDuplicate: true });
+                if (res.message == 'Thành viên ban tổ chức không thể hủy tham gia') {
+                    enqueueSnackbar(res.message, { variant: 'error', preventDuplicate: true });
+                }
+                if (res.data.length !== 0) {
+                    onSucess && onSucess(res.data[0]);
+                    enqueueSnackbar(res.message, { variant: 'success', preventDuplicate: true });
+                }
                 handleClose();
             });
         } else {

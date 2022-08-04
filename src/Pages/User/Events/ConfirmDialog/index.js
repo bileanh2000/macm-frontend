@@ -44,10 +44,14 @@ const ConfirmCancel = ({ isOpen, handleClose, onSucess, data }) => {
         let studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
         eventApi.cancelJointEvent(id, studentId).then((res) => {
             console.log(res);
-            enqueueSnackbar(res.message, { variant: 'success', preventDuplicate: true });
+            if (res.message === 'Thành viên ban tổ chức không thể hủy tham gia') {
+                enqueueSnackbar(res.message, { variant: 'error', preventDuplicate: true });
+            }
+            if (res.data.length !== 0) {
+                onSucess && onSucess(res.data[0]);
+                enqueueSnackbar(res.message, { variant: 'success', preventDuplicate: true });
+            }
             handleClose();
-            onSucess && onSucess(res.data[0].event.id);
-            // onSucess && onSucess(true);
         });
     };
     return (

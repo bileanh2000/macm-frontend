@@ -19,7 +19,7 @@ import * as Yup from 'yup';
 const ImageUpload = (props) => {
     const [selectedFile, setSelectedFile] = useState();
     const [preview, setPreview] = useState(props.image);
-
+    const user = JSON.parse(localStorage.getItem('currentUser'));
     const Input = styled('input')({
         display: 'none',
     });
@@ -76,7 +76,8 @@ const ImageUpload = (props) => {
                 <Input accept="image/*" id="contained-button-file" type="file" onChange={onSelectFile} />
                 <Avatar
                     alt="anh dai dien"
-                    srcSet={preview ? preview : props.image}
+                    // srcSet={preview ? preview : props.image}
+                    srcSet={user.image}
                     sx={{ width: 180, height: 180, position: 'absolute', top: 55, left: 16 }}
                 />
             </label>

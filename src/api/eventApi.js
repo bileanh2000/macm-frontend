@@ -118,7 +118,7 @@ const eventApi = {
     },
 
     getAllMemberNotJointEvent: (id) => {
-        const url = `/event/headculture/getlistmembernotjoin/${id}?pageNo=0&pageSize=10`;
+        const url = `/event/headculture/getlistmembernotjoin/${id}?pageNo=0&pageSize=10000`;
         return axiosClient.get(url);
     },
     updateMemberToJoinEvent: (id, body) => {

@@ -23,10 +23,12 @@ import ConfirmCancel from './ConfirmDialog';
 import { FormatColorReset } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import moment from 'moment';
+import NoValuePage from 'src/Components/NoValuePage';
 
 function EventDetail() {
     let { id } = useParams();
     const [event, setEvent] = useState([]);
+    const [dataStatus, setDataStatus] = useState('');
     const [eventJoined, setEventJoined] = useState([]);
     const [scheduleList, setScheduleList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
@@ -61,6 +63,7 @@ function EventDetail() {
             const response = await eventApi.getEventScheduleByEvent(params);
             console.log('Thanh cong roi: ', response);
             setScheduleList(response.data);
+            setDataStatus(response.message);
         } catch (error) {
             console.log('That bai roi huhu ', error);
         }
@@ -69,7 +72,7 @@ function EventDetail() {
     const checkEventJoined = () => {
         if (eventJoined.length !== 0) {
             if (eventJoined.find((item) => item.eventId === parseInt(id))) {
-                console.log('dung cmnd');
+                console.log('dung cmnd', eventJoined);
                 setIsJoined(true);
             } else {
                 console.log('sai cmnd');
@@ -116,8 +119,12 @@ function EventDetail() {
         getListEvents();
         console.log(event);
         window.scrollTo({ behavior: 'smooth', top: '0px' });
+        console.info('data status', dataStatus);
     }, []);
 
+    if (dataStatus === 'No value present') {
+        return <NoValuePage message="Hoạt động này không tồn tại hoặc đã bị xóa" />;
+    }
     if (!scheduleList[0]) {
         return <LoadingProgress />;
     }
@@ -133,8 +140,8 @@ function EventDetail() {
                     data={event[0]}
                     onSucess={(newEvent) => {
                         console.log('newEvent', newEvent);
+
                         eventJoined && setEventJoined([newEvent, ...eventJoined]);
-                        // setChange(deleteEventId);
                     }}
                 />
             )}

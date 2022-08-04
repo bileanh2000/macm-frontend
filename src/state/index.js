@@ -5,6 +5,7 @@ const { setGlobalState, useGlobalState } = createGlobalState({
     alreadyVisited: true,
     allRole: [],
     loginErrorStatus: '',
+    loading: true,
 });
 
 export { useGlobalState, setGlobalState };

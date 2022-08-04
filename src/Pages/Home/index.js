@@ -75,8 +75,7 @@ function Index() {
                 <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Let Google help apps determine location. This means sending anonymous location data to Google,
-                        even when no apps are running.
+                        <PaymentNotification />
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -87,7 +86,6 @@ function Index() {
                 </DialogActions>
             </Dialog>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
-                <PaymentNotification />
                 {/* <Typography variant="h6">Bạn đéo cần phải đóng tiền kỳ này</Typography> */}
             </Box>
             <Grid container spacing={2}>

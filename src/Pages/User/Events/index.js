@@ -31,13 +31,13 @@ const cx = classNames.bind(styles);
 
 function EventList() {
     const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
     const [events, setEvents] = useState([]);
     const [pageSize, setPageSize] = useState(0);
     const [semester, setSemester] = useState('Summer2022');
     const [monthInSemester, setMonthInSemester] = useState([]);
     const [month, setMonth] = useState(0);
     const [semesterList, setSemesterList] = useState([]);
+    const [totalResult, setTotalResult] = useState([]);
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('sm'));
 
@@ -53,6 +53,7 @@ function EventList() {
             setEvents(response.data);
             console.log('getListEventsBySemester', response);
             setPageSize(Math.ceil(response.totalResult / 5));
+            setTotalResult(response.totalResult);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
@@ -89,7 +90,7 @@ function EventList() {
         getListEventsBySemester(JSON.parse(localStorage.getItem('currentUser')).studentId, month, page - 1, semester);
     }, [semester, month, page]);
 
-    if (!events) {
+    if (!events.length) {
         return <LoadingProgress />;
     }
 
@@ -136,7 +137,7 @@ function EventList() {
             </Box>
             <Box sx={{}}>
                 <Box>
-                    {events && events.length === 0 ? (
+                    {!totalResult ? (
                         <Typography variant="h5" sx={{ textAlign: 'center', mt: 3 }}>
                             KHÔNG CÓ SỰ KIỆN NÀO
                         </Typography>

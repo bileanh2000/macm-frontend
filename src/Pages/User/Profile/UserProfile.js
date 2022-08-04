@@ -14,10 +14,10 @@ function UserProfile() {
     const [userDetail, setUserDetail] = useState([]);
     const [openQRDialog, setOpenQRDialog] = useState(false);
     const [QRUrl, setQRUrl] = useState('');
+    const user = JSON.parse(localStorage.getItem('currentUser'));
 
     const fetchUserQR = async (userDetail) => {
         try {
-
             const response = await userApi.generateQrCode(userDetail);
             setQRUrl(response.data[0]);
         } catch (error) {
@@ -39,13 +39,12 @@ function UserProfile() {
         };
 
         fetchUserDetail();
-
     }, []);
 
     useEffect(() => {
         console.log(userDetail[0]);
         fetchUserQR(userDetail[0]);
-    }, [userDetail])
+    }, [userDetail]);
 
     const handleDialogOpen = () => {
         setOpenQRDialog(true);
@@ -70,7 +69,7 @@ function UserProfile() {
                         <img src="https://source.unsplash.com/random" alt="" width="100%" height="146px" />
                         <Avatar
                             alt="anh dai dien"
-                            srcSet="https://scontent.fhan5-6.fna.fbcdn.net/v/t39.30808-6/281356576_3493649010862384_4475616120131758473_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=kYec_HK0aBIAX-gh-W3&_nc_ht=scontent.fhan5-6.fna&oh=00_AT-XfxH5kDkm71k41u2jR27-skqEJcsukxhuIPBdJGFVjQ&oe=62A8E9B7"
+                            srcSet={user.image}
                             sx={{ width: 180, height: 180, position: 'absolute', top: 55, left: 16 }}
                         />
                     </Box>
@@ -143,7 +142,7 @@ function UserProfile() {
                                 disabled
                                 id="outlined-disabled"
                                 label="Số điện thoại"
-                                defaultValue={'0' + item.phone}
+                                defaultValue={item.phone}
                                 fullWidth
                             />
                             <TextField

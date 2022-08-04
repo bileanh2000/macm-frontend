@@ -11,6 +11,7 @@ import { Box, Button, FormControl, MenuItem, Paper, Select, Tooltip, Typography 
 import userApi from 'src/api/userApi';
 import styled from '@emotion/styled';
 import ReactDOM from 'react-dom';
+import LoadingProgress from 'src/Components/LoadingProgress';
 
 const cx = classNames.bind(styles);
 
@@ -79,6 +80,9 @@ function Schedule() {
         return container;
     });
 
+    // if (!commonList.length) {
+    //     return <LoadingProgress />;
+    // }
     const renderEventContent = (eventInfo) => {
         // console.log(eventInfo);
         return (

@@ -77,8 +77,8 @@ function AttendanceReport() {
                             ))}
                         </TextField>
                         <Typography variant="button">
-                            Vắng mặt: {(totalAbsent / totalActivity) * 100}% trên tổng số ({totalAbsent}/{totalActivity}
-                            )
+                            Vắng mặt: {Math.round((totalAbsent / totalActivity) * 10000) / 100}% trên tổng số (
+                            {totalAbsent}/{totalActivity})
                         </Typography>
                     </Box>
 
