@@ -7,7 +7,6 @@ import RegisterExhibition from './RegisterExhibition';
 import RegisterPlayer from './RegisterPlayer';
 
 function MemberTournament({ tournament, isUpdate }) {
-    console.log(isUpdate);
     let { tournamentId } = useParams();
     const [type, setType] = useState(1);
     const [competitivePlayer, setCompetitivePlayer] = useState([]);
@@ -30,13 +29,14 @@ function MemberTournament({ tournament, isUpdate }) {
     const handleChangeType = (event) => {
         setType(event.target.value);
         if (type === 1) {
-            fetchCompetitivePlayer(tournamentId, weightRange);
+            fetchCompetitivePlayer(weightRange);
         } else {
             fetchExhibitionTeam(tournamentId, exhibitionType);
         }
     };
 
     const handleChangeWeight = (event) => {
+        console.log(event.target.value);
         setWeightRange(event.target.value);
         let range;
         if (event.target.value === 0) {
@@ -44,7 +44,7 @@ function MemberTournament({ tournament, isUpdate }) {
         } else {
             range = listWeightRange.find((weight) => weight.id === event.target.value);
         }
-        fetchCompetitivePlayer(tournamentId, range);
+        fetchCompetitivePlayer(event.target.value);
     };
 
     const handleChangeExhibitionType = (event) => {
@@ -63,6 +63,7 @@ function MemberTournament({ tournament, isUpdate }) {
     const fetchExhibitionType = async (tournamentId) => {
         try {
             const response = await adminTournamentAPI.getAllExhibitionType(tournamentId);
+            console.log(response.data);
             setListExhibitionType(response.data);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
@@ -80,9 +81,9 @@ function MemberTournament({ tournament, isUpdate }) {
         }
     };
 
-    const fetchCompetitivePlayer = async (params, weightRange) => {
+    const fetchCompetitivePlayer = async (weightRange) => {
         try {
-            const response = await adminTournamentAPI.getAllCompetitivePlayer(params, weightRange);
+            const response = await adminTournamentAPI.getListPlayerBracket(weightRange);
             console.log(response.data);
             setCompetitivePlayer(response.data);
         } catch (error) {
@@ -99,11 +100,17 @@ function MemberTournament({ tournament, isUpdate }) {
     };
 
     useEffect(() => {
-        fetchCompetitivePlayer(tournamentId, weightRange == 0 ? { weightMin: 0, weightMax: 0 } : weightRange);
         fetchExhibitionTeam(tournamentId, exhibitionType == 0 ? { exhibitionType: 0 } : exhibitionType);
+    }, [tournamentId, exhibitionType]);
+
+    useEffect(() => {
+        type == 1 && fetchCompetitivePlayer(weightRange);
+    }, [weightRange, type]);
+
+    useEffect(() => {
         getAllCompetitiveType(tournamentId);
         fetchExhibitionType(tournamentId);
-    }, [type]);
+    }, [tournamentId]);
 
     return (
         <Fragment>
@@ -112,7 +119,7 @@ function MemberTournament({ tournament, isUpdate }) {
                     Danh sách thành viên tham gia
                 </Typography>
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <FormControl size="small">
                     <Typography variant="caption">Nội dung thi đấu</Typography>
                     <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
@@ -122,7 +129,7 @@ function MemberTournament({ tournament, isUpdate }) {
                 </FormControl>
                 {type === 1 ? (
                     tournament.competitiveTypes.length > 0 ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                             {!isUpdate && (
                                 <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialog(true)}>
                                     Thêm người chơi thi đấu đối kháng
@@ -136,9 +143,9 @@ function MemberTournament({ tournament, isUpdate }) {
                                     displayEmpty
                                     onChange={handleChangeWeight}
                                 >
-                                    <MenuItem value={0}>
+                                    {/* <MenuItem value={0}>
                                         <em>Tất cả</em>
-                                    </MenuItem>
+                                    </MenuItem> */}
                                     {listWeightRange &&
                                         listWeightRange.map((range) => (
                                             <MenuItem value={range.id} key={range.id}>
@@ -155,7 +162,7 @@ function MemberTournament({ tournament, isUpdate }) {
                         </Box>
                     )
                 ) : tournament.exhibitionTypes.length > 0 ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                         {!isUpdate && (
                             <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialogExhibition(true)}>
                                 Thêm người chơi thi đấu biểu diễn
@@ -193,10 +200,10 @@ function MemberTournament({ tournament, isUpdate }) {
                         setOpenDialog(false);
                     }}
                     onSuccess={(newItem) => {
-                        if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
-                            return;
-                        }
-                        setCompetitivePlayer([newItem, ...competitivePlayer]);
+                        // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
+                        //     return;
+                        // }
+                        setCompetitivePlayer([...newItem, ...competitivePlayer]);
                         setOpenDialog(false);
                     }}
                 />

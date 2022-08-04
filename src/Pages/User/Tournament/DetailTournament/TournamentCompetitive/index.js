@@ -71,6 +71,13 @@ function TournamentCompetitive({ competitive }) {
                             ))}
                     </Select>
                 </FormControl>
+                <Box>
+                    {competitive.length > 0 && (
+                        <Typography variant="body1">
+                            {competitiveId == competitive[0].competitiveTypeId ? 'Bạn thi đấu tại bảng này!' : ''}
+                        </Typography>
+                    )}
+                </Box>
             </Box>
 
             {listPlayer && listPlayer.length > 0 ? (

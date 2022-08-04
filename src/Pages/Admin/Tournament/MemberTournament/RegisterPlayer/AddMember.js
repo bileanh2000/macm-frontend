@@ -26,8 +26,8 @@ function AddMember(props) {
                             setUser(newValue);
                             handleAddMember(newValue);
                         }}
-                        getOptionDisabled={(options) => (user.length >= 1 ? true : false)}
-                        // disableCloseOnSelect
+                        // getOptionDisabled={(options) => (user.length >= 1 ? true : false)}
+                        disableCloseOnSelect
                         getOptionLabel={(option) => option.studentId}
                         renderOption={(props, option, { selected }) => (
                             <li {...props}>

@@ -68,6 +68,11 @@ function FightingCompetition(props) {
         if (data.weightMax < data.weightMin) {
             setFocus('weightMax', { shouldSelect: true });
             setError('weightMax', { message: 'Hạng cân tối đa không được nhỏ hơn hạng cân tối thiểu' });
+        } else if (data.weightMax == data.weightMin) {
+            setFocus('weightMax', { shouldSelect: true });
+            setError('weightMax', {
+                message: 'Hạng cân tối thiểu và tối đa không được trùng nhau',
+            });
         } else if (!data.weightMax.toString().match(/^(\d+(\.(0|5){0,1})?)$/)) {
             setFocus('weightMax', { shouldSelect: true });
             setError('weightMax', {
@@ -257,8 +262,15 @@ function FightingCompetition(props) {
                 </Collapse>
             </Paper>
             <Collapse in={!isChecked}>
-                <Fab color="primary" aria-label="add" onClick={() => setIsChecked(!isChecked)} size="medium">
+                <Fab
+                    color="primary"
+                    variant="extended"
+                    aria-label="add"
+                    onClick={() => setIsChecked(!isChecked)}
+                    size="medium"
+                >
                     <Add />
+                    Thêm người chơi
                 </Fab>
             </Collapse>
         </Box>

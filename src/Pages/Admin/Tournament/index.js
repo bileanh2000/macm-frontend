@@ -16,7 +16,7 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import { Delete, Edit, AddCircle } from '@mui/icons-material';
+import { AddCircle, EmojiEvents } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 
@@ -138,23 +138,85 @@ function Tournament() {
                         tournaments
                             .filter((t) => t.status === 1)
                             .map((tournament) => (
-                                <Paper elevation={3} key={tournament.id}>
-                                    <Box component={Link} to={`${tournament.id}`}>
-                                        <div className={cx('tournament-list')}>
-                                            <div className={cx('tournament-status')}>
-                                                {tournament.status === 3 ? (
-                                                    <p className={cx('upcoming')}>Sắp diễn ra</p>
-                                                ) : tournament.status === 2 ? (
-                                                    <p className={cx('going-on')}>Đang diễn ra</p>
-                                                ) : (
-                                                    <p className={cx('closed')}>Đã kết thúc</p>
-                                                )}
-                                            </div>
-                                            <div className={cx('tournament-title')}>{tournament.name}</div>
-                                            <div className={cx('tournament-date')}>
-                                                {moment(new Date(tournament.startDate)).format('DD/MM/yyyy')}
-                                            </div>
-                                        </div>
+                                <Paper
+                                    elevation={3}
+                                    key={tournament.id}
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        padding: 2,
+                                        m: 2,
+                                        flexWrap: 'wrap',
+                                        transition: 'box-shadow 100ms linear',
+                                        cursor: 'pointer',
+                                        alignItems: 'center',
+
+                                        '&:hover': {
+                                            boxShadow: '0px 0px 16px 1px rgba(0,0,0,0.2)',
+                                            // opacity: [0.9, 0.8, 0.7],
+                                        },
+                                    }}
+                                >
+                                    <Box
+                                        component={Link}
+                                        to={`${tournament.id}`}
+                                        sx={{ display: 'flex', alignItems: 'center' }}
+                                    >
+                                        <Box
+                                            sx={{
+                                                backgroundColor: '#F0F0F0',
+                                                padding: 0.8,
+                                                mr: 2,
+                                                borderRadius: '10px',
+                                                width: '50px',
+                                                height: '50px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flex: 1,
+                                            }}
+                                        >
+                                            <EmojiEvents fontSize="large" sx={{ color: '#0ACE70' }} />
+                                        </Box>
+                                        <Box>
+                                            <Typography
+                                                sx={{
+                                                    fontSize: '20px',
+                                                    lineHeight: '1.2',
+                                                    fontWeight: '500',
+                                                }}
+                                            >
+                                                {tournament.name}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', flex: 1 }}>
+                                        <Box sx={{ mr: 1.5, ml: 2 }}>
+                                            {tournament.status === 3 ? (
+                                                <p className={cx('upcoming')}>Sắp diễn ra</p>
+                                            ) : tournament.status === 2 ? (
+                                                <p className={cx('going-on')}>Đang diễn ra</p>
+                                            ) : (
+                                                <p className={cx('closed')}>Đã kết thúc</p>
+                                            )}
+                                        </Box>
+                                        {/* <Box>
+                                                    {tournament.join ? (
+                                                        <div className={cx('joined')}>Đã đăng ký</div>
+                                                    ) : null}
+                                                </Box> */}
+                                    </Box>
+
+                                    <Box>
+                                        <Typography
+                                            sx={{
+                                                fontSize: '16px',
+                                                lineHeight: '1.2',
+                                                fontWeight: '500',
+                                            }}
+                                        >
+                                            {moment(new Date(tournament.startDate)).format('DD/MM/yyyy')}
+                                        </Typography>
                                     </Box>
                                 </Paper>
                             ))
@@ -228,24 +290,86 @@ function Tournament() {
                                 {tournaments
                                     .filter((t) => t.status === 2)
                                     .map((tournament) => (
-                                        <Paper elevation={3} key={tournament.id}>
-                                            <Box component={Link} to={`${tournament.id}`}>
-                                                <div className={cx('tournament-list')}>
-                                                    <div className={cx('tournament-status')}>
-                                                        {/* <p className={cx('upcoming')}> */}
-                                                        {tournament.status === 3 ? (
-                                                            <p className={cx('upcoming')}>Sắp diễn ra</p>
-                                                        ) : tournament.status === 2 ? (
-                                                            <p className={cx('going-on')}>Đang diễn ra</p>
-                                                        ) : (
-                                                            <p className={cx('closed')}>Đã kết thúc</p>
-                                                        )}
-                                                    </div>
-                                                    <div className={cx('tournament-title')}>{tournament.name}</div>
-                                                    <div className={cx('tournament-date')}>
-                                                        {moment(new Date(tournament.startDate)).format('DD/MM/yyyy')}
-                                                    </div>
-                                                </div>
+                                        <Paper
+                                            elevation={3}
+                                            key={tournament.id}
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                padding: 2,
+                                                m: 2,
+                                                flexWrap: 'wrap',
+                                                transition: 'box-shadow 100ms linear',
+                                                cursor: 'pointer',
+                                                alignItems: 'center',
+
+                                                '&:hover': {
+                                                    boxShadow: '0px 0px 16px 1px rgba(0,0,0,0.2)',
+                                                    // opacity: [0.9, 0.8, 0.7],
+                                                },
+                                            }}
+                                        >
+                                            <Box
+                                                component={Link}
+                                                to={`${tournament.id}`}
+                                                sx={{ display: 'flex', alignItems: 'center' }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: '#F0F0F0',
+                                                        padding: 0.8,
+                                                        mr: 2,
+                                                        borderRadius: '10px',
+                                                        width: '50px',
+                                                        height: '50px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <EmojiEvents fontSize="large" sx={{ color: '#0ACE70' }} />
+                                                </Box>
+                                                <Box>
+                                                    <Typography
+                                                        sx={{
+                                                            fontSize: '20px',
+                                                            lineHeight: '1.2',
+                                                            fontWeight: '500',
+                                                        }}
+                                                    >
+                                                        {tournament.name}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', flex: 1 }}>
+                                                <Box sx={{ mr: 1.5, ml: 2 }}>
+                                                    {tournament.status === 3 ? (
+                                                        <p className={cx('upcoming')}>Sắp diễn ra</p>
+                                                    ) : tournament.status === 2 ? (
+                                                        <p className={cx('going-on')}>Đang diễn ra</p>
+                                                    ) : (
+                                                        <p className={cx('closed')}>Đã kết thúc</p>
+                                                    )}
+                                                </Box>
+                                                {/* <Box>
+                                                    {tournament.join ? (
+                                                        <div className={cx('joined')}>Đã đăng ký</div>
+                                                    ) : null}
+                                                </Box> */}
+                                            </Box>
+
+                                            <Box>
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: '16px',
+                                                        lineHeight: '1.2',
+                                                        fontWeight: '500',
+                                                    }}
+                                                >
+                                                    {moment(new Date(tournament.startDate)).format('DD/MM/yyyy')}
+                                                </Typography>
                                             </Box>
                                         </Paper>
                                     ))}
@@ -261,24 +385,85 @@ function Tournament() {
                                 {tournaments
                                     .filter((t) => t.status === 3)
                                     .map((tournament) => (
-                                        <Paper elevation={3} key={tournament.id}>
-                                            <Box component={Link} to={`${tournament.id}`}>
-                                                <div className={cx('tournament-list')}>
-                                                    <div className={cx('tournament-status')}>
-                                                        {/* <p className={cx('upcoming')}> */}
-                                                        {tournament.status === 3 ? (
-                                                            <p className={cx('upcoming')}>Sắp diễn ra</p>
-                                                        ) : tournament.status === 2 ? (
-                                                            <p className={cx('going-on')}>Đang diễn ra</p>
-                                                        ) : (
-                                                            <p className={cx('closed')}>Đã kết thúc</p>
-                                                        )}
-                                                    </div>
-                                                    <div className={cx('tournament-title')}>{tournament.name}</div>
-                                                    <div className={cx('tournament-date')}>
-                                                        {moment(new Date(tournament.startDate)).format('DD/MM/yyyy')}
-                                                    </div>
-                                                </div>
+                                        <Paper
+                                            elevation={3}
+                                            key={tournament.id}
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                padding: 2,
+                                                m: 2,
+                                                flexWrap: 'wrap',
+                                                transition: 'box-shadow 100ms linear',
+                                                cursor: 'pointer',
+                                                alignItems: 'center',
+
+                                                '&:hover': {
+                                                    boxShadow: '0px 0px 16px 1px rgba(0,0,0,0.2)',
+                                                    // opacity: [0.9, 0.8, 0.7],
+                                                },
+                                            }}
+                                        >
+                                            <Box
+                                                component={Link}
+                                                to={`${tournament.id}`}
+                                                sx={{ display: 'flex', alignItems: 'center' }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        backgroundColor: '#F0F0F0',
+                                                        padding: 0.8,
+                                                        mr: 2,
+                                                        borderRadius: '10px',
+                                                        width: '50px',
+                                                        height: '50px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <EmojiEvents fontSize="large" sx={{ color: '#0ACE70' }} />
+                                                </Box>
+                                                <Box>
+                                                    <Typography
+                                                        sx={{
+                                                            fontSize: '20px',
+                                                            lineHeight: '1.2',
+                                                            fontWeight: '500',
+                                                        }}
+                                                    >
+                                                        {tournament.name}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', flex: 1 }}>
+                                                <Box sx={{ mr: 1.5, ml: 2 }}>
+                                                    {tournament.status === 3 ? (
+                                                        <p className={cx('upcoming')}>Sắp diễn ra</p>
+                                                    ) : tournament.status === 2 ? (
+                                                        <p className={cx('going-on')}>Đang diễn ra</p>
+                                                    ) : (
+                                                        <p className={cx('closed')}>Đã kết thúc</p>
+                                                    )}
+                                                </Box>
+                                                {/* <Box>
+                                                    {tournament.join ? (
+                                                        <div className={cx('joined')}>Đã đăng ký</div>
+                                                    ) : null}
+                                                </Box> */}
+                                            </Box>
+
+                                            <Box>
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: '16px',
+                                                        lineHeight: '1.2',
+                                                        fontWeight: '500',
+                                                    }}
+                                                >
+                                                    {moment(new Date(tournament.startDate)).format('DD/MM/yyyy')}
+                                                </Typography>
                                             </Box>
                                         </Paper>
                                     ))}
@@ -288,7 +473,7 @@ function Tournament() {
                         )}
                         {status == 0 && (
                             <Button sx={{ float: 'right', m: 1 }} onClick={handleOpenDialogTournament}>
-                                Các sự kiện đã kết thúc
+                                Các giải đấu đã kết thúc
                             </Button>
                         )}
                     </Box>

@@ -267,7 +267,7 @@ function TableMatch(params) {
                                     {index + 1}
                                 </TableCell>
                                 <TableCell align="right">{row.team.teamName}</TableCell>
-                                <TableCell align="right">{moment(row.time).format('hh:mm -- DD-MM')}</TableCell>
+                                <TableCell align="right">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
                                 <TableCell align="right">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
                                 {/* {params.status === 2 && <TableCell align="right"></TableCell>} */}
                                 {params.status === 3 && (

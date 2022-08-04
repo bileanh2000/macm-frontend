@@ -82,7 +82,8 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
             setNumberMale(exType.numberMale);
             setNumberFemale(exType.numberFemale);
         }
-        console.log(exType);
+        setDataMale([]);
+        setDateFemale([]);
     };
     const getAllMember = async () => {
         try {
@@ -108,7 +109,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
     const registerTeam = async (exhibitionType, params) => {
         try {
             const response = await adminTournament.registerTeam(exhibitionType, params);
-            let variant = 'success';
+            let variant = response.message.includes('thành công') ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
         } catch (error) {
             let variant = 'error';
@@ -130,7 +131,6 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
         const listStudentId = teamMember.map((student) => student.studentId);
 
         const params = { listStudentId, teamName: data.teamName, exhibitionTypeId: exhibitionType };
-
         registerTeam(exhibitionType, params);
         onSuccess && onSuccess();
         handleCloseDialog();
@@ -138,11 +138,12 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
 
     const handleDelete = (data) => {
         let newData;
-        console.log(data);
-        if (data.gender == 0) {
+        console.log(data, dataMale, dataFemale);
+        if (!data.gender) {
             newData = dataMale.filter((d) => {
                 return d.studentId !== data.studentId;
             });
+            console.log(newData);
             setDataMale(newData);
         } else {
             newData = dataFemale.filter((d) => {

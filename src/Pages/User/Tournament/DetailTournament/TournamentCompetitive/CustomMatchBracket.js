@@ -3,6 +3,7 @@ import classNames from 'classnames/bind';
 import moment from 'moment';
 
 import styles from './CustomMatchBracket.module.scss';
+import { Box } from '@mui/material';
 
 const cx = classNames.bind(styles);
 
@@ -21,34 +22,48 @@ function CustomMatchBracket(params) {
 
     return (
         <Fragment>
-            <div className={cx('theme', 'theme-dark')}>
-                <div className={cx('bracket', ' disable-image')}>
-                    {matches.map((matchs, index) => (
-                        <div className={cx('column')} key={index}>
+            <Box className={cx('tournament-bracket', 'tournament-bracket--rounded')} sx={{ mt: 2, mb: 2 }}>
+                {matches.map((matchs, index) => (
+                    <div className={cx('tournament-bracket__round')} key={index}>
+                        <h3 className={cx('tournament-bracket__round-title')}>
+                            Trận{' '}
+                            {index == matches.length - 1
+                                ? 'bán kết'
+                                : index == matches.length - 2
+                                ? 'chung kết'
+                                : index + 1}
+                        </h3>
+                        <ul className={cx('tournament-bracket__list')}>
                             {matchs.map((match, i) =>
                                 index === 0 ? (
-                                    match.firstPlayer && match.secondPlayer ? (
-                                        <div className={cx('match', 'winner-top', 'winner-bottom')} key={match.id}>
+                                    <li
+                                        className={cx(
+                                            'tournament-bracket__item',
+                                            (match.firstPlayer && match.secondPlayer) || params.status === 1
+                                                ? ''
+                                                : 'hidden',
+                                        )}
+                                        key={match.id}
+                                    >
+                                        <Box sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}>
                                             <div>
                                                 <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
                                             </div>
-                                            <div className={cx('match-top', 'team')}>
-                                                <span className={cx('image')}></span>
-                                                <span className={cx('name')}>{match.firstPlayer?.studentName}</span>
-                                                <span className={cx('score')}>{match.firstPlayer?.point}</span>
+                                            <div className={cx('tournament-bracket__match')}>
+                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                    <small>{match.firstPlayer?.studentName}</small>
+                                                </Box>
+                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                    <small>{match.firstPlayer?.point}</small>
+                                                </Box>
                                             </div>
-
-                                            <div className={cx('match-bottom', 'team')}>
-                                                <span className={cx('image')}></span>
-                                                <span className={cx('name')}>{match.secondPlayer?.studentName}</span>
-                                                <span className={cx('score')}>{match.secondPlayer?.point}</span>
-                                            </div>
-                                            <div className={cx('match-lines')}>
-                                                <div className={cx('line', 'one')}></div>
-                                                <div className={cx('line', 'two')}></div>
-                                            </div>
-                                            <div className={cx('match-lines', 'alt')}>
-                                                <div className={cx('line', 'one')}></div>
+                                            <div className={cx('tournament-bracket__match')}>
+                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                    <small>{match.secondPlayer?.studentName}</small>
+                                                </Box>
+                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                    <small>{match.secondPlayer?.point}</small>
+                                                </Box>
                                             </div>
                                             <div>
                                                 <small>
@@ -57,86 +72,45 @@ function CustomMatchBracket(params) {
                                                         : ''}
                                                 </small>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <div
-                                            className={cx('match', 'winner-top', 'winner-bottom', 'hidden')}
-                                            key={match.id}
-                                        >
-                                            <div>
-                                                <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                            </div>
-
-                                            <div className={cx('match-top', 'team')}>
-                                                <span className={cx('image')}></span>
-                                                <span className={cx('name')}>{match.firstPlayer?.studentName}</span>
-                                                <span className={cx('score')}>{match.firstPlayer?.point}</span>
-                                            </div>
-
-                                            <div className={cx('match-bottom', 'team')}>
-                                                <span className={cx('image')}></span>
-                                                <span className={cx('name')}>{match.secondPlayer?.studentName}</span>
-                                                <span className={cx('score')}>{match.secondPlayer?.point}</span>
-                                            </div>
-                                            <div className={cx('match-lines')}>
-                                                <div className={cx('line', 'one')}></div>
-                                                <div className={cx('line', 'two')}></div>
-                                            </div>
-                                            <div className={cx('match-lines', 'alt')}>
-                                                <div className={cx('line', 'one')}></div>
-                                            </div>
-                                            <div>
-                                                <small>
-                                                    {match.time
-                                                        ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
-                                                        : ''}
-                                                </small>
-                                            </div>
-                                        </div>
-                                    )
+                                        </Box>
+                                    </li>
                                 ) : (
-                                    <div className={cx('match', 'winner-bottom', 'winner-top')} key={match.id}>
-                                        <div>
-                                            <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                        </div>
-                                        <div className={cx('match-top', 'team')}>
-                                            <span className={cx('image')}></span>
-                                            <span className={cx('name')}>{match.firstPlayer?.studentName}</span>
-                                            <span className={cx('score')}>{match.firstPlayer?.point}</span>
-                                        </div>
-                                        <div className={cx('match-bottom', 'team')}>
-                                            <span className={cx('image')}></span>
-                                            <span className={cx('name')}>{match.secondPlayer?.studentName}</span>
-                                            <span className={cx('score')}>{match.secondPlayer?.point}</span>
-                                        </div>
-
-                                        <div className={cx('match-lines')}>
-                                            <div className={cx('line', 'one')}></div>
-                                            {index === __matches.length - 2 ? (
-                                                ''
-                                            ) : (
-                                                <div className={cx('line', 'two')}></div>
-                                            )}
-                                        </div>
-
-                                        <div className={cx('match-lines', 'alt')}>
-                                            <div className={cx('line', 'one')}></div>
-                                        </div>
-
-                                        <div>
-                                            <small>
-                                                {match.time
-                                                    ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
-                                                    : ''}
-                                            </small>
-                                        </div>
-                                    </div>
+                                    <li className={cx('tournament-bracket__item')} key={match.id}>
+                                        <Box sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}>
+                                            <div>
+                                                <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
+                                            </div>
+                                            <div className={cx('tournament-bracket__match')}>
+                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                    <small>{match.firstPlayer?.studentName}</small>
+                                                </Box>
+                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                    <small>{match.firstPlayer?.point}</small>
+                                                </Box>
+                                            </div>
+                                            <div className={cx('tournament-bracket__match')}>
+                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                    <small>{match.secondPlayer?.studentName}</small>
+                                                </Box>
+                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                    <small>{match.secondPlayer?.point}</small>
+                                                </Box>
+                                            </div>
+                                            <div>
+                                                <small>
+                                                    {match.time
+                                                        ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
+                                                        : ''}
+                                                </small>
+                                            </div>
+                                        </Box>
+                                    </li>
                                 ),
                             )}
-                        </div>
-                    ))}
-                </div>
-            </div>
+                        </ul>
+                    </div>
+                ))}
+            </Box>
         </Fragment>
     );
 }

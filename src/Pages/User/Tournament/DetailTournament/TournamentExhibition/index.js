@@ -34,10 +34,13 @@ function TournamentExhibition({ exhibition }) {
     const [listExhibitionType, setListExhibitionType] = useState([]);
     const [tournamentStatus, setTournamentStatus] = useState(-1);
     const [open, setOpen] = useState(false);
+    const [myTeam, setMyTeam] = useState();
 
     const handleChangeExhibitionType = (event) => {
         console.log(event.target.value);
         setExhibitionType(event.target.value);
+        const team = exhibition.find((t) => t.exhibitionTypeId === event.target.value);
+        setMyTeam(team);
         let exType;
         if (event.target.value === 0) {
             exType = { exhibitionType: 0 };
@@ -54,6 +57,8 @@ function TournamentExhibition({ exhibition }) {
             console.log(response);
             setListExhibitionType(response.data);
             setExhibitionType(response.data[0].id);
+            const team = exhibition.find((t) => t.exhibitionTypeId === response.data[0].id);
+            setMyTeam(team);
             getExhibitionResult(response.data[0].id, nowDate);
             setTournamentStatus(response.code);
         } catch (error) {
@@ -108,12 +113,12 @@ function TournamentExhibition({ exhibition }) {
                             ))}
                     </Select>
                 </FormControl>
-                {exhibition.length > 0 && (
+                {myTeam && (
                     <Button variant="outlined" onClick={() => handleOpenTeam(true)}>
                         Đội của tôi
                     </Button>
                 )}
-                {exhibition.length > 0 && (
+                {myTeam && (
                     <Dialog
                         open={open}
                         fullWidth
@@ -122,12 +127,10 @@ function TournamentExhibition({ exhibition }) {
                         aria-labelledby="alert-dialog-title"
                         aria-describedby="alert-dialog-description"
                     >
-                        <DialogTitle id="alert-dialog-title">
-                            Nội dung thi đấu: {exhibition[0].exhibitionTypeName}
-                        </DialogTitle>
+                        <DialogTitle id="alert-dialog-title">Nội dung thi đấu: {myTeam.exhibitionTypeName}</DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description">
-                                <Typography variant="caption">Đội của tôi: {exhibition[0].teamName}</Typography>
+                                <Typography variant="caption">Đội của tôi: {myTeam.teamName}</Typography>
                             </DialogContentText>
                             <TableContainer component={Paper}>
                                 <Table sx={{ minWidth: 650 }} aria-label="caption table">
@@ -142,7 +145,7 @@ function TournamentExhibition({ exhibition }) {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {exhibition[0].exhibitionPlayersDto.map((row, index) => (
+                                        {myTeam.exhibitionPlayersDto.map((row, index) => (
                                             <TableRow key={row.id}>
                                                 <TableCell component="th" scope="row">
                                                     {index + 1}

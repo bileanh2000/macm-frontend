@@ -60,7 +60,7 @@ function AddMember(props) {
                                         {option.studentId} - {option.studentName}
                                     </li>
                                 )}
-                                style={{ width: 500 }}
+                                // style={{ width: 500 }}
                                 renderInput={(params) => (
                                     <TextField {...params} label="Thành viên" placeholder="Thêm thành viên" />
                                 )}

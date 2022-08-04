@@ -61,11 +61,12 @@ function MemberList({ data, type }) {
             data.map((item, index) => {
                 const container = {};
                 container['id'] = index + 1;
-                container['studentName'] = item.playerName;
-                container['weight'] = item.weight + 'Kg';
-                container['studentId'] = item.playerStudentId;
+                container['studentName'] = item.competitivePlayer.tournamentPlayer.user.name;
+                container['weight'] = item.competitivePlayer.weight + 'Kg';
+                container['studentId'] = item.competitivePlayer.tournamentPlayer.user.studentId;
                 container['playerGender'] = item.playerGender ? 'Nam' : 'Nữ';
-                container['weightRange'] = item.weightMin + ' - ' + item.weightMax + 'Kg';
+                container['weightRange'] =
+                    item.competitiveType.weightMin + ' - ' + item.competitiveType.weightMax + 'Kg';
                 return container;
             });
     }
@@ -170,7 +171,7 @@ function MemberList({ data, type }) {
             }}
         >
             <DataGrid
-                loading={data.length === 0}
+                // loading={data.length === 0}
                 disableSelectionOnClick={true}
                 rows={rowsPlayer}
                 columns={columns}

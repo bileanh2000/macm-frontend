@@ -518,17 +518,23 @@ function CustomMatchBracket(params) {
             ) : (
                 ''
             )}
-            <div className={cx('theme', 'theme-dark')}>
-                <div className={cx('bracket', ' disable-image')}>
-                    {matches.map((matchs, index) => (
-                        <div className={cx('column')} key={index}>
+            <Box className={cx('tournament-bracket', 'tournament-bracket--rounded')} sx={{ mt: 2, mb: 2 }}>
+                {matches.map((matchs, index) => (
+                    <div className={cx('tournament-bracket__round')} key={index}>
+                        <h3 className={cx('tournament-bracket__round-title')}>
+                            Trận{' '}
+                            {index == matches.length - 1
+                                ? 'bán kết'
+                                : index == matches.length - 2
+                                ? 'chung kết'
+                                : index + 1}
+                        </h3>
+                        <ul className={cx('tournament-bracket__list')}>
                             {matchs.map((match, i) =>
                                 index === 0 ? (
-                                    <div
+                                    <li
                                         className={cx(
-                                            'match',
-                                            'winner-top',
-                                            'winner-bottom',
+                                            'tournament-bracket__item',
                                             (match.firstPlayer && match.secondPlayer) || params.status === 1
                                                 ? ''
                                                 : 'hidden',
@@ -536,105 +542,96 @@ function CustomMatchBracket(params) {
                                         key={match.id}
                                         onClick={(e) => handleClickResult(e, match)}
                                     >
-                                        <div>
-                                            <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                        </div>
-
-                                        <div
-                                            className={cx('match-top', 'team', isEdit ? 'draggable' : '')}
-                                            draggable={isEdit ? 'true' : ''}
-                                            onDragOver={(e) => onDragOver(e)}
-                                            onDragStart={(e) =>
-                                                onDragStart(e, { firstPlayer: match.firstPlayer }, i, 0)
-                                            }
-                                            onDragEnd={() => onDragEnd()}
-                                            onDrop={(e) => onDragDrop(e, { firstPlayer: match.firstPlayer }, i, 0)}
-                                        >
-                                            <span className={cx('image')}></span>
-                                            {/* <span className={cx('seed')}>{match.firstPlayer?.studentId}</span> */}
-                                            <span className={cx('name')}>{match.firstPlayer?.studentName}</span>
-                                            <span className={cx('score')}>{match.firstPlayer?.point}</span>
-                                        </div>
-
-                                        <div
-                                            className={cx('match-bottom', 'team', isEdit ? 'draggable' : '')}
-                                            draggable={isEdit ? 'true' : ''}
-                                            onDragOver={(e) => onDragOver(e)}
-                                            onDragStart={(e) =>
-                                                onDragStart(e, { secondPlayer: match.secondPlayer }, i, 1)
-                                            }
-                                            onDragEnd={() => onDragEnd()}
-                                            onDrop={(e) => onDragDrop(e, { secondPlayer: match.secondPlayer }, i, 1)}
-                                        >
-                                            <span className={cx('image')}></span>
-                                            {/* <span className={cx('seed')}>{match.secondPlayer?.studentId}</span> */}
-                                            <span className={cx('name')}>{match.secondPlayer?.studentName}</span>
-                                            <span className={cx('score')}>{match.secondPlayer?.point}</span>
-                                        </div>
-                                        <div className={cx('match-lines')}>
-                                            <div className={cx('line', 'one')}></div>
-                                            <div className={cx('line', 'two')}></div>
-                                        </div>
-                                        <div className={cx('match-lines', 'alt')}>
-                                            <div className={cx('line', 'one')}></div>
-                                        </div>
-                                        <div>
-                                            <small>
-                                                {match.time
-                                                    ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
-                                                    : ''}
-                                            </small>
-                                        </div>
-                                    </div>
+                                        <Box sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}>
+                                            <div>
+                                                <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
+                                            </div>
+                                            <div
+                                                className={cx('tournament-bracket__match', isEdit ? 'draggable' : '')}
+                                                draggable={isEdit ? true : false}
+                                                onDragOver={(e) => onDragOver(e)}
+                                                onDragStart={(e) =>
+                                                    onDragStart(e, { firstPlayer: match.firstPlayer }, i, 0)
+                                                }
+                                                onDragEnd={() => onDragEnd()}
+                                                onDrop={(e) => onDragDrop(e, { firstPlayer: match.firstPlayer }, i, 0)}
+                                            >
+                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                    <small>{match.firstPlayer?.studentName}</small>
+                                                </Box>
+                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                    <small>{match.firstPlayer?.point}</small>
+                                                </Box>
+                                            </div>
+                                            <div
+                                                className={cx('tournament-bracket__match', isEdit ? 'draggable' : '')}
+                                                draggable={isEdit ? true : false}
+                                                onDragOver={(e) => onDragOver(e)}
+                                                onDragStart={(e) =>
+                                                    onDragStart(e, { secondPlayer: match.secondPlayer }, i, 1)
+                                                }
+                                                onDragEnd={() => onDragEnd()}
+                                                onDrop={(e) =>
+                                                    onDragDrop(e, { secondPlayer: match.secondPlayer }, i, 1)
+                                                }
+                                            >
+                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                    <small>{match.secondPlayer?.studentName}</small>
+                                                </Box>
+                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                    <small>{match.secondPlayer?.point}</small>
+                                                </Box>
+                                            </div>
+                                            <div>
+                                                <small>
+                                                    {match.time
+                                                        ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
+                                                        : ''}
+                                                </small>
+                                            </div>
+                                        </Box>
+                                    </li>
                                 ) : (
-                                    <div
-                                        className={cx('match', 'winner-bottom', 'winner-top')}
+                                    <li
+                                        className={cx('tournament-bracket__item')}
                                         key={match.id}
                                         onClick={(e) => handleClickResult(e, match)}
                                     >
-                                        <div>
-                                            <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                        </div>
-                                        <div className={cx('match-top', 'team')}>
-                                            <span className={cx('image')}></span>
-                                            {/* <span className={cx('seed')}>{match.firstPlayer?.studentId}</span> */}
-                                            <span className={cx('name')}>{match.firstPlayer?.studentName}</span>
-                                            <span className={cx('score')}>{match.firstPlayer?.point}</span>
-                                        </div>
-                                        <div className={cx('match-bottom', 'team')}>
-                                            <span className={cx('image')}></span>
-                                            {/* <span className={cx('seed')}>{match.secondPlayer?.studentId}</span> */}
-                                            <span className={cx('name')}>{match.secondPlayer?.studentName}</span>
-                                            <span className={cx('score')}>{match.secondPlayer?.point}</span>
-                                        </div>
-
-                                        <div className={cx('match-lines')}>
-                                            <div className={cx('line', 'one')}></div>
-                                            {index === __matches.length - 2 ? (
-                                                ''
-                                            ) : (
-                                                <div className={cx('line', 'two')}></div>
-                                            )}
-                                        </div>
-
-                                        <div className={cx('match-lines', 'alt')}>
-                                            <div className={cx('line', 'one')}></div>
-                                        </div>
-
-                                        <div>
-                                            <small>
-                                                {match.time
-                                                    ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
-                                                    : ''}
-                                            </small>
-                                        </div>
-                                    </div>
+                                        <Box sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}>
+                                            <div>
+                                                <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
+                                            </div>
+                                            <div className={cx('tournament-bracket__match')}>
+                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                    <small>{match.firstPlayer?.studentName}</small>
+                                                </Box>
+                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                    <small>{match.firstPlayer?.point}</small>
+                                                </Box>
+                                            </div>
+                                            <div className={cx('tournament-bracket__match')}>
+                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                    <small>{match.secondPlayer?.studentName}</small>
+                                                </Box>
+                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                    <small>{match.secondPlayer?.point}</small>
+                                                </Box>
+                                            </div>
+                                            <div>
+                                                <small>
+                                                    {match.time
+                                                        ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
+                                                        : ''}
+                                                </small>
+                                            </div>
+                                        </Box>
+                                    </li>
                                 ),
                             )}
-                        </div>
-                    ))}
-                </div>
-            </div>
+                        </ul>
+                    </div>
+                ))}
+            </Box>
         </Fragment>
     );
 }

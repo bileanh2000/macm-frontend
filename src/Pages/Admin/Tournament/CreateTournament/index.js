@@ -8,6 +8,7 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    Divider,
     FormControlLabel,
     Grid,
     InputAdornment,
@@ -241,60 +242,60 @@ function CreateTourament() {
         mode: 'onBlur',
     });
 
-    console.log('hien thi switch', isOverride);
     return (
-        <Paper elevation={3}>
-            <Container maxWidth="lg" sx={{ pb: 2, pt: 1 }}>
-                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 5 }}>
-                    Tạo giải đấu
-                </Typography>
-                <Dialog fullWidth maxWidth="lg" open={open}>
-                    <DialogTitle>Xem trước thông tin giải đấu</DialogTitle>
-                    <Grid container spacing={2}>
-                        <Grid item xs={8}>
-                            <DialogContent sx={{ height: '500px' }}>
-                                <FullCalendar
-                                    locale="vie"
-                                    height="100%"
-                                    plugins={[dayGridPlugin, interactionPlugin]}
-                                    initialView="dayGridMonth"
-                                    events={TournamentSchedule}
-                                    weekends={true}
-                                    headerToolbar={{
-                                        left: 'title',
-                                        center: '',
-                                        right: 'prev next today',
-                                    }}
+        <Box sx={{ m: 1, p: 1 }}>
+            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+                Tạo giải đấu
+            </Typography>
+            <Divider />
+            <Dialog fullWidth maxWidth="lg" open={open}>
+                <DialogTitle>Xem trước thông tin giải đấu</DialogTitle>
+                <Grid container spacing={2}>
+                    <Grid item xs={8} md={12}>
+                        <DialogContent sx={{ height: '500px' }}>
+                            <FullCalendar
+                                locale="vie"
+                                height="100%"
+                                plugins={[dayGridPlugin, interactionPlugin]}
+                                initialView="dayGridMonth"
+                                events={TournamentSchedule}
+                                weekends={true}
+                                headerToolbar={{
+                                    left: 'title',
+                                    center: '',
+                                    right: 'prev next today',
+                                }}
+                            />
+                            {(isOverride === 3 || isOverride === 2) && (
+                                <FormControlLabel
+                                    sx={{ marginLeft: '1px' }}
+                                    control={
+                                        <Switch
+                                            hidden={isOverride === 1}
+                                            checked={checked}
+                                            onChange={handleChangeOverride}
+                                        />
+                                    }
+                                    label="Lịch đang trùng với lịch tập, bạn có muốn tạo không"
                                 />
-                                {(isOverride === 3 || isOverride === 2) && (
-                                    <FormControlLabel
-                                        sx={{ marginLeft: '1px' }}
-                                        control={
-                                            <Switch
-                                                hidden={isOverride === 1}
-                                                checked={checked}
-                                                onChange={handleChangeOverride}
-                                            />
-                                        }
-                                        label="Lịch đang trùng với lịch tập, bạn có muốn tạo không"
-                                    />
-                                )}
-                            </DialogContent>
-                        </Grid>
-                        {previewData && (
-                            <Grid item xs={4}>
-                                <PreviewData data={previewData} />
-                            </Grid>
-                        )}
+                            )}
+                        </DialogContent>
                     </Grid>
+                    {previewData && (
+                        <Grid item xs={4} md={12}>
+                            <PreviewData data={previewData} />
+                        </Grid>
+                    )}
+                </Grid>
 
-                    <DialogActions>
-                        <Button onClick={handleClose}>Quay lại</Button>
-                        <Button onClick={handleCreate} disabled={disabled}>
-                            Đồng ý
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+                <DialogActions>
+                    <Button onClick={handleClose}>Quay lại</Button>
+                    <Button onClick={handleCreate} disabled={disabled}>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Container maxWidth="lg">
                 <Box
                     component="form"
                     sx={{
@@ -307,330 +308,354 @@ function CreateTourament() {
                     onSubmit={handleSubmit}
                 >
                     <Grid container spacing={4}>
-                        <Grid item xs={12} sm={7}>
-                            <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="h6">
-                                Thông tin giải đấu
-                            </Typography>
-                            <TextField
-                                id="outlined-basic"
-                                label="Tên giải đấu"
-                                variant="outlined"
-                                fullWidth
-                                {...register('tournamentName')}
-                                error={errors.tournamentName ? true : false}
-                                helperText={errors.tournamentName?.message}
-                            />
-                            <TextField
-                                id="outlined-multiline-flexible"
-                                name="description"
-                                control={control}
-                                label="Nội dung"
-                                multiline
-                                maxRows={4}
-                                value={description}
-                                {...register('description')}
-                                error={errors.description ? true : false}
-                                helperText={errors.description?.message}
-                                onChange={(e) => setDescription(e.target.value)}
-                                fullWidth
-                                // {...register('content')}
-                            />
-                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                        <Grid item xs={12} sm={7} sx={{ pl: '10px !importance' }}>
+                            <Paper elevation={3} sx={{ p: 2, mt: 2 }}>
+                                <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="h6">
+                                    Thông tin giải đấu
+                                </Typography>
+                                <Divider sx={{ mb: 2 }} />
+                                <TextField
+                                    id="outlined-basic"
+                                    label="Tên giải đấu"
+                                    variant="outlined"
+                                    fullWidth
+                                    {...register('tournamentName')}
+                                    error={errors.tournamentName ? true : false}
+                                    helperText={errors.tournamentName?.message}
+                                />
+                                <TextField
+                                    id="outlined-multiline-flexible"
+                                    name="description"
+                                    control={control}
+                                    label="Nội dung"
+                                    multiline
+                                    maxRows={4}
+                                    value={description}
+                                    {...register('description')}
+                                    error={errors.description ? true : false}
+                                    helperText={errors.description?.message}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    fullWidth
+                                    // {...register('content')}
+                                />
+                                <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="h6">
+                                    Thời gian diễn ra và hạn đăng kí
+                                </Typography>
+                                <Divider sx={{ mb: 2 }} />
+                                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                                    <Grid container columns={12} spacing={2}>
+                                        <Grid item xs={6}>
+                                            <Controller
+                                                required
+                                                name="startDate"
+                                                control={control}
+                                                defaultValue={null}
+                                                render={({
+                                                    field: { onChange, value },
+                                                    fieldState: { error, invalid },
+                                                }) => (
+                                                    <DatePicker
+                                                        label="Ngày bắt đầu"
+                                                        inputFormat="dd/MM/yyyy"
+                                                        disablePast
+                                                        ampm={false}
+                                                        value={value}
+                                                        onChange={(value) => onChange(value)}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                sx={{
+                                                                    marginTop: '0px !important',
+                                                                    marginBottom: '16px !important',
+                                                                }}
+                                                                {...params}
+                                                                required
+                                                                id="outlined-disabled"
+                                                                error={invalid}
+                                                                helperText={invalid ? error.message : null}
+                                                                // id="startDate"
+                                                                variant="outlined"
+                                                                margin="dense"
+                                                                fullWidth
+                                                            />
+                                                        )}
+                                                    />
+                                                )}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Controller
+                                                required
+                                                name="finishDate"
+                                                inputFormat="dd/MM/yyyy"
+                                                control={control}
+                                                defaultValue={null}
+                                                render={({
+                                                    field: { onChange, value },
+                                                    fieldState: { error, invalid },
+                                                }) => (
+                                                    <DatePicker
+                                                        label="Ngày kết thúc"
+                                                        minDate={startDate}
+                                                        disablePast
+                                                        ampm={false}
+                                                        inputFormat="dd/MM/yyyy"
+                                                        value={value}
+                                                        onChange={(value) => onChange(value)}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                sx={{
+                                                                    marginTop: '0px !important',
+                                                                    marginBottom: '16px !important',
+                                                                }}
+                                                                {...params}
+                                                                required
+                                                                id="outlined-disabled"
+                                                                error={invalid}
+                                                                helperText={invalid ? error.message : null}
+                                                                // id="startDate"
+                                                                variant="outlined"
+                                                                margin="dense"
+                                                                fullWidth
+                                                            />
+                                                        )}
+                                                    />
+                                                )}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Controller
+                                                required
+                                                name="datePlayerDeadline"
+                                                control={control}
+                                                defaultValue={null}
+                                                render={({
+                                                    field: { onChange, value },
+                                                    fieldState: { error, invalid },
+                                                }) => (
+                                                    <DatePicker
+                                                        label="Hạn đăng kí cho người chơi"
+                                                        inputFormat="dd/MM/yyyy"
+                                                        disablePast
+                                                        ampm={false}
+                                                        value={value}
+                                                        onChange={(value) => onChange(value)}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                sx={{
+                                                                    marginTop: '0px !important',
+                                                                    marginBottom: '16px !important',
+                                                                }}
+                                                                {...params}
+                                                                required
+                                                                id="outlined-disabled"
+                                                                error={invalid}
+                                                                helperText={invalid ? error.message : null}
+                                                                // id="startDate"
+                                                                variant="outlined"
+                                                                margin="dense"
+                                                                fullWidth
+                                                            />
+                                                        )}
+                                                    />
+                                                )}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Controller
+                                                required
+                                                name="dateCommitteeDeadline"
+                                                inputFormat="dd/MM/yyyy"
+                                                control={control}
+                                                defaultValue={null}
+                                                render={({
+                                                    field: { onChange, value },
+                                                    fieldState: { error, invalid },
+                                                }) => (
+                                                    <DatePicker
+                                                        label="Hạn đăng kí tham gia ban tổ chức"
+                                                        minDate={startDate}
+                                                        disablePast
+                                                        ampm={false}
+                                                        inputFormat="dd/MM/yyyy"
+                                                        value={value}
+                                                        onChange={(value) => onChange(value)}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                sx={{
+                                                                    marginTop: '0px !important',
+                                                                    marginBottom: '16px !important',
+                                                                }}
+                                                                {...params}
+                                                                required
+                                                                id="outlined-disabled"
+                                                                error={invalid}
+                                                                helperText={invalid ? error.message : null}
+                                                                // id="startDate"
+                                                                variant="outlined"
+                                                                margin="dense"
+                                                                fullWidth
+                                                            />
+                                                        )}
+                                                    />
+                                                )}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                </LocalizationProvider>
+                                <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="h6">
+                                    Chi phí
+                                </Typography>
+                                <Divider sx={{ mb: 2 }} />
+                                <Controller
+                                    name="cost"
+                                    variant="outlined"
+                                    defaultValue=""
+                                    control={control}
+                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        <NumberFormat
+                                            name="cost"
+                                            customInput={TextField}
+                                            label="Tổng chi phí tổ chức"
+                                            thousandSeparator={true}
+                                            variant="outlined"
+                                            defaultValue=""
+                                            value={value}
+                                            onValueChange={(v) => {
+                                                onChange(Number(v.value));
+                                            }}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                            }}
+                                            error={invalid}
+                                            helperText={invalid ? error.message : null}
+                                            fullWidth
+                                        />
+                                    )}
+                                />
                                 <Grid container columns={12} spacing={2}>
                                     <Grid item xs={6}>
-                                        <Controller
-                                            required
-                                            name="startDate"
-                                            control={control}
-                                            defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <DatePicker
-                                                    label="Ngày bắt đầu"
-                                                    inputFormat="dd/MM/yyyy"
-                                                    disablePast
-                                                    ampm={false}
-                                                    value={value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            sx={{
-                                                                marginTop: '0px !important',
-                                                                marginBottom: '16px !important',
-                                                            }}
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
+                                        <TextField
+                                            type="number"
+                                            id="outlined-basic"
+                                            label="Số người dự kiến tham gia ban tổ chức"
+                                            variant="outlined"
+                                            fullWidth
+                                            {...register('numOfOrganizingCommitee')}
+                                            error={errors.numOfOrganizingCommitee ? true : false}
+                                            helperText={errors.numOfOrganizingCommitee?.message}
                                         />
                                     </Grid>
                                     <Grid item xs={6}>
                                         <Controller
-                                            required
-                                            name="finishDate"
-                                            inputFormat="dd/MM/yyyy"
+                                            name="feeOrganizingCommiteePay"
+                                            variant="outlined"
+                                            defaultValue=""
                                             control={control}
-                                            defaultValue={null}
                                             render={({
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
                                             }) => (
-                                                <DatePicker
-                                                    label="Ngày kết thúc"
-                                                    minDate={startDate}
-                                                    disablePast
-                                                    ampm={false}
-                                                    inputFormat="dd/MM/yyyy"
+                                                <NumberFormat
+                                                    name="feeOrganizingCommiteePay"
+                                                    customInput={TextField}
+                                                    label="Phí tham gia ban tổ chức"
+                                                    thousandSeparator={true}
+                                                    onValueChange={(v) => {
+                                                        onChange(Number(v.value));
+                                                    }}
+                                                    variant="outlined"
+                                                    defaultValue=""
                                                     value={value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            sx={{
-                                                                marginTop: '0px !important',
-                                                                marginBottom: '16px !important',
-                                                            }}
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
+                                                    InputProps={{
+                                                        endAdornment: (
+                                                            <InputAdornment position="end">vnđ</InputAdornment>
+                                                        ),
+                                                    }}
+                                                    error={invalid}
+                                                    helperText={invalid ? error.message : null}
+                                                    fullWidth
                                                 />
                                             )}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid container spacing={2} sx={{ alignItems: 'center' }}>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            type="number"
+                                            id="outlined-basic"
+                                            label="Số người dự kiến tham gia thi đấu"
+                                            variant="outlined"
+                                            fullWidth
+                                            {...register('numOfParticipants')}
+                                            error={errors.numOfParticipants ? true : false}
+                                            helperText={errors.numOfParticipants?.message}
                                         />
                                     </Grid>
                                     <Grid item xs={6}>
                                         <Controller
-                                            required
-                                            name="datePlayerDeadline"
+                                            name="feePlayerPay"
+                                            variant="outlined"
+                                            defaultValue=""
                                             control={control}
-                                            defaultValue={null}
                                             render={({
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
                                             }) => (
-                                                <DatePicker
-                                                    label="Hạn đăng kí cho người chơi"
-                                                    inputFormat="dd/MM/yyyy"
-                                                    disablePast
-                                                    ampm={false}
+                                                <NumberFormat
+                                                    name="feePlayerPay"
+                                                    customInput={TextField}
+                                                    label="Phí tham gia thi đấu"
+                                                    thousandSeparator={true}
+                                                    onValueChange={(v) => {
+                                                        onChange(Number(v.value));
+                                                    }}
+                                                    variant="outlined"
+                                                    defaultValue=""
                                                     value={value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            sx={{
-                                                                marginTop: '0px !important',
-                                                                marginBottom: '16px !important',
-                                                            }}
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Controller
-                                            required
-                                            name="dateCommitteeDeadline"
-                                            inputFormat="dd/MM/yyyy"
-                                            control={control}
-                                            defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <DatePicker
-                                                    label="Hạn đăng kí tham gia ban tổ chức"
-                                                    minDate={startDate}
-                                                    disablePast
-                                                    ampm={false}
-                                                    inputFormat="dd/MM/yyyy"
-                                                    value={value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            sx={{
-                                                                marginTop: '0px !important',
-                                                                marginBottom: '16px !important',
-                                                            }}
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
+                                                    InputProps={{
+                                                        endAdornment: (
+                                                            <InputAdornment position="end">vnđ</InputAdornment>
+                                                        ),
+                                                    }}
+                                                    error={invalid}
+                                                    helperText={invalid ? error.message : null}
+                                                    fullWidth
                                                 />
                                             )}
                                         />
                                     </Grid>
                                 </Grid>
-                            </LocalizationProvider>
-                            <Controller
-                                name="cost"
-                                variant="outlined"
-                                defaultValue=""
-                                control={control}
-                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                    <NumberFormat
-                                        name="cost"
-                                        customInput={TextField}
-                                        label="Tổng chi phí tổ chức"
-                                        thousandSeparator={true}
-                                        variant="outlined"
-                                        defaultValue=""
-                                        value={value}
-                                        onValueChange={(v) => {
-                                            onChange(Number(v.value));
-                                        }}
-                                        InputProps={{
-                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                        }}
-                                        error={invalid}
-                                        helperText={invalid ? error.message : null}
-                                        fullWidth
-                                    />
-                                )}
-                            />
-                            <Grid container columns={12} spacing={2}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        type="number"
-                                        id="outlined-basic"
-                                        label="Số người dự kiến tham gia ban tổ chức"
-                                        variant="outlined"
-                                        fullWidth
-                                        {...register('numOfOrganizingCommitee')}
-                                        error={errors.numOfOrganizingCommitee ? true : false}
-                                        helperText={errors.numOfOrganizingCommitee?.message}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Controller
-                                        name="feeOrganizingCommiteePay"
-                                        variant="outlined"
-                                        defaultValue=""
-                                        control={control}
-                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                            <NumberFormat
-                                                name="feeOrganizingCommiteePay"
-                                                customInput={TextField}
-                                                label="Phí tham gia ban tổ chức"
-                                                thousandSeparator={true}
-                                                onValueChange={(v) => {
-                                                    onChange(Number(v.value));
-                                                }}
-                                                variant="outlined"
-                                                defaultValue=""
-                                                value={value}
-                                                InputProps={{
-                                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                                }}
-                                                error={invalid}
-                                                helperText={invalid ? error.message : null}
-                                                fullWidth
-                                            />
-                                        )}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={2} sx={{ alignItems: 'center' }}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        type="number"
-                                        id="outlined-basic"
-                                        label="Số người dự kiến tham gia thi đấu"
-                                        variant="outlined"
-                                        fullWidth
-                                        {...register('numOfParticipants')}
-                                        error={errors.numOfParticipants ? true : false}
-                                        helperText={errors.numOfParticipants?.message}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Controller
-                                        name="feePlayerPay"
-                                        variant="outlined"
-                                        defaultValue=""
-                                        control={control}
-                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                            <NumberFormat
-                                                name="feePlayerPay"
-                                                customInput={TextField}
-                                                label="Phí tham gia thi đấu"
-                                                thousandSeparator={true}
-                                                onValueChange={(v) => {
-                                                    onChange(Number(v.value));
-                                                }}
-                                                variant="outlined"
-                                                defaultValue=""
-                                                value={value}
-                                                InputProps={{
-                                                    endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                                }}
-                                                error={invalid}
-                                                helperText={invalid ? error.message : null}
-                                                fullWidth
-                                            />
-                                        )}
-                                    />
-                                </Grid>
-                            </Grid>
+                            </Paper>
                         </Grid>
                         <Grid item xs={12} sm={5}>
-                            <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="h6">
-                                Nội dung thi đấu
-                            </Typography>
-                            <Grid container spacing={1}>
-                                <Grid item xs={12}>
-                                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
-                                        Thi đấu đối kháng
-                                    </Typography>
-                                    <FightingCompetition
-                                        onAddFightingCompetition={AddFightingCompetitionHandler}
-                                        data={datasFightingCompetition}
-                                    />
-                                </Grid>
+                            <Paper elevation={3} sx={{ p: 2, mt: 2 }}>
+                                <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="h6">
+                                    Nội dung thi đấu
+                                </Typography>
+                                <Divider sx={{ mb: 2 }} />
+                                <Grid container spacing={1}>
+                                    <Grid item xs={12}>
+                                        <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                                            Thi đấu đối kháng
+                                        </Typography>
+                                        <FightingCompetition
+                                            onAddFightingCompetition={AddFightingCompetitionHandler}
+                                            data={datasFightingCompetition}
+                                        />
+                                    </Grid>
 
-                                <Grid item xs={12}>
-                                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
-                                        Thi đấu biểu diễn
-                                    </Typography>
-                                    <PerformanceCompetition
-                                        onAddPerformanceCompetition={PerformanceCompetitionHandler}
-                                        data={datasPerformanceCompetition}
-                                    />
+                                    <Grid item xs={12}>
+                                        <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                                            Thi đấu biểu diễn
+                                        </Typography>
+                                        <PerformanceCompetition
+                                            onAddPerformanceCompetition={PerformanceCompetitionHandler}
+                                            data={datasPerformanceCompetition}
+                                        />
+                                    </Grid>
                                 </Grid>
-                            </Grid>
+                            </Paper>
                         </Grid>
                         <Grid item xs={12}>
                             <div className={cx('create-event-button')}>
@@ -642,7 +667,7 @@ function CreateTourament() {
                     </Grid>
                 </Box>
             </Container>
-        </Paper>
+        </Box>
     );
 }
 

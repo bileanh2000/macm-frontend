@@ -1,445 +1,316 @@
-$font-size: 16px; // supports px, rem, em, etc.
-$match-height: 90px;
-$match-height-only: 31px;
-$match-spacing: 24px; // used for lines, margins, and more. Should be even number.
-$match-width: 265px; // used to define width of match items, and used to calculate line sizes
-$border-size: 1px; // border sizes and line sizes
-$border-radius: 2px; // border radiuses for matches
+/*!
+ * Responsive Tournament Bracket
+ * Copyright 2016 Jakub Hájek
+ * Licensed under MIT (https://opensource.org/licenses/MIT)
+ */
 
-.theme {
-    height: 100%;
-    // width: 100%;
-    // position: absolute;
+/* @font-face {
+    font-family: "Work Sans";
+    font-style: normal;
+    font-weight: 300;
+    src: url(https://fonts.gstatic.com/s/worksans/v11/QGY_z_wNahGAdqQ43RhVcIgYT2Xz5u32KxfXBiEJow.ttf)
+      format("truetype");
+  }
+  @font-face {
+    font-family: "Work Sans";
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://fonts.gstatic.com/s/worksans/v11/QGY_z_wNahGAdqQ43RhVcIgYT2Xz5u32K0nXBiEJow.ttf)
+      format("truetype");
+  }
+  @font-face {
+    font-family: "Work Sans";
+    font-style: normal;
+    font-weight: 600;
+    src: url(https://fonts.gstatic.com/s/worksans/v11/QGY_z_wNahGAdqQ43RhVcIgYT2Xz5u32K5fQBiEJow.ttf)
+      format("truetype");
+  }
+  @font-face {
+    font-family: "Work Sans";
+    font-style: normal;
+    font-weight: 700;
+    src: url(https://fonts.gstatic.com/s/worksans/v11/QGY_z_wNahGAdqQ43RhVcIgYT2Xz5u32K67QBiEJow.ttf)
+      format("truetype");
+  } */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
-.bracket {
-    padding: 40px;
-    margin: 5px;
+html {
+    font-size: 15px;
+}
+@media (min-width: 38em) {
+    html {
+        font-size: 14px;
+    }
+}
+@media (min-width: 52em) {
+    html {
+        font-size: 15px;
+    }
+}
+@media (min-width: 72em) {
+    html {
+        font-size: 16px;
+    }
+}
+/* body {
+      background-color: #f1f1f1;
+      font-family: "Work Sans", "Helvetica Neue", Arial, sans-serif;
+    } */
+ul {
+    padding: 0;
+}
+.container {
+    width: 90%;
+    min-width: 18em;
+    margin: 20px auto;
+}
+h1,
+h2 {
+    text-align: center;
+}
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5em;
+}
+h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 2em;
 }
 
-// Main Layout
-
-.bracket {
-    display: flex;
-    flex-direction: row;
-    position: relative;
-}
-
-.column {
-    display: flex;
-    flex-direction: column;
-    min-height: 100%;
-    justify-content: space-around;
-    align-content: center;
+.draggable {
+    cursor: grab;
 }
 
 .hidden {
     visibility: hidden;
 }
-
-.match {
-    position: relative;
+.tournament-bracket {
     display: flex;
     flex-direction: column;
-    // min-width: $match-width;
-    max-width: $match-width;
-    height: $match-height;
-    margin: $match-spacing / 2 $match-spacing $match-spacing / 2 0;
-
-    // Add border radius
-    .match-top {
-        border-radius: $border-radius $border-radius 0 0;
-    }
-    .match-bottom {
-        border-radius: 0 0 $border-radius $border-radius;
-    }
-
-    .team {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        border: $border-size solid black;
-        position: relative;
-
-        span {
-            padding-left: $font-size / 2;
-            &:last-child {
-                padding-right: $font-size / 2;
-            }
-        }
-        .score {
-            margin-left: auto;
-        } // Sets score to right
-        &:first-child {
-            margin-bottom: $border-size * -1;
-        } // Sets borders on top of eachother
+}
+@media (min-width: 38em) {
+    .tournament-bracket {
+        flex-direction: row;
     }
 }
-
-.match_only {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    // min-width: $match-width;
-    max-width: $match-width;
-    height: $match-height-only;
-    margin: $match-spacing / 2 $match-spacing $match-spacing / 2 0;
-
-    // Add border radius
-    .match-top {
-        border-radius: $border-radius $border-radius 0 0;
-    }
-    .match-bottom {
-        border-radius: 0 0 $border-radius $border-radius;
-    }
-
-    .team {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        border: $border-size solid black;
-        position: relative;
-
-        span {
-            padding-left: $font-size / 2;
-            &:last-child {
-                padding-right: $font-size / 2;
-            }
-        }
-        .score {
-            margin-left: auto;
-        } // Sets score to right
-        &:first-child {
-            margin-bottom: $border-size * -1;
-        } // Sets borders on top of eachother
-    }
-}
-
-.match-lines {
+.tournament-bracket__round {
     display: block;
-    position: absolute;
-    top: 50%;
-    bottom: 0;
-    margin-top: ($border-size - 1) * -1;
-    right: $border-size * -1;
-    .line {
-        background: red;
+    margin-left: -3px;
+    flex: 1;
+}
+.tournament-bracket__round-title {
+    color: #9e9e9e;
+    font-size: 0.95rem;
+    font-weight: 400;
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 0.5em;
+}
+.tournament-bracket__list {
+    // background-color: #0000000a;
+    display: flex;
+    flex-direction: column;
+    flex-flow: row wrap;
+    justify-content: center;
+    height: 100%;
+    min-height: 100%;
+    border-bottom: 1px dashed #e5e5e5;
+    padding-bottom: 2em;
+    margin-bottom: 2em;
+    transition: padding 0.2s ease-in-out, margin 0.2s ease-in-out;
+}
+@media (max-width: 24em) {
+    .tournament-bracket__list {
+        padding-bottom: 1em;
+        margin-bottom: 1em;
+    }
+}
+@media (min-width: 38em) {
+    .tournament-bracket__list {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-right: 1px dashed #e5e5e5;
+        border-bottom: 0;
+    }
+}
+
+.tournament-bracket__round:last-child .tournament-bracket__list {
+    border: 0;
+}
+.tournament-bracket__item {
+    display: flex;
+    flex: 0 1 auto;
+    justify-content: center;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    padding: 2% 0;
+    width: 48%;
+    transition: padding 0.2s linear;
+}
+.tournament-bracket__item:nth-child(odd) {
+    margin-right: 2%;
+}
+.tournament-bracket__item:nth-child(even) {
+    margin-left: 2%;
+}
+.tournament-bracket__item::after {
+    transition: width 0.2s linear;
+}
+@media (max-width: 24em) {
+    .tournament-bracket__item {
+        width: 100%;
+        padding: 0.2rem 1rem;
+    }
+    .tournament-bracket__item:nth-child(odd),
+    .tournament-bracket__item:nth-child(even) {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+@media (min-width: 38em) {
+    .tournament-bracket__item {
+        padding: 0.2rem 1rem;
+        width: 100%;
+    }
+    .tournament-bracket__item:nth-child(odd),
+    .tournament-bracket__item:nth-child(even) {
+        margin: 0;
+    }
+    .tournament-bracket__item::after {
         position: absolute;
-        &.one {
-            height: $border-size;
-            width: ($match-spacing / 2);
-        }
-        &.two {
-            height: ($match-height + $match-spacing) / 2 + $border-size;
-            width: $border-size;
-            left: ($match-spacing / 2) - $border-size;
-        }
-    }
-    // Controls the line left-side line of a match
-    &.alt {
-        left: (($match-spacing / 2)) * -1;
-    }
-}
-
-// Make the line go upwards on even-lined matches
-.match:nth-child(even) .match-lines .line.two {
-    transform: translate(0, -100%);
-}
-
-// Make the left-side line disappear on the first column
-.column:first-child .match-lines.alt {
-    display: none;
-}
-
-// Make the right-side lines disappear on the final column (but keep left-side)
-.column:last-child .match-lines {
-    display: none;
-    &.alt {
+        right: 0;
+        content: '';
         display: block;
+        width: 2em;
+        height: 40%;
+        border-right: 2px solid #9e9e9e;
+    }
+    .tournament-bracket__item:nth-child(odd)::after {
+        top: 50%;
+        border-top: 2px solid #9e9e9e;
+        transform: translateY(-1px);
+    }
+    /*.tournament-bracket--rounded*/
+    .tournament-bracket__item:nth-child(odd)::after {
+        border-top-right-radius: 0.6em;
+    }
+    .tournament-bracket__item:nth-child(even)::after {
+        bottom: 50%;
+        border-bottom: 2px solid #9e9e9e;
+        transform: translateY(1px);
+    }
+    .tournament-bracket--rounded .tournament-bracket__item:nth-child(even)::after {
+        border-bottom-right-radius: 0.6em;
+    }
+    .tournament-bracket__round:first-child .tournament-bracket__item {
+        padding-left: 0;
+    }
+    .tournament-bracket__round:last-child .tournament-bracket__item {
+        padding-right: 0;
+    }
+    .tournament-bracket__round:last-child .tournament-bracket__item::after {
+        display: none;
+    }
+    .tournament-bracket__round:nth-last-child(2) .tournament-bracket__item::after {
+        border-radius: 0;
+        border-right: 0;
     }
 }
-
-// Adds additional height for each column out, the math should support any changes to match height, match spacing, or border size.
-// Don't love this, but percentages / flexbox can't really solve this.
-// Up to 5 columns supported by default
-.column:nth-child(2) {
-    .match-lines .line.two {
-        height: ($match-height + $match-spacing) + $border-size * 2;
+@media (min-width: 72em) {
+    .tournament-bracket__item {
+        padding: 0.5em 1.5em;
+    }
+    .tournament-bracket__item::after {
+        width: 1.5em;
     }
 }
-.column:nth-child(3) {
-    .match-lines .line.two {
-        height: ($match-height + $match-spacing) * 2 + $border-size * 3;
+.tournament-bracket__match {
+    display: flex;
+    width: 100%;
+    background-color: #0000000a;
+    // padding: 1em;
+    min-height: 2em;
+    border: 1px solid transparent;
+    border-radius: 0.1em;
+    box-shadow: 0 2px 0 0 #e5e5e5;
+    outline: none;
+    cursor: pointer;
+    transition: padding 0.2s ease-in-out, border 0.2s linear;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    justify-content: space-between;
+}
+// .tournament-bracket__match:focus {
+//     border-color: #2196f3;
+// }
+.tournament-bracket__match::before,
+.tournament-bracket__match::after {
+    transition: all 0.2s linear;
+}
+@media (max-width: 24em) {
+    .tournament-bracket__match {
+        padding: 0.75em 0.5em;
     }
 }
-.column:nth-child(4) {
-    .match-lines .line.two {
-        height: ($match-height + $match-spacing) * 3 + $border-size * 4;
-    }
-}
-.column:nth-child(5) {
-    .match-lines .line.two {
-        height: ($match-height + $match-spacing) * 4 + $border-size * 5;
-    }
-}
-
-// Themes
-
-// Light Theme
-$light-background: #f9fafd;
-$light-border-main: #dadfe3;
-$light-border-alt: #dadfe3;
-$light-winning-team-background: #fff;
-$light-losing-team-background: #fff;
-$light-winning-team-color: #272f36;
-$light-losing-team-color: #708392;
-// If you want these colors to be different, this will override the main border color.
-$light-line-color-override: null; // For the connecting lines, so they don't match above border-main color.
-$light-seed-color-override: #9fafbf;
-$light-score-color-override: #9fafbf;
-
-.theme-light {
-    // Coloring
-    background: $light-background;
-    border-color: darken($light-background, 5%);
-
-    .match-lines .line {
-        background: $light-border-main;
-        background: $light-line-color-override;
-    }
-
-    .team {
-        background: $light-losing-team-background;
-        border-color: $light-border-alt;
-        color: $light-losing-team-color;
-    }
-    .winner-top .match-top,
-    .winner-bottom .match-bottom {
-        background: $light-winning-team-background;
-        color: $light-winning-team-color;
-        border-color: $light-border-main;
-        z-index: 1;
-    }
-    .match {
-        .seed {
-            color: $light-seed-color-override;
-        }
-        .score {
-            color: $light-score-color-override;
-        }
-    }
-
-    // Sizing
-    .match {
-        .seed {
-            font-size: 12px;
-            min-width: 10px;
-        }
-        .score {
-            font-size: 14px;
-        }
-    }
-}
-
-// Dark Theme
-$dark-background: #0e1217;
-$dark-border-main: #36404e;
-$dark-border-alt: #232c36;
-$dark-winning-team-background: #232c36;
-$dark-losing-team-background: #182026;
-$dark-winning-team-color: #e3e8ef;
-$dark-losing-team-color: #6b798c;
-// If you want these colors to be different, this will override the main border color.
-$dark-line-color-override: null; // For the connecting lines, so they don't match above border-main color.
-$dark-seed-color-override: null;
-$dark-score-color-override: null;
-$dark-score-winner-color-override: #03d9ce;
-
-.theme-dark {
-    // Coloring
-    //background: $dark-background;
-    border-color: darken($dark-background, 5%);
-
-    .match-lines .line {
-        background: $dark-border-main;
-        background: $dark-line-color-override;
-    }
-
-    .team {
-        background: $dark-losing-team-background;
-        border-color: $dark-border-alt;
-        color: $dark-losing-team-color;
-    }
-    .winner-top .match-top,
-    .winner-bottom .match-bottom {
-        background: $dark-winning-team-background;
-        color: $dark-winning-team-color;
-        border-color: $dark-border-main;
-        z-index: 1;
-        .score {
-            color: $dark-score-winner-color-override;
-        }
-    }
-    .match {
-        .seed {
-            color: $dark-seed-color-override;
-        }
-        .score {
-            color: $dark-score-color-override;
-        }
-    }
-
-    // Sizing
-    .match {
-        .seed {
-            font-size: 12px;
-            min-width: 10px;
-        }
-        .score {
-            font-size: 14px;
-        }
-    }
-}
-
-// Note: this theme is kinda hacky / improvised compared to the other themes, but it gives an idea of what a more branded look can do using the above template as a starting point.
-
-.theme-dark-trendy {
-    // Coloring
-    background: #2b5876;
-    background: -webkit-linear-gradient(to right, #171721, #122b29);
-    background: linear-gradient(to right, #171721, #122b29);
-    border-color: darken($dark-background, 5%);
-
-    .match-lines .line {
-        background: $dark-border-main;
-        background: $dark-line-color-override;
-    }
-
-    .team {
-        background: transparentize(#323641, 0.6);
-        color: $dark-losing-team-color;
-        border: 2px solid transparent;
-        &:first-child {
-            margin-bottom: 2px;
-        }
-        &:last-child {
-            margin-top: 2px;
-        }
-    }
-    .winner-top .match-top,
-    .winner-bottom .match-bottom {
-        background: #323641;
-        color: $dark-winning-team-color;
-        z-index: 1;
-        .score {
-            color: $dark-score-winner-color-override;
-        }
-    }
-    .match {
-        .team .name {
-            text-transform: uppercase;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-        }
-        .seed {
-            display: none;
-        }
-        margin-right: $match-spacing * 2;
-        .match-top {
-            border-radius: 0;
-        }
-        .match-bottom {
-            border-radius: 0;
-        }
-    }
-    .match-lines {
-        opacity: 0.75;
-        .line {
-            background: $dark-score-winner-color-override;
-        }
-        right: ($match-spacing/2) * -1;
-        &.alt {
-            left: ($match-spacing) * -1;
-        }
-    }
-    .team {
-        overflow: hidden;
-    }
-    .score:before {
-        opacity: 0.25;
+@media (min-width: 38em) {
+    .tournament-bracket__match::before,
+    .tournament-bracket__match::after {
         position: absolute;
+        left: 0;
         z-index: 1;
         content: '';
         display: block;
-        background: black;
-        min-height: 50px;
-        min-width: 70px;
-        transform: translate(-12px, 0) rotate(25deg);
+        width: 1em;
+        height: 10%;
+        border-left: 2px solid #9e9e9e;
+    }
+    .tournament-bracket__match::before {
+        bottom: 50%;
+        border-bottom: 2px solid #9e9e9e;
+        transform: translate(0, 1px);
+    }
+    .tournament-bracket--rounded .tournament-bracket__match::before {
+        border-bottom-left-radius: 0.6em;
+    }
+    .tournament-bracket__match::after {
+        top: 50%;
+        border-top: 2px solid #9e9e9e;
+        transform: translate(0, -1px);
+    }
+    .tournament-bracket--rounded .tournament-bracket__match::after {
+        border-top-left-radius: 0.6em;
     }
 }
-
-// "disabled" classed for the main bracket. include these in the bracket div to disable elements in the match (or, i recommend just delete the spans you don't want)
-.disable-image .image,
-.disable-seed .seed,
-.disable-name .name,
-.disable-score .score {
-    display: none !important;
-}
-
-// want lines but no borders? set this in main bracket.
-.disable-borders {
-    border-width: 0px !important;
-    .team {
-        border-width: 0px !important;
+@media (min-width: 72em) {
+    .tournament-bracket__match::before,
+    .tournament-bracket__match::after {
+        width: 1.5em;
+    }
+    .tournament-bracket__match::before {
+        transform: translate(0, 1px);
+    }
+    .tournament-bracket__match::after {
+        transform: translate(0, -1px);
     }
 }
-// want a border around the match but not between teams? set this in main bracket.
-.disable-seperator {
-    .match-top {
-        border-bottom: 0px !important;
-    }
-    .match-bottom {
-        border-top: 0px !important;
-    }
-    .team:first-child {
-        margin-bottom: 0px;
-    }
+.tournament-bracket__round:last-child .tournament-bracket__match::before,
+.tournament-bracket__round:last-child .tournament-bracket__match::after {
+    border-left: 0;
+}
+.tournament-bracket__round:last-child .tournament-bracket__match::before {
+    border-bottom-left-radius: 0;
+}
+.tournament-bracket__round:last-child .tournament-bracket__match::after {
+    display: none;
 }
 
-// Theme Switcher
-.theme-switcher {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 24px;
-    border: 1px solid darken(#e1e8ef, 10%);
-    background: #6b798c;
-
-    h2 {
-        color: #e1e8ef;
-        text-transform: uppercase;
-        font-size: 12px;
-        margin: 0 0 12px 0;
-    }
-    button {
-        line-height: 1em;
-        font-size: 14px;
-        font-weight: 500;
-        padding: 10px 16px;
-        border-radius: 2px;
-        border: 1px solid #ccc;
-        cursor: pointer;
-        background: #6b798c;
-        color: #ccc;
-        border: 1px solid #eee;
-    }
-}
-
-.theme-light .theme-switcher #theme-light,
-.theme-dark .theme-switcher #theme-dark,
-.theme-dark-trendy .theme-switcher #theme-dark-trendy,
-.theme-none .theme-switcher #theme-none {
-    background: darken(#6b798c, 12%);
-    border-color: darken(#6b798c, 15%);
+.tournament-bracket__round:first-child .tournament-bracket__match::before,
+.tournament-bracket__round:first-child .tournament-bracket__match::after {
+    display: none;
 }

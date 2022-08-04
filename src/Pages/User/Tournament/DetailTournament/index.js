@@ -6,6 +6,7 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Divider,
     FormControl,
     FormControlLabel,
     FormHelperText,
@@ -22,7 +23,7 @@ import PropTypes from 'prop-types';
 import { Box } from '@mui/system';
 import { useCallback, useState, Fragment, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Delete, Edit } from '@mui/icons-material';
+import { Delete, Edit, EmojiEvents } from '@mui/icons-material';
 
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import TournamentOverview from './TournamentOverview';
@@ -34,6 +35,7 @@ import MemberTournament from './MemberTournament';
 import RegisterPlayer from './RegisterPlayer';
 import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
+import moment from 'moment';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -177,6 +179,7 @@ function DetailTournament() {
     const getAllUserCompetitivePlayer = async () => {
         try {
             const response = await userTournamentAPI.getAllUserCompetitivePlayer(tournamentId, user.studentId);
+            // console.log(response.data);
             setIsJoinCompetitive(response.data);
         } catch (error) {
             console.log('Loi roi', error);
@@ -186,6 +189,7 @@ function DetailTournament() {
     const getAllUserExhibitionPlayer = async () => {
         try {
             const response = await userTournamentAPI.getAllUserExhibitionPlayer(tournamentId, user.studentId);
+            console.log(response.data);
             setIsJoinExhibition(response.data);
         } catch (error) {
             console.log('Loi roi', error);
@@ -195,8 +199,8 @@ function DetailTournament() {
     const getAllOrginizingCommitteeRole = async () => {
         try {
             const response = await userTournamentAPI.getAllUserOrganizingCommittee(tournamentId, user.studentId);
-            console.log(response.data);
-            setIsJoinAdmin(response.data);
+            console.log(response);
+            setIsJoinAdmin(response);
         } catch (error) {
             console.log('Loi roi', error);
         }
@@ -246,7 +250,7 @@ function DetailTournament() {
     };
 
     return (
-        <Box sx={{ m: 1, p: 1, height: '80vh' }}>
+        <Box sx={{ m: 1, p: 1 }}>
             <RegisterPlayer
                 title="Đăng kí tham gia thi đấu"
                 userInformation={user}
@@ -305,32 +309,64 @@ function DetailTournament() {
                 <Fragment>
                     <Paper elevation={3}>
                         <Container maxWidth="xl">
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} sm={7}>
-                                    <Typography variant="h4" sx={{ fontSize: 'bold' }}>
-                                        {tournament.name}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ fontSize: 'bold' }}>
-                                        {scheduleData[0].date} - {scheduleData[scheduleData.length - 1].date}
-                                    </Typography>
-                                </Grid>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    pt: 1,
+                                    pb: 1,
+                                }}
+                            >
+                                <Box sx={{ display: 'flex', pt: 1 }}>
+                                    <Box>
+                                        <Box
+                                            sx={{
+                                                backgroundColor: '#F0F0F0',
+                                                padding: 0.8,
+                                                mr: 2,
+                                                borderRadius: '10px',
+                                                width: '4em',
+                                                height: '4em',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flex: 1,
+                                            }}
+                                        >
+                                            <EmojiEvents fontSize="large" sx={{ color: '#0ACE70' }} />
+                                        </Box>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="h4" sx={{ fontSize: 'bold' }}>
+                                            {tournament.name}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ fontSize: 'bold' }}>
+                                            {scheduleData[0].date} - {scheduleData[scheduleData.length - 1].date}
+                                        </Typography>
+                                    </Box>
+                                </Box>
                                 {new Date(scheduleList[0].date) > new Date() ? (
-                                    <Grid item xs={12} sm={5}>
-                                        {isJoinAdmin.length === 0 ? (
+                                    <Box>
+                                        {isJoinAdmin.data.length === 0 ? (
                                             <Box sx={{ display: 'flex', alignContent: 'space-between' }}>
-                                                <Button
-                                                    variant="outlined"
-                                                    // startIcon={<Edit />}
-                                                    onClick={() => handleOpenDialog(true)}
-                                                    {...(handleRegisterDeadline(0)
-                                                        ? { disabled: false }
-                                                        : { disabled: true })}
-                                                    sx={{ mr: 2, float: 'right' }}
-                                                >
-                                                    {handleRegisterDeadline(0)
-                                                        ? 'Đăng kí thi đấu'
-                                                        : 'Hết hạn đăng ký thi đấu'}
-                                                </Button>
+                                                {isJoinAdmin.message.includes('Đang chờ duyệt') ? (
+                                                    ''
+                                                ) : (
+                                                    <Button
+                                                        variant="outlined"
+                                                        // startIcon={<Edit />}
+                                                        onClick={() => handleOpenDialog(true)}
+                                                        {...(handleRegisterDeadline(0)
+                                                            ? { disabled: false }
+                                                            : { disabled: true })}
+                                                        sx={{ mr: 2, float: 'right' }}
+                                                    >
+                                                        {handleRegisterDeadline(0)
+                                                            ? 'Đăng kí thi đấu'
+                                                            : 'Hết hạn đăng ký thi đấu'}
+                                                    </Button>
+                                                )}
                                                 {isJoinCompetitive.length === 0 && isJoinExhibition.length === 0 && (
                                                     <Button
                                                         variant="outlined"
@@ -339,25 +375,39 @@ function DetailTournament() {
                                                         {...(handleRegisterDeadline(1)
                                                             ? { disabled: false }
                                                             : { disabled: true })}
+                                                        {...(isJoinAdmin.message
+                                                            ? { disabled: true }
+                                                            : { disabled: false })}
                                                         sx={{ float: 'right' }}
                                                     >
-                                                        {handleRegisterDeadline(1)
-                                                            ? 'Đăng kí vào ban tổ chức'
-                                                            : 'Hết hạn đăng ký ban tổ chức'}
+                                                        {isJoinAdmin.message} vào ban tổ chức
                                                     </Button>
                                                 )}
                                             </Box>
                                         ) : (
-                                            <Typography variant="h4" sx={{ fontSize: 'bold' }}>
-                                                "Bạn là thành viên ban tổ chức"
-                                            </Typography>
+                                            <Typography variant="h6">Bạn là thành viên ban tổ chức</Typography>
                                         )}
-                                    </Grid>
+                                        <Box>
+                                            <Typography variant="body1">
+                                                Hạn đăng kí người chơi:{' '}
+                                                {moment(new Date(tournament.registrationPlayerDeadline)).format(
+                                                    'DD/MM/yyyy',
+                                                )}
+                                            </Typography>
+                                            <Typography variant="body1">
+                                                Hạn đăng kí ban tổ chức:{' '}
+                                                {moment(
+                                                    new Date(tournament.registrationOrganizingCommitteeDeadline),
+                                                ).format('DD/MM/yyyy')}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
                                 ) : (
                                     ''
                                 )}
-                            </Grid>
-                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                            </Box>
+                            <Divider />
+                            <Box>
                                 <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
                                     <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
                                     <Tab label="Lịch thi đấu" {...a11yProps(1)} value={1} />

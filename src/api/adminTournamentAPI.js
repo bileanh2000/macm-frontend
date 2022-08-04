@@ -79,6 +79,15 @@ const adminTournament = {
         });
     },
 
+    getAllCompetitivePlayerByType: (tournamentId, competitiveTypeId) => {
+        const url = `/tournament/headclub/getallcompetitiveplayerbytype/${tournamentId}`;
+        return axiosClient.get(url, {
+            params: {
+                competitiveTypeId: competitiveTypeId,
+            },
+        });
+    },
+
     getAllExhibitionTeam: (tournamentId, params) => {
         const url = `/tournament/headclub/getallexhibitionteam/${tournamentId}`;
         return axiosClient.get(url, {
@@ -167,18 +176,14 @@ const adminTournament = {
         return axiosClient.put(url);
     },
 
-    addNewCompetitivePlayer: (tournamentId, userId, weight) => {
-        const url = `/competitive/headclub/addnewcompetitiveplayer/${tournamentId}`;
-        return axiosClient.post(url, null, { params: { userId: userId, weight: weight } });
+    addNewCompetitivePlayer: (competitiveTypeId, users) => {
+        const url = `/competitive/headclub/addnewcompetitiveplayer/${competitiveTypeId}`;
+        return axiosClient.post(url, users);
     },
 
-    getListPlayerBracket: (competitiveTypeId, round) => {
+    getListPlayerBracket: (competitiveTypeId) => {
         const url = `/competitive/headclub/getlistplayerbracket/${competitiveTypeId}`;
-        return axiosClient.get(url, null, {
-            params: {
-                round: round,
-            },
-        });
+        return axiosClient.get(url);
     },
 
     spawnMatchs: (competitiveTypeId, round) => {

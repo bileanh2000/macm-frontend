@@ -45,23 +45,23 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
     const [maxWeight, setMaxWeight] = useState();
     const [allMember, setAllMember] = useState();
 
-    const validationSchema = Yup.object().shape({
-        weight: Yup.number()
-            .required('Không được để trống trường này')
-            .typeError('Vui lòng nhập số')
-            .min(minWeight, `Vui lòng nhập hạng cân trong khoảng ${minWeight} - ${maxWeight} Kg`)
-            .max(maxWeight, `Vui lòng nhập hạng cân trong khoảng ${minWeight} - ${maxWeight} Kg`),
-    });
+    // const validationSchema = Yup.object().shape({
+    //     weight: Yup.number()
+    //         .required('Không được để trống trường này')
+    //         .typeError('Vui lòng nhập số')
+    //         .min(minWeight, `Vui lòng nhập hạng cân trong khoảng ${minWeight} - ${maxWeight} Kg`)
+    //         .max(maxWeight, `Vui lòng nhập hạng cân trong khoảng ${minWeight} - ${maxWeight} Kg`),
+    // });
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-    } = useForm({
-        resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
-    });
+    // const {
+    //     register,
+    //     handleSubmit,
+    //     formState: { errors },
+    //     reset,
+    // } = useForm({
+    //     resolver: yupResolver(validationSchema),
+    //     mode: 'onBlur',
+    // });
     const AddPlayerHandler = (data) => {
         setPlayer(data);
     };
@@ -77,11 +77,12 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
             setMinWeight(range.weightMin);
             setMaxWeight(range.weightMax);
         }
+        getAllMember(event.target.value);
     };
 
-    const getAllMember = async () => {
+    const getAllMember = async (weightRange) => {
         try {
-            const response = await adminTournament.listUserNotJoinCompetitive(tournamentId);
+            const response = await adminTournament.listUserNotJoinCompetitive(weightRange);
             console.log(response.data);
             setAllMember(response.data);
         } catch (error) {
@@ -92,7 +93,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
     const addNewCompetitivePlayer = async (tournamentId, studentId, weight) => {
         try {
             const response = await adminTournament.addNewCompetitivePlayer(tournamentId, studentId, weight);
-            let variant = 'success';
+            let variant = response.data > 0 ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
         } catch (error) {
             let variant = 'error';
@@ -102,9 +103,9 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
 
     const handleCloseDialog = () => {
         setPlayer([]);
-        reset({
-            weight: '',
-        });
+        // reset({
+        //     weight: '',
+        // });
         handleClose && handleClose();
     };
 
@@ -115,21 +116,22 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
             enqueueSnackbar('Vui lòng chọn thông tin người chơi', { variant });
             return;
         }
-        console.log(tournamentId, player[0].id, data.weight);
-        addNewCompetitivePlayer(tournamentId, player[0].id, data.weight);
-        const newPlayer = {
-            playerGender: player[0].gender,
-            playerName: player[0].name,
-            playerStudentId: player[0].studentId,
-            weight: data.weight,
-            weightMax: maxWeight,
-            weightMin: minWeight,
-        };
+        addNewCompetitivePlayer(weightRange, player);
+        const newPlayer = player.map((p) => {
+            return {
+                playerGender: p.gender,
+                playerName: p.name,
+                playerStudentId: p.studentId,
+                weight: 0,
+                weightMax: maxWeight,
+                weightMin: minWeight,
+            };
+        });
         onSuccess && onSuccess(newPlayer);
         setPlayer([]);
-        reset({
-            weight: '',
-        });
+        // reset({
+        //     weight: '',
+        // });
         handleClose && handleClose();
     };
 
@@ -152,8 +154,8 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
     }, [tournamentId]);
 
     useEffect(() => {
-        getAllMember();
-    }, []);
+        getAllMember(weightRange);
+    }, [weightRange]);
 
     return (
         <Dialog
@@ -188,7 +190,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
                 </Box>
 
                 <Grid container spacing={2}>
-                    <Grid item xs={8}>
+                    <Grid item xs={12}>
                         <Paper elevation={3} sx={{ width: '100%' }}>
                             {player.length > 0 && (
                                 <TableContainer sx={{ maxHeight: 440 }}>
@@ -215,7 +217,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
                             )}
                         </Paper>
                     </Grid>
-                    <Grid item xs={4}>
+                    {/* <Grid item xs={4}>
                         <TextField
                             fullWidth
                             type="number"
@@ -227,12 +229,12 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
                             helperText={errors.weight?.message}
                             required
                         />
-                    </Grid>
+                    </Grid> */}
                 </Grid>
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
-                <Button onClick={handleSubmit(handleRegister)} autoFocus>
+                <Button onClick={handleRegister} autoFocus>
                     Đồng ý
                 </Button>
             </DialogActions>

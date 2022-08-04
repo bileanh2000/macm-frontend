@@ -60,7 +60,7 @@ function TournamentCompetitive({ tournamentStatus }) {
             const response = await adminTournament.spawnMatchs(weightRange);
             getListPlayerByCompetitiveID(weightRange);
             // setListPlayer(response.data)
-            enqueueSnackbar(response.message);
+            enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.log('Failed to fetch match: ', error);
         }
@@ -102,7 +102,7 @@ function TournamentCompetitive({ tournamentStatus }) {
         try {
             const response = await adminTournament.spawnTimeAndArea(tournamentId);
             getListPlayerByCompetitiveID(competitiveId);
-            enqueueSnackbar(response.message);
+            enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.log('Failed to spawn time: ', error);
         }
@@ -111,7 +111,7 @@ function TournamentCompetitive({ tournamentStatus }) {
     const confirmListMatchsPlayer = async () => {
         try {
             const response = await adminTournament.confirmListMatchsPlayer(tournamentId);
-            enqueueSnackbar(response.message);
+            enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.log('Failed to confirm match: ', error);
         }
@@ -143,7 +143,6 @@ function TournamentCompetitive({ tournamentStatus }) {
         getAllArea();
     }, []);
 
-    console.log('gui data', listPlayer);
     return (
         <Fragment>
             <Dialog maxWidth="xs" open={open}>
@@ -187,7 +186,7 @@ function TournamentCompetitive({ tournamentStatus }) {
                 </FormControl>
                 {tournamentStatus == 1 && listPlayer.length > 0 && (
                     <Button variant="outlined" onClick={handleDialogConfirmMatch} sx={{ mr: 2, float: 'right' }}>
-                        Xác nhận và cập nhật thời gian cho bảng đấu
+                        Xác nhận danh sách thi đấu
                     </Button>
                 )}
             </Box>

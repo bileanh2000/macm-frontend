@@ -38,27 +38,46 @@
 .upcoming {
     display: flex;
     justify-content: center;
-    padding: 8px;
+    padding: 5px;
     border-radius: 5px;
-    color: white;
-    background-color: #259323;
+    // color: #259323;
+    // background-color: #c4fdc3b6;
+    background-color: #ffdf81;
+    color: #967000;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+.joined {
+    display: flex;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 5px;
+    // color: #259323;
+    background-color: #c4fdc3b6;
+
+    font-weight: bold;
+    font-size: 0.8rem;
 }
 .going-on {
     display: flex;
     justify-content: center;
-    padding: 8px;
+    padding: 5px;
     // width: 90px;
     border-radius: 5px;
-    color: white;
-    background-color: #7292e5;
+    color: #2d4173;
+    background-color: #adc2f6c0;
+    font-weight: bold;
+    font-size: 0.8rem;
 }
 .closed {
     display: flex;
     justify-content: center;
-    padding: 8px;
+    padding: 5px;
     border-radius: 5px;
-    color: white;
-    background-color: #748998;
+    color: #5c6c6c;
+    background-color: #a6c5c77d;
+    font-weight: bold;
+    font-size: 0.8rem;
 }
 
 .tournament-link {
