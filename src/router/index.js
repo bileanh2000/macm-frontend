@@ -82,6 +82,7 @@ import EventDetail from 'src/Pages/User/Events/EventDetail';
 import Notification from 'src/Pages/Notification';
 import AttendanceReport from 'src/Pages/Home/AttendanceReport';
 
+// const ROLE_NAME = JSON.parse(localStorage.getItem('currentUser')).role.name;
 const adminRouters = [
     // { path: '/:userId', component: UserProfile, layout: HeaderOnly },
     // { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
@@ -122,8 +123,8 @@ const adminRouters = [
     { path: '/admin/clubfee/event', component: ListEventsFee },
     { path: '/admin/clubfee/event/:eventId', component: EventFee },
     { path: '/admin/clubfee/event/:eventId/report', component: ReportEvent },
-    { path: '/admin/clubfee/facility', component: FacilityFee },
-    { path: '/admin/clubfee/facility/report', component: FacilityReport },
+    // { path: '/admin/clubfee/facility', component: FacilityFee },
+    // { path: '/admin/clubfee/facility/report', component: FacilityReport },
     { path: '/admin/clubfee/membership/report', component: ReportMembership },
     { path: '/admin/clubfee/tournaments', component: ListTournament },
     { path: '/admin/clubfee/tournaments/:tournamentId', component: TournamentFee },

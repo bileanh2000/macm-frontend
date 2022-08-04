@@ -15,41 +15,6 @@ import Home from './Pages/Admin/Home';
 import ErrorPage from './Pages/ErrorPage';
 import Notification from './Pages/Notification';
 
-// function App() {
-//     const [login, setLogin] = useState({ authenticated: true, currentUser: null });
-//     return (
-//         <SnackbarProvider maxSnack={4} autoHideDuration={5000} preventDuplicate>
-//             <div className="App">
-//                 <Routes>
-//                     {privateRouters.map((route, index) => {
-//                         const Page = route.component;
-//                         let Layout = DefaultLayout;
-
-//                         if (route.layout) {
-//                             Layout = route.layout;
-//                         } else if (route.layout === null) {
-//                             Layout = Fragment;
-//                         }
-//                         return (
-//                             <Route
-//                                 key={index}
-//                                 path={route.path}
-//                                 element={
-//                                     <Layout>
-//                                         <Page />
-//                                     </Layout>
-//                                 }
-//                             />
-//                         );
-//                     })}
-//                 </Routes>
-//             </div>
-//         </SnackbarProvider>
-//     );
-// }
-// export default App;
-// const USER_ROLE_ID = JSON.parse(localStorage.getItem('currentUser')).role.name || 10;
-
 class App extends Component {
     constructor(props) {
         super(props);
@@ -142,17 +107,6 @@ class App extends Component {
                             }
                             // element={<Login />}
                         ></Route>
-                        {/* <Route
-                            path="/"
-                            render={(props) => <Login authenticated={this.state.authenticated} {...props} />}
-                            // element={(props) => <Login authenticated={this.state.authenticated} {...props} />}
-                        ></Route> */}
-                        {/* <Route
-                            path="/notifications"
-                            // render={(props) => <Login authenticated={this.state.authenticated} {...props} />}
-                            element={<Notification />}
-                            // element={<Login />}
-                        ></Route> */}
                         <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />}></Route>
                         {userRouter.map((route, index) => {
                             const Page = route.component;
@@ -207,11 +161,6 @@ class App extends Component {
                               })
                             : null}
                     </Routes>
-                    {/* {console.log(this.isAdmin())} */}
-                    {/* {alert(JSON.parse(localStorage.getItem('currentUser')).role.id)} */}
-                    {/* {window.location.pathname.startsWith('/admin') ? <Navigate to="/forbidden" /> : ''} */}
-
-                    {/* <Alert stack={{ limit: 3 }} timeout={3000} position="top-right" effect="slide" offset={65} /> */}
                 </div>
             </SnackbarProvider>
         );

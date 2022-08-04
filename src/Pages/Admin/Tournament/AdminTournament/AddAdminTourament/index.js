@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import {
     Alert,
     Button,
@@ -68,25 +68,19 @@ function AddAdminTourament({ value, index, total, active }) {
     }, [tournamentId]);
 
     const columns = [
-        { field: 'studentName', headerName: 'Tên', width: 100, flex: 0.5 },
+        { field: 'studentName', headerName: 'Tên', flex: 1 },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
-            width: 100,
-            flex: 0.3,
+            // width: 100,
+            flex: 1,
         },
         {
             field: 'roleInTournament',
             headerName: 'Vai trò mong muốn trong ban tổ chức',
-            width: 150,
-            flex: 0.6,
+            // width: 150,
+            flex: 1,
         },
-        // {
-        //     field: 'registerStatus',
-        //     headerName: 'Trạng thái',
-        //     width: 50,
-        //     flex: 0.5,
-        // },
         {
             field: 'actions',
             type: 'actions',

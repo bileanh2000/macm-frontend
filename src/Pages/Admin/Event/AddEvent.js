@@ -32,10 +32,13 @@ import interactionPlugin from '@fullcalendar/interaction';
 import eventApi from 'src/api/eventApi';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useSnackbar } from 'notistack';
 
 const cx = classNames.bind(styles);
 
 function AddEvent() {
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
     const [isChecked, setIsChecked] = useState(false);
     const [isCheckedForm, setIsCheckedForm] = useState(false);
     const [description, setDescription] = useState('');
@@ -94,31 +97,20 @@ function AddEvent() {
             setEvent(response.data);
 
             if (response.data.length != 0) {
-                // setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                // snackBarStatus = true;
-                // dynamicAlert(snackBarStatus, res.message);
                 eventApi.createScheduleSession(previewData, response.data[0].id).then((res) => {
                     console.log('create event schedule', res);
                     console.log('create event schedule', res.data);
 
                     if (res.data.length != 0) {
-                        // setOpenSnackBar(true);
-                        // setSnackBarStatus(true);
-                        // snackBarStatus = true;
-                        // dynamicAlert(snackBarStatus, res.message);
-                        // setEvent(res.data);
+                        enqueueSnackbar(res.message, { variant: 'success' });
                         navigator(-1);
                     } else {
                         console.log('huhu');
-                        // setOpenSnackBar(true);
-                        // setSnackBarStatus(false);
-                        // snackBarStatus = false;
-                        // dynamicAlert(snackBarStatus, res.message);
                     }
                 });
             } else {
                 console.log('huhu');
+                // enqueueSnackbar(response.message, { variant: 'success' });
                 // setOpenSnackBar(true);
                 // setSnackBarStatus(false);
                 // snackBarStatus = false;
@@ -195,19 +187,12 @@ function AddEvent() {
             console.log('2', res.data);
 
             if (res.data.length != 0) {
-                // setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                // snackBarStatus = true;
-                // dynamicAlert(snackBarStatus, res.message);
                 checkOveride(res.data);
                 setPreviewData(res.data);
                 setOpen(true);
             } else {
                 console.log('huhu');
-                // setOpenSnackBar(true);
-                // setSnackBarStatus(false);
-                // snackBarStatus = false;
-                // dynamicAlert(snackBarStatus, res.message);
+                enqueueSnackbar(res.message, { variant: 'error' });
             }
         });
         console.log('submit form data', dataSubmit);
@@ -290,17 +275,6 @@ function AddEvent() {
                         height="100%"
                         plugins={[dayGridPlugin, interactionPlugin]}
                         initialView="dayGridMonth"
-                        // events={[
-                        //     {
-                        //         id: 1,
-                        //         title: 'đi tập đi đmm',
-                        //         date: '2022-06-16',
-                        //         // display: 'background',
-                        //         // textColor: 'white',
-                        //         backgroundColor: '#5ba8f5',
-                        //         classNames: ['test-css'],
-                        //     },
-                        // ]}
                         events={EventSchedule}
                         weekends={true}
                         headerToolbar={{
@@ -308,20 +282,6 @@ function AddEvent() {
                             center: '',
                             right: 'prev next today',
                         }}
-
-                        // eventClick={(args) => {
-                        //     deleteDate(args.event.id);
-                        // }}
-                        // dateClick={function (arg) {
-                        //     swal({
-                        //         title: 'Date',
-                        //         text: arg.dateStr,
-                        //         type: 'success',
-                        //     });
-                        // }}
-                        // selectable
-                        // select={handleEventAdd}
-                        // eventDrop={(e) => console.log(e)}
                     />
                     {(isOverride === 0 || isOverride === 2) && (
                         <FormControlLabel
