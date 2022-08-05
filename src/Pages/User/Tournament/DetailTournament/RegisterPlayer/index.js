@@ -136,7 +136,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                 userInformation.gender ? exhibitionType.numberMale > 0 : exhibitionType.numberFemale > 0,
             );
             setListExhibitionType(exhibitionType);
-            setExhibitionType(exhibitionType[0].id);
+            exhibitionType.length > 0 && setExhibitionType(exhibitionType[0].id);
             setNumberMale(exhibitionType[0].numberMale);
             setNumberFemale(exhibitionType[0].numberFemale);
         } catch (error) {
@@ -222,7 +222,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                 (weightRange) => weightRange.gender == userInformation.gender,
             );
             setListWeightRange(listWeightByGender);
-            setWeightRange(listWeightByGender[0].id);
+            listWeightByGender.length > 0 && setWeightRange(listWeightByGender[0].id);
             setMinWeight(listWeightByGender[0].weightMin);
             setMaxWeight(listWeightByGender[0].weightMax);
         } catch (error) {
@@ -272,7 +272,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                         </Select>
                     </FormControl>
                     {type === 1 ? (
-                        isJoinCompetitive.length == 0 ? (
+                        isJoinCompetitive.length == 0 && listWeightRange.length > 0 ? (
                             <Box
                                 sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}
                             >
@@ -297,7 +297,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                         ) : (
                             <Typography variant="caption">Bạn đã đăng kí tham gia thi đấu rồi</Typography>
                         )
-                    ) : (
+                    ) : listExhibitionType.length > 0 ? (
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
                             <FormControl size="small">
                                 <Typography variant="caption">Thể thức thi đấu</Typography>
@@ -316,9 +316,11 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                                 </Select>
                             </FormControl>
                         </Box>
+                    ) : (
+                        <Typography variant="caption">Không có thể thức thi đấu phù hợp với bạn!!!</Typography>
                     )}
                 </Box>
-                {type == 1 && isJoinCompetitive.length == 0 && (
+                {type == 1 && isJoinCompetitive.length == 0 && listWeightRange.length > 0 && (
                     <Grid container spacing={2}>
                         <Grid item xs={5}>
                             <Typography sx={{ m: 1 }}>
@@ -341,7 +343,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                         </Grid>
                     </Grid>
                 )}
-                {type == 2 && (
+                {type == 2 && listExhibitionType.length > 0 && (
                     <Box>
                         <TextField
                             fullWidth
@@ -364,7 +366,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                                     numberMale={numberMale}
                                     gender={0}
                                     allMember={allMember.filter((male) => male.gender === true)}
-                                    fixedOptions={userInfo.gender ? userInfo : []}
+                                    fixedOptions={userInfo.gender ? userInfo : null}
                                 />
                             )}
                         </Box>
@@ -419,7 +421,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                                     numberFemale={numberFemale}
                                     gender={1}
                                     allMember={allMember.filter((male) => male.gender === false)}
-                                    fixedOptions={userInfo.gender ? [] : userInfo}
+                                    fixedOptions={userInfo.gender ? null : userInfo}
                                 />
                             )}
                         </Box>

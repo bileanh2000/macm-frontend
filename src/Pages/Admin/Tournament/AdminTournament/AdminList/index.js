@@ -1,12 +1,41 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { styled } from '@mui/material/styles';
 import { Button, Typography } from '@mui/material';
+import { Add } from '@mui/icons-material';
 
-function AdminList({ data, value, index, active, total }) {
+import RegisterAdmin from './RegisterAdmin';
+import userTournamentAPI from 'src/api/userTournamentAPI';
+
+function AdminList({ adminList, value, index, active, total, isUpdate, user, Success }) {
+    const [data, setData] = useState(adminList);
     const [pageSize, setPageSize] = useState(10);
+    const [open, setOpen] = useState(false);
+    const [roleInTournament, setRoleInTournament] = useState([]);
+
+    useEffect(() => {
+        setData(adminList);
+    }, [adminList]);
+
+    const handleOpenDialog = () => {
+        setOpen(true);
+    };
+
+    const getRoleInTournament = async () => {
+        try {
+            const response = await userTournamentAPI.getAllOrginizingCommitteeRole();
+            console.log(response);
+            setRoleInTournament(response.data);
+        } catch (error) {
+            console.log('Khong the lay duoc role', error);
+        }
+    };
+
+    useEffect(() => {
+        getRoleInTournament();
+    }, []);
 
     const columns = [
         { field: 'studentName', headerName: 'Tên', flex: 0.8 },
@@ -90,6 +119,17 @@ function AdminList({ data, value, index, active, total }) {
                 </Box>
                 <Box>
                     Số lượng thành viên trong ban tổ chức: {active}/{total}
+                    {(!isUpdate || active < total) && roleInTournament.length > 0 && (
+                        <Button
+                            startIcon={<Add />}
+                            size="small"
+                            variant="outlined"
+                            sx={{ mr: 2, ml: 2 }}
+                            onClick={() => handleOpenDialog(true)}
+                        >
+                            Thêm người vào ban tổ chức
+                        </Button>
+                    )}
                 </Box>
             </GridToolbarContainer>
         );
@@ -197,6 +237,25 @@ function AdminList({ data, value, index, active, total }) {
                     NoRowsOverlay: CustomNoRowsOverlay,
                 }}
             />
+            {roleInTournament.length > 0 && (
+                <RegisterAdmin
+                    title="Đăng kí tham gia thi đấu"
+                    isOpen={open}
+                    handleClose={() => {
+                        setOpen(false);
+                    }}
+                    user={user}
+                    roles={roleInTournament}
+                    onSuccess={(newItem) => {
+                        // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
+                        //     return;
+                        // }
+                        // setCompetitivePlayer([...newItem, ...competitivePlayer]);
+                        Success && Success(newItem);
+                        setOpen(false);
+                    }}
+                />
+            )}
         </Box>
     );
 }

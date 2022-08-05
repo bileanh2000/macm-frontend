@@ -1,18 +1,19 @@
-import { Add, CheckBox, CheckBoxOutlineBlank } from '@mui/icons-material';
-import { Autocomplete, Box, Button, Checkbox, Collapse, Fab, Grid, Paper, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import { Autocomplete, Box, Checkbox, Grid, TextField } from '@mui/material';
+import { CheckBox, CheckBoxOutlineBlank } from '@mui/icons-material';
 
 const icon = <CheckBoxOutlineBlank fontSize="small" />;
 const checkedIcon = <CheckBox fontSize="small" />;
 
-function AddMember(props) {
-    const [user, setUser] = useState(props.data);
+function AddAdmin(props) {
+    const [admin, setAdmin] = useState(props.data);
 
     useEffect(() => {
-        setUser(props.data);
+        setAdmin(props.data);
     }, [props.data]);
 
     const handleAddMember = (newValue) => {
+        console.log(newValue);
         props.onAddPlayer(newValue);
     };
 
@@ -25,15 +26,15 @@ function AddMember(props) {
                         multiple
                         id="checkboxes-tags-demo"
                         options={props.allMember}
-                        value={user}
-                        isOptionEqualToValue={(option, value) => option.studentId === value.studentId}
+                        value={admin}
+                        isOptionEqualToValue={(option, value) => option.user.studentId === value.user.studentId}
                         onChange={(event, newValue) => {
-                            setUser(newValue);
+                            setAdmin(newValue);
                             handleAddMember(newValue);
                         }}
                         // getOptionDisabled={(options) => (user.length >= 1 ? true : false)}
                         disableCloseOnSelect
-                        getOptionLabel={(option) => option.studentId}
+                        getOptionLabel={(option) => option.user.studentId}
                         renderOption={(props, option, { selected }) => (
                             <li {...props}>
                                 <Checkbox
@@ -42,7 +43,7 @@ function AddMember(props) {
                                     style={{ marginRight: 8 }}
                                     checked={selected}
                                 />
-                                {option.studentId} - {option.name}
+                                {option.user.studentId} - {option.user.name}
                             </li>
                         )}
                         style={{ width: 500 }}
@@ -56,4 +57,4 @@ function AddMember(props) {
     );
 }
 
-export default AddMember;
+export default AddAdmin;

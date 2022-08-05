@@ -69,6 +69,11 @@ const adminTournament = {
 
     //Member
 
+    addListOrganizingCommittee: (studentId, tournamentId, params) => {
+        const url = `/tournament/headclub/addlistorganizingcommittee/${studentId}/${tournamentId}`;
+        return axiosClient.post(url, params);
+    },
+
     getAllCompetitivePlayer: (tournamentId, params) => {
         const url = `/tournament/headclub/getallcompetitiveplayer/${tournamentId}`;
         return axiosClient.get(url, {
@@ -168,6 +173,11 @@ const adminTournament = {
 
     listUserNotJoinCompetitive: (tournamentId) => {
         const url = `competitive/headclub/listusernotjoincompetitive/${tournamentId}`;
+        return axiosClient.get(url);
+    },
+
+    getAllUserNotJoinTournament: (tournamentId) => {
+        const url = `tournament/headclub/getallusernotjointournament/${tournamentId}`;
         return axiosClient.get(url);
     },
 

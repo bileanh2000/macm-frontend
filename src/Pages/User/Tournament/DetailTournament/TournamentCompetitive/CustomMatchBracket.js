@@ -20,6 +20,8 @@ function CustomMatchBracket(params) {
         setMatches(__matches);
     }, [params.matches]);
 
+    console.log(matches, params.rounds);
+
     return (
         <Fragment>
             <Box className={cx('tournament-bracket', 'tournament-bracket--rounded')} sx={{ mt: 2, mb: 2 }}>
