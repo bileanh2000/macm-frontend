@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { Button, Container, Paper, Typography } from '@mui/material';
+import { Box, Button, Container, Paper, Typography } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 import ViewAttendance from './ViewAttendance';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
@@ -39,12 +39,15 @@ function Attendance() {
 
     return (
         <Paper elevation={3} sx={{ p: 1 }}>
-            <Button variant="contained" color="success" sx={{ float: 'right', m: 2 }}>
-                <Link to={`./report`} style={{ color: 'white' }}>
-                    Thống kê thành viên tham gia buổi tập
-                </Link>
-            </Button>
-            {trainingScheduleId && type && (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button variant="contained" color="success">
+                    <Link to={`./report`} style={{ color: 'white' }}>
+                        Thống kê thành viên tham gia buổi tập
+                    </Link>
+                </Button>
+            </Box>
+
+            {trainingScheduleId && (
                 <Container maxWidth="xl">
                     <ViewAttendance data={{ trainingScheduleId, date, type }} />
                     <Button variant="outlined" sx={{ color: 'black' }}>
@@ -56,9 +59,18 @@ function Attendance() {
                             Điểm danh
                         </Link>
                     </Button>
+                    <Button variant="outlined" sx={{ color: 'black' }}>
+                        <Link
+                            sx={{ color: 'black' }}
+                            to="./scanqrcode"
+                            // state={{ id: trainingScheduleId, date: date, type: type }}
+                        >
+                            QRCode
+                        </Link>
+                    </Button>
                 </Container>
             )}
-            {!trainingScheduleId && <Typography variant="h3">Hôm nay không có buổi tập nào</Typography>}
+            {!trainingScheduleId && <Typography variant="h3">Hôm nay không có hoạt động nào cần điểm danh!</Typography>}
         </Paper>
     );
 }

@@ -139,7 +139,7 @@ function QRScanner() {
                     });
                 }
             } catch (error) {
-                enqueueSnackbar('Mã QR không hợp lệ error' + error, {
+                enqueueSnackbar('Mã QR không hợp lệ error', {
                     variant: 'error',
                 });
                 console.log(error);

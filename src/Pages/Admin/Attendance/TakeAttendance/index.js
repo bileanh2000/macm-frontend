@@ -24,9 +24,17 @@ function TakeAttendance() {
 
     const getAttendanceByStudentId = async () => {
         try {
-            const response = await adminAttendanceAPI.getAttendanceByStudentId(_trainingScheduleId);
-            setUserList(response.data);
-            console.log('get from database', response.data);
+            // const response = await adminAttendanceAPI.getAttendanceByStudentId(_trainingScheduleId);
+            // setUserList(response.data);
+            // console.log('get from database', response.data);
+            adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
+                // setActivityId(res.data[0].id);
+                adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
+                    setUserList(res.data);
+                    // setTotalActive(res.totalActive);
+                    // setTotalResult(res.totalResult);
+                });
+            });
         } catch (error) {
             console.log('Không thể lấy dữ liệu người dùng tham gia điểm danh. Error: ', error);
         }

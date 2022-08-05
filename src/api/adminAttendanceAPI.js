@@ -35,7 +35,6 @@ const adminAttendanceAPI = {
     },
 
     //common
-
     getCommonSessionByDate: (date) => {
         const url = '/commonschedule/getcommonsessionbydate';
         return axiosClient.get(url, { params: { date } });

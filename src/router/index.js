@@ -169,8 +169,8 @@ const adminRouters = [
     { path: '/admin/events/:id/member/addtoadmin', component: AddToAdmin },
     { path: '/admin/events/:id/member/addmember', component: AddMemberToEvent },
     // Facility paths
-    { path: '/admin/facility', component: Facility },
-    { path: '/admin/facility/reports', component: ReportFacility },
+    // { path: '/admin/facility', component: Facility },
+    // { path: '/admin/facility/reports', component: ReportFacility },
     //Login
     // { path: '/', component: LoginPage, layout: null },
     // Notifications

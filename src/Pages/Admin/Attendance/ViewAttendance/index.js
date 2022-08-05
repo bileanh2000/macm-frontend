@@ -15,7 +15,8 @@ function ViewAttendance({ data }) {
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
     const location = useLocation();
-
+    const [activityId, setActivityId] = useState();
+    // const now = new Date();
     console.log(data);
     let _type = location.state?.type;
     if (!_type) _type = data.type;
@@ -31,7 +32,15 @@ function ViewAttendance({ data }) {
             console.log(_trainingScheduleId);
             let response;
             if (_type == 0) {
-                response = await adminAttendanceAPI.checkAttendanceByScheduleId(_trainingScheduleId);
+                adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
+                    // setActivityId(res.data[0].id);
+                    adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
+                        setUserList(res.data);
+                        setTotalActive(res.totalActive);
+                        setTotalResult(res.totalResult);
+                    });
+                });
+                // response = (await activityId) && ;
             }
             if (_type == 1) {
                 response = await adminAttendanceAPI.getAttendanceByEventId(_trainingScheduleId);
@@ -48,6 +57,9 @@ function ViewAttendance({ data }) {
     useEffect(() => {
         checkAttendanceByScheduleId();
     }, []);
+    useEffect(() => {
+        console.log('activityId', activityId);
+    }, [activityId]);
 
     let snackBarStatus;
 
@@ -88,14 +100,16 @@ function ViewAttendance({ data }) {
         },
     ];
 
-    const rowsUser = userList.map((item, index) => {
-        const container = {};
-        container['id'] = index + 1;
-        container['name'] = item.name;
-        container['studentId'] = item.studentId;
-        container['status'] = item.status == 0 ? 'Vắng mặt' : item.status == 1 ? 'Có mặt' : 'Chưa điểm danh';
-        return container;
-    });
+    const rowsUser =
+        userList &&
+        userList.map((item, index) => {
+            const container = {};
+            container['id'] = index + 1;
+            container['name'] = item.name;
+            container['studentId'] = item.studentId;
+            container['status'] = item.status == 0 ? 'Vắng mặt' : item.status == 1 ? 'Có mặt' : 'Chưa điểm danh';
+            return container;
+        });
 
     function CustomToolbar() {
         return (
