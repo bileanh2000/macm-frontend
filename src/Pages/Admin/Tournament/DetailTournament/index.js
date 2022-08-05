@@ -69,6 +69,7 @@ function a11yProps(index) {
 
 function DetailTournament() {
     let { tournamentId } = useParams();
+    const user = JSON.parse(localStorage.getItem('currentUser'));
     const [tournament, setTournament] = useState();
     const [scheduleList, setScheduleList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
@@ -246,7 +247,7 @@ function DetailTournament() {
                                 <TournamentExhibition tournamentStatus={tournament.status} />
                             </TabPanel>
                             <TabPanel value={value} index={4}>
-                                <AdminTournament isUpdate={isUpdate} />
+                                <AdminTournament isUpdate={isUpdate} user={user} />
                             </TabPanel>
                             <TabPanel value={value} index={5}>
                                 <MemberTournament tournament={tournament} isUpdate={isUpdate} />

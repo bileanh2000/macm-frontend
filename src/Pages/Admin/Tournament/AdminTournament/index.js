@@ -14,7 +14,7 @@ function a11yProps(index) {
     };
 }
 
-function AdminTournament() {
+function AdminTournament({ isUpdate, user }) {
     let { tournamentId } = useParams();
     const [adminList, setAdminList] = useState([]);
     const [active, setActive] = useState(-1);
@@ -42,19 +42,45 @@ function AdminTournament() {
 
     useEffect(() => {
         fetchAdminInTournament(tournamentId);
-    }, []);
+    }, [tournamentId]);
 
     return (
         <Fragment>
             <Box sx={{ width: '100%' }}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        variant="scrollable"
+                        scrollButtons="auto"
+                        aria-label="basic tabs example"
+                    >
                         <Tab label="Danh sách ban tổ chức" {...a11yProps(0)} />
                         <Tab label="Cập nhật vai trò" {...a11yProps(1)} />
                         <Tab label="Xét duyệt yêu cầu tham gia" {...a11yProps(2)} />
                     </Tabs>
+                    {/* {!isUpdate && (
+                        <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialogExhibition(true)}>
+                            Thêm người chơi thi đấu biểu diễn
+                        </Button>
+                    )} */}
                 </Box>
-                <AdminList data={adminList} active={active} total={total} value={value} index={0} />
+                <AdminList
+                    adminList={adminList}
+                    isUpdate={isUpdate}
+                    user={user}
+                    active={active}
+                    total={total}
+                    value={value}
+                    index={0}
+                    Success={(newItem) => {
+                        // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
+                        //     return;
+                        // }
+                        console.log(newItem);
+                        setAdminList([...newItem, ...adminList]);
+                    }}
+                />
                 <UpdateAdminTournament value={value} active={active} total={total} index={1} />
                 <AddAdminTourament value={value} active={active} total={total} index={2} />
             </Box>

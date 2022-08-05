@@ -23,7 +23,7 @@ function TournamentCompetitive({ competitive }) {
         try {
             const response = await adminTournament.listMatchs(competitiveId);
             setListPlayer(response.data);
-            console.log('lay data', response.data);
+            console.log('lay data', response);
             setRounds(response.totalResult);
         } catch (error) {
             console.log('Failed to fetch match: ', error);
