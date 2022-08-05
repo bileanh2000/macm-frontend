@@ -84,7 +84,7 @@ function DetailTournament() {
     const [helperText, setHelperText] = useState('Vui lòng chọn vai trò');
     const [isJoinCompetitive, setIsJoinCompetitive] = useState([]);
     const [isJoinExhibition, setIsJoinExhibition] = useState([]);
-    const [isJoinAdmin, setIsJoinAdmin] = useState([]);
+    const [isJoinAdmin, setIsJoinAdmin] = useState();
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -348,9 +348,10 @@ function DetailTournament() {
                                 </Box>
                                 {new Date(scheduleList[0].date) > new Date() ? (
                                     <Box>
-                                        {isJoinAdmin.data.length === 0 ? (
+                                        {isJoinAdmin && isJoinAdmin.data.length === 0 ? (
                                             <Box sx={{ display: 'flex', alignContent: 'space-between' }}>
-                                                {isJoinAdmin.message.includes('Đang chờ duyệt') ? (
+                                                {isJoinAdmin.message &&
+                                                isJoinAdmin.message.includes('Đang chờ duyệt') ? (
                                                     ''
                                                 ) : (
                                                     <Button
@@ -380,7 +381,9 @@ function DetailTournament() {
                                                             : { disabled: false })}
                                                         sx={{ float: 'right' }}
                                                     >
-                                                        {isJoinAdmin.message} vào ban tổ chức
+                                                        {isJoinAdmin.message
+                                                            ? isJoinAdmin.message + 'vào ban tổ chức'
+                                                            : 'Đăng kí vào ban tổ chức'}
                                                     </Button>
                                                 )}
                                             </Box>

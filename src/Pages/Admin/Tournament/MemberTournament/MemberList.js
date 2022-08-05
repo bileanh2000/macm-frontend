@@ -64,7 +64,7 @@ function MemberList({ data, type }) {
                 container['studentName'] = item.competitivePlayer.tournamentPlayer.user.name;
                 container['weight'] = item.competitivePlayer.weight + 'Kg';
                 container['studentId'] = item.competitivePlayer.tournamentPlayer.user.studentId;
-                container['playerGender'] = item.playerGender ? 'Nam' : 'Nữ';
+                container['playerGender'] = item.competitivePlayer.tournamentPlayer.user.gender ? 'Nam' : 'Nữ';
                 container['weightRange'] =
                     item.competitiveType.weightMin + ' - ' + item.competitiveType.weightMax + 'Kg';
                 return container;

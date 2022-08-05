@@ -67,6 +67,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
     };
     const handleChangeWeight = (event) => {
         setWeightRange(event.target.value);
+        setPlayer([]);
         let range;
         if (event.target.value === 0) {
             range = { weightMax: 0, weightMin: 0 };
@@ -93,7 +94,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
     const addNewCompetitivePlayer = async (tournamentId, studentId, weight) => {
         try {
             const response = await adminTournament.addNewCompetitivePlayer(tournamentId, studentId, weight);
-            let variant = response.data > 0 ? 'success' : 'error';
+            let variant = response.data.length > 0 ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
         } catch (error) {
             let variant = 'error';
@@ -119,12 +120,11 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
         addNewCompetitivePlayer(weightRange, player);
         const newPlayer = player.map((p) => {
             return {
-                playerGender: p.gender,
-                playerName: p.name,
-                playerStudentId: p.studentId,
-                weight: 0,
-                weightMax: maxWeight,
-                weightMin: minWeight,
+                competitivePlayer: {
+                    tournamentPlayer: { user: { gender: p.gender, name: p.name, studentId: p.studentId } },
+                    weight: 0,
+                },
+                competitiveType: { weightMax: maxWeight, weightMin: minWeight },
             };
         });
         onSuccess && onSuccess(newPlayer);

@@ -7,7 +7,7 @@ const checkedIcon = <CheckBox fontSize="small" />;
 
 function AddMember(props) {
     const [isChecked, setIsChecked] = useState(false);
-    const fixedOptions = [props.fixedOptions];
+    const fixedOptions = props.fixedOptions ? [props.fixedOptions] : null;
     // const fixedOptions = [{ gender: true, studentId: 'HE150001', studentName: 'dam van toan 22' }];
     const [user, setUser] = useState(props.data);
 
@@ -30,61 +30,123 @@ function AddMember(props) {
                 <Collapse in={isChecked}>
                     <Grid container spacing={2} sx={{ p: 1 }}>
                         <Grid item xs={12}>
-                            <Autocomplete
-                                multiple
-                                id="checkboxes-tags-demo"
-                                options={props.allMember}
-                                value={user}
-                                isOptionEqualToValue={(option, value) => option.studentId === value.studentId}
-                                onChange={(event, newValue) => {
-                                    setUser([
-                                        ...fixedOptions,
-                                        ...newValue.filter((option) => fixedOptions.indexOf(option) === -1),
-                                    ]);
-                                }}
-                                // freeSolo={user.length > 3 ? false : true}
-                                getOptionDisabled={(options) =>
-                                    props.gender === 0
-                                        ? user.length >= props.numberMale
+                            {fixedOptions ? (
+                                <Autocomplete
+                                    multiple
+                                    id="checkboxes-tags-demo"
+                                    options={props.allMember}
+                                    value={user}
+                                    isOptionEqualToValue={(option, value) => option.studentId === value.studentId}
+                                    onChange={(event, newValue) => {
+                                        setUser([
+                                            ...fixedOptions,
+                                            ...newValue.filter(
+                                                (option) =>
+                                                    fixedOptions.findIndex((fo) => fo.studentId == option.studentId) ===
+                                                    -1,
+                                            ),
+                                        ]);
+                                    }}
+                                    // freeSolo={user.length > 3 ? false : true}
+                                    getOptionDisabled={(options) =>
+                                        props.gender === 0
+                                            ? user.length >= props.numberMale
+                                                ? true
+                                                : false
+                                            : user.length >= props.numberFemale
                                             ? true
                                             : false
-                                        : user.length >= props.numberFemale
-                                        ? true
-                                        : false
-                                }
-                                disableCloseOnSelect
-                                getOptionLabel={(option) => option.studentId}
-                                renderOption={(props, option, { selected }) => (
-                                    <li {...props}>
-                                        <Checkbox
-                                            icon={icon}
-                                            checkedIcon={checkedIcon}
-                                            style={{ marginRight: 8 }}
-                                            checked={selected}
-                                        />
-                                        {option.studentId} - {option.studentName}
-                                    </li>
-                                )}
-                                renderTags={(tagValue, getTagProps) =>
-                                    tagValue.map((option, index) => (
-                                        <Fragment key={index}>
-                                            <Chip
-                                                label={option.studentId}
-                                                {...getTagProps({ index })}
-                                                disabled={
-                                                    fixedOptions.findIndex((fo) => fo.studentId == option.studentId) !==
-                                                    -1
-                                                }
+                                    }
+                                    disableCloseOnSelect
+                                    getOptionLabel={(option) => option.studentId}
+                                    renderOption={(props, option, { selected }) => (
+                                        <li {...props}>
+                                            <Checkbox
+                                                icon={icon}
+                                                checkedIcon={checkedIcon}
+                                                style={{ marginRight: 8 }}
+                                                checked={selected}
                                             />
-                                            {console.log(option)}
-                                        </Fragment>
-                                    ))
-                                }
-                                style={{ width: 500 }}
-                                renderInput={(params) => (
-                                    <TextField {...params} label="Thành viên" placeholder="Thêm thành viên" />
-                                )}
-                            />
+                                            {option.studentId} - {option.studentName}
+                                        </li>
+                                    )}
+                                    renderTags={(tagValue, getTagProps) =>
+                                        tagValue.map((option, index) => (
+                                            <Fragment key={index}>
+                                                <Chip
+                                                    label={option.studentId}
+                                                    {...getTagProps({ index })}
+                                                    disabled={
+                                                        fixedOptions &&
+                                                        fixedOptions.findIndex(
+                                                            (fo) => fo.studentId == option.studentId,
+                                                        ) !== -1
+                                                    }
+                                                />
+                                                {console.log(option)}
+                                            </Fragment>
+                                        ))
+                                    }
+                                    style={{ width: 500 }}
+                                    renderInput={(params) => (
+                                        <TextField {...params} label="Thành viên" placeholder="Thêm thành viên" />
+                                    )}
+                                />
+                            ) : (
+                                <Autocomplete
+                                    multiple
+                                    id="checkboxes-tags-demo"
+                                    options={props.allMember}
+                                    value={user}
+                                    isOptionEqualToValue={(option, value) => option.studentId === value.studentId}
+                                    onChange={(event, newValue) => {
+                                        setUser(newValue);
+                                    }}
+                                    // freeSolo={user.length > 3 ? false : true}
+                                    getOptionDisabled={(options) =>
+                                        props.gender === 0
+                                            ? user.length >= props.numberMale
+                                                ? true
+                                                : false
+                                            : user.length >= props.numberFemale
+                                            ? true
+                                            : false
+                                    }
+                                    disableCloseOnSelect
+                                    getOptionLabel={(option) => option.studentId}
+                                    renderOption={(props, option, { selected }) => (
+                                        <li {...props}>
+                                            <Checkbox
+                                                icon={icon}
+                                                checkedIcon={checkedIcon}
+                                                style={{ marginRight: 8 }}
+                                                checked={selected}
+                                            />
+                                            {option.studentId} - {option.studentName}
+                                        </li>
+                                    )}
+                                    renderTags={(tagValue, getTagProps) =>
+                                        tagValue.map((option, index) => (
+                                            <Fragment key={index}>
+                                                <Chip
+                                                    label={option.studentId}
+                                                    {...getTagProps({ index })}
+                                                    // disabled={
+                                                    //     fixedOptions &&
+                                                    //     fixedOptions.findIndex((fo) => fo.studentId == option.studentId) !==
+                                                    //         -1
+                                                    // }
+                                                />
+                                                {console.log(option)}
+                                            </Fragment>
+                                        ))
+                                    }
+                                    style={{ width: 500 }}
+                                    renderInput={(params) => (
+                                        <TextField {...params} label="Thành viên" placeholder="Thêm thành viên" />
+                                    )}
+                                />
+                            )}
                         </Grid>
                         <Grid item xs={12} container spacing={2}></Grid>
                         <Grid item xs={12}>
