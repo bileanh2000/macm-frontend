@@ -1,17 +1,26 @@
-import { Alert, Box, Button, FormControlLabel, Radio, RadioGroup, Snackbar, styled, Typography } from '@mui/material';
+import {
+    Alert,
+    Box,
+    Button,
+    Divider,
+    FormControlLabel,
+    Radio,
+    RadioGroup,
+    Snackbar,
+    styled,
+    Typography,
+} from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
-import { RadioButtonChecked, RadioButtonUnchecked, SignalWifiStatusbarConnectedNoInternet4 } from '@mui/icons-material';
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 
 function TakeAttendance() {
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(20);
-    const [openSnackBar, setOpenSnackBar] = useState(false);
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
     const location = useLocation();
     const history = useNavigate();
 
@@ -19,7 +28,7 @@ function TakeAttendance() {
     const _nowDate = location.state?.date;
 
     let attendance = userList.reduce((attendaceCount, user) => {
-        return user.status ? attendaceCount + 1 : attendaceCount;
+        return user.status == 1 ? attendaceCount + 1 : attendaceCount;
     }, 0);
 
     const getAttendanceByStudentId = async () => {
@@ -44,25 +53,6 @@ function TakeAttendance() {
         getAttendanceByStudentId();
     }, []);
 
-    let snackBarStatus;
-
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
-
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpenSnackBar(false);
-    };
-
     const columns = [
         { field: 'id', headerName: 'Số thứ tự', flex: 0.5 },
         { field: 'name', headerName: 'Tên', flex: 0.8 },
@@ -84,11 +74,11 @@ function TakeAttendance() {
             },
         },
         {
-            field: 'actions',
+            field: 'Attend',
             type: 'actions',
-            headerName: 'Có mặt - Vắng mặt',
-            width: 100,
-            flex: 0.5,
+            headerName: 'Có mặt',
+            width: 50,
+            flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
                 if (params.row.status == 'Có mặt') {
@@ -100,11 +90,6 @@ function TakeAttendance() {
                             color="primary"
                             aria-details="Có mặt"
                         />,
-                        <GridActionsCellItem
-                            icon={<RadioButtonUnchecked />}
-                            label="Vắng mặt"
-                            onClick={() => toggleStatus(params.row.studentId, 0)}
-                        />,
                     ];
                 } else if (params.row.status == 'Vắng mặt') {
                     return [
@@ -112,12 +97,6 @@ function TakeAttendance() {
                             icon={<RadioButtonUnchecked />}
                             label="Có mặt"
                             onClick={() => toggleStatus(params.row.studentId, 1)}
-                        />,
-                        <GridActionsCellItem
-                            icon={<RadioButtonChecked />}
-                            label="Vắng mặt"
-                            onClick={() => toggleStatus(params.row.studentId, 0)}
-                            color="primary"
                         />,
                     ];
                 }
@@ -127,6 +106,36 @@ function TakeAttendance() {
                         label="Có mặt"
                         onClick={() => toggleStatus(params.row.studentId, 1)}
                     />,
+                ];
+            },
+        },
+        {
+            field: 'Absent',
+            type: 'actions',
+            headerName: 'Vắng mặt',
+            width: 50,
+            flex: 0.3,
+            cellClassName: 'actions',
+            getActions: (params) => {
+                if (params.row.status == 'Có mặt') {
+                    return [
+                        <GridActionsCellItem
+                            icon={<RadioButtonUnchecked />}
+                            label="Vắng mặt"
+                            onClick={() => toggleStatus(params.row.studentId, 0)}
+                        />,
+                    ];
+                } else if (params.row.status == 'Vắng mặt') {
+                    return [
+                        <GridActionsCellItem
+                            icon={<RadioButtonChecked />}
+                            label="Vắng mặt"
+                            onClick={() => toggleStatus(params.row.studentId, 0)}
+                            color="primary"
+                        />,
+                    ];
+                }
+                return [
                     <GridActionsCellItem
                         icon={<RadioButtonUnchecked />}
                         label="Vắng mặt"
@@ -185,6 +194,9 @@ function TakeAttendance() {
                 >
                     <GridToolbarQuickFilter />
                 </Box>
+                <Typography variant="body1">
+                    Số người tham gia hôm nay {attendance}/{userList.length}
+                </Typography>
             </GridToolbarContainer>
         );
     }
@@ -248,56 +260,47 @@ function TakeAttendance() {
     }
 
     return (
-        <Fragment>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
+        <Box sx={{ m: 1, p: 1 }}>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Trạng thái điểm danh ngày: {_nowDate}
-                <Typography variant="h6">
-                    Số người tham gia hôm nay {attendance}/{userList.length}
-                </Typography>
+                Điểm danh ngày: {_nowDate}
             </Typography>
+            <Divider sx={{ mb: 2 }} />
             <Box component="form" onSubmit={handleSubmit(onSubmit)}>
                 <Box
                     sx={{
                         height: '70vh',
                         width: '100%',
                         '& .status-rows': {
-                            justifyContent: 'center !important',
-                            minHeight: '0px !important',
-                            maxHeight: '35px !important',
-                            borderRadius: '100px',
-                            position: 'relative',
-                            top: '9px',
+                            // justifyContent: 'center !important',
+                            // minHeight: '0px !important',
+                            // maxHeight: '35px !important',
+                            // borderRadius: '100px',
+                            // position: 'relative',
+                            // top: '9px',
                         },
-                        '& .status-rows.active': {
+                        '& .status-rows.active .MuiDataGrid-cellContent': {
                             backgroundColor: '#56f000',
                             color: '#fff',
                             fontWeight: '600',
                             textAlign: 'center',
+                            padding: 1,
+                            borderRadius: 5,
                         },
-                        '& .status-rows.deactive': {
+                        '& .status-rows.deactive .MuiDataGrid-cellContent': {
                             backgroundColor: '#ff3838',
                             color: '#fff',
                             fontWeight: '600',
+                            textAlign: 'center',
+                            padding: 1,
+                            borderRadius: 5,
                         },
-                        '& .status-rows.subActive': {
+                        '& .status-rows.subActive .MuiDataGrid-cellContent': {
                             backgroundColor: '#cfb2b2',
                             color: '#fff',
                             fontWeight: '600',
+                            textAlign: 'center',
+                            padding: 1,
+                            borderRadius: 5,
                         },
                     }}
                 >
@@ -315,9 +318,11 @@ function TakeAttendance() {
                         }}
                     />
                 </Box>
-                <Button type="submit">Đồng ý</Button>
+                <Button type="submit" variant="outline">
+                    Đồng ý
+                </Button>
             </Box>
-        </Fragment>
+        </Box>
     );
 }
 

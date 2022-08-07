@@ -1,6 +1,8 @@
 import { Alert, Box, Button, FormControl, MenuItem, Select, Snackbar, Typography } from '@mui/material';
+import { useSnackbar } from 'notistack';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import MemberList from './MemberList';
 import RegisterExhibition from './RegisterExhibition';
@@ -9,6 +11,8 @@ import RegisterPlayer from './RegisterPlayer';
 function MemberTournament({ tournament, isUpdate }) {
     let { tournamentId } = useParams();
     const [type, setType] = useState(1);
+    const { enqueueSnackbar } = useSnackbar();
+    const [isCreate, setIsCreate] = useState(false);
     const [competitivePlayer, setCompetitivePlayer] = useState([]);
     const [exhibitionTeam, setExhibitionTeam] = useState([]);
     const [weightRange, setWeightRange] = useState(0);
@@ -85,7 +89,10 @@ function MemberTournament({ tournament, isUpdate }) {
         try {
             const response = await adminTournamentAPI.getListPlayerBracket(weightRange);
             console.log(response.data);
-            setCompetitivePlayer(response.data);
+            if (response.data.length > 0) {
+                setCompetitivePlayer(response.data[0].listPlayers);
+                setIsCreate(response.data[0].changed);
+            }
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -97,6 +104,24 @@ function MemberTournament({ tournament, isUpdate }) {
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
+    };
+
+    const spawnMatches = async (weightRange) => {
+        try {
+            const response = await adminTournamentAPI.spawnMatchs(weightRange);
+            enqueueSnackbar(response.message, { variant: 'success' });
+        } catch (error) {
+            console.log('Failed to fetch match: ', error);
+        }
+    };
+
+    const handleCreateMatches = () => {
+        if (weightRange == 0) {
+            let varian = 'error';
+            enqueueSnackbar('Vui lòng chọn hạng cân trước khi tạo bảng đấu', { varian });
+            return;
+        }
+        spawnMatches(weightRange);
     };
 
     useEffect(() => {
@@ -114,11 +139,6 @@ function MemberTournament({ tournament, isUpdate }) {
 
     return (
         <Fragment>
-            <Box>
-                <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                    Danh sách thành viên tham gia
-                </Typography>
-            </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <FormControl size="small">
                     <Typography variant="caption">Nội dung thi đấu</Typography>
@@ -131,9 +151,19 @@ function MemberTournament({ tournament, isUpdate }) {
                     tournament.competitiveTypes.length > 0 ? (
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                             {!isUpdate && (
-                                <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialog(true)}>
-                                    Thêm người chơi thi đấu đối kháng
-                                </Button>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                    <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialog(true)}>
+                                        Thêm người chơi thi đấu đối kháng
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        sx={{ mr: 2 }}
+                                        onClick={() => handleCreateMatches()}
+                                        disabled={!isCreate}
+                                    >
+                                        Tạo bảng thi đấu
+                                    </Button>
+                                </Box>
                             )}
                             <FormControl size="small">
                                 <Typography variant="caption">Hạng cân</Typography>
@@ -164,9 +194,22 @@ function MemberTournament({ tournament, isUpdate }) {
                 ) : tournament.exhibitionTypes.length > 0 ? (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                         {!isUpdate && (
-                            <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialogExhibition(true)}>
-                                Thêm người chơi thi đấu biểu diễn
-                            </Button>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                <Button
+                                    variant="outlined"
+                                    sx={{ mr: 2 }}
+                                    onClick={() => handleOpenDialogExhibition(true)}
+                                >
+                                    Thêm người chơi thi đấu biểu diễn
+                                </Button>
+                                {/* <Button
+                                    variant="outlined"
+                                    sx={{ mr: 2 }}
+                                    // onClick={() => handleOpenDialogExhibition(true)}
+                                >
+                                    Tạo bảng thi đấu
+                                </Button> */}
+                            </Box>
                         )}
                         <FormControl size="small">
                             <Typography variant="caption">Thể thức thi đấu</Typography>
@@ -214,7 +257,7 @@ function MemberTournament({ tournament, isUpdate }) {
                         setOpenDialogExhibition(false);
                     }}
                     onSuccess={() => {
-                        fetchExhibitionTeam(tournamentId, exhibitionType);
+                        // fetchExhibitionTeam(tournamentId, exhibitionType);
                         setOpenDialogExhibition(false);
                     }}
                 />

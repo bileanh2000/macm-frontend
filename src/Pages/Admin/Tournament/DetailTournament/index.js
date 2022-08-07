@@ -114,7 +114,6 @@ function DetailTournament() {
 
     useEffect(() => {
         getTournamentById(tournamentId);
-        // fetchAdminInTournament(tournamentId);
         fetchTournamentSchedule(tournamentId);
         window.scrollTo({ behavior: 'smooth', top: '0px' });
     }, [tournamentId]);
@@ -219,8 +218,8 @@ function DetailTournament() {
                                 <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
                                     <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
                                     <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />
-                                    {isUpdate && <Tab label="Bảng đấu đối kháng" {...a11yProps(2)} value={2} />}
-                                    {isUpdate && <Tab label="Bảng đấu biểu diễn" {...a11yProps(3)} value={3} />}
+                                    <Tab label="Bảng đấu đối kháng" {...a11yProps(2)} value={2} />
+                                    <Tab label="Bảng đấu biểu diễn" {...a11yProps(3)} value={3} />
                                     <Tab label="Danh sách ban tổ chức" {...a11yProps(4)} value={4} />
                                     <Tab label="Danh sách người chơi" {...a11yProps(5)} value={5} />
                                 </Tabs>
