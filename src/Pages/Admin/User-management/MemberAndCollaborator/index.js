@@ -33,10 +33,7 @@ import {
     TablePagination,
     Tooltip,
 } from '@mui/material';
-import Collapse from '@mui/material/Collapse';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SecurityIcon from '@mui/icons-material/Security';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
+
 import { useNavigate } from 'react-router-dom';
 import { Link as routerLink } from 'react-router-dom';
 import Link from '@mui/material/Link';
@@ -47,31 +44,19 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import styles from './MemberAndCollaborator.module.scss';
-import { FileUploader } from 'react-drag-drop-files';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+
 import { Controller, useForm } from 'react-hook-form';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import clsx from 'clsx';
 import axios from 'axios';
 import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import parse from 'autosuggest-highlight/parse';
-import match from 'autosuggest-highlight/match';
 import moment from 'moment';
-import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
-
-const fileTypes = ['CSV', 'JPG', 'png'];
-const Input = styled('input')({
-    display: 'none',
-});
+import AddMemberDialog from '../AddMemberDialog';
+import ViewDetailMemberDialog from '../ViewDetailMemberDialog';
 
 function MemberAndCollaborator() {
     const token = localStorage[`accessToken`];
@@ -87,18 +72,11 @@ function MemberAndCollaborator() {
     const [selectionModel, setSelectionModel] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
     const [emailList, setEmailList] = useState([]);
+    const [selectedStudent, setSelectedStudent] = useState([]);
 
-    const onChangeSearch = {
-        dateFrom: '',
-        dateTo: '',
-        email: '',
-        gender: '',
-        generation: '',
-        isActive: '',
-        name: '',
-        roleId: '',
-        studentId: '',
-    };
+    const [isOpenAddMember, setIsOpenAddMember] = useState(false);
+    const [isOpenViewMember, setIsOpenViewMember] = useState(false);
+    const [isEditDialog, setIsEditDialog] = useState(false);
 
     const toggleFilter = () => {
         setChecked((prev) => !prev);
@@ -152,6 +130,7 @@ function MemberAndCollaborator() {
         register,
         control,
         handleSubmit,
+        reset,
         formState: { errors },
     } = useForm({
         // resolver: yupResolver(validationSchema),
@@ -181,7 +160,7 @@ function MemberAndCollaborator() {
             field: 'email',
             headerName: 'Email',
             width: 220,
-            renderCell: (params) => <Link href={`mailto:${params.value}`}>{params.value.toString()}</Link>,
+            // renderCell: (params) => <Link href={`mailto:${params.value}`}>{params.value.toString()}</Link>,
             flex: 1,
         },
 
@@ -246,7 +225,7 @@ function MemberAndCollaborator() {
             type: 'actions',
             flex: 0.5,
             getActions: (params) => [
-                <GridActionsCellItem icon={<EditIcon />} label="Chỉnh sửa" onClick={editUser(params.row.studentId)} />,
+                <GridActionsCellItem icon={<EditIcon />} label="Chỉnh sửa" onClick={() => editUser(params)} />,
             ],
         },
     ];
@@ -266,26 +245,25 @@ function MemberAndCollaborator() {
         container['studentId'] = item.studentId;
         container['role'] = item.roleName;
         container['active'] = item.active ? 'Active' : 'Deactive';
+        container['phone'] = item.phone;
+        container['image'] = item.image;
+        container['currentAddress'] = item.currentAddress;
+        container['roleId'] = item.roleId;
 
         return container;
     });
 
-    const editUser = useCallback(
-        (studentId) => () => {
-            setTimeout(() => {
-                console.log(studentId);
-                let path = `${studentId}/edit`;
-                navigate(path);
-            });
-        },
-        [],
-    );
+    const editUser = (params) => {
+        setSelectedStudent(params.row);
+        setIsOpenViewMember(true);
+        setIsEditDialog(true);
+    };
 
     const handleOnClick = (rowData) => {
-        console.log('push -> /roles/' + rowData.studentId);
-        let path = `${rowData.studentId}`;
-        navigate(path);
-        // alert('navigation');
+        // console.log('push -> /roles/' + rowData.studentId);
+        setSelectedStudent(rowData);
+        setIsOpenViewMember(true);
+        setIsEditDialog(false);
     };
     const [openSnackBar, setOpenSnackBar] = useState(false);
     let snackBarStatus;
@@ -422,6 +400,47 @@ function MemberAndCollaborator() {
 
     return (
         <Fragment>
+            <AddMemberDialog
+                title="Thêm thành viên"
+                isOpen={isOpenAddMember}
+                handleClose={() => setIsOpenAddMember(false)}
+                onSucess={(newUser) => {
+                    setUserList([newUser, ...userList]);
+                }}
+            />
+            {isOpenViewMember && (
+                <ViewDetailMemberDialog
+                    // title="Thông tin thành viên"
+                    selectedStudent={selectedStudent}
+                    isOpen={isOpenViewMember}
+                    handleClose={() => setIsOpenViewMember(false)}
+                    editable={isEditDialog}
+                    onSucess={(updatedUser) => {
+                        setUserList((oldUserList) => {
+                            return oldUserList.map((user) => {
+                                if (user.id === updatedUser.id) {
+                                    return {
+                                        ...user,
+                                        name: updatedUser.name,
+                                        email: updatedUser.email,
+                                        gender: updatedUser.gender,
+                                        dateOfBirth: updatedUser.dateOfBirth,
+                                        generation: updatedUser.generation,
+                                        studentId: updatedUser.studentId,
+                                        role: updatedUser.roleName,
+                                        phone: updatedUser.phone,
+                                        currentAddress: updatedUser.currentAddress,
+                                        roleId: updatedUser.roleId,
+                                    };
+                                }
+                                return user;
+                            });
+                        });
+                    }}
+                />
+            )}
+
+            {/* Filter */}
             <Grow in={checked}>
                 <Box
                     component="form"
@@ -546,32 +565,15 @@ function MemberAndCollaborator() {
                             </LocalizationProvider>
                         </Grid>
                         <Grid item xs={6}>
-                            {/* <TextField
-                                    fullWidth
-                                    id="standard-basic"
-                                    label="Email"
-                                    variant="standard"
-                                    size="small"
-                                    // {...register('email')}
-                                    onChange={(e) => {
-                                        onChangeSearch.email = e.target.value;
-                                        // console.log(onChangeSearch);
-                                    }}
-                                /> */}
                             <TextField
                                 fullWidth
                                 id="standard-select-currency"
                                 select
                                 label="Giới tính"
-                                // onChange={handleChangeGender}
                                 defaultValue=""
                                 variant="standard"
                                 size="small"
                                 {...register('gender')}
-                                // onChange={(e) => {
-                                //     onChangeSearch.gender = e.target.value;
-                                //     // console.log(onChangeSearch);
-                                // }}
                             >
                                 <MenuItem value="">Tất cả</MenuItem>
                                 <MenuItem value="true">Nam</MenuItem>
@@ -582,15 +584,10 @@ function MemberAndCollaborator() {
                                 id="standard-select-currency"
                                 select
                                 label="Vai trò"
-                                // onChange={handleChangeGender}
                                 defaultValue=""
                                 variant="standard"
                                 size="small"
                                 {...register('roleId')}
-                                // onChange={(e) => {
-                                //     onChangeSearch.roleId = e.target.value;
-                                //     // console.log(onChangeSearch);
-                                // }}
                             >
                                 <MenuItem value="">Tất cả</MenuItem>
                                 <MenuItem value={10}>Ban truyền thông</MenuItem>
@@ -608,26 +605,19 @@ function MemberAndCollaborator() {
                                     render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                         <DatePicker
                                             label="Đến ngày"
-                                            // views={['year', 'month', 'day']}
                                             disableFuture
-                                            // maxDate={new Date('2022-06-12')}
                                             views={['year', 'month', 'day']}
                                             ampm={false}
                                             value={value}
                                             onChange={(value) => {
                                                 onChange(value);
-                                                // onChangeSearch.dateTo =
-                                                //     value === null ? '' : moment(value).format('yyyy-MM-DD');
-                                                // console.log(onChangeSearch);
                                             }}
-                                            // onChange={(value) => callApi(value, 'dateTo')}
                                             renderInput={(params) => (
                                                 <TextField
                                                     {...params}
                                                     id="outlined-disabled"
                                                     error={invalid}
                                                     helperText={invalid ? error.message : null}
-                                                    // id="startDate"
                                                     variant="standard"
                                                     margin="dense"
                                                     fullWidth
@@ -638,6 +628,16 @@ function MemberAndCollaborator() {
                                 />
                             </LocalizationProvider>
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                                <Button
+                                    variant="outlined"
+                                    sx={{ mr: 1 }}
+                                    onClick={() => {
+                                        reset({ gender: '', roleId: '' });
+                                        console.log('heheh');
+                                    }}
+                                >
+                                    Reset
+                                </Button>
                                 <Button variant="contained" type="submit">
                                     Lọc
                                 </Button>
@@ -691,11 +691,6 @@ function MemberAndCollaborator() {
                         value={semester}
                         onChange={handleChange}
                     >
-                        {/* {currencies.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))} */}
                         <MenuItem value="Summer2022">Summer 2022</MenuItem>
                         <MenuItem value="Spring2022">Spring 2022</MenuItem>
                     </TextField>
@@ -704,9 +699,8 @@ function MemberAndCollaborator() {
                     <Button
                         variant="outlined"
                         sx={{ marginRight: 2 }}
-                        component={routerLink}
-                        to={'/admin/addUser'}
                         startIcon={<AddCircleIcon />}
+                        onClick={() => setIsOpenAddMember(true)}
                     >
                         Thêm thành viên
                     </Button>
@@ -723,7 +717,6 @@ function MemberAndCollaborator() {
                     </Button>
                 </Box>
             </Box>
-            {/* <div style={{ height: '70vh', width: '100%' }}> */}
 
             <Box
                 sx={{
@@ -732,8 +725,6 @@ function MemberAndCollaborator() {
                 }}
             >
                 <DataGrid
-                    // loading={!userList.length}
-                    // disableSelectionOnClick={true}
                     checkboxSelection
                     rows={rowsUser}
                     columns={columns}
@@ -749,7 +740,6 @@ function MemberAndCollaborator() {
                     }}
                     components={{
                         Toolbar: CustomToolbar,
-                        // Pagination: CustomPagination,
                         Footer: CustomFooter,
                     }}
                     onSelectionModelChange={(ids) => {
@@ -762,7 +752,6 @@ function MemberAndCollaborator() {
                     }}
                 />
             </Box>
-            {/* </div> */}
         </Fragment>
     );
 }

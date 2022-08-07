@@ -249,6 +249,7 @@ function TakeAttendance() {
 
     return (
         <Fragment>
+           
             <Snackbar
                 open={openSnackBar}
                 autoHideDuration={5000}

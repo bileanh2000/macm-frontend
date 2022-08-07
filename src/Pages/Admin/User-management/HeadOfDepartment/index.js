@@ -23,14 +23,21 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import { MenuItem, TextField } from '@mui/material';
 import moment from 'moment';
+import AddMemberDialog from '../AddMemberDialog';
+import ViewDetailMemberDialog from '../ViewDetailMemberDialog';
 
-function MemberAndCollaborator() {
+function HeadOfDepartment() {
     let navigate = useNavigate();
     const [userList, setUserList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [stageStudentId, setStageStudentID] = useState({ studentId: '', name: '' });
     const [semester, setSemester] = useState('Summer2022');
     const [editable, setEditable] = useState(false);
+    const [selectedStudent, setSelectedStudent] = useState([]);
+
+    const [isOpenAddMember, setIsOpenAddMember] = useState(false);
+    const [isOpenViewMember, setIsOpenViewMember] = useState(false);
+    const [isEditDialog, setIsEditDialog] = useState(false);
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -61,7 +68,6 @@ function MemberAndCollaborator() {
             setEditable(false);
         }
         console.log(editable);
-        fetchAdminListBySemester(semester);
     };
     useEffect(() => {
         console.log(stageStudentId);
@@ -90,13 +96,7 @@ function MemberAndCollaborator() {
             type: 'actions',
             flex: 1,
             getActions: (params) => [
-                <GridActionsCellItem
-                    icon={<EditIcon />}
-                    label="Delete"
-                    onClick={() => {
-                        navigate(`${params.row.studentId}/edit`);
-                    }}
-                />,
+                <GridActionsCellItem icon={<EditIcon />} label="Chỉnh sửa" onClick={() => editUser(params)} />,
 
                 <GridActionsCellItem
                     icon={<DeleteIcon />}
@@ -112,15 +112,20 @@ function MemberAndCollaborator() {
 
     const rows = userList.map((item, index) => {
         const container = {};
-        container['id'] = index + 1;
+        container['id'] = item.id;
         container['name'] = item.name;
         container['email'] = item.email;
-        container['generation'] = item.generation;
-        container['dateOfBirth'] = moment(new Date(item.dateOfBirth)).format('DD/MM/yyyy');
         container['gender'] = item.gender ? 'Nam' : 'Nữ';
+        container['dateOfBirth'] = moment(new Date(item.dateOfBirth)).format('DD/MM/yyyy');
+        container['generation'] = item.generation;
+        container['month'] = new Date(item.dateOfBirth).getMonth() + 1;
         container['studentId'] = item.studentId;
         container['role'] = item.roleName;
-        container['month'] = new Date(item.dateOfBirth).getMonth() + 1;
+        container['active'] = item.active ? 'Active' : 'Deactive';
+        container['phone'] = item.phone;
+        container['image'] = item.image;
+        container['currentAddress'] = item.currentAddress;
+        container['roleId'] = item.roleId;
 
         return container;
     });
@@ -141,11 +146,16 @@ function MemberAndCollaborator() {
     );
 
     const handleOnClick = (rowData) => {
-        // console.log('push -> /roles/' + rowData.studentId);
-        let path = `${rowData.studentId}`;
-        navigate(path);
-        // alert('navigation');
+        setSelectedStudent(rowData);
+        setIsOpenViewMember(true);
+        setIsEditDialog(false);
     };
+    const editUser = (params) => {
+        setSelectedStudent(params.row);
+        setIsOpenViewMember(true);
+        setIsEditDialog(true);
+    };
+
     function CustomToolbar() {
         return (
             <GridToolbarContainer>
@@ -157,6 +167,46 @@ function MemberAndCollaborator() {
 
     return (
         <Fragment>
+            <AddMemberDialog
+                title="Thêm thành viên"
+                isOpen={isOpenAddMember}
+                handleClose={() => setIsOpenAddMember(false)}
+                onSucess={(newUser) => {
+                    setUserList([newUser, ...userList]);
+                }}
+            />
+            {isOpenViewMember && (
+                <ViewDetailMemberDialog
+                    // title="Thông tin thành viên"
+                    selectedStudent={selectedStudent}
+                    isOpen={isOpenViewMember}
+                    handleClose={() => setIsOpenViewMember(false)}
+                    editable={isEditDialog}
+                    adminRole={true}
+                    onSucess={(updatedUser) => {
+                        setUserList((oldUserList) => {
+                            return oldUserList.map((user) => {
+                                if (user.id === updatedUser.id) {
+                                    return {
+                                        ...user,
+                                        name: updatedUser.name,
+                                        email: updatedUser.email,
+                                        gender: updatedUser.gender,
+                                        dateOfBirth: updatedUser.dateOfBirth,
+                                        generation: updatedUser.generation,
+                                        studentId: updatedUser.studentId,
+                                        role: updatedUser.roleName,
+                                        phone: updatedUser.phone,
+                                        currentAddress: updatedUser.currentAddress,
+                                        roleId: updatedUser.roleId,
+                                    };
+                                }
+                                return user;
+                            });
+                        });
+                    }}
+                />
+            )}
             <Dialog
                 open={openDialog}
                 onClose={handleCloseDialog}
@@ -198,7 +248,7 @@ function MemberAndCollaborator() {
             </TextField>
             <div style={{ height: '80vh', width: '100%' }}>
                 <DataGrid
-                    loading={!userList.length}
+                    // loading={!userList.length}
                     disableSelectionOnClick={true}
                     rows={rows}
                     columns={columns}
@@ -220,4 +270,4 @@ function MemberAndCollaborator() {
     );
 }
 
-export default MemberAndCollaborator;
+export default HeadOfDepartment;
