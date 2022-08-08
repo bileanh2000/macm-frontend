@@ -1,15 +1,4 @@
-import {
-    Alert,
-    Box,
-    Button,
-    Divider,
-    FormControlLabel,
-    Radio,
-    RadioGroup,
-    Snackbar,
-    styled,
-    Typography,
-} from '@mui/material';
+import { Box, Divider, styled, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
@@ -17,13 +6,18 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
+import moment from 'moment';
+import { useSnackbar } from 'notistack';
 
 function TakeAttendance() {
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(20);
+    const [eventId, setEventId] = useState(0);
     const location = useLocation();
     const history = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
+    const _type = location.state?.type;
     const _trainingScheduleId = location.state?.id;
     const _nowDate = location.state?.date;
 
@@ -31,19 +25,41 @@ function TakeAttendance() {
         return user.status == 1 ? attendaceCount + 1 : attendaceCount;
     }, 0);
 
+    console.log(moment(new Date(_nowDate)).format('DD/MM/yyyy'), _nowDate);
+
     const getAttendanceByStudentId = async () => {
         try {
             // const response = await adminAttendanceAPI.getAttendanceByStudentId(_trainingScheduleId);
             // setUserList(response.data);
             // console.log('get from database', response.data);
-            adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
-                // setActivityId(res.data[0].id);
-                adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
-                    setUserList(res.data);
-                    // setTotalActive(res.totalActive);
-                    // setTotalResult(res.totalResult);
-                });
-            });
+            // adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
+            //     // setActivityId(res.data[0].id);
+            //     adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
+            //         setUserList(res.data);
+            //         // setTotalActive(res.totalActive);
+            //         // setTotalResult(res.totalResult);
+            //     });
+            // });
+            let response;
+            if (_type == 0) {
+                adminAttendanceAPI
+                    .getTrainingSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
+                    .then((res) => {
+                        console.log(res);
+                        adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
+                            setUserList(res.data);
+                        });
+                    });
+            }
+            if (_type == 1) {
+                adminAttendanceAPI
+                    .getEventSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
+                    .then((res) => {
+                        setEventId(res.data[0].id);
+                        adminAttendanceAPI.getAttendanceByEventId(res.data[0].id);
+                        setUserList(res.data);
+                    });
+            }
         } catch (error) {
             console.log('Không thể lấy dữ liệu người dùng tham gia điểm danh. Error: ', error);
         }
@@ -166,16 +182,32 @@ function TakeAttendance() {
         history({ pathname: '/admin/attendance' }, { state: { id: _trainingScheduleId, date: _nowDate } });
     };
 
-    const takeAttend = async (id, status) => {
+    const takeAttend = async (id, trainingScheduleId, status) => {
         try {
-            await adminAttendanceAPI.takeAttendance(id, status);
+            const response = await adminAttendanceAPI.takeAttendance(id, trainingScheduleId, status);
+            enqueueSnackbar(response.message, { variant: 'success' });
+        } catch (error) {
+            console.log('Không thể điểm danh, error: ', error);
+        }
+    };
+
+    const takeAttendanceEvent = async (eventId, id, status) => {
+        try {
+            const response = await adminAttendanceAPI.takeAttendanceEvent(eventId, id, status);
+            enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.log('Không thể điểm danh, error: ', error);
         }
     };
 
     const toggleStatus = (id, status) => {
-        takeAttend(id, status);
+        if (_type == 0) {
+            takeAttend(id, _trainingScheduleId, status);
+        }
+        if (_type == 1) {
+            takeAttendanceEvent(eventId, id, status);
+        }
+
         const newUserList = userList.map((user) => {
             return user.studentId === id ? { ...user, status: status } : user;
         });
@@ -318,9 +350,9 @@ function TakeAttendance() {
                         }}
                     />
                 </Box>
-                <Button type="submit" variant="outline">
-                    Đồng ý
-                </Button>
+                {/* <Button type="submit" variant="outline">
+                    Quay lại
+                </Button> */}
             </Box>
         </Box>
     );

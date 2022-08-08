@@ -28,10 +28,13 @@ import RuleIcon from '@mui/icons-material/Rule';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import FeedIcon from '@mui/icons-material/Feed';
 import CelebrationIcon from '@mui/icons-material/Celebration';
+import { PriceCheck, Savings } from '@mui/icons-material';
 
 function Sidebar() {
     const [selectedIndex, setSelectedIndex] = React.useState(1);
     const [open, setOpen] = React.useState(false);
+    const [openFee, setOpenFee] = React.useState(false);
+    const [openAttendance, setOpenAttendance] = React.useState(false);
 
     const handleListItemClick = (event, index) => {
         setSelectedIndex(index);
@@ -40,6 +43,15 @@ function Sidebar() {
     const handleClick = () => {
         setOpen(!open);
     };
+
+    const handleClickFee = () => {
+        setOpenFee(!openFee);
+    };
+
+    const handleClickAttendance = () => {
+        setOpenAttendance(!openAttendance);
+    };
+
     return (
         <List>
             <Toolbar />
@@ -93,7 +105,7 @@ function Sidebar() {
                     </ListItem>
                 </List>
             </Collapse>
-            <Divider />
+            {/* <Divider />
             <ListItem
                 button
                 component={Link}
@@ -105,7 +117,7 @@ function Sidebar() {
                     <InventoryIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Cơ Sở Vật Chất" />
-            </ListItem>
+            </ListItem> */}
             <Divider />
             <ListItem
                 button
@@ -120,18 +132,52 @@ function Sidebar() {
                 <ListItemText primary="Quản Lý Lịch Tập" />
             </ListItem>
             <Divider />
-            <ListItem
+
+            {/* <ListItem
                 button
                 component={Link}
                 to="/admin/attendance"
                 selected={selectedIndex === 5}
                 onClick={(event) => handleListItemClick(event, 5)}
-            >
+            ></ListItem> */}
+            <ListItem button onClick={handleClickAttendance}>
                 <ListItemIcon>
                     <HowToRegIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Điểm danh" />
+                {openAttendance ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
+            <Collapse in={openAttendance} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                    <ListItem
+                        button
+                        sx={{ pl: 4 }}
+                        component={Link}
+                        to="/admin/attendance"
+                        selected={selectedIndex === 1}
+                        onClick={(event) => handleListItemClick(event, 1)}
+                    >
+                        <ListItemIcon>
+                            <PeopleAltRoundedIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Điểm danh hôm nay" />
+                    </ListItem>
+                    <ListItem
+                        button
+                        sx={{ pl: 4 }}
+                        component={Link}
+                        to="/admin/editattendance"
+                        selected={selectedIndex === 2}
+                        onClick={(event) => handleListItemClick(event, 2)}
+                    >
+                        <ListItemIcon>
+                            <PsychologyIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Chỉnh sửa điểm danh" />
+                    </ListItem>
+                </List>
+            </Collapse>
+
             <Divider />
             <ListItem
                 button
@@ -146,18 +192,44 @@ function Sidebar() {
                 <ListItemText primary="Trang Liên Hệ" />
             </ListItem>
             <Divider />
-            <ListItem
-                button
-                component={Link}
-                to="/admin/clubfee"
-                selected={selectedIndex === 7}
-                onClick={(event) => handleListItemClick(event, 7)}
-            >
+            <ListItem button onClick={handleClickFee}>
                 <ListItemIcon>
                     <PaidIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Chi Phí CLB" />
+                {openFee ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
+            <Collapse in={openFee} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                    <ListItem
+                        button
+                        sx={{ pl: 4 }}
+                        component={Link}
+                        to="/admin/membership"
+                        selected={selectedIndex === 1}
+                        onClick={(event) => handleListItemClick(event, 1)}
+                    >
+                        <ListItemIcon>
+                            <PriceCheck />
+                        </ListItemIcon>
+                        <ListItemText primary="Phí duy trì CLB" />
+                    </ListItem>
+                    <ListItem
+                        button
+                        sx={{ pl: 4 }}
+                        component={Link}
+                        to="/admin/fund"
+                        selected={selectedIndex === 2}
+                        onClick={(event) => handleListItemClick(event, 2)}
+                    >
+                        <ListItemIcon>
+                            <Savings />
+                        </ListItemIcon>
+                        <ListItemText primary="Quỹ câu lạc bộ" />
+                    </ListItem>
+                </List>
+            </Collapse>
+
             <Divider />
             <ListItem
                 button
@@ -185,7 +257,7 @@ function Sidebar() {
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Giải Đấu" />
             </ListItem>
-            <Divider />
+            {/* <Divider />
             <ListItem
                 button
                 component={Link}
@@ -197,7 +269,7 @@ function Sidebar() {
                     <FeedIcon />
                 </ListItemIcon>
                 <ListItemText primary="Quản Lý Tin Tức" />
-            </ListItem>
+            </ListItem> */}
             <Divider />
             <ListItem
                 button

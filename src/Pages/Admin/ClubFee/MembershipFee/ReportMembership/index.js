@@ -3,7 +3,7 @@ import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
-import { Typography } from '@mui/material';
+import { Divider, Typography } from '@mui/material';
 import moment from 'moment';
 
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
@@ -31,15 +31,20 @@ function ReportMembership() {
 
     const columns = [
         { field: 'date', type: 'date', headerName: 'Ngày chỉnh sửa', flex: 0.5 },
-        { field: 'time', headerName: 'Thời gian chỉnh sửa', flex: 0.8 },
+        { field: 'time', headerName: 'Thời gian chỉnh sửa', flex: 0.3 },
         { field: 'note', headerName: 'Nội dung chỉnh sửa', flex: 1.5 },
         //{ field: 'studentName', headerName: 'Tên người bị sửa', flex: 0.8 },
-
+        {
+            field: 'updatedBy',
+            headerName: 'Chỉnh sửa bởi',
+            width: 150,
+            flex: 0.3,
+        },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
             width: 150,
-            flex: 0.5,
+            flex: 0.3,
         },
         {
             field: 'fundChange',
@@ -54,12 +59,6 @@ function ReportMembership() {
                     deactive: params.row.paymentStatus === false,
                 });
             },
-        },
-        {
-            field: 'updatedBy',
-            headerName: 'Chỉnh sửa bởi',
-            width: 150,
-            flex: 0.5,
         },
         { field: 'fundBalance', headerName: 'Số dư', flex: 0.5 },
     ];
@@ -99,26 +98,34 @@ function ReportMembership() {
         );
     }
     return (
-        <div>
+        <Box sx={{ m: 1, p: 1 }}>
             {semester && (
                 <Box>
-                    <Typography variant="h3">Lịch sử thay đổi chi phí câu lạc bộ</Typography>
-                    <Typography variant="h5">Học kì: {semester.name}</Typography>
+                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+                        Lịch sử thay đổi chi phí câu lạc bộ
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
+                    <Typography variant="h6">Học kì: {semester.name}</Typography>
                 </Box>
             )}
             <Box
                 sx={{
                     height: '70vh',
-                    '& .status-rows.active': {
+                    '& .status-rows.active .MuiDataGrid-cellContent': {
                         backgroundColor: '#56f000',
                         color: '#fff',
                         fontWeight: '600',
                         textAlign: 'center',
+                        padding: 1,
+                        borderRadius: 5,
                     },
-                    '& .status-rows.deactive': {
+                    '& .status-rows.deactive .MuiDataGrid-cellContent': {
                         backgroundColor: '#ff3838',
                         color: '#fff',
                         fontWeight: '600',
+                        textAlign: 'center',
+                        padding: 1,
+                        borderRadius: 5,
                     },
                 }}
             >
@@ -135,7 +142,7 @@ function ReportMembership() {
                     }}
                 />
             </Box>
-        </div>
+        </Box>
     );
 }
 

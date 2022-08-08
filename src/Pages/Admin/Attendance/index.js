@@ -28,6 +28,7 @@ function Attendance() {
                 setTrainingScheduleId(response.data[0].id);
             }
             setType(response.data[0].type);
+            // console.log(response);
         } catch (error) {
             console.log('dm', error);
         }
@@ -57,7 +58,7 @@ function Attendance() {
                                     <Link
                                         sx={{ color: 'black' }}
                                         to="./take"
-                                        state={{ id: trainingScheduleId, date: date, type: type }}
+                                        state={{ id: trainingScheduleId, date: _nowDate, type: type }}
                                     >
                                         Điểm danh
                                     </Link>

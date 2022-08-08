@@ -1,27 +1,23 @@
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, Container, Divider, TextField, Typography } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import classNames from 'classnames/bind';
-
-import styles from '../CreateRule/CreateRule.module.scss';
-import { useState } from 'react';
-import adminRuleAPI from 'src/api/adminRuleAPI';
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useState } from 'react';
+import { useSnackbar } from 'notistack';
 
-const cx = classNames.bind(styles)
+import adminRuleAPI from 'src/api/adminRuleAPI';
 
 function EditRule() {
-
-    const location = useLocation()
+    const location = useLocation();
     const _rule = location.state?.rule;
-    const history = useNavigate()
+    const navigator = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
-    const [rule, setRule] = useState(_rule.description)
-
+    const [rule, setRule] = useState(_rule.description);
 
     const validationSchema = Yup.object().shape({
-        description: Yup.string().required('Không được để trống trường này')
+        description: Yup.string().required('Không được để trống trường này'),
     });
 
     const {
@@ -33,36 +29,31 @@ function EditRule() {
         mode: 'onBlur',
     });
 
-    const onSubmit = async (data) => {
+    const updateRule = async (data) => {
         try {
-            console.log(data.description)
-            if (rule != null) {
-                await adminRuleAPI.update({
-                    id: _rule.id,
-                    description: data.description,
-                });
-            }
-            history(
-                { pathname: '/admin/rules' },
-                {
-                    state:
-                    {
-                        isSuccess: true,
-                        message: "Chỉnh sửa rules thành công",
-                        openSnackBar: true
-                    }
-                })
-        } catch (error) {
-            console.log("Error detected: " + error)
-        }
-    }
+            const response = await adminRuleAPI.update({
+                id: _rule.id,
+                description: data.description,
+            });
+            enqueueSnackbar(response.message, { variant: 'success' });
+        } catch (error) {}
+    };
+
+    const onSubmit = async (data) => {
+        updateRule(data);
+
+        navigator({ pathname: '/admin/rules' });
+    };
 
     return (
-        <div className={cx('wrapper')}>
-            <div className={cx('container')}>
-                <h1>Sửa nội quy của câu lạc bộ</h1>
-            </div>
-            <div style={{ width: '80%' }}>
+        <Box sx={{ m: 1, p: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+                    Chỉnh sửa nội quy
+                </Typography>
+            </Box>
+            <Divider />
+            <Container>
                 <Box
                     component="form"
                     sx={{
@@ -92,15 +83,19 @@ function EditRule() {
                         >
                             Xác nhận
                         </Button>
-                        <Button variant="contained" color="error">
-                            <Link to="/admin/rules">Hủy bỏ</Link>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            sx={{ maxHeight: '50px', minHeight: '50px' }}
+                            component={Link}
+                            to={'/admin/rules'}
+                        >
+                            Hủy bỏ
                         </Button>
                     </Box>
                 </Box>
-            </div>
-
-
-        </div >
+            </Container>
+        </Box>
     );
 }
 

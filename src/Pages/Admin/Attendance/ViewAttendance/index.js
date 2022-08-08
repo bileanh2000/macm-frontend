@@ -28,19 +28,25 @@ function ViewAttendance({ data }) {
             console.log(_trainingScheduleId);
             let response;
             if (_type == 0) {
-                adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
-                    adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
+                adminAttendanceAPI
+                    .getTrainingSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
+                    .then((res) => {
+                        adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
+                            setUserList(res.data);
+                            setTotalActive(res.totalActive);
+                            setTotalResult(res.totalResult);
+                        });
+                    });
+            }
+            if (_type == 1) {
+                adminAttendanceAPI
+                    .getEventSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
+                    .then((res) => {
+                        adminAttendanceAPI.getAttendanceByEventId(res.data[0].id);
                         setUserList(res.data);
                         setTotalActive(res.totalActive);
                         setTotalResult(res.totalResult);
                     });
-                });
-            }
-            if (_type == 1) {
-                response = await adminAttendanceAPI.getAttendanceByEventId(_trainingScheduleId);
-                setUserList(response.data);
-                setTotalActive(response.totalActive);
-                setTotalResult(response.totalResult);
             }
         } catch (error) {
             console.log('Không thể lấy dữ liệu người dùng tham gia điểm danh. Error: ', error);

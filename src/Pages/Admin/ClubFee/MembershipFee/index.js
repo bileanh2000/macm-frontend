@@ -1,31 +1,50 @@
-import { RadioButtonChecked, RadioButtonUnchecked, Assessment } from '@mui/icons-material';
+import { RadioButtonChecked, RadioButtonUnchecked, Assessment, ResetTvRounded } from '@mui/icons-material';
 import { Edit } from '@mui/icons-material';
-import { Alert, Box, Button, FormControl, Grid, MenuItem, Select, Snackbar, Typography } from '@mui/material';
+import {
+    Alert,
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Divider,
+    FormControl,
+    Grid,
+    InputAdornment,
+    MenuItem,
+    Select,
+    Snackbar,
+    styled,
+    TextField,
+    Typography,
+} from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import React, { Fragment, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import * as Yup from 'yup';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import NumberFormat from 'react-number-format';
+import { useSnackbar } from 'notistack';
+
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 import adminFunAPi from 'src/api/adminFunAPi';
-import EditFee from '../EditFee/EditFee';
 
 function MembershipFee() {
+    const { enqueueSnackbar } = useSnackbar();
     const [userList, setUserList] = useState([]);
     const [semesterList, setSemesterList] = useState([]);
     const [cost, setCost] = useState(0);
     const [funClub, setFunClub] = useState('');
     const [pageSize, setPageSize] = useState(10);
-    const [openSnackBar, setOpenSnackBar] = useState(false);
     const [semesterId, setSemesterId] = useState();
     const [semesterName, setSemesterName] = useState();
     const [currentSemester, setCurrentSemester] = useState({});
-    const history = useNavigate();
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    const [editDialog, setEditDialog] = useState({
-        message: '',
-        isLoading: false,
-        params: -1,
-    });
+    const [open, setOpen] = useState(false);
+    const [openConfirm, setOpenConfirm] = useState(false);
+    const [idMember, setIdMember] = useState();
 
     let payment = userList.reduce((paymentCount, user) => {
         return user.status ? paymentCount + 1 : paymentCount;
@@ -61,6 +80,7 @@ function MembershipFee() {
     const getSemester = async () => {
         try {
             const response = await adminClubFeeAPI.getSemester();
+            // console.log('semester', response.data);
             const array = response.data;
             setSemesterId(Math.max(...array.map((o) => o.id)));
             setSemesterName(array.find((semester) => semester.id == Math.max(...array.map((o) => o.id))).name);
@@ -84,9 +104,6 @@ function MembershipFee() {
         fetchFunClub();
         getSemester();
         getCurrentSemester();
-        if (JSON.stringify(currentSemester) !== '{}') {
-            getListMemberShip(currentSemester.id);
-        }
     }, []);
 
     useEffect(() => {
@@ -96,6 +113,25 @@ function MembershipFee() {
         }
     }, [currentSemester]);
 
+    const validationSchema = Yup.object().shape({
+        cost: Yup.number()
+            .required('Không được để trống trường này')
+            .typeError('Vui lòng nhập số')
+            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+    });
+
+    const {
+        register,
+        control,
+        handleSubmit,
+        reset,
+        // formState,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+        mode: 'onBlur',
+    });
+
     const handleChangeSemester = (e) => {
         setSemesterId(e.target.value);
         setSemesterName(semesterList.find((semester) => semester.id == e.target.value).name);
@@ -103,54 +139,27 @@ function MembershipFee() {
         getAmount(semesterList.find((semester) => semester.id == e.target.value).name);
     };
 
-    const handleEditDialog = (message, isLoading, params) => {
-        setEditDialog({
-            message,
-            isLoading,
-            params,
-        });
+    const handleOpen = () => {
+        setOpen(true);
     };
 
-    const handleEdit = (params) => {
-        handleEditDialog('Chỉnh sửa tiền phí', true, params);
+    const handleClose = () => {
+        setOpen(false);
+        reset({ cost: '' });
     };
 
     const updateMembershipFee = async (semesterId, totalAmount) => {
         try {
-            await adminClubFeeAPI.updateMembershipFee(semesterId, totalAmount);
+            const res = await adminClubFeeAPI.updateMembershipFee(semesterId, totalAmount);
+            enqueueSnackbar(res.message, { variant: 'success' });
         } catch (error) {
             console.log('Không thể chỉnh sửa tiền phí, error: ', error);
         }
     };
 
-    const areUSureEdit = (choose, params) => {
-        if (choose) {
-            console.log('get', params);
-            updateMembershipFee(currentSemester.name, params);
-            setCost(+params);
-            dynamicAlert(true, 'Cập nhật thành công');
-            setOpenSnackBar(true);
-            handleEditDialog('', false, -1);
-        } else {
-            handleEditDialog('', false, -1);
-        }
-    };
-
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
-
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpenSnackBar(false);
+    const onSubmit = (data) => {
+        updateMembershipFee(currentSemester.name, data.cost);
+        setCost(+data.cost);
     };
 
     const columns = [
@@ -174,11 +183,11 @@ function MembershipFee() {
             },
         },
         {
-            field: 'actions',
+            field: 'pay',
             type: 'actions',
-            headerName: 'Đã đóng - Chưa đóng',
-            width: 100,
-            flex: 0.5,
+            headerName: 'Đã đóng',
+            width: 50,
+            flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
                 if (params.row.status == 'Đã đóng') {
@@ -190,11 +199,6 @@ function MembershipFee() {
                             color="primary"
                             aria-details="Đã đóng"
                         />,
-                        <GridActionsCellItem
-                            icon={<RadioButtonUnchecked />}
-                            label="Chưa đóng"
-                            onClick={() => toggleStatus(params.row.id)}
-                        />,
                     ];
                 }
                 return [
@@ -203,6 +207,28 @@ function MembershipFee() {
                         label="Đã đóng"
                         onClick={() => toggleStatus(params.row.id)}
                     />,
+                ];
+            },
+            hide: semesterId > 0 && currentSemester.id > 0 && semesterId != currentSemester.id,
+        },
+        {
+            field: 'notpay',
+            type: 'actions',
+            headerName: 'Chưa đóng',
+            width: 50,
+            flex: 0.3,
+            cellClassName: 'actions',
+            getActions: (params) => {
+                if (params.row.status == 'Đã đóng') {
+                    return [
+                        <GridActionsCellItem
+                            icon={<RadioButtonUnchecked />}
+                            label="Chưa đóng"
+                            onClick={() => toggleStatus(params.row.id)}
+                        />,
+                    ];
+                }
+                return [
                     <GridActionsCellItem
                         icon={<RadioButtonChecked />}
                         label="Chưa đóng"
@@ -225,23 +251,27 @@ function MembershipFee() {
         return container;
     });
 
-    const onSubmit = () => {
-        history({ pathname: '/admin/clubfee' });
-        window.scrollTo({ behavior: 'smooth', top: '0px' });
-    };
-
     const updateMembership = async (id) => {
         await adminClubFeeAPI.updateMembership(id);
     };
 
     const toggleStatus = (id) => {
-        console.log(id);
-        updateMembership(id);
+        setIdMember(id);
+        setOpenConfirm(true);
+    };
+
+    const handleCloseConfirm = () => {
+        setIdMember(-1);
+        setOpenConfirm(false);
+    };
+
+    const handleOpenConfirm = () => {
+        updateMembership(idMember);
         const newUserList = userList.map((user) => {
-            return user.id === id ? { ...user, status: !user.status } : user;
+            return user.id === idMember ? { ...user, status: !user.status } : user;
         });
-        console.log(newUserList);
         setUserList(newUserList);
+        handleCloseConfirm();
     };
 
     function CustomToolbar() {
@@ -272,32 +302,81 @@ function MembershipFee() {
         );
     }
 
-    return (
-        <Fragment>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
+    const StyledGridOverlay = styled('div')(({ theme }) => ({
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        '& .ant-empty-img-1': {
+            fill: theme.palette.mode === 'light' ? '#aeb8c2' : '#262626',
+        },
+        '& .ant-empty-img-2': {
+            fill: theme.palette.mode === 'light' ? '#f5f5f7' : '#595959',
+        },
+        '& .ant-empty-img-3': {
+            fill: theme.palette.mode === 'light' ? '#dce0e6' : '#434343',
+        },
+        '& .ant-empty-img-4': {
+            fill: theme.palette.mode === 'light' ? '#fff' : '#1c1c1c',
+        },
+        '& .ant-empty-img-5': {
+            fillOpacity: theme.palette.mode === 'light' ? '0.8' : '0.08',
+            fill: theme.palette.mode === 'light' ? '#f5f5f5' : '#fff',
+        },
+    }));
+    function CustomNoRowsOverlay() {
+        return (
+            <StyledGridOverlay>
+                <svg width="120" height="100" viewBox="0 0 184 152" aria-hidden focusable="false">
+                    <g fill="none" fillRule="evenodd">
+                        <g transform="translate(24 31.67)">
+                            <ellipse className="ant-empty-img-5" cx="67.797" cy="106.89" rx="67.797" ry="12.668" />
+                            <path
+                                className="ant-empty-img-1"
+                                d="M122.034 69.674L98.109 40.229c-1.148-1.386-2.826-2.225-4.593-2.225h-51.44c-1.766 0-3.444.839-4.592 2.225L13.56 69.674v15.383h108.475V69.674z"
+                            />
+                            <path
+                                className="ant-empty-img-2"
+                                d="M33.83 0h67.933a4 4 0 0 1 4 4v93.344a4 4 0 0 1-4 4H33.83a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4z"
+                            />
+                            <path
+                                className="ant-empty-img-3"
+                                d="M42.678 9.953h50.237a2 2 0 0 1 2 2V36.91a2 2 0 0 1-2 2H42.678a2 2 0 0 1-2-2V11.953a2 2 0 0 1 2-2zM42.94 49.767h49.713a2.262 2.262 0 1 1 0 4.524H42.94a2.262 2.262 0 0 1 0-4.524zM42.94 61.53h49.713a2.262 2.262 0 1 1 0 4.525H42.94a2.262 2.262 0 0 1 0-4.525zM121.813 105.032c-.775 3.071-3.497 5.36-6.735 5.36H20.515c-3.238 0-5.96-2.29-6.734-5.36a7.309 7.309 0 0 1-.222-1.79V69.675h26.318c2.907 0 5.25 2.448 5.25 5.42v.04c0 2.971 2.37 5.37 5.277 5.37h34.785c2.907 0 5.277-2.421 5.277-5.393V75.1c0-2.972 2.343-5.426 5.25-5.426h26.318v33.569c0 .617-.077 1.216-.221 1.789z"
+                            />
+                        </g>
+                        <path
+                            className="ant-empty-img-3"
+                            d="M149.121 33.292l-6.83 2.65a1 1 0 0 1-1.317-1.23l1.937-6.207c-2.589-2.944-4.109-6.534-4.109-10.408C138.802 8.102 148.92 0 161.402 0 173.881 0 184 8.102 184 18.097c0 9.995-10.118 18.097-22.599 18.097-4.528 0-8.744-1.066-12.28-2.902z"
+                        />
+                        <g className="ant-empty-img-4" transform="translate(149.65 15.383)">
+                            <ellipse cx="20.654" cy="3.167" rx="2.849" ry="2.815" />
+                            <path d="M5.698 5.63H0L2.898.704zM9.259.704h4.985V5.63H9.259z" />
+                        </g>
+                    </g>
+                </svg>
+                <Box sx={{ mt: 1 }}>Danh sách trống</Box>
+            </StyledGridOverlay>
+        );
+    }
 
-            <Grid container spacing={4}>
-                <Grid item xs={12}>
-                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                        Quản lý chi phí câu lạc bộ
+    return (
+        <Box sx={{ m: 1, p: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+                    Quản lý chi phí câu lạc bộ
+                </Typography>
+                <Box>
+                    <Typography variant="h6" gutterBottom sx={{ marginBottom: 2 }}>
+                        <strong>Số dư câu lạc bộ hiện tại: </strong>
+                        {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                     </Typography>
-                </Grid>
+                </Box>
+            </Box>
+            <Divider sx={{ mb: 2 }} />
+            <Grid container spacing={4}>
                 <Grid item xs={8}>
-                    <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         {semesterId > 0 && (
                             <FormControl medium="true">
                                 <Select id="demo-simple-select" value={semesterId} onChange={handleChangeSemester}>
@@ -309,29 +388,104 @@ function MembershipFee() {
                                 </Select>
                             </FormControl>
                         )}
-                        <Box sx={{ display: 'flex' }}>
-                            <Typography variant="h6" sx={{ color: 'red', marginRight: 5 }}>
-                                Số tiền : {cost.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                        <Box sx={{ display: 'flex', flexDirection: 'column', ml: 2 }}>
+                            <Typography variant="h6" sx={{ color: 'red' }}>
+                                Số tiền mỗi người phải đóng:{' '}
                             </Typography>
-
-                            {semesterId == currentSemester.id && semesterId && currentSemester.id > 0 && (
-                                <Button startIcon={<Edit />} onClick={() => handleEdit(cost)}>
-                                    Chỉnh sửa phí
-                                </Button>
-                            )}
+                            <Typography variant="h6" sx={{ color: 'red' }}>
+                                {cost.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                {semesterId == currentSemester.id && semesterId && currentSemester.id > 0 && (
+                                    <Button startIcon={<Edit />} onClick={handleOpen}></Button>
+                                )}
+                            </Typography>
                         </Box>
-                    </Typography>
+                    </Box>
                 </Grid>
                 <Grid item xs={4}>
-                    <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                    {/* <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                         Số dư câu lạc bộ hiện tại:{' '}
                         {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-                    </Typography>
-                    <Typography variant="h6" sx={{ float: 'right' }}>
+                    </Typography> */}
+                    <Typography variant="body1" sx={{ float: 'right' }}>
                         Đã đóng: {payment}/{userList.length}
                     </Typography>
                 </Grid>
             </Grid>
+
+            <Dialog
+                fullWidth
+                maxWidth="md"
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    Chỉnh sửa tiền phí
+                </DialogTitle>
+                <DialogContent>
+                    <Box
+                        component="form"
+                        noValidate
+                        autoComplete="off"
+                        sx={{
+                            '& .MuiTextField-root': { mb: 2, mt: 2 },
+                        }}
+                    >
+                        <Controller
+                            name="cost"
+                            variant="outlined"
+                            defaultValue=""
+                            control={control}
+                            render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                <NumberFormat
+                                    name="cost"
+                                    customInput={TextField}
+                                    label="Nhập số tiền"
+                                    thousandSeparator={true}
+                                    variant="outlined"
+                                    defaultValue={cost}
+                                    value={value}
+                                    onValueChange={(v) => {
+                                        onChange(Number(v.value));
+                                    }}
+                                    InputProps={{
+                                        endAdornment: <InputAdornment position="end">VND</InputAdornment>,
+                                    }}
+                                    error={invalid}
+                                    helperText={invalid ? error.message : null}
+                                    fullWidth
+                                />
+                            )}
+                        />
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Hủy</Button>
+                    <Button onClick={handleSubmit(onSubmit)} autoFocus>
+                        Xác nhận
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                fullWidth
+                maxWidth="md"
+                open={openConfirm}
+                onClose={handleCloseConfirm}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    Xác nhận
+                </DialogTitle>
+                <DialogContent>Bạn có chắc chắn muốn cập nhật trạng thái đóng tiền</DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseConfirm}>Hủy</Button>
+                    <Button onClick={handleOpenConfirm} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Box
                 sx={{
@@ -339,27 +493,27 @@ function MembershipFee() {
                     width: '100%',
                     '& .status-rows': {
                         justifyContent: 'center !important',
-                        minHeight: '0px !important',
-                        maxHeight: '35px !important',
-                        borderRadius: '100px',
-                        position: 'relative',
-                        top: '9px',
                     },
-                    '& .status-rows.active': {
+                    '& .status-rows.active .MuiDataGrid-cellContent': {
                         backgroundColor: '#56f000',
                         color: '#fff',
                         fontWeight: '600',
                         textAlign: 'center',
+                        padding: 1,
+                        borderRadius: 5,
                     },
-                    '& .status-rows.deactive': {
+                    '& .status-rows.deactive .MuiDataGrid-cellContent': {
                         backgroundColor: '#ff3838',
                         color: '#fff',
                         fontWeight: '600',
+                        textAlign: 'center',
+                        padding: 1,
+                        borderRadius: 5,
                     },
                 }}
             >
                 <DataGrid
-                    loading={!userList.length}
+                    // loading={!userList.length}
                     disableSelectionOnClick={true}
                     rows={rowsUser}
                     columns={columns}
@@ -368,14 +522,11 @@ function MembershipFee() {
                     rowsPerPageOptions={[10, 20, 30]}
                     components={{
                         Toolbar: CustomToolbar,
+                        NoRowsOverlay: CustomNoRowsOverlay,
                     }}
                 />
             </Box>
-            {/* <Button onClick={onSubmit}>Đồng ý</Button> */}
-            {editDialog.isLoading && (
-                <EditFee onDialog={areUSureEdit} message={editDialog.message} id={editDialog.params} />
-            )}
-        </Fragment>
+        </Box>
     );
 }
 

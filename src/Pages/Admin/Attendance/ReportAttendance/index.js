@@ -36,43 +36,48 @@ function ReportAttendance() {
         }
     };
 
+    const header = [{ id: 1 }];
     useEffect(() => {
         fetchSemester();
         fetchAttendanceReportBySemester(semester);
     }, [semester]);
 
-    const columns = [
-        { field: 'studentName', headerName: 'Tên sinh viên', flex: 0.5 },
-        { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.3 },
-        { field: 'roleName', headerName: 'Vai trò trong CLB', width: 150, flex: 0.6 },
+    // const columns = [
+    //     { field: 'studentName', headerName: 'Tên sinh viên', flex: 0.5 },
+    //     { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.3 },
+    //     { field: 'roleName', headerName: 'Vai trò trong CLB', width: 150, flex: 0.6 },
 
-        {
-            field: 'totalAbsent',
-            headerName: 'Số buổi nghỉ',
-            width: 150,
-            flex: 0.6,
-            cellClassName: (params) => {
-                if (params.value == null) {
-                    return '';
-                }
-                return clsx('status-rows', {
-                    deactive: true,
-                });
-            },
-        },
-        {
-            field: 'percentAbsent',
-            headerName: 'Phần trăm số buổi nghỉ',
-            width: 150,
-            flex: 0.4,
-            cellClassName: (params) => {
-                if (params.value == null) {
-                    return '';
-                }
-                return clsx('status-rows-active');
-            },
-        },
-    ];
+    //     {
+    //         field: 'totalAbsent',
+    //         headerName: 'Số buổi nghỉ',
+    //         width: 150,
+    //         flex: 0.6,
+    //         cellClassName: (params) => {
+    //             if (params.value == null) {
+    //                 return '';
+    //             }
+    //             return clsx('status-rows', {
+    //                 deactive: true,
+    //             });
+    //         },
+    //     },
+    //     {
+    //         field: 'percentAbsent',
+    //         headerName: 'Phần trăm số buổi nghỉ',
+    //         width: 150,
+    //         flex: 0.4,
+    //         cellClassName: (params) => {
+    //             if (params.value == null) {
+    //                 return '';
+    //             }
+    //             return clsx('status-rows-active');
+    //         },
+    //     },
+    // ];
+
+    const columns = header.map((i) => {
+        return i;
+    });
 
     const rowsAttendance = attendanceList.map((item, index) => {
         const container = {};
