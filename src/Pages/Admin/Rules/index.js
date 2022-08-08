@@ -1,24 +1,33 @@
 import { useState } from 'react';
-import { Alert, Button, Snackbar } from '@mui/material';
-import { Link, useLocation } from "react-router-dom";
-import classNames from 'classnames/bind';
+import { Box, Button, Divider, Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { AddCircle } from '@mui/icons-material';
 
-import styles from '../Rules/ViewRule/ListRule.module.scss';
-import ListRule from '../Rules/ViewRule/ListRule'
-
-
-const cx = classNames.bind(styles)
+import ListRule from '../Rules/ViewRule/ListRule';
 
 function Rules() {
     return (
-        <div className={cx('wrapper')} >
-            <div className={cx('container')}>
-                <h1>Quản lý nội quy</h1>
-                <Button variant="contained" color="success"><Link to="./create" style={{ color: "white" }}>Tạo nội quy mới</Link></Button>
-            </div>
-            <ListRule />
-        </div>
-    )
+        <Box sx={{ m: 1, p: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+                    Quản lý nội quy
+                </Typography>
+                <Button
+                    variant="outlined"
+                    sx={{ maxHeight: '50px', minHeight: '50px' }}
+                    component={Link}
+                    to={'./create'}
+                    startIcon={<AddCircle />}
+                >
+                    Tạo nội quy mới
+                </Button>
+            </Box>
+            <Divider />
+            <Box sx={{ m: 2 }}>
+                <ListRule />
+            </Box>
+        </Box>
+    );
 }
 
 export default Rules;

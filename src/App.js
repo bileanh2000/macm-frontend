@@ -127,7 +127,15 @@ class App extends Component {
         }
 
         return (
-            <SnackbarProvider maxSnack={4} autoHideDuration={5000} preventDuplicate>
+            <SnackbarProvider
+                maxSnack={4}
+                autoHideDuration={5000}
+                preventDuplicate
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+            >
                 <div className="app">
                     <Routes>
                         <Route

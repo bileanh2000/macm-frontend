@@ -7,8 +7,8 @@ const adminAttendanceAPI = {
         return axiosClient.get(url);
     },
 
-    takeAttendance: (studentId, status) => {
-        const url = `/admin/headtechnique/takeattendance/${studentId}`;
+    takeAttendance: (studentId, trainingScheduleId, status) => {
+        const url = `/admin/headtechnique/takeattendance/${studentId}/${trainingScheduleId}`;
         return axiosClient.put(url, null, { params: { status } });
     },
 
@@ -21,6 +21,10 @@ const adminAttendanceAPI = {
         const url = `/admin/headtechnique/checkattendance/report`;
         return axiosClient.get(url, { params: { semester } });
     },
+    getListOldTrainingScheduleToTakeAttendanceBySemester: (semester) => {
+        const url = `/admin/headtechnique/getlistoldtrainingscheduletotakeattendancebysemester/${semester}`;
+        return axiosClient.get(url);
+    },
 
     //Event
 
@@ -29,9 +33,19 @@ const adminAttendanceAPI = {
         return axiosClient.get(url);
     },
 
-    takeAttendanceEvent: (memberEventId, status) => {
-        const url = `/event/headculture/takeattendanceevent/${memberEventId}`;
+    takeAttendanceEvent: (eventId, studentId, status) => {
+        const url = `/event/headculture/takeattendanceevent/${eventId}/${studentId}`;
         return axiosClient.get(url, { params: { status: status } });
+    },
+
+    getEventSessionByDate: (date) => {
+        const url = '/eventschedule/geteventsessionbydate';
+        return axiosClient.get(url, { params: { date: date } });
+    },
+
+    getListOldEventToTakeAttendanceBySemester: (semester) => {
+        const url = `/event/headculture/getlistoldeventtotakeattendancebysemester/${semester}`;
+        return axiosClient.get(url);
     },
 
     //common

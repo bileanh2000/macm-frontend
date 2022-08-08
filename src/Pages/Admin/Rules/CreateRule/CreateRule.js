@@ -1,25 +1,20 @@
 import { useState } from 'react';
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, Container, Divider, TextField, Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import classNames from 'classnames/bind';
-
-import styles from '../CreateRule/CreateRule.module.scss';
-import adminRuleAPI from 'src/api/adminRuleAPI';
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useSnackbar } from 'notistack';
 
-const cx = classNames.bind(styles)
+import adminRuleAPI from 'src/api/adminRuleAPI';
 
 function CreateRule() {
-
-    const history = useNavigate()
-    const [rule, setRule] = useState('')
-    const [isSubmit, setIsSubmit] = useState(false);
-
+    let navigator = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
+    // const [rule, setRule] = useState('');
 
     const validationSchema = Yup.object().shape({
-        description: Yup.string().required('Không được để trống trường này')
+        description: Yup.string().required('Không được để trống trường này'),
     });
 
     const {
@@ -31,72 +26,73 @@ function CreateRule() {
         mode: 'onBlur',
     });
 
-
+    const createRule = async (data) => {
+        try {
+            const response = await adminRuleAPI.create({
+                description: data.description,
+            });
+            enqueueSnackbar(response.message, { variant: 'success' });
+        } catch (error) {
+            console.warn('Failed to create new rule');
+        }
+    };
 
     const handleCreateRule = async (data) => {
-        setIsSubmit(true)
-        try {
-            if (rule != null) {
-                await adminRuleAPI.create({
-                    description: data.description,
-                });
-            }
-            history(
-                { pathname: '/admin/rules' },
-                {
-                    state:
-                    {
-                        isSuccess: true,
-                        message: "Thêm rules thành công",
-                        openSnackBar: true
-                    }
-                })
-        } catch (error) {
-            console.log("Error detected: " + error)
-        }
-    }
+        createRule(data);
+        navigator({ pathname: '/admin/rules' });
+    };
 
     return (
-        <div className={cx('wrapper')}>
-            <div className={cx('container')}>
-                <h1>Thêm nội quy mới của câu lạc bộ</h1>
-            </div>
-            <Box
-                component="form"
-                sx={{
-                    '& .MuiTextField-root': { m: 1, width: '100%' },
-                }}
-                Validate
-                autoComplete="off"
-            >
-                <TextField
-                    fullWidth
-                    id="outlined-error-helper-text fullWidth"
-                    label="Nội dung"
-                    multiline
-                    rows={6}
-                    {...register('description')}
-                    error={errors.description ? true : false}
-                    defaultValue=''
-                    helperText={errors.description?.message}
-                    required
-                />
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '8px', mt: '8px' }}>
-                    <Button
-                        variant="contained"
-                        color="success"
-                        style={{ marginRight: 20 }}
-                        onClick={handleSubmit(handleCreateRule)}
-                        disabled={isSubmit}
-                    >
-                        Xác nhận
-                    </Button>
-                    <Button variant="contained" color="error">
-                        <Link to="/admin/rules">Hủy bỏ</Link>
-                    </Button>
-                </Box>
+        <Box sx={{ m: 1, p: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+                    Thêm mới nội quy
+                </Typography>
             </Box>
-        </div >
+            <Divider />
+            <Container>
+                <Box
+                    component="form"
+                    sx={{
+                        '& .MuiTextField-root': { m: 1, width: '100%' },
+                    }}
+                    Validate
+                    autoComplete="off"
+                >
+                    <TextField
+                        fullWidth
+                        id="outlined-error-helper-text fullWidth"
+                        label="Nội dung"
+                        multiline
+                        rows={6}
+                        {...register('description')}
+                        error={errors.description ? true : false}
+                        defaultValue=""
+                        helperText={errors.description?.message}
+                        required
+                    />
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '8px', mt: '8px' }}>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            style={{ marginRight: 20 }}
+                            onClick={handleSubmit(handleCreateRule)}
+                        >
+                            Xác nhận
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            sx={{ maxHeight: '50px', minHeight: '50px' }}
+                            component={Link}
+                            to={'/admin/rules'}
+                        >
+                            Hủy bỏ
+                        </Button>
+                    </Box>
+                </Box>
+            </Container>
+        </Box>
     );
 }
 

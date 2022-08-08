@@ -18,8 +18,9 @@ import { useParams } from 'react-router-dom';
 import CustomMatchBracket from './CustomMatchBracket';
 import adminTournament from 'src/api/adminTournamentAPI';
 
-function TournamentCompetitive({ tournamentStatus }) {
+function TournamentCompetitive() {
     let { tournamentId } = useParams();
+    const [tournamentStatus, setTournamentStatus] = useState(0);
     const { enqueueSnackbar } = useSnackbar();
     const [competitiveId, setCompetitiveId] = useState(0);
     const [listWeightRange, setListWeightRange] = useState([]);
@@ -27,6 +28,7 @@ function TournamentCompetitive({ tournamentStatus }) {
     const [rounds, setRounds] = useState();
     const [areaList, setAreaList] = useState();
     const [open, setOpen] = useState(false);
+    const [isCreate, setIsCreate] = useState(true);
     // const [tournamentStatus, setTournamentStatus] = useState(-1);
 
     const handleChangeCompetitiveId = (event) => {
@@ -46,10 +48,11 @@ function TournamentCompetitive({ tournamentStatus }) {
     const getListPlayerByCompetitiveID = async (weightRange) => {
         try {
             const response = await adminTournament.listMatchs(weightRange);
-            setListPlayer(response.data);
+            setListPlayer(response.data[0].listMatchDto);
             console.log('lay data', response);
-            // setTournamentStatus(response.code);
+            setTournamentStatus(response.data[0].status);
             setRounds(response.totalResult);
+            setIsCreate(response.data[0].changed);
         } catch (error) {
             console.log('Failed to fetch match: ', error);
         }
@@ -84,18 +87,8 @@ function TournamentCompetitive({ tournamentStatus }) {
             enqueueSnackbar('Vui lòng chọn hạng cân trước khi tạo bảng đấu', { varian });
             return;
         }
-        // console.log(listPlayer);
-        if (listPlayer && listPlayer.length == 0) {
-            console.log('loz3');
-            spawnMatches(competitiveId);
-            console.log('loz4');
-        }
-        // console.log(listPlayer);
-        // if (listPlayer && listPlayer.length > 0) {
-        // } else {
-        //     enqueueSnackbar('Không thể tạo bảng đấu do không đủ người', { error: 'error' });
-        //     return;
-        // }
+        console.log('haha');
+        spawnMatches(competitiveId);
     };
 
     const spawnTimeAndArea = async () => {
@@ -110,7 +103,7 @@ function TournamentCompetitive({ tournamentStatus }) {
 
     const confirmListMatchsPlayer = async () => {
         try {
-            const response = await adminTournament.confirmListMatchsPlayer(tournamentId);
+            const response = await adminTournament.confirmListMatchsPlayer(competitiveId);
             enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.log('Failed to confirm match: ', error);
@@ -184,7 +177,7 @@ function TournamentCompetitive({ tournamentStatus }) {
                             ))}
                     </Select>
                 </FormControl>
-                {tournamentStatus == 1 && listPlayer.length > 0 && (
+                {tournamentStatus == 0 && listPlayer.length > 0 && (
                     <Button variant="outlined" onClick={handleDialogConfirmMatch} sx={{ mr: 2, float: 'right' }}>
                         Xác nhận danh sách thi đấu
                     </Button>
@@ -210,6 +203,8 @@ function TournamentCompetitive({ tournamentStatus }) {
                         status={tournamentStatus}
                         areaList={areaList}
                         onUpdateResult={UpdateResultHandler}
+                        isCreate={isCreate}
+                        onCreateMatches={handleDialogCreate}
                     />
                 </div>
             ) : tournamentStatus == 1 ? (

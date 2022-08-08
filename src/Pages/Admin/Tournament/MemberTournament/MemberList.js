@@ -61,10 +61,10 @@ function MemberList({ data, type }) {
             data.map((item, index) => {
                 const container = {};
                 container['id'] = index + 1;
-                container['studentName'] = item.competitivePlayer.tournamentPlayer.user.name;
-                container['weight'] = item.competitivePlayer.weight + 'Kg';
-                container['studentId'] = item.competitivePlayer.tournamentPlayer.user.studentId;
-                container['playerGender'] = item.competitivePlayer.tournamentPlayer.user.gender ? 'Nam' : 'Nữ';
+                container['studentName'] = item.tournamentPlayer.user.name;
+                container['weight'] = item.weight + 'Kg';
+                container['studentId'] = item.tournamentPlayer.user.studentId;
+                container['playerGender'] = item.tournamentPlayer.user.gender ? 'Nam' : 'Nữ';
                 container['weightRange'] =
                     item.competitiveType.weightMin + ' - ' + item.competitiveType.weightMax + 'Kg';
                 return container;

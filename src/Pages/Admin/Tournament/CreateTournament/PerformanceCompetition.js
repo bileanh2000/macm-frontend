@@ -190,7 +190,7 @@ function PerformanceCompetition(props) {
                     size="medium"
                 >
                     <Add />
-                    Thêm người chơi
+                    Thêm thể thức thi đấu
                 </Fab>
             </Collapse>
         </Box>

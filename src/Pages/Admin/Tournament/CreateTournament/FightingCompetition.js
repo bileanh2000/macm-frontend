@@ -270,7 +270,7 @@ function FightingCompetition(props) {
                     size="medium"
                 >
                     <Add />
-                    Thêm người chơi
+                    Thêm hạng cân thi đấu
                 </Fab>
             </Collapse>
         </Box>

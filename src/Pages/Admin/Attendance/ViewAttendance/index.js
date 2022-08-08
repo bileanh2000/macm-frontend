@@ -12,12 +12,8 @@ function ViewAttendance({ data }) {
     const [pageSize, setPageSize] = useState(10);
     const [totalActive, setTotalActive] = useState();
     const [totalResult, setTotalResult] = useState();
-    const [openSnackBar, setOpenSnackBar] = useState(false);
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
     const location = useLocation();
-    const [activityId, setActivityId] = useState();
-    // const now = new Date();
-    console.log(data);
+
     let _type = location.state?.type;
     if (!_type) _type = data.type;
 
@@ -32,23 +28,26 @@ function ViewAttendance({ data }) {
             console.log(_trainingScheduleId);
             let response;
             if (_type == 0) {
-                adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
-                    // setActivityId(res.data[0].id);
-                    adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
+                adminAttendanceAPI
+                    .getTrainingSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
+                    .then((res) => {
+                        adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
+                            setUserList(res.data);
+                            setTotalActive(res.totalActive);
+                            setTotalResult(res.totalResult);
+                        });
+                    });
+            }
+            if (_type == 1) {
+                adminAttendanceAPI
+                    .getEventSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
+                    .then((res) => {
+                        adminAttendanceAPI.getAttendanceByEventId(res.data[0].id);
                         setUserList(res.data);
                         setTotalActive(res.totalActive);
                         setTotalResult(res.totalResult);
                     });
-                });
-                // response = (await activityId) && ;
             }
-            if (_type == 1) {
-                response = await adminAttendanceAPI.getAttendanceByEventId(_trainingScheduleId);
-            }
-            console.log(response);
-            setUserList(response.data);
-            setTotalActive(response.totalActive);
-            setTotalResult(response.totalResult);
         } catch (error) {
             console.log('Không thể lấy dữ liệu người dùng tham gia điểm danh. Error: ', error);
         }
@@ -57,27 +56,6 @@ function ViewAttendance({ data }) {
     useEffect(() => {
         checkAttendanceByScheduleId();
     }, []);
-    useEffect(() => {
-        console.log('activityId', activityId);
-    }, [activityId]);
-
-    let snackBarStatus;
-
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
-
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setOpenSnackBar(false);
-    };
 
     const columns = [
         { field: 'id', headerName: 'Số thứ tự', flex: 0.5 },
@@ -122,6 +100,9 @@ function ViewAttendance({ data }) {
                 >
                     <GridToolbarQuickFilter />
                 </Box>
+                <Typography variant="body1">
+                    Số người tham gia hôm nay {totalActive}/{totalResult}
+                </Typography>
             </GridToolbarContainer>
         );
     }
@@ -185,55 +166,42 @@ function ViewAttendance({ data }) {
 
     return (
         <Fragment>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
-            <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Trạng thái điểm danh ngày: {moment(new Date(_nowDate)).format('DD/MM/yyyy')}
-                <Typography variant="h6">
-                    Số người tham gia hôm nay {totalActive}/{totalResult}
-                </Typography>
-            </Typography>
             <Box
                 sx={{
                     height: '70vh',
                     width: '100%',
                     '& .status-rows': {
-                        justifyContent: 'center !important',
-                        minHeight: '0px !important',
-                        maxHeight: '35px !important',
-                        borderRadius: '100px',
-                        position: 'relative',
-                        top: '9px',
-                        minWidth: '104.143px !important',
+                        // justifyContent: 'center !important',
+                        // minHeight: '0px !important',
+                        // maxHeight: '35px !important',
+                        // borderRadius: '100px',
+                        // position: 'relative',
+                        // top: '9px',
+                        // minWidth: '104.143px !important',
                     },
-                    '& .status-rows.active': {
+                    '& .status-rows.active .MuiDataGrid-cellContent': {
                         backgroundColor: '#56f000',
                         color: '#fff',
                         fontWeight: '600',
                         textAlign: 'center',
+                        padding: 1,
+                        borderRadius: 5,
                     },
-                    '& .status-rows.deactive': {
+                    '& .status-rows.deactive .MuiDataGrid-cellContent': {
                         backgroundColor: '#ff3838',
                         color: '#fff',
                         fontWeight: '600',
+                        textAlign: 'center',
+                        padding: 1,
+                        borderRadius: 5,
                     },
-                    '& .status-rows.subActive': {
+                    '& .status-rows.subActive .MuiDataGrid-cellContent': {
                         backgroundColor: '#cfb2b2',
                         color: '#fff',
                         fontWeight: '600',
+                        textAlign: 'center',
+                        padding: 1,
+                        borderRadius: 5,
                     },
                 }}
             >

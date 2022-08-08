@@ -66,6 +66,7 @@ import addSessionPage from '../Pages/Admin/TrainingSchedule/addSession';
 import EditEvent from '../Pages/Admin/Event/EditEvent';
 
 import Attendance from 'src/Pages/Admin/Attendance';
+import EditAttendance from 'src/Pages/Admin/Attendance/EditAttendance';
 import ReportAttendance from 'src/Pages/Admin/Attendance/ReportAttendance';
 import TakeAttendance from 'src/Pages/Admin/Attendance/TakeAttendance';
 import ViewEventSchedule from 'src/Pages/Admin/Event/ViewEventSchedule';
@@ -112,23 +113,24 @@ const adminRouters = [
 
     //Attendance paths
     { path: '/admin/attendance', component: Attendance },
+    { path: '/admin/editattendance', component: EditAttendance },
     { path: '/admin/attendance/take', component: TakeAttendance },
     { path: '/admin/attendance/report', component: ReportAttendance },
     { path: '/admin/attendance/scanqrcode', component: CheckAttendanceDate },
 
     //Club fee paths
-    { path: '/admin/clubfee', component: ClubFee },
-    { path: '/admin/clubfee/membership', component: MembershipFee },
+    // { path: '/admin/clubfee', component: ClubFee },
+    { path: '/admin/membership', component: MembershipFee },
+    { path: '/admin/membership/report', component: ReportMembership },
     { path: '/admin/clubfee/event', component: ListEventsFee },
     { path: '/admin/clubfee/event/:eventId', component: EventFee },
     { path: '/admin/clubfee/event/:eventId/report', component: ReportEvent },
     { path: '/admin/clubfee/facility', component: FacilityFee },
     { path: '/admin/clubfee/facility/report', component: FacilityReport },
-    { path: '/admin/clubfee/membership/report', component: ReportMembership },
     { path: '/admin/clubfee/tournaments', component: ListTournament },
     { path: '/admin/clubfee/tournaments/:tournamentId', component: TournamentFee },
     { path: '/admin/clubfee/tournaments/:tournamentId/report/:typeId', component: TournamentFeeReport },
-    { path: '/admin/clubfee/fund', component: ClubFund },
+    { path: '/admin/fund', component: ClubFund },
 
     //Rule paths
     { path: '/admin/rules/*', component: Rules },
