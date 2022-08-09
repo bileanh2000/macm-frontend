@@ -1,45 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Alert,
     Button,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Snackbar,
     styled,
-    TextField,
     Typography,
 } from '@mui/material';
-import clsx from 'clsx';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { Box } from '@mui/system';
-import { useForm } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 
-let snackBarStatus;
-
 function AddAdminTourament({ value, index, total, active }) {
     let { tournamentId } = useParams();
+    const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
     const [userList, setUserList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
-    const [openSnackBar, setOpenSnackBar] = useState(false);
     const [isApprove, setIsApprove] = useState(false);
     const [idUpdate, setIdUpdate] = useState(0);
     const [_active, setActive] = useState(active);
-
-    let navigate = useNavigate();
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpenSnackBar(false);
-    };
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -68,29 +53,20 @@ function AddAdminTourament({ value, index, total, active }) {
     }, [tournamentId]);
 
     const columns = [
-        { field: 'studentName', headerName: 'Tên', width: 100, flex: 0.5 },
+        { field: 'studentName', headerName: 'Tên', flex: 0.3 },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
-            width: 100,
             flex: 0.3,
         },
-        {
-            field: 'roleInTournament',
-            headerName: 'Vai trò mong muốn trong ban tổ chức',
-            width: 150,
-            flex: 0.6,
-        },
         // {
-        //     field: 'registerStatus',
-        //     headerName: 'Trạng thái',
-        //     width: 50,
-        //     flex: 0.5,
+        //     field: 'roleInTournament',
+        //     headerName: 'Vai trò mong muốn',
+        //     flex: 0.3,
         // },
         {
-            field: 'actions',
+            field: 'approve',
             type: 'actions',
-            width: 150,
             flex: 0.5,
             cellClassName: 'actions',
             getActions: (params) => {
@@ -115,6 +91,27 @@ function AddAdminTourament({ value, index, total, active }) {
             },
             hide: _active === 10,
         },
+
+        // {
+        //     field: 'reject',
+        //     headerName: 'hihi',
+        //     type: 'actions',
+        //     flex: 0.5,
+        //     cellClassName: 'actions',
+        //     getActions: (params) => {
+        //         return [
+        //             <Button
+        //                 component="button"
+        //                 label="Đã đóng"
+        //                 onClick={() => handleOpenDialog(params.row.id, false)}
+        //                 style={{ backgroundColor: 'lightcoral' }}
+        //             >
+        //                 Từ chối
+        //             </Button>,
+        //         ];
+        //     },
+        //     // hide: _active === 10,
+        // },
     ];
 
     const rowsUser = userList.map((item, index) => {
@@ -127,42 +124,21 @@ function AddAdminTourament({ value, index, total, active }) {
         return container;
     });
 
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
-
     const acceptRequestToJoinOrganizingCommittee = async (organizingCommitteeId) => {
         try {
             const response = await adminTournamentAPI.acceptRequestToJoinOrganizingCommittee(organizingCommitteeId);
-            setOpenSnackBar(true);
-            snackBarStatus = true;
-            dynamicAlert(snackBarStatus, response.message);
+            enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.log('Khong the chap thuan yeu cau nay, loi:', error);
-            setOpenSnackBar(true);
-            snackBarStatus = true;
-            dynamicAlert(snackBarStatus, 'Khong the chap thuan yeu cau nay');
         }
     };
 
     const declineRequestToJoinOrganizingCommittee = async (organizingCommitteeId) => {
         try {
             const response = await adminTournamentAPI.declineRequestToJoinOrganizingCommittee(organizingCommitteeId);
-            setOpenSnackBar(true);
-            snackBarStatus = true;
-            dynamicAlert(snackBarStatus, response.message);
+            enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.log('Khong the chap thuan yeu cau nay, loi:', error);
-            setOpenSnackBar(true);
-            snackBarStatus = true;
-            dynamicAlert(snackBarStatus, 'Khong the chap thuan yeu cau nay');
         }
     };
     const handleUpdate = () => {
@@ -279,21 +255,6 @@ function AddAdminTourament({ value, index, total, active }) {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
 
             <Box
                 sx={{

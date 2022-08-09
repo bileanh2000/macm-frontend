@@ -14,6 +14,7 @@ function TakeAttendance() {
     const [pageSize, setPageSize] = useState(20);
     const [eventId, setEventId] = useState(0);
     const location = useLocation();
+    const [scheduleId, setScheduleId] = useState(0);
     const history = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
 
@@ -42,23 +43,20 @@ function TakeAttendance() {
             // });
             let response;
             if (_type == 0) {
-                adminAttendanceAPI
-                    .getTrainingSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
-                    .then((res) => {
-                        console.log(res);
-                        adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
-                            setUserList(res.data);
-                        });
-                    });
-            }
-            if (_type == 1) {
-                adminAttendanceAPI
-                    .getEventSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
-                    .then((res) => {
-                        setEventId(res.data[0].id);
-                        adminAttendanceAPI.getAttendanceByEventId(res.data[0].id);
+                adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
+                    console.log(res);
+                    setScheduleId(res.data[0].id);
+                    adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
                         setUserList(res.data);
                     });
+                });
+            }
+            if (_type == 1) {
+                adminAttendanceAPI.getEventSessionByDate(moment(_nowDate)).then((res) => {
+                    setEventId(res.data[0].id);
+                    adminAttendanceAPI.getAttendanceByEventId(res.data[0].id);
+                    setUserList(res.data);
+                });
             }
         } catch (error) {
             console.log('Không thể lấy dữ liệu người dùng tham gia điểm danh. Error: ', error);
@@ -202,7 +200,7 @@ function TakeAttendance() {
 
     const toggleStatus = (id, status) => {
         if (_type == 0) {
-            takeAttend(id, _trainingScheduleId, status);
+            takeAttend(id, scheduleId, status);
         }
         if (_type == 1) {
             takeAttendanceEvent(eventId, id, status);

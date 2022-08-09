@@ -48,11 +48,18 @@ function TournamentCompetitive() {
     const getListPlayerByCompetitiveID = async (weightRange) => {
         try {
             const response = await adminTournament.listMatchs(weightRange);
-            setListPlayer(response.data[0].listMatchDto);
             console.log('lay data', response);
-            setTournamentStatus(response.data[0].status);
-            setRounds(response.totalResult);
-            setIsCreate(response.data[0].changed);
+            if (response.data.length > 0) {
+                setListPlayer(response.data[0].listMatchDto);
+                setTournamentStatus(response.data[0].status);
+                setRounds(response.totalResult);
+                setIsCreate(response.data[0].changed);
+            } else {
+                setListPlayer(response.data);
+                setTournamentStatus(0);
+                setRounds(0);
+                setIsCreate(true);
+            }
         } catch (error) {
             console.log('Failed to fetch match: ', error);
         }
@@ -155,11 +162,11 @@ function TournamentCompetitive() {
                     <Button onClick={handleOk}>Đồng ý</Button>
                 </DialogActions>
             </Dialog>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            {/* <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                     Bảng đấu
                 </Typography>
-            </Box>
+            </Box> */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
                 <FormControl size="small">
                     <Typography variant="caption">Hạng cân</Typography>

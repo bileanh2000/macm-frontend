@@ -57,7 +57,7 @@ function AdminTournament({ isUpdate, user }) {
                     >
                         <Tab label="Danh sách ban tổ chức" {...a11yProps(0)} />
                         <Tab label="Cập nhật vai trò" {...a11yProps(1)} />
-                        <Tab label="Xét duyệt yêu cầu tham gia" {...a11yProps(2)} />
+                        {/* <Tab label="Xét duyệt yêu cầu tham gia" {...a11yProps(2)} /> */}
                     </Tabs>
                     {/* {!isUpdate && (
                         <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialogExhibition(true)}>
@@ -82,7 +82,7 @@ function AdminTournament({ isUpdate, user }) {
                     }}
                 />
                 <UpdateAdminTournament value={value} active={active} total={total} index={1} />
-                <AddAdminTourament value={value} active={active} total={total} index={2} />
+                {/* <AddAdminTourament value={value} active={active} total={total} index={2} /> */}
             </Box>
         </Fragment>
     );

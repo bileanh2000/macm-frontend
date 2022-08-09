@@ -114,6 +114,9 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
                         >
                             <Grid container columns={12} sx={{ mt: 2 }} spacing={3}>
                                 <Grid item xs={7}>
+                                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                                        Thông tin giải đấu
+                                    </Typography>
                                     <TextField
                                         id="outlined-basic"
                                         label="Tên giải đấu"
@@ -138,46 +141,12 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
                                         error={errors.description ? true : false}
                                         helperText={errors.description?.message}
                                     />
-                                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
-                                        Nội dung thi đấu
-                                    </Typography>
-                                    <Grid container spacing={1}>
-                                        <Grid item xs={4}>
-                                            <Typography
-                                                sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }}
-                                                variant="body1"
-                                            >
-                                                Thi đấu đối kháng
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={8}>
-                                            {datasFightingCompetition && (
-                                                <UpdateFightingCompetition
-                                                    onAddFightingCompetition={AddFightingCompetitionHandler}
-                                                    data={datasFightingCompetition}
-                                                />
-                                            )}
-                                        </Grid>
-                                        <Grid item xs={4}>
-                                            <Typography
-                                                sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }}
-                                                variant="body1"
-                                            >
-                                                Thi đấu biểu diễn
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={8}>
-                                            {datasPerformanceCompetition && (
-                                                <UpdatePerformanceCompetition
-                                                    onAddPerformanceCompetition={PerformanceCompetitionHandler}
-                                                    data={datasPerformanceCompetition}
-                                                />
-                                            )}
-                                        </Grid>
-                                    </Grid>
                                 </Grid>
                                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                                     <Grid item xs={5}>
+                                        <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                                            Hạn đăng kí
+                                        </Typography>
                                         <Controller
                                             required
                                             name="datePlayerDeadline"
@@ -254,6 +223,41 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
                                         />
                                     </Grid>
                                 </LocalizationProvider>
+                                <Grid item xs={12}>
+                                    <Typography sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }} variant="body1">
+                                        Nội dung thi đấu
+                                    </Typography>
+                                    <Grid container spacing={3}>
+                                        <Grid item xs={12} sm={6}>
+                                            <Typography
+                                                sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }}
+                                                variant="body1"
+                                            >
+                                                Thi đấu đối kháng
+                                            </Typography>
+                                            {datasFightingCompetition && (
+                                                <UpdateFightingCompetition
+                                                    onAddFightingCompetition={AddFightingCompetitionHandler}
+                                                    data={datasFightingCompetition}
+                                                />
+                                            )}
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <Typography
+                                                sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }}
+                                                variant="body1"
+                                            >
+                                                Thi đấu biểu diễn
+                                            </Typography>
+                                            {datasPerformanceCompetition && (
+                                                <UpdatePerformanceCompetition
+                                                    onAddPerformanceCompetition={PerformanceCompetitionHandler}
+                                                    data={datasPerformanceCompetition}
+                                                />
+                                            )}
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
                             </Grid>
                         </Box>
                     </DialogContent>

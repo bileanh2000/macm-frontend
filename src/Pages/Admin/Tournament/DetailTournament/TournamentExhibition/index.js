@@ -98,11 +98,11 @@ function TournamentExhibition({ tournamentStatus }) {
 
     return (
         <Fragment>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            {/* <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                     Bảng đấu biểu diễn
                 </Typography>
-            </Box>
+            </Box> */}
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
                 <FormControl size="small">

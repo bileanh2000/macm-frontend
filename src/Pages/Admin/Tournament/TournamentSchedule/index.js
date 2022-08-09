@@ -52,9 +52,9 @@ function TournamentSchedule() {
         return container;
     });
 
-    const handleEventAdd = () => {
-        console.log('selected');
-    };
+    // const handleEventAdd = () => {
+    //     console.log('selected');
+    // };
     let navigate = useNavigate();
     const navigateToUpdate = (params) => {
         console.log(params);

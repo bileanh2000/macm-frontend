@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import {
     Button,
     Chip,
+    Collapse,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     Icon,
+    IconButton,
     Paper,
     Table,
     TableBody,
@@ -15,6 +17,8 @@ import {
     TableHead,
     TableRow,
     TextField,
+    Tooltip,
+    Typography,
 } from '@mui/material';
 import moment from 'moment';
 import { Box } from '@mui/system';
@@ -22,7 +26,7 @@ import * as Yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import NumberFormat from 'react-number-format';
-import { SportsScore } from '@mui/icons-material';
+import { KeyboardArrowDown, KeyboardArrowUp, SportsScore } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 
 import adminTournament from 'src/api/adminTournamentAPI';
@@ -89,6 +93,85 @@ function TableMatch(params) {
         params.onUpdateResult(newMatches);
         handleClose();
     };
+
+    function Row(props) {
+        const { row, status, index } = props;
+        const [open, setOpen] = React.useState(false);
+
+        return (
+            <React.Fragment>
+                <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                    <TableCell>
+                        <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                            {open ? (
+                                <Tooltip title="Đóng" arrow>
+                                    <KeyboardArrowUp />
+                                </Tooltip>
+                            ) : (
+                                <Tooltip title="Thành viên trong đội" arrow>
+                                    <KeyboardArrowDown />
+                                </Tooltip>
+                            )}
+                        </IconButton>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                        {index + 1}
+                    </TableCell>
+                    <TableCell align="right">{row.team.teamName}</TableCell>
+                    <TableCell align="right">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
+                    <TableCell align="right">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
+                    {/* {params.status === 2 && <TableCell align="right"></TableCell>} */}
+                    {status === 3 && (
+                        <TableCell align="right">
+                            <Chip
+                                icon={<SportsScore />}
+                                label={row.score == null ? 'Cập nhật điểm số' : 'Đã cập nhật'}
+                                clickable={row.score == null ? true : false}
+                                onClick={() => handleClickResult(row)}
+                            />
+                        </TableCell>
+                    )}
+                </TableRow>
+                <TableRow>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                        <Collapse in={open} timeout="auto" unmountOnExit>
+                            <Box sx={{ margin: 1 }}>
+                                <Typography variant="h6" gutterBottom component="div">
+                                    Thành viên
+                                </Typography>
+                                <Table size="small" aria-label="purchases">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Tên thành viên</TableCell>
+                                            <TableCell>Mã số sinh viên</TableCell>
+                                            <TableCell align="right">Giới tính</TableCell>
+                                            <TableCell align="right">Vai trò</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {row.team.exhibitionPlayers.map((player) => (
+                                            <TableRow key={player.id}>
+                                                <TableCell component="th" scope="row">
+                                                    {player.tournamentPlayer.user.name}
+                                                </TableCell>
+                                                <TableCell>{player.tournamentPlayer.user.studentId}</TableCell>
+                                                <TableCell align="right">
+                                                    {player.tournamentPlayer.user.gender ? 'Nam' : 'Nữ'}
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    {player.roleInTeam ? 'Trưởng nhóm' : ''}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </Box>
+                        </Collapse>
+                    </TableCell>
+                </TableRow>
+            </React.Fragment>
+        );
+    }
 
     return (
         <Box>
@@ -252,6 +335,7 @@ function TableMatch(params) {
                     <caption>Địa điểm thi đấu: {params.matches[0].area.name}</caption>
                     <TableHead>
                         <TableRow>
+                            <TableCell></TableCell>
                             <TableCell>STT</TableCell>
                             <TableCell align="right">Tên đội</TableCell>
                             <TableCell align="right">Thời gian thi đấu</TableCell>
@@ -262,25 +346,26 @@ function TableMatch(params) {
                     </TableHead>
                     <TableBody>
                         {params.matches.map((row, index) => (
-                            <TableRow key={row.id}>
-                                <TableCell component="th" scope="row">
-                                    {index + 1}
-                                </TableCell>
-                                <TableCell align="right">{row.team.teamName}</TableCell>
-                                <TableCell align="right">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
-                                <TableCell align="right">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
-                                {/* {params.status === 2 && <TableCell align="right"></TableCell>} */}
-                                {params.status === 3 && (
-                                    <TableCell align="right">
-                                        <Chip
-                                            icon={<SportsScore />}
-                                            label={row.score == null ? 'Cập nhật điểm số' : 'Đã cập nhật'}
-                                            clickable={row.score == null ? true : false}
-                                            onClick={() => handleClickResult(row)}
-                                        />
-                                    </TableCell>
-                                )}
-                            </TableRow>
+                            <Row key={row.id} row={row} status={params.status} index={index} />
+                            // <TableRow key={row.id}>
+                            //     <TableCell component="th" scope="row">
+                            //         {index + 1}
+                            //     </TableCell>
+                            //     <TableCell align="right">{row.team.teamName}</TableCell>
+                            //     <TableCell align="right">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
+                            //     <TableCell align="right">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
+                            //     {/* {params.status === 2 && <TableCell align="right"></TableCell>} */}
+                            //     {params.status === 3 && (
+                            //         <TableCell align="right">
+                            //             <Chip
+                            //                 icon={<SportsScore />}
+                            //                 label={row.score == null ? 'Cập nhật điểm số' : 'Đã cập nhật'}
+                            //                 clickable={row.score == null ? true : false}
+                            //                 onClick={() => handleClickResult(row)}
+                            //             />
+                            //         </TableCell>
+                            //     )}
+                            // </TableRow>
                         ))}
                     </TableBody>
                 </Table>

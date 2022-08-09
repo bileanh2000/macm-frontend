@@ -102,6 +102,16 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
         }
     };
 
+    const handleDelete = (data) => {
+        let newData;
+        console.log(data);
+        newData = player.filter((d) => {
+            return d.studentId !== data.studentId;
+        });
+        console.log(newData);
+        setPlayer(newData);
+    };
+
     const handleCloseDialog = () => {
         setPlayer([]);
         // reset({
@@ -120,10 +130,9 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
         addNewCompetitivePlayer(weightRange, player);
         const newPlayer = player.map((p) => {
             return {
-                
-                    tournamentPlayer: { user: { gender: p.gender, name: p.name, studentId: p.studentId } },
-                    weight: 0,
-                
+                tournamentPlayer: { user: { gender: p.gender, name: p.name, studentId: p.studentId } },
+                weight: 0,
+
                 competitiveType: { weightMax: maxWeight, weightMin: minWeight },
             };
         });
@@ -191,7 +200,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
 
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
-                        <Paper elevation={3} sx={{ width: '100%' }}>
+                        <Paper elevation={3} sx={{ width: '100%', minHeight: 400 }}>
                             {player.length > 0 && (
                                 <TableContainer sx={{ maxHeight: 440 }}>
                                     <Table stickyHeader aria-label="sticky table">
@@ -209,6 +218,17 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
                                                     <TableCell align="center">{data.studentId}</TableCell>
                                                     <TableCell align="center">{data.name}</TableCell>
                                                     <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
+                                                    <TableCell align="center">
+                                                        <IconButton
+                                                            aria-label="delete"
+                                                            onClick={() => {
+                                                                // handleOpenDialog();
+                                                                handleDelete(data);
+                                                            }}
+                                                        >
+                                                            <Delete />
+                                                        </IconButton>
+                                                    </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
@@ -217,19 +237,6 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
                             )}
                         </Paper>
                     </Grid>
-                    {/* <Grid item xs={4}>
-                        <TextField
-                            fullWidth
-                            type="number"
-                            id="outlined-basic"
-                            label="Cân nặng"
-                            variant="outlined"
-                            {...register('weight')}
-                            error={errors.weight ? true : false}
-                            helperText={errors.weight?.message}
-                            required
-                        />
-                    </Grid> */}
                 </Grid>
             </DialogContent>
             <DialogActions>

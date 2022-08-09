@@ -18,10 +18,14 @@ import {
 } from '@mui/material';
 import { Box } from '@mui/system';
 import { Cancel, Delete, Edit } from '@mui/icons-material';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
+import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { vi } from 'date-fns/locale';
 
 import adminTournament from 'src/api/adminTournamentAPI';
+import moment from 'moment';
 
 function TournamentSchedule({ isUpdate }) {
     const nowDate = new Date();
@@ -70,14 +74,10 @@ function TournamentSchedule({ isUpdate }) {
     };
 
     const validationSchema = Yup.object().shape({
-        startTime: Yup.string()
-            .nullable()
-            .required('Không để để trống trường này')
-            .matches(/^([01]?\d|2[0-3]):([0-5]?\d):([0-5]?\d)$/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
-        finishTime: Yup.string()
-            .nullable()
-            .required('Không để để trống trường này')
-            .matches(/^([01]?\d|2[0-3]):([0-5]?\d):([0-5]?\d)$/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
+        startTime: Yup.string().nullable().required('Không để để trống trường này'),
+        // .matches(/^([01]?\d|2[0-3]):([0-5]?\d):([0-5]?\d)$/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
+        finishTime: Yup.string().nullable().required('Không để để trống trường này'),
+        // .matches(/^([01]?\d|2[0-3]):([0-5]?\d):([0-5]?\d)$/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
     });
 
     const handleDelete = (id) => {
@@ -97,8 +97,12 @@ function TournamentSchedule({ isUpdate }) {
     };
 
     const handleUpdate = (data) => {
-        const newData = { finishTime: data.finishTime, startTime: data.startTime, date: scheduleUpdate.date };
-
+        const newData = {
+            finishTime: moment(new Date(data.finishTime)).format('HH:mm:ss'),
+            startTime: moment(new Date(data.startTime)).format('HH:mm:ss'),
+            date: scheduleUpdate.date,
+        };
+        console.log(newData);
         if (scheduleUpdate.params) {
             adminTournament.updateTournamentSession(scheduleUpdate.params.id, newData).then((res) => {
                 if (res.data.length != 0) {
@@ -137,7 +141,7 @@ function TournamentSchedule({ isUpdate }) {
 
     const handleClose = () => {
         setOpen(false);
-        setScheduleUpdate({});
+        setScheduleUpdate();
         reset({
             startTime: '',
             finishTime: '',
@@ -229,46 +233,90 @@ function TournamentSchedule({ isUpdate }) {
                         </Grid>
                     </DialogTitle>
                     <DialogContent sx={{ height: '500px', paddingTop: '20px !important' }}>
-                        <Grid container spacing={1} columns={12}>
-                            <Grid item sm={4}>
-                                <TextField
-                                    disabled
-                                    id="outlined-disabled"
-                                    label="Ngày tháng"
-                                    defaultValue={scheduleUpdate.date}
-                                    fullWidth
-                                    {...register('date')}
-                                    //error={errors.date ? true : false}
-                                    //helperText={errors.date?.message}
-                                />
+                        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                            <Grid container spacing={1} columns={12}>
+                                <Grid item sm={4}>
+                                    <TextField
+                                        disabled
+                                        id="outlined-disabled"
+                                        label="Ngày tháng"
+                                        defaultValue={scheduleUpdate.date}
+                                        fullWidth
+                                        {...register('date')}
+                                        //error={errors.date ? true : false}
+                                        //helperText={errors.date?.message}
+                                    />
+                                </Grid>
+                                <Grid item sm={4}>
+                                    <Controller
+                                        required
+                                        name="startTime"
+                                        inputFormat="HH:mm:ss"
+                                        control={control}
+                                        defaultValue={
+                                            scheduleUpdate.params ? '2022-08-17T' + scheduleUpdate.params.startTime : ''
+                                        }
+                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                            <TimePicker
+                                                label="Thời gian bắt đầu"
+                                                ampm={false}
+                                                inputFormat="HH:mm:ss"
+                                                value={value}
+                                                onChange={(value) => onChange(value)}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        required
+                                                        id="outlined-disabled"
+                                                        error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        // id="startDate"
+                                                        variant="outlined"
+                                                        margin="dense"
+                                                        fullWidth
+                                                    />
+                                                )}
+                                            />
+                                        )}
+                                    />
+                                </Grid>
+                                <Grid item sm={4}>
+                                    <Controller
+                                        required
+                                        name="finishTime"
+                                        inputFormat="HH:mm:ss"
+                                        defaultValue={
+                                            scheduleUpdate.params
+                                                ? '2022-08-17T' + scheduleUpdate.params.finishTime
+                                                : ''
+                                        }
+                                        control={control}
+                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                            <TimePicker
+                                                label="Thời gian kết thúc"
+                                                ampm={false}
+                                                inputFormat="HH:mm:ss"
+                                                value={value}
+                                                onChange={(value) => onChange(value)}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        required
+                                                        id="outlined-disabled"
+                                                        error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        // id="startDate"
+                                                        variant="outlined"
+                                                        margin="dense"
+                                                        fullWidth
+                                                    />
+                                                )}
+                                            />
+                                        )}
+                                    />
+                                </Grid>
                             </Grid>
-                            <Grid item sm={4}>
-                                <TextField
-                                    required
-                                    control={control}
-                                    id="outlined-disabled"
-                                    label="Thời gian bắt đầu"
-                                    defaultValue={scheduleUpdate.params ? scheduleUpdate.params.startTime : ''}
-                                    fullWidth
-                                    {...register('startTime')}
-                                    error={errors.startTime ? true : false}
-                                    helperText={errors.startTime?.message}
-                                />
-                            </Grid>
-                            <Grid item sm={4}>
-                                <TextField
-                                    required
-                                    control={control}
-                                    id="outlined-disabled"
-                                    label="Thời gian kết thúc"
-                                    defaultValue={scheduleUpdate.params ? scheduleUpdate.params.finishTime : ''}
-                                    fullWidth
-                                    {...register('finishTime')}
-                                    error={errors.finishTime ? true : false}
-                                    helperText={errors.finishTime?.message}
-                                />
-                            </Grid>
-                        </Grid>
+                        </LocalizationProvider>
                     </DialogContent>
 
                     <DialogActions>
