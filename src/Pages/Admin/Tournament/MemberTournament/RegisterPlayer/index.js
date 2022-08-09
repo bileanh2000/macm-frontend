@@ -33,7 +33,6 @@ import userApi from 'src/api/userApi';
 import { Delete } from '@mui/icons-material';
 import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
-import MultiSelect from './Multiple';
 
 function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
     let { tournamentId } = useParams();
