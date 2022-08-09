@@ -6,9 +6,11 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Grid,
     IconButton,
     MenuItem,
     Pagination,
+    Paper,
     TextField,
     Typography,
 } from '@mui/material';
@@ -17,12 +19,19 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import styles from './Event.module.scss';
 import classNames from 'classnames/bind';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import eventApi from 'src/api/eventApi';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import semesterApi from 'src/api/semesterApi';
 import moment from 'moment';
 import { EventSeatTwoTone } from '@mui/icons-material';
+import CelebrationIcon from '@mui/icons-material/Celebration';
+import EventItem from './EventItem';
+import trainingScheduleApi from 'src/api/trainingScheduleApi';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import AddEventDialog from './AddEventDialog';
 
 const cx = classNames.bind(styles);
 
@@ -30,27 +39,41 @@ function Event() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [events, setEvents] = useState([]);
+    const [upComingEvents, setUpComingEvents] = useState([]);
+    const [goingOnEvents, setGoingOnEvents] = useState([]);
+    const [closedEvent, setClosedEvent] = useState([]);
     const [pageSize, setPageSize] = useState(10);
     const [semester, setSemester] = useState('Summer2022');
     const [monthInSemester, setMonthInSemester] = useState([]);
     const [month, setMonth] = useState(0);
     const [semesterList, setSemesterList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
-    const [eventOnclick, SetEventOnclick] = useState({ name: '', id: '' });
-
+    const [commonList, setCommonList] = useState([]);
+    const [startDateOfSemester, setStartDateOfSemester] = useState();
+    const calendarComponentRef = useRef(null);
+    let navigate = useNavigate();
     const handleChange = (event) => {
         setSemester(event.target.value);
     };
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
+
+    const calendarFilter = (date) => {
+        let calApi = calendarComponentRef.current.getApi();
+        calApi.gotoDate(date);
     };
-    const handleOpenDialog = () => {
-        setOpenDialog(true);
+    const getStartDateBySemesterName = (name) => {
+        let startDateBySemester = semesterList && semesterList.filter((item) => item.name === name);
+        startDateBySemester[0] && setStartDateOfSemester(startDateBySemester[0].startDate);
     };
     const getListEventsBySemester = async (month, page, semester) => {
         try {
             const response = await eventApi.getEventBySemester(month, page, semester);
+            let upComing = response.data.filter((event) => event.status === 'Chưa diễn ra');
+            let goingOn = response.data.filter((event) => event.status === 'Đang diễn ra');
+            let closed = response.data.filter((event) => event.status === 'Đã kết thúc');
             setEvents(response.data);
+            setUpComingEvents(upComing);
+            setGoingOnEvents(goingOn);
+            setClosedEvent(closed);
 
             // setTotal(response.totalPage);
             // setPageSize(response.pageSize);
@@ -73,11 +96,40 @@ function Event() {
     const fetchSemester = async () => {
         try {
             const response = await semesterApi.getTop3Semester();
-            console.log('Thanh cong roi, semester: ', response);
+            console.log('getTop3Semester: ', response);
             setSemesterList(response.data);
+            setSemester(response.data[0].name);
         } catch (error) {
-            console.log('That bai roi huhu, semester: ', error);
+            console.log('Fail when getTop3Semester', error);
         }
+    };
+
+    const fetchCommonScheduleBySemester = async () => {
+        try {
+            const response = await trainingScheduleApi.commonSchedule();
+            console.log('Thanh cong roi: ', response);
+            let eventSchedule = response.data.filter((event) => event.type === 1);
+            setCommonList(eventSchedule);
+        } catch (error) {
+            console.log('That bai roi huhu ', error);
+        }
+    };
+    const scheduleData = commonList.map((item) => {
+        const container = {};
+        container['id'] = item.id;
+        container['date'] = item.date;
+        container['title'] = item.title;
+        container['display'] = 'background';
+        container['type'] = item.type;
+
+        container['backgroundColor'] = '#ccffe6';
+
+        return container;
+    });
+    const navigateToUpdate = (params, date) => {
+        console.log(params);
+        // let path = `${moment(date).format('YYYY-MM-DD')}/edit`;
+        // navigate(path);
     };
 
     useEffect(() => {
@@ -87,45 +139,52 @@ function Event() {
         fetchSemester();
     }, []);
     useEffect(() => {
-        fetchMonthInSemester(semester);
         getListEventsBySemester(month, page - 1, semester);
+        fetchCommonScheduleBySemester();
     }, [semester, month, page]);
 
-    const handleDelete = useCallback(
-        (id) => () => {
-            handleCloseDialog();
-            setTimeout(() => {
-                // const params = { studentId: id, semester: semester };
-                eventApi.deleteEvent(id).then((res) => {
-                    setEvents((prev) => prev.filter((item) => item.id !== id));
-                    console.log('delete', res);
-                    console.log('delete', res.data);
-                });
-            });
-        },
-        [],
-    );
+    useEffect(() => {
+        fetchMonthInSemester(semester);
+        setMonth(new Date().getMonth() + 1);
+    }, [semester]);
+    useEffect(() => {
+        getStartDateBySemesterName(semester);
+
+        // let newDate = moment(new Date()).format('yyyy-MM-DD');
+        // let formatMonth = month;
+
+        // if (month) {
+        //     newDate =
+        //         startDateOfSemester &&
+        //         startDateOfSemester.split('-')[0] + '-' + formatMonth + '-' + startDateOfSemester.split('-')[2];
+        // }
+        // if (month < 10) {
+        //     formatMonth = '0' + month;
+        // }
+
+        // newDate && calendarFilter(newDate);
+        // console.log('heheeeee', newDate);
+        // console.log('heheeeee', formatMonth);
+        // month &&
+        //     calendarFilter(
+        //         new Date(`${startDateOfSemester.split('-')[0]}-${month}-${startDateOfSemester.split('-')[2]}`),
+        //     );
+        month &&
+            startDateOfSemester &&
+            calendarFilter(
+                new Date(`${startDateOfSemester.split('-')[0]}-${month}-${startDateOfSemester.split('-')[2]}`),
+            );
+    }, [semester, month, startDateOfSemester]);
+
     return (
-        <Box>
-            <Dialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa sự kiện "${eventOnclick.name}"?`}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        "{eventOnclick.name}" sẽ được xóa khỏi danh sách sự kiện!
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog}>Từ chối</Button>
-                    <Button onClick={handleDelete(eventOnclick.id)} autoFocus>
-                        Đồng ý
-                    </Button>
-                </DialogActions>
-            </Dialog>
+        <Fragment>
+            <AddEventDialog
+                title="Thêm sự kiện mới"
+                isOpen={openDialog}
+                handleClose={() => {
+                    setOpenDialog(false);
+                }}
+            />
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                     Danh sách sự kiện
@@ -133,14 +192,17 @@ function Event() {
                 <Button
                     variant="outlined"
                     sx={{ maxHeight: '50px', minHeight: '50px' }}
-                    component={Link}
-                    to={'/admin/events/add'}
+                    // component={Link}
+                    // to={'/admin/events/add'}
+                    onClick={() => {
+                        setOpenDialog(true);
+                    }}
                     startIcon={<AddCircleIcon />}
                 >
                     Thêm sự kiện mới
                 </Button>
             </Box>
-            <Box sx={{ mb: 1 }}>
+            <Box sx={{ mb: 2 }}>
                 <TextField
                     id="outlined-select-currency"
                     select
@@ -150,6 +212,8 @@ function Event() {
                     onChange={handleChange}
                     sx={{ mr: 2 }}
                 >
+                    {/* {semesterList[0] && <MenuItem value={semesterList[0].name}>{semesterList[0].name}</MenuItem>} */}
+
                     {semesterList.map((option) => (
                         <MenuItem key={option.id} value={option.name}>
                             {option.name}
@@ -174,82 +238,143 @@ function Event() {
                     ))}
                 </TextField>
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Box sx={{ width: '80%' }}>
-                    {events && events.length === 0 ? (
-                        <Typography variant="h5" sx={{ textAlign: 'center', mt: 3 }}>
-                            KHÔNG CÓ SỰ KIỆN NÀO
+            <Grid container spacing={4}>
+                <Grid item xs={4}>
+                    {events.length !== 0 ? null : (
+                        <Typography sx={{ fontWeight: 'bold', mt: 3, textAlign: 'center' }}>
+                            Không có sự kiện nào !
                         </Typography>
-                    ) : (
-                        ''
                     )}
-                    <ul>
-                        {events &&
-                            events.map((item) => {
-                                return (
-                                    <li key={item.id}>
-                                        <div className={cx('events')}>
-                                            <Box component={Link} to={`${item.id}`}>
-                                                <div className={cx('event-list')}>
-                                                    <div className={cx('event-status')}>
-                                                        {/* <p className={cx('upcoming')}> */}
-                                                        {item.status === 'Chưa diễn ra' ? (
-                                                            <p className={cx('upcoming')}>Sắp diễn ra</p>
-                                                        ) : item.status === 'Đang diễn ra' ? (
-                                                            <p className={cx('going-on')}>Đang diễn ra</p>
-                                                        ) : (
-                                                            <p className={cx('closed')}>Đã kết thúc</p>
-                                                        )}
-                                                    </div>
-                                                    <div className={cx('event-title')}>{item.name}</div>
-                                                    <div className={cx('event-date')}>
-                                                        {moment(new Date(item.startDate)).format('DD/MM/yyyy')}
-                                                    </div>
-                                                </div>
-                                            </Box>
-                                            <div className={cx('event-action')}>
-                                                {item.status === 'Chưa diễn ra' ? (
-                                                    <Fragment>
-                                                        <IconButton
-                                                            aria-label="delete"
-                                                            onClick={() => {
-                                                                handleOpenDialog();
-                                                                SetEventOnclick({ name: item.name, id: item.id });
-                                                                // handleDelete(item.id);
-                                                            }}
-                                                        >
-                                                            <DeleteIcon />
-                                                        </IconButton>
-                                                        <IconButton
-                                                            aria-label="edit"
-                                                            component={Link}
-                                                            to={`${item.id}/edit`}
-                                                        >
-                                                            <EditIcon />
-                                                        </IconButton>
-                                                    </Fragment>
-                                                ) : (
-                                                    ''
-                                                )}
-                                            </div>
-                                        </div>
-                                    </li>
-                                );
-                            })}
-                    </ul>
-                    <Box>
-                        <Pagination
-                            count={events && Math.floor(events.length / 5) + 1}
-                            // count={3}
-                            page={page}
-                            color="primary"
-                            sx={{ display: 'flex', mt: 4, justifyContent: 'flex-end' }}
-                            onChange={(event, value) => setPage(value)}
-                        />
-                    </Box>
-                </Box>
+                    {goingOnEvents.length !== 0 ? (
+                        <Box sx={{ mb: 2 }}>
+                            <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Đang diễn ra</Typography>
+                            <ul>
+                                {goingOnEvents &&
+                                    goingOnEvents.map((item) => {
+                                        return <EventItem key={item.id} data={item} />;
+                                    })}
+                            </ul>
+                        </Box>
+                    ) : null}
+
+                    {upComingEvents.length !== 0 ? (
+                        <Box>
+                            <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Sắp diễn ra</Typography>
+                            <ul>
+                                {upComingEvents &&
+                                    upComingEvents.map((item) => {
+                                        return (
+                                            <EventItem
+                                                key={item.id}
+                                                data={item}
+                                                onSuccess={(deletedId) =>
+                                                    setUpComingEvents((prev) =>
+                                                        prev.filter((item) => item.id !== deletedId),
+                                                    )
+                                                }
+                                            />
+                                        );
+                                    })}
+                            </ul>
+                        </Box>
+                    ) : null}
+                    {closedEvent.length !== 0 ? (
+                        <>
+                            <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Đã kết thúc</Typography>
+                            <Box sx={{ height: '40vh', overflowY: 'overlay' }}>
+                                <ul>
+                                    {closedEvent &&
+                                        closedEvent.map((item) => {
+                                            return <EventItem key={item.id} data={item} />;
+                                        })}
+                                </ul>
+                                <ul>
+                                    {closedEvent &&
+                                        closedEvent.map((item) => {
+                                            return <EventItem key={item.id} data={item} />;
+                                        })}
+                                </ul>
+                                <ul>
+                                    {closedEvent &&
+                                        closedEvent.map((item) => {
+                                            return <EventItem key={item.id} data={item} />;
+                                        })}
+                                </ul>
+                                <ul>
+                                    {closedEvent &&
+                                        closedEvent.map((item) => {
+                                            return <EventItem key={item.id} data={item} />;
+                                        })}
+                                </ul>
+                            </Box>
+                        </>
+                    ) : null}
+                </Grid>
+                <Grid item xs={8} sx={{ height: '80vh' }}>
+                    <FullCalendar
+                        // initialDate={new Date(2022, month - 1, 1)}
+                        // {...(semester!==2?(initialDate: '2022-10-01'):{})}
+                        // initialDate={semester !== 2 ? new Date('2022-10-01') : new Date()}
+                        locale="vie"
+                        height="100%"
+                        plugins={[dayGridPlugin, interactionPlugin]}
+                        initialView="dayGridMonth"
+                        // events={[
+                        //     {
+                        //         id: 1,
+                        //         title: 'Teambuiding Tam đảo 18:00-19:00',
+                        //         start: '2022-06-24',
+                        //         end: '2022-06-27',
+                        //         // display: 'background',
+                        //         // textColor: 'white',
+                        //         // backgroundColor: '#5ba8f5',
+                        //         classNames: ['test-css'],
+                        //     },
+                        // ]}
+                        events={scheduleData}
+                        weekends={true}
+                        headerToolbar={{
+                            left: 'title',
+                            center: 'dayGridMonth,dayGridWeek',
+                            right: 'prev next today',
+                            // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                        }}
+                        // editable={true}
+                        // selectable={true}
+                        // datesSet={(dateInfo) => {
+                        //     getMonthInCurrentTableView(dateInfo.start);
+                        // }}
+                        eventClick={(args) => {
+                            navigateToUpdate(args.event, args.event.start);
+                            // console.log(args);
+                        }}
+                        dateClick={function (arg) {
+                            // console.log(arg.dateStr);
+                            // navigateToCreate(arg.dateStr);
+                            // swal({
+                            //     title: 'Date',
+                            //     text: arg.dateStr,
+                            //     type: 'success',
+                            // });
+                        }}
+                        ref={calendarComponentRef}
+                        // selectable
+                        // select={handleEventAdd}
+                        // eventDrop={(e) => console.log(e)}
+                    />
+                </Grid>
+            </Grid>
+            <Box>
+                <Pagination
+                    count={events && Math.floor(events.length / 5) + 1}
+                    // count={3}
+                    page={page}
+                    color="primary"
+                    sx={{ display: 'flex', mt: 4, justifyContent: 'flex-end' }}
+                    onChange={(event, value) => setPage(value)}
+                />
             </Box>
-        </Box>
+        </Fragment>
     );
 }
 
