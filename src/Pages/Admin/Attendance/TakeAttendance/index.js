@@ -14,6 +14,7 @@ function TakeAttendance() {
     const [pageSize, setPageSize] = useState(20);
     const [eventId, setEventId] = useState(0);
     const location = useLocation();
+    const [scheduleId, setScheduleId] = useState(0);
     const history = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
 
@@ -44,6 +45,7 @@ function TakeAttendance() {
             if (_type == 0) {
                 adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
                     console.log(res);
+                    setScheduleId(res.data[0].id);
                     adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
                         setUserList(res.data);
                     });
@@ -198,7 +200,7 @@ function TakeAttendance() {
 
     const toggleStatus = (id, status) => {
         if (_type == 0) {
-            takeAttend(id, _trainingScheduleId, status);
+            takeAttend(id, scheduleId, status);
         }
         if (_type == 1) {
             takeAttendanceEvent(eventId, id, status);

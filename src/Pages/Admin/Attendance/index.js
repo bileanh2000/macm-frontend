@@ -21,22 +21,27 @@ function Attendance() {
     // const date = moment(new Date(_nowDate)).format('DD/MM/yyyy');
 
     console.log(trainingScheduleId, _nowDate);
-    const getSessionByDate = async () => {
-        try {
-            const response = await adminAttendanceAPI.getCommonSessionByDate(_nowDate);
-            if (!_trainingScheduleId && response.data.length > 0) {
-                setTrainingScheduleId(response.data[0].id);
-            }
-            setType(response.data[0].type);
-            // console.log(response);
-        } catch (error) {
-            console.log('dm', error);
-        }
-    };
 
     useEffect(() => {
+        const getSessionByDate = async () => {
+            try {
+                const response = await adminAttendanceAPI.getCommonSessionByDate(_nowDate);
+                if (!_trainingScheduleId && response.data.length > 0) {
+                    setTrainingScheduleId(response.data[0].id);
+                    console.log(response);
+                }
+                setType(response.data[0].type);
+                // console.log(response);
+            } catch (error) {
+                console.log('dm', error);
+            }
+        };
         getSessionByDate();
-    }, []);
+    }, [_nowDate, _trainingScheduleId]);
+
+    useEffect(() => {
+        setTrainingScheduleId(_trainingScheduleId);
+    }, [_trainingScheduleId]);
 
     return (
         <Box sx={{ m: 1, p: 1 }}>
