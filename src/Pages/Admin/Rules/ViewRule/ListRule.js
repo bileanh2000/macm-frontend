@@ -91,7 +91,7 @@ function List() {
                 <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     Xác nhận
                 </DialogTitle>
-                <DialogContent>Bạn có chắc chắn muốn cập nhật trạng thái đóng tiền</DialogContent>
+                <DialogContent>Bạn có chắc chắn muốn xóa rule này?</DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseConfirm}>Hủy</Button>
                     <Button onClick={handleOpenConfirm} autoFocus>

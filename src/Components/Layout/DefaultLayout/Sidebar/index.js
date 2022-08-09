@@ -154,6 +154,10 @@ function Sidebar() {
                         sx={{ pl: 4 }}
                         component={Link}
                         to="/admin/attendance"
+                        state={{
+                            id: null,
+                            date: null,
+                        }}
                         selected={selectedIndex === 1}
                         onClick={(event) => handleListItemClick(event, 1)}
                     >
