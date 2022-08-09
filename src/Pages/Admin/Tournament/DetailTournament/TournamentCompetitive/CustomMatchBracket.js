@@ -499,7 +499,7 @@ function CustomMatchBracket(params) {
                             </LocalizationProvider>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={handleCloseUpdateTime}>Quay lại</Button>
+                            <Button onClick={handleCloseUpdateTime}>Hủy</Button>
                             <Button onClick={handleSubmit(handleUpdateTime)}>Đồng ý</Button>
                         </DialogActions>
                     </div>
@@ -511,16 +511,20 @@ function CustomMatchBracket(params) {
                     *Chọn vào 1 cặp trận để cập nhật thời gian và địa điểm thi đấu
                 </Typography>
             )}
-            {params.status === 0 && !params.isCreate ? (
-                <Box>
-                    {!isEdit ? (
-                        <Button onClick={() => setEdit(true)}>Chỉnh sửa bảng đấu</Button>
-                    ) : (
-                        <Button onClick={handleUpdateMatches}>Xác nhận</Button>
-                    )}
-                </Box>
+            {params.status === 0 ? (
+                !params.isCreate ? (
+                    <Box>
+                        {!isEdit ? (
+                            <Button onClick={() => setEdit(true)}>Chỉnh sửa bảng đấu</Button>
+                        ) : (
+                            <Button onClick={handleUpdateMatches}>Xác nhận</Button>
+                        )}
+                    </Box>
+                ) : (
+                    <Button onClick={handleCreateMatches}>Tạo bảng đấu</Button>
+                )
             ) : (
-                <Button onClick={handleCreateMatches}>Tạo bảng đấu</Button>
+                ''
             )}
             <Box className={cx('tournament-bracket', 'tournament-bracket--rounded')} sx={{ mt: 2, mb: 2 }}>
                 {matches.map((matchs, index) => (
@@ -528,9 +532,11 @@ function CustomMatchBracket(params) {
                         <h3 className={cx('tournament-bracket__round-title')}>
                             Trận{' '}
                             {index == matches.length - 1
-                                ? 'bán kết'
+                                ? 'tranh hạng 3'
                                 : index == matches.length - 2
                                 ? 'chung kết'
+                                : index == matches.length - 3
+                                ? 'bán kết'
                                 : index + 1}
                         </h3>
                         <ul className={cx('tournament-bracket__list')}>

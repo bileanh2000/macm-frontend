@@ -20,13 +20,13 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
     const [openEditDialog, setOpenEditDialog] = useState(false);
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
-        [`&.${tableCellClasses.head}`]: {
-            backgroundColor: theme.palette.common.black,
-            color: theme.palette.common.white,
-        },
-        [`&.${tableCellClasses.body}`]: {
-            fontSize: 14,
-        },
+        // [`&.${tableCellClasses.head}`]: {
+        //     backgroundColor: theme.palette.common.black,
+        //     color: theme.palette.common.white,
+        // },
+        // [`&.${tableCellClasses.body}`]: {
+        //     fontSize: 14,
+        // },
     }));
 
     const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -50,9 +50,13 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                 <Fragment>
                     <Grid container columns={12} sx={{ mt: 2, ml: 0 }} spacing={2}>
                         <Grid item xs={7}>
-                            <Typography variant="h4">{tournament.name}</Typography>
-                            <Typography variant="body1">{tournament.description}</Typography>
-                            <Typography variant="h6">Hạng mục thi đấu:</Typography>
+                            <Typography variant="body1" sx={{ p: 2, m: 1 }}>
+                                <strong>Nội dung: </strong>
+                                {tournament.description}
+                            </Typography>
+                            <Typography variant="body1" sx={{ p: 2, m: 1 }}>
+                                <strong>Hạng mục thi đấu:</strong>
+                            </Typography>
                         </Grid>
                         <Grid item xs={5}>
                             {!isUpdate && (
@@ -89,7 +93,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                                     {tournament.competitiveTypes.length > 0 && (
                                         <TableContainer sx={{ maxHeight: 440 }}>
                                             <Typography variant="body1">
-                                                <strong>Thi đấu đối kháng: </strong>
+                                                <strong>Thi đấu đối kháng </strong>
                                             </Typography>
                                             <Table stickyHeader aria-label="sticky table">
                                                 <TableHead>
@@ -120,7 +124,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                                     {tournament.exhibitionTypes.length > 0 && (
                                         <TableContainer sx={{ maxHeight: 440 }}>
                                             <Typography variant="body1">
-                                                <strong>Thi đấu biểu diễn: </strong>
+                                                <strong>Thi đấu biểu diễn </strong>
                                             </Typography>
                                             <Table aria-label="sticky table">
                                                 <TableHead>

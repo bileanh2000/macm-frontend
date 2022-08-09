@@ -2,25 +2,28 @@ import { Box, ButtonGroup, Button, Typography, TextField, Grid, Snackbar, Alert 
 import { useParams, useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { DatePicker, LocalizationProvider, StaticDatePicker, TimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { useEffect, useState } from 'react';
 import vi from 'date-fns/locale/vi';
 import { Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material';
-import trainingSchedule from 'src/api/trainingScheduleApi';
 import moment from 'moment';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
+import { useSnackbar } from 'notistack';
+
+import trainingSchedule from 'src/api/trainingScheduleApi';
 
 function UpdateTouramentSchedule() {
     const currentDate = new Date();
     const { tournamentScheduleId } = useParams();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [open, setOpen] = useState(false);
     // const { tournamentScheduleId } = useParams();
     const [scheduleList, setScheduleList] = useState([]);
 
-    const [value, setValue] = useState(scheduleList);
+    // const [value, setValue] = useState(scheduleList);
     const [selectedDate, setSelectedDate] = useState();
     const [dateValue, setDateValue] = useState();
 
@@ -89,24 +92,7 @@ function UpdateTouramentSchedule() {
         mode: 'onBlur',
         defaultValues: {},
     });
-    const [openSnackBar, setOpenSnackBar] = useState(false);
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    let snackBarStatus;
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
 
-        setOpenSnackBar(false);
-    };
     let navigate = useNavigate();
     const onSubmit = async (data) => {
         data = {
@@ -118,39 +104,25 @@ function UpdateTouramentSchedule() {
         await trainingSchedule.updateSchedule(data).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
-            if (res.data.length != 0) {
-                setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
-                navigate(`/admin/trainingschedules`);
-            } else {
-                console.log('huhu');
-                setOpenSnackBar(true);
-                // setSnackBarStatus(false);
-                snackBarStatus = false;
-                dynamicAlert(snackBarStatus, res.message);
-            }
+            // if (res.data.length != 0) {
+            //     setOpenSnackBar(true);
+            //     // setSnackBarStatus(true);
+            //     snackBarStatus = true;
+            //     dynamicAlert(snackBarStatus, res.message);
+            //     navigate(`/admin/trainingschedules`);
+            // } else {
+            //     console.log('huhu');
+            //     setOpenSnackBar(true);
+            //     // setSnackBarStatus(false);
+            //     snackBarStatus = false;
+            //     dynamicAlert(snackBarStatus, res.message);
+            // }
+            enqueueSnackbar(res.message, { variant: 'success' });
         });
         console.log('form submit', data);
     };
     return (
         <Box>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
             <Dialog
                 open={open}
                 onClose={handleClose}
@@ -205,7 +177,7 @@ function UpdateTouramentSchedule() {
                                         />
                                     </Grid>
                                     <Grid item sm={4}>
-                                        <TextField
+                                        {/* <TextField
                                             required
                                             id="outlined-disabled"
                                             label="Thời gian bắt đầu"
@@ -214,6 +186,36 @@ function UpdateTouramentSchedule() {
                                             {...register('startTime')}
                                             error={errors.startTime ? true : false}
                                             helperText={errors.startTime?.message}
+                                        /> */}
+                                        <Controller
+                                            required
+                                            name="startTime"
+                                            control={control}
+                                            defaultValue={null}
+                                            render={({
+                                                field: { onChange, value },
+                                                fieldState: { error, invalid },
+                                            }) => (
+                                                <TimePicker
+                                                    label="Thời gian bắt đầu"
+                                                    ampm={false}
+                                                    value={value}
+                                                    onChange={(value) => onChange(value)}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            required
+                                                            id="outlined-disabled"
+                                                            error={invalid}
+                                                            helperText={invalid ? error.message : null}
+                                                            // id="startDate"
+                                                            variant="outlined"
+                                                            margin="dense"
+                                                            fullWidth
+                                                        />
+                                                    )}
+                                                />
+                                            )}
                                         />
                                     </Grid>
                                     <Grid item sm={4}>

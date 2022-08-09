@@ -46,51 +46,6 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             flex: 0.6,
         },
         { field: 'role', headerName: 'Vai trò trong sự kiện', width: 150, flex: 1 },
-        { field: 'registerStatus', headerName: 'Trạng thái', width: 150, flex: 1 },
-        {
-            field: 'paymentStatus',
-            headerName: 'Đóng tiền',
-            flex: 0.5,
-            renderCell: (cellValues) => {
-                return (
-                    <Button
-                        sx={{
-                            ...(cellValues.row.paymentStatus === 'Đã đóng'
-                                ? {
-                                      backgroundColor: '#00AD31',
-                                      boxShadow: 'none',
-                                      width: '112px',
-                                      '&:hover': {
-                                          backgroundColor: '#00AD31',
-                                          boxShadow: 'none',
-                                      },
-                                      '&:active': {
-                                          boxShadow: 'none',
-                                          backgroundColor: '#00AD31',
-                                      },
-                                  }
-                                : {
-                                      backgroundColor: '#ff3838',
-                                      boxShadow: 'none',
-                                      width: '112px',
-                                      '&:hover': {
-                                          backgroundColor: '#ff3838',
-                                          boxShadow: 'none',
-                                      },
-                                      '&:active': {
-                                          boxShadow: 'none',
-                                          backgroundColor: '#ff3838',
-                                      },
-                                  }),
-                        }}
-                        variant="contained"
-                        color="primary"
-                    >
-                        {cellValues.row.paymentStatus}
-                    </Button>
-                );
-            },
-        },
     ];
 
     const rowsUser =
@@ -119,7 +74,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 </Box>
                 <Box>
                     Số lượng thành viên trong ban tổ chức: {active}/{total}
-                    {(!isUpdate || active < total) && roleInTournament.length > 0 && (
+                    {!isUpdate && roleInTournament.length > 0 && (
                         <Button
                             startIcon={<Add />}
                             size="small"

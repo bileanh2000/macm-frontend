@@ -1,37 +1,30 @@
 import React, { useState } from 'react';
 import {
-    Alert,
     Button,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Snackbar,
     styled,
-    TextField,
     Typography,
 } from '@mui/material';
 import clsx from 'clsx';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { Box } from '@mui/system';
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 
-let snackBarStatus;
-
 function UpdateAdminTournament({ value, index }) {
     let { tournamentId } = useParams();
-    let navigate = useNavigate();
-
+    const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
     const [adminList, setAdminList] = useState([]);
     const [roles, setRoles] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
-    const [openSnackBar, setOpenSnackBar] = useState(false);
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
 
     const handleRowEditCommit = React.useCallback(
         (params) => {
@@ -50,25 +43,12 @@ function UpdateAdminTournament({ value, index }) {
         [adminList, roles],
     );
 
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
     const handleUpdate = () => {
         console.log('submit', adminList);
         adminTournamentAPI.updateTournamentOrganizingCommitteeRole(adminList).then((res) => {
             console.log(res);
             console.log(res.data);
-            if (res.message === 'Cập nhật chức vụ cho thành viên trong sự kiện thành công') {
-                setOpenSnackBar(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
-                // setTimeout(navigate(-1), 3000);
-            }
+            enqueueSnackbar(res.message, { variant: 'success' });
         });
         setOpenDialog(false);
         // navigate(-1);
@@ -99,14 +79,6 @@ function UpdateAdminTournament({ value, index }) {
         fetchAdminInTournament(tournamentId);
         fetchRolesInTournament();
     }, [tournamentId]);
-
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpenSnackBar(false);
-    };
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -248,25 +220,9 @@ function UpdateAdminTournament({ value, index }) {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
             <Typography variant="caption" sx={{ mb: 3 }}>
                 Bấm vào vai trò của từng người để chỉnh sửa
             </Typography>
-            <p></p>
             <Box
                 sx={{
                     height: '70vh',

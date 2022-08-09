@@ -119,6 +119,7 @@ function EditAttendance() {
                                 <TableCell>Hoạt động</TableCell>
                                 <TableCell>Ngày</TableCell>
                                 <TableCell>Giờ</TableCell>
+                                <TableCell>Có mặt</TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
                         </TableHead>
@@ -138,11 +139,18 @@ function EditAttendance() {
                                         {row.startTime} - {row.finishTime}
                                     </TableCell>
                                     <TableCell>
+                                        {row.totalAttend}/{row.totalSize}
+                                    </TableCell>
+                                    <TableCell>
                                         <Tooltip title="Xem trạng thái điểm danh">
                                             <IconButton
                                                 LinkComponent={Link}
                                                 to={`../admin/attendance`}
-                                                state={{ id: row.id, date: row.date, type: type }}
+                                                state={{
+                                                    id: row.id,
+                                                    date: moment(row.date).format('DD/MM/YYYY'),
+                                                    type: type,
+                                                }}
                                                 sx={{ mr: 1 }}
                                             >
                                                 <VisibilityOutlined />
@@ -152,7 +160,11 @@ function EditAttendance() {
                                             <IconButton
                                                 LinkComponent={Link}
                                                 to="../admin/attendance/take"
-                                                state={{ id: row.id, date: row.date, type: type }}
+                                                state={{
+                                                    id: row.id,
+                                                    date: moment(row.date).format('DD/MM/YYYY'),
+                                                    type: type,
+                                                }}
                                             >
                                                 <BorderColorOutlined />
                                             </IconButton>

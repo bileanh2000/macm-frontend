@@ -131,7 +131,10 @@ function TrainingSchedule() {
             date.getDate() === nowDate.getDate()
         ) {
             console.log('dung ngay roi');
-            navigate({ pathname: '../admin/attendance' }, { state: { date: date, id: params } });
+            navigate(
+                { pathname: '../admin/attendance' },
+                { state: { date: moment(date).format('DD/MM/YYYY'), id: params } },
+            );
         } else {
             console.log('sai ngay roi');
             console.log(date);
