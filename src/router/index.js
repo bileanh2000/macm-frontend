@@ -1,6 +1,6 @@
 import { HeaderOnly } from '../Components/Layout';
 import AdminHomePage from '../Pages/Admin/Home';
-import UserManagementPage from '../Pages/Admin/User-management';
+// import UserManagementPage from '../Pages/Admin/User-management';
 
 import UserProfile from 'src/Pages/User/Profile/UserProfile';
 import EditUserProfile from 'src/Pages/User/Profile/EditUserProfile';

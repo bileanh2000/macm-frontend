@@ -144,7 +144,7 @@ function AddEvent() {
             .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
         startTime: Yup.string().nullable().required('Không được để trống trường này'),
         finishTime: Yup.string().nullable().required('Không được để trống trường này'),
-        cost: Yup.string().required('Không được để trống trường này').min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
+        cost: Yup.number().required('Không được để trống trường này').min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
         ...(isChecked && {
             amountPerRegister: Yup.number()
                 .required('Không được để trống trường này')
@@ -683,7 +683,7 @@ function AddEvent() {
                                     InputProps={{
                                         endAdornment: <InputAdornment position="end">VND</InputAdornment>,
                                     }}
-                                    error={invalid}
+                                    error={error}
                                     helperText={invalid ? error.message : null}
                                     fullWidth
                                 />

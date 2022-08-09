@@ -460,30 +460,6 @@ function MemberAndCollaborator() {
                 >
                     <Grid container spacing={3}>
                         <Grid item xs={6}>
-                            {/* <TextField
-                                    fullWidth
-                                    id="standard-basic"
-                                    label="Tên"
-                                    variant="standard"
-                                    size="small"
-                                    onChange={(e) => {
-                                        onChangeSearch.name = e.target.value;
-                                        // console.log(onChangeSearch);
-                                    }}
-                                    // {...register('name')}
-                                /> */}
-                            {/* <TextField
-                                    fullWidth
-                                    id="standard-basic"
-                                    label="Mã sinh viên"
-                                    variant="standard"
-                                    size="small"
-                                    // {...register('studentId')}
-                                    onChange={(e) => {
-                                        onChangeSearch.studentId = e.target.value;
-                                        // console.log(onChangeSearch);
-                                    }}
-                                /> */}
                             <TextField
                                 fullWidth
                                 id="standard-select-currency"
