@@ -17,13 +17,13 @@ function Attendance() {
     const [trainingScheduleId, setTrainingScheduleId] = useState(_trainingScheduleId);
 
     const nowDate = new Date();
-    if (!_nowDate) _nowDate = nowDate;
-    const date = moment(new Date(_nowDate)).format('DD/MM/yyyy');
+    if (!_nowDate) _nowDate = moment(new Date(nowDate)).format('DD/MM/yyyy');
+    // const date = moment(new Date(_nowDate)).format('DD/MM/yyyy');
 
-    console.log(trainingScheduleId, date);
+    console.log(trainingScheduleId, _nowDate);
     const getSessionByDate = async () => {
         try {
-            const response = await adminAttendanceAPI.getCommonSessionByDate(date);
+            const response = await adminAttendanceAPI.getCommonSessionByDate(_nowDate);
             if (!_trainingScheduleId && response.data.length > 0) {
                 setTrainingScheduleId(response.data[0].id);
             }
@@ -44,7 +44,7 @@ function Attendance() {
                 {trainingScheduleId ? (
                     <Container maxWidth="xl">
                         <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                            Trạng thái điểm danh ngày: {moment(new Date(_nowDate)).format('DD/MM/yyyy')}
+                            Trạng thái điểm danh ngày: {_nowDate}
                         </Typography>
                         <Divider />
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, mt: 2 }}>
@@ -75,7 +75,7 @@ function Attendance() {
                             </Box>
                         </Box>
 
-                        <ViewAttendance data={{ trainingScheduleId, date, type }} />
+                        <ViewAttendance data={{ trainingScheduleId, date: _nowDate, type }} />
                     </Container>
                 ) : (
                     <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>

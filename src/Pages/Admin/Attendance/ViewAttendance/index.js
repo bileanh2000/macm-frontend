@@ -25,28 +25,24 @@ function ViewAttendance({ data }) {
 
     const checkAttendanceByScheduleId = async () => {
         try {
-            console.log(_trainingScheduleId);
+            console.log(_trainingScheduleId, _nowDate);
             let response;
             if (_type == 0) {
-                adminAttendanceAPI
-                    .getTrainingSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
-                    .then((res) => {
-                        adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
-                            setUserList(res.data);
-                            setTotalActive(res.totalActive);
-                            setTotalResult(res.totalResult);
-                        });
-                    });
-            }
-            if (_type == 1) {
-                adminAttendanceAPI
-                    .getEventSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
-                    .then((res) => {
-                        adminAttendanceAPI.getAttendanceByEventId(res.data[0].id);
+                adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
+                    adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
                         setUserList(res.data);
                         setTotalActive(res.totalActive);
                         setTotalResult(res.totalResult);
                     });
+                });
+            }
+            if (_type == 1) {
+                adminAttendanceAPI.getEventSessionByDate(_nowDate).then((res) => {
+                    adminAttendanceAPI.getAttendanceByEventId(res.data[0].id);
+                    setUserList(res.data);
+                    setTotalActive(res.totalActive);
+                    setTotalResult(res.totalResult);
+                });
             }
         } catch (error) {
             console.log('Không thể lấy dữ liệu người dùng tham gia điểm danh. Error: ', error);

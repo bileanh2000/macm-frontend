@@ -42,23 +42,19 @@ function TakeAttendance() {
             // });
             let response;
             if (_type == 0) {
-                adminAttendanceAPI
-                    .getTrainingSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
-                    .then((res) => {
-                        console.log(res);
-                        adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
-                            setUserList(res.data);
-                        });
-                    });
-            }
-            if (_type == 1) {
-                adminAttendanceAPI
-                    .getEventSessionByDate(moment(new Date(_nowDate)).format('DD/MM/yyyy'))
-                    .then((res) => {
-                        setEventId(res.data[0].id);
-                        adminAttendanceAPI.getAttendanceByEventId(res.data[0].id);
+                adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
+                    console.log(res);
+                    adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
                         setUserList(res.data);
                     });
+                });
+            }
+            if (_type == 1) {
+                adminAttendanceAPI.getEventSessionByDate(moment(_nowDate)).then((res) => {
+                    setEventId(res.data[0].id);
+                    adminAttendanceAPI.getAttendanceByEventId(res.data[0].id);
+                    setUserList(res.data);
+                });
             }
         } catch (error) {
             console.log('Không thể lấy dữ liệu người dùng tham gia điểm danh. Error: ', error);
