@@ -137,6 +137,16 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
+    updateWeightForCompetitivePlayer: (competitivePlayerId, weight) => {
+        const url = `/competitive/headclub/updateweightplayer/${competitivePlayerId}`;
+        return axiosClient.put(url, null, { params: { weight: weight } });
+    },
+
+    deleteCompetitivePlayer: (competitivePlayerId) => {
+        const url = `/competitive/headclub/deletecompetitiveplayer/${competitivePlayerId}`;
+        return axiosClient.put(url);
+    },
+
     //Fee
 
     getAllTournamentOrganizingCommitteePaymentStatus: (tournamentId) => {
