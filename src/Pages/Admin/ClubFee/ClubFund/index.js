@@ -175,12 +175,6 @@ function ClubFund() {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <GridToolbarQuickFilter />
                 </Box>
-                <Box>
-                    <Typography variant="body1" gutterBottom sx={{ marginBottom: 2 }}>
-                        <strong>Số dư câu lạc bộ hiện tại: </strong>
-                        {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-                    </Typography>
-                </Box>
             </GridToolbarContainer>
         );
     }
@@ -238,7 +232,7 @@ function ClubFund() {
                 </DialogContent>
 
                 <DialogActions>
-                    <Button onClick={handleClose}>Quay lại</Button>
+                    <Button onClick={handleClose}>Hủy</Button>
                     <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
                 </DialogActions>
             </Dialog>
@@ -246,45 +240,43 @@ function ClubFund() {
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
                     Quỹ câu lạc bộ
                 </Typography>
+                <Box>
+                    <Typography variant="h6" gutterBottom sx={{ marginBottom: 2 }}>
+                        <strong>Số dư câu lạc bộ hiện tại: </strong>
+                        {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                    </Typography>
+                </Box>
             </Box>
             <Divider />
             <Container maxWidth="lg">
-                <Grid container spacing={12} sx={{ p: 2 }}>
-                    <Grid item xs={12} md={6}>
-                        <Paper elevation={2} sx={{ bgcolor: '#91ff35' }}>
-                            <CardActionArea onClick={() => handleOpenDialog(1)}>
-                                <CardContent>
-                                    <Typography variant="h6" component="div">
-                                        <PaidOutlined
-                                            fontSize="large"
-                                            focusable={false}
-                                            sx={{ position: 'absolute', right: 15, color: '#fff' }}
-                                        />
-                                    </Typography>
+                <Box sx={{ display: 'flex', p: 2, m: 2, justifyContent: 'space-around' }}>
+                    <Paper elevation={2} sx={{ bgcolor: '#91ff35' }}>
+                        <CardActionArea onClick={() => handleOpenDialog(1)}>
+                            <CardContent>
+                                <Box sx={{ display: 'flex' }}>
                                     <Typography variant="h6">Thêm tiền vào quỹ</Typography>
-                                </CardContent>
-                            </CardActionArea>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <Paper elevation={2} sx={{ bgcolor: 'secondary.light' }}>
-                            <CardActionArea onClick={() => handleOpenDialog(0)}>
-                                <CardContent>
                                     <Typography variant="h6" component="div">
-                                        <MoneyOffRounded
-                                            fontSize="large"
-                                            focusable={false}
-                                            sx={{ position: 'absolute', right: 15, color: '#fff' }}
-                                        />
+                                        <PaidOutlined fontSize="large" focusable={false} sx={{ color: '#fff' }} />
                                     </Typography>
+                                </Box>
+                            </CardContent>
+                        </CardActionArea>
+                    </Paper>
+                    <Paper elevation={2} sx={{ bgcolor: 'secondary.light' }}>
+                        <CardActionArea onClick={() => handleOpenDialog(0)}>
+                            <CardContent>
+                                <Box sx={{ display: 'flex' }}>
                                     <Typography variant="h6" component="div">
                                         Rút tiền ra khỏi quỹ
                                     </Typography>
-                                </CardContent>
-                            </CardActionArea>
-                        </Paper>
-                    </Grid>
-                </Grid>
+                                    <Typography variant="h6" component="div">
+                                        <MoneyOffRounded fontSize="large" focusable={false} sx={{ color: '#fff' }} />
+                                    </Typography>
+                                </Box>
+                            </CardContent>
+                        </CardActionArea>
+                    </Paper>
+                </Box>
 
                 <Box
                     sx={{

@@ -39,7 +39,7 @@ import { useSnackbar } from 'notistack';
 const cx = classNames.bind(styles);
 
 function CustomMatchBracket(params) {
-    console.log('tao bang', params.matches, params.competitiveId);
+    // console.log('tao bang', params.matches, params.competitiveId);
     let i;
     let __matches = [];
     for (i = 1; i <= params.rounds; i++) {
@@ -98,7 +98,7 @@ function CustomMatchBracket(params) {
     });
 
     const onDragStart = (e, match, index, isFirst) => {
-        if (params.status !== 1) {
+        if (params.status !== 0) {
             return;
         }
         //const player = findPlayer(matches[0], id);
@@ -108,7 +108,7 @@ function CustomMatchBracket(params) {
     };
 
     const onDragOver = (e) => {
-        if (params.status !== 1) {
+        if (params.status !== 0) {
             return;
         }
         e.preventDefault();
@@ -117,14 +117,14 @@ function CustomMatchBracket(params) {
     };
 
     const onDragEnd = () => {
-        if (params.status !== 1) {
+        if (params.status !== 0) {
             return;
         }
         setDragItem(null);
         setDragOverItem(null);
     };
     const onDragDrop = (e, match, index, isFirst) => {
-        if (params.status !== 1) {
+        if (params.status !== 0) {
             return;
         }
         const player = { ...match, index: index, isFirst: isFirst };
@@ -197,6 +197,10 @@ function CustomMatchBracket(params) {
         } catch (error) {
             console.log('Khong the update');
         }
+    };
+    const handleCreateMatches = () => {
+        params.onCreateMatches();
+        console.log('hihi');
     };
 
     const handleUpdateMatches = () => {
@@ -507,7 +511,7 @@ function CustomMatchBracket(params) {
                     *Chọn vào 1 cặp trận để cập nhật thời gian và địa điểm thi đấu
                 </Typography>
             )}
-            {params.status === 1 ? (
+            {params.status === 0 && !params.isCreate ? (
                 <Box>
                     {!isEdit ? (
                         <Button onClick={() => setEdit(true)}>Chỉnh sửa bảng đấu</Button>
@@ -516,7 +520,7 @@ function CustomMatchBracket(params) {
                     )}
                 </Box>
             ) : (
-                ''
+                <Button onClick={handleCreateMatches}>Tạo bảng đấu</Button>
             )}
             <Box className={cx('tournament-bracket', 'tournament-bracket--rounded')} sx={{ mt: 2, mb: 2 }}>
                 {matches.map((matchs, index) => (
@@ -535,9 +539,7 @@ function CustomMatchBracket(params) {
                                     <li
                                         className={cx(
                                             'tournament-bracket__item',
-                                            (match.firstPlayer && match.secondPlayer) || params.status === 1
-                                                ? ''
-                                                : 'hidden',
+                                            match.firstPlayer && match.secondPlayer ? '' : 'hidden',
                                         )}
                                         key={match.id}
                                         onClick={(e) => handleClickResult(e, match)}

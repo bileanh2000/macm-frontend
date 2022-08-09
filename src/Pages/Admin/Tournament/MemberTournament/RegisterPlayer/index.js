@@ -120,10 +120,10 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
         addNewCompetitivePlayer(weightRange, player);
         const newPlayer = player.map((p) => {
             return {
-                competitivePlayer: {
+                
                     tournamentPlayer: { user: { gender: p.gender, name: p.name, studentId: p.studentId } },
                     weight: 0,
-                },
+                
                 competitiveType: { weightMax: maxWeight, weightMin: minWeight },
             };
         });

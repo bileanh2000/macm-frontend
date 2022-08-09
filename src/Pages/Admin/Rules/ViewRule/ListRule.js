@@ -1,52 +1,46 @@
-import { ModeEditOutline, DeleteForeverOutlined } from "@mui/icons-material";
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Pagination, Snackbar, Stack } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import classNames from "classnames/bind";
+import { ModeEditOutline, DeleteForeverOutlined } from '@mui/icons-material';
+import {
+    Alert,
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Grid,
+    Pagination,
+    Paper,
+    Snackbar,
+    Stack,
+} from '@mui/material';
+import { useSnackbar } from 'notistack';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
-import adminRuleAPI from 'src/api/adminRuleAPI'
-import styles from './ListRule.module.scss'
-import DialogCommon from "src/Components/Dialog/Dialog";
-
-const cx = classNames.bind(styles)
+import adminRuleAPI from 'src/api/adminRuleAPI';
 
 function List() {
-    const location = useLocation();
-    const _openSnackBar = location.state?.isSuccess == null ? false : true
-    const _isSuccess = location.state?.isSuccess == null ? true : location.state?.isSuccess
-    const _message = location.state?.message == null ? "" : location.state?.message
-    const [success, setSuccess] = useState({ isSuccess: _isSuccess, message: _message })
-    const [openSnackBar, setOpenSnackBar] = useState(_openSnackBar);
+    const [openConfirm, setOpenConfirm] = useState(false);
     const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0)
+    const [total, setTotal] = useState(0);
     const [rules, setRules] = useState([]);
-    const [pageSize, setPageSize] = useState(10)
-    const [dialog, setDialog] = useState({
-        message: "",
-        isLoading: false,
-        params: -1
-    });
-    const handleDialog = (message, isLoading, params) => {
-        setDialog({
-            message,
-            isLoading,
-            params
-        });
+    const [rule, setRule] = useState();
+    const { enqueueSnackbar } = useSnackbar();
+    const [pageSize, setPageSize] = useState(10);
+
+    const handleCloseConfirm = () => {
+        setRule();
+        setOpenConfirm(false);
     };
-    const areUSureDelete = (choose) => {
-        if (choose) {
-            deleteRule(dialog.params)
-            setSuccess({ isSuccess: true, message: "Xóa rule thành công" })
-            setOpenSnackBar(true)
-            const newRules = rules.filter((rule) => {
-                return rule.id !== dialog.params;
-            });
-            setRules(newRules)
-            handleDialog("", false, -1);
-        } else {
-            console.log(dialog);
-            handleDialog("", false, -1);
-        }
+
+    const handleOpenConfirm = () => {
+        deleteRule(rule);
+        const newRules = rules.filter((r) => {
+            return r.id !== rule;
+        });
+        setRules(newRules);
+        handleCloseConfirm();
     };
 
     const handleChange = (event, value) => {
@@ -55,96 +49,87 @@ function List() {
 
     const getListRules = async (pageNo) => {
         try {
-            const response = await adminRuleAPI.getAll(pageNo)
-            setRules(response.data)
-            setTotal(response.totalPage)
-            setPageSize(response.pageSize)
+            const response = await adminRuleAPI.getAll(pageNo);
+            setRules(response.data);
+            setTotal(response.totalPage);
+            setPageSize(response.pageSize);
         } catch (error) {
-            console.log("Lấy dữ liệu rule thất bại", error);
+            console.log('Lấy dữ liệu rule thất bại', error);
         }
-    }
-    console.log(rules)
+    };
+    console.log(rules);
 
     useEffect(() => {
-        getListRules(page - 1)
-        window.scrollTo({ behavior: 'smooth', top: '0px' })
-    }, [page])
+        getListRules(page - 1);
+        window.scrollTo({ behavior: 'smooth', top: '0px' });
+    }, [page]);
 
     const deleteRule = async (id) => {
         try {
-            await adminRuleAPI.delete(id)
+            const response = await adminRuleAPI.delete(id);
+            enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
-            console.log("Xóa rule thất bại", error);
+            console.log('Xóa rule thất bại', error);
         }
-    }
+    };
 
-
-
-    const handleDelete = params => {
-        handleDialog("Bạn có chắc chắn muốn xóa không?", true, params);
-    }
-
-    const handleCloseSnackBar = (reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setOpenSnackBar(false);
-    }
+    const handleDelete = (params) => {
+        setOpenConfirm(true);
+        setRule(params);
+    };
 
     return (
-        <div className={cx('rule-container')}>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={3000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        <Box>
+            <Dialog
+                fullWidth
+                maxWidth="md"
+                open={openConfirm}
+                onClose={handleCloseConfirm}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
             >
-                <Alert onClose={handleCloseSnackBar} severity="success" sx={{ width: '100%' }}>
-                    {success.message}
-                </Alert>
-            </Snackbar>
-
-            {
-                rules.map((row, index) => (
-                    <div className={cx('rule-item')} key={index}>
-                        <Grid container spacing={2} style={{ alignItems: "center", marginTop: 1 }}>
-                            <Grid item xs={1}>
-                                {(page - 1) * pageSize + index + 1}
-                            </Grid>
-                            <Grid item xs={9}>
-                                {row.description}
-                            </Grid>
-                            <Grid item xs={1}>
-                                <Link to={{ pathname: './edit' }}
-                                    state={
-                                        {
-                                            rule: row
-                                        }
-                                    }
-                                >
-                                    <ModeEditOutline color="primary" />
-                                </Link>
-                            </Grid>
-                            <Grid item xs={1} onClick={() => handleDelete(row.id)}>
-                                <DeleteForeverOutlined color="primary" />
-                            </Grid>
+                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    Xác nhận
+                </DialogTitle>
+                <DialogContent>Bạn có chắc chắn muốn cập nhật trạng thái đóng tiền</DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseConfirm}>Hủy</Button>
+                    <Button onClick={handleOpenConfirm} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {rules.map((row, index) => (
+                <Paper elevation={1} key={index} sx={{ minHeight: 10, p: 2, m: 2 }}>
+                    <Grid container spacing={2} sx={{ m: 0, alignItems: 'center' }}>
+                        <Grid item xs={1}>
+                            {(page - 1) * pageSize + index + 1}
                         </Grid>
-                    </div>))
-            }
+                        <Grid item xs={9}>
+                            {row.description}
+                        </Grid>
+                        <Grid item xs={1}>
+                            <Link
+                                to={{ pathname: './edit' }}
+                                state={{
+                                    rule: row,
+                                }}
+                            >
+                                <ModeEditOutline color="primary" />
+                            </Link>
+                        </Grid>
+                        <Grid item xs={1} onClick={() => handleDelete(row.id)}>
+                            <DeleteForeverOutlined color="primary" />
+                        </Grid>
+                    </Grid>
+                </Paper>
+            ))}
             {total > 1 && (
                 <Stack spacing={2}>
                     <Pagination count={total} page={page} onChange={handleChange} />
                 </Stack>
             )}
-            {dialog.isLoading && (
-                <DialogCommon
-                    //Update
-                    onDialog={areUSureDelete}
-                    message={dialog.message}
-                    id={dialog.params}
-                />
-            )}
-        </div >
+        </Box>
     );
 }
 
