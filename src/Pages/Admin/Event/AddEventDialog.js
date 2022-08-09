@@ -46,6 +46,7 @@ import userApi from 'src/api/userApi';
 import moment from 'moment';
 import { useSnackbar } from 'notistack';
 import { Add, Delete } from '@mui/icons-material';
+import { useRef } from 'react';
 
 const steps = ['Thông tin sự kiện', 'Thêm vai trò BTC', 'Thêm chi phí', 'Thêm lịch', 'Xem trước'];
 const eventRoles = [{ id: 1, name: 'hehe' }];
@@ -144,56 +145,17 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                       .typeError('Vui lòng không để trống trường này')
                       .required('Vui lòng không để trống trường này'),
                   finishDate: Yup.date()
-                      .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được bé hơn ngày bắt đầu`)
+                      .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc không được bé hơn thời gian bắt đầu`)
                       .typeError('Vui lòng không để trống trường này')
                       .required('Vui lòng không để trống trường này'),
-                  //   ...(startDate !== endDate
-                  //       ? {
-                  //             startTime: Yup.date().typeError('Vui lòng không để trống trường này'),
-                  //             finishTime: Yup.date()
-                  //                 .min(
-                  //                     Yup.ref('startTime'),
-                  //                     ({ min }) => `Thời gian kết thúc không được bé hơn thời gian bắt đầu`,
-                  //                 )
-                  //                 .typeError('Vui lòng không để trống trường này'),
-                  //         }
-                  //       : {
-                  //             startTime: Yup.date().typeError('Vui lòng không để trống trường này'),
-                  //             finishTime: Yup.date().typeError('Vui lòng không để trống trường này'),
-                  //         }),
-                  startTime: Yup.date().typeError('Start Date is required').required('Start Date is required'),
-                  //   finishTime: Yup.date()
-                  //       .typeError('finishTime is required')
-                  //       .required('finishTime is required')
-                  //       .when(['startTime', 'startDate', 'finishDate'], (startTime, startDate, finishDate) => {
-                  //           //   if (startTime) {
-                  //           return Yup.string()
-                  //               .min(startTime, 'End Date must be after Start Date')
-                  //               .typeError('End Date is required');
-                  //           //   } else {
-                  //           //       return Yup.date().typeError('End Date is required');
-                  //           //   }
-                  //       }),
-                  //   finishTime: Yup.date()
-                  //       .required('This field is required')
-                  //       .test(
-                  //         {
-                  //           name:'unique-checklist',
-                  //           test: function(value, ctx) {
-                  //             var unique = true
-                  //             if(value) {
-                  //               ctx.parent.checklist.forEach(function (item) {
-                  //                 if(item.value.toString().toLowerCase() === value.toString().toLowerCase()) unique = false
-                  //             })}
-                  //             return value && value.length > 0 && !unique
-                  //               ? this.createError({
-                  //                   message: 'New checklist item must be unique',
-                  //                   path: 'newCheckListItem'
-                  //                 })
-                  //               : true;
-                  //           },
-                  //         }
-                  //       ),
+                  registrationMemberDeadline: Yup.date()
+                      .max(Yup.ref('startDate'), ({ min }) => `Deadline không được bé hơn thời gian bắt đầu`)
+                      .typeError('Vui lòng không để trống trường này')
+                      .required('Vui lòng không để trống trường này'),
+                  registrationOrganizingCommitteeDeadline: Yup.date()
+                      .max(Yup.ref('startDate'), ({ min }) => `Deadline không được bé hơn thời gian bắt đầu`)
+                      .typeError('Vui lòng không để trống trường này')
+                      .required('Vui lòng không để trống trường này'),
               }
             : null),
 
@@ -233,8 +195,11 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
         formState: { errors, isDirty, isValid },
     } = useForm({
         resolver: yupResolver(validationSchema),
+
         mode: 'onChange',
+        reValidateMode: 'onChange',
     });
+
     const handleCancel = () => {
         setIsChecked(!isChecked);
         resetField('roleName');
@@ -250,30 +215,12 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
         console.log(data);
         const newData = [...datas, { ...data, id: Math.random() }];
         setDatas(newData);
-        // reset({
-        //     roleName: '',
-        //     numberOfRole: '',
-        // });
+
         resetField('roleName');
         resetField('numberOfRole');
 
         setIsChecked(!isChecked);
-
-        // setIsChecked(!isChecked);
-        // reset({
-        //     weightMin: '',
-        //     weightMax: '',
-        // });
     };
-
-    // const amountPerRegisterSuggestions = ()=>{
-
-    // }
-
-    // useEffect(() => {
-    //     console.log('heeeeeeeeeeeeeeeeee', amountPerRegister);
-    //     setA(amountPerRegister);
-    // }, [amountPerRegister]);
 
     useEffect(() => {
         console.log('heeeeeeeeeeeee a');
@@ -286,8 +233,27 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
         }
     }, [activeStep, isValid]);
 
-    // console.log(isDirty);
     console.log('isValid', isValid);
+    const formRef = useRef(null);
+
+    const handlePreview = () => {
+        // let newSkipped = skipped;
+        // if (isStepSkipped(activeStep)) {
+        //     newSkipped = new Set(newSkipped.values());
+        //     newSkipped.delete(activeStep);
+        // }
+
+        // setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        // setSkipped(newSkipped);
+        console.log('handlePreview');
+    };
+    /**
+     * Revalidate form after step changed
+     */
+    useEffect(() => {
+        control._updateValid();
+    }, [activeStep, control]);
+
     return (
         <Fragment>
             <Dialog
@@ -308,6 +274,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                             '& .MuiTextField-root': { mb: 2 },
                             '& .MuiBox-root': { width: '100%', ml: 1, mr: 2 },
                         }}
+                        ref={formRef}
                     >
                         <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
                             {steps.map((label, index) => {
@@ -496,7 +463,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                     variant="outlined"
                                     defaultValue=""
                                     control={control}
-                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                    render={({ field: { onChange, value }, fieldState: { error } }) => (
                                         <NumberFormat
                                             name="amountFromClub"
                                             customInput={TextField}
@@ -514,8 +481,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                             InputProps={{
                                                 endAdornment: <InputAdornment position="end">VND</InputAdornment>,
                                             }}
-                                            error={invalid}
-                                            helperText={invalid ? error.message : null}
+                                            error={!!error}
+                                            helperText={error ? error.message : null}
                                             fullWidth
                                         />
                                     )}
@@ -552,7 +519,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                         // defaultValue=""
                                         defaultValue=""
                                         control={control}
-                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        render={({ field: { onChange, value }, fieldState: { error } }) => (
                                             <NumberFormat
                                                 name="amountPerRegister"
                                                 customInput={TextField}
@@ -567,8 +534,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                 InputProps={{
                                                     endAdornment: <InputAdornment position="end">VND</InputAdornment>,
                                                 }}
-                                                error={invalid}
-                                                helperText={invalid ? error.message : null}
+                                                error={!!error}
+                                                helperText={error ? error.message : null}
                                                 fullWidth
                                             />
                                         )}
@@ -588,8 +555,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
                                             }) => (
-                                                <DatePicker
-                                                    label="Ngày bắt đầu"
+                                                <DateTimePicker
+                                                    label="Thời gian bắt đầu"
                                                     disablePast
                                                     ampm={false}
                                                     value={value}
@@ -629,8 +596,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
                                             }) => (
-                                                <DatePicker
-                                                    label="Ngày kết thúc"
+                                                <DateTimePicker
+                                                    label="Thời gian kết thúc"
                                                     disablePast
                                                     ampm={false}
                                                     value={value}
@@ -661,7 +628,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                         />
                                     </Grid>
                                 </Grid>
-                                <Grid container spacing={2}>
+                                {/* <Grid container spacing={2}>
                                     <Grid item xs={6}>
                                         <Controller
                                             required
@@ -711,7 +678,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
                                             }) => (
-                                                <TimePicker
+                                                <DateTimePicker
                                                     label="Thời gian kết thúc"
                                                     ampm={false}
                                                     value={value}
@@ -737,7 +704,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                             )}
                                         />
                                     </Grid>
-                                </Grid>
+                                </Grid> */}
                                 <Grid container spacing={2}>
                                     <Grid item xs={6}>
                                         <Controller
@@ -751,7 +718,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                             }) => (
                                                 <DateTimePicker
                                                     label="Deadline đăng ký tham gia"
-                                                    // disablePast
+                                                    disablePast
                                                     ampm={false}
                                                     value={value}
                                                     onChange={(value) => onChange(value)}
@@ -788,7 +755,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                             }) => (
                                                 <DateTimePicker
                                                     label="Deadline đăng ký ban tổ chức"
-                                                    // disablePast
+                                                    disablePast
                                                     disabled={skipped.has(1)}
                                                     ampm={false}
                                                     value={value}
@@ -862,7 +829,10 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                 {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}
                             </Button>
                         ) : (
-                            <Button onClick={handleNext} disabled={!isValid}>
+                            <Button
+                                onClick={activeStep === steps.length - 2 ? handlePreview : handleNext}
+                                disabled={!isValid}
+                            >
                                 {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}
                             </Button>
                         )}
