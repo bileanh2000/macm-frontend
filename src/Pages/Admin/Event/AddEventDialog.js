@@ -124,7 +124,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                           /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ ]+$/,
                           'Không hợp lệ: vui lòng nhập chữ',
                       ),
-                  numberOfRole: Yup.number()
+                  maxQuantity: Yup.number()
                       .nullable()
                       .required('Không được để trống trường này')
                       .min(1, 'Vui lòng nhập giá trị lớn hơn 0')
@@ -160,20 +160,48 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                       //   .max(Yup.ref('finishDate'), ({ min }) => `Thời gian bắt không được bé hơn thời gian kết thúc`)
                       .typeError('Vui lòng không để trống trường này')
                       .required('Vui lòng không để trống trường này'),
+
+                  //   finishDate: Yup.date()
+                  //       .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
+                  //       .typeError('Vui lòng không để trống trường này')
+                  //       .required('Vui lòng không để trống trường này'),
                   finishDate: Yup.date()
-                      .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc không được bé hơn thời gian bắt đầu`)
+                      .test(
+                          'same_dates_test',
+                          'Thời gian bắt đầu và thời gian kết thúc không được bằng nhau',
+                          function (value) {
+                              const { startDate } = this.parent;
+                              return value.getTime() !== startDate.getTime();
+                          },
+                      )
+                      .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
+                      .required('Vui lòng không để trống trường này')
                       .typeError('Vui lòng không để trống trường này')
                       .required('Vui lòng không để trống trường này'),
+
                   registrationMemberDeadline: Yup.date()
                       .max(Yup.ref('startDate'), ({ max }) => `Deadline không được muộn hơn thời gian bắt đầu`)
                       .typeError('Vui lòng không để trống trường này')
                       .required('Vui lòng không để trống trường này'),
-                  ...(!skipped.has(2) && {
-                      registrationOrganizingCommitteeDeadline: Yup.date()
-                          .max(Yup.ref('startDate'), ({ min }) => `Deadline không được muộn hơn thời gian bắt đầu`)
-                          .typeError('Vui lòng không để trống trường này')
-                          .required('Vui lòng không để trống trường này'),
-                  }),
+                  ...(!skipped.has(1)
+                      ? {
+                            registrationOrganizingCommitteeDeadline: Yup.date()
+                                .max(
+                                    Yup.ref('startDate'),
+                                    ({ min }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`,
+                                )
+                                .typeError('Vui lòng không để trống trường này')
+                                .required('Vui lòng không để trống trường này')
+                                .test(
+                                    'same_dates_test',
+                                    'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu',
+                                    function (value) {
+                                        const { startDate } = this.parent;
+                                        return value.getTime() !== startDate.getTime();
+                                    },
+                                ),
+                        }
+                      : null),
               }
             : null),
     });
@@ -186,6 +214,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
         resetField,
         setFocus,
         setError,
+        clearErrors,
         formState: { errors, isDirty, isValid },
     } = useForm({
         resolver: yupResolver(validationSchema),
@@ -202,14 +231,14 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     };
     const handleAddEventRoles = (data) => {
         console.log(data);
-        const newData = [...datas, { ...data, id: Math.random() }];
+        const newData = [...datas, { id: Math.random(), roleName: data.roleName, maxQuantity: data.maxQuantity }];
         setDatas(newData);
 
         /**
          * Reset field keep error (isValid)
          */
         resetField('roleName', { keepError: true });
-        resetField('numberOfRole', { keepError: true });
+        resetField('maxQuantity', { keepError: true });
 
         setIsChecked(!isChecked);
     };
@@ -217,19 +246,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
         setIsChecked(!isChecked);
 
         resetField('roleName', { keepError: true });
-        resetField('numberOfRole', { keepError: true });
+        resetField('maxQuantity', { keepError: true });
     };
-
-    useEffect(() => {
-        console.log('heeeeeeeeeeeee a');
-        if (activeStep === 2) {
-            // if (isValid) {
-            //     return;
-            // }
-            console.log('heeeeeeeeeeeee skip', isValid);
-            setThirdStepStatus(isValid);
-        }
-    }, [activeStep, isValid]);
 
     console.log('isValid', isValid);
     const formRef = useRef(null);
@@ -255,7 +273,28 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     /**
      * Create Event
      */
-    const handleCreateEvent = () => {};
+    const handleCreateEvent = (data) => {
+        const createEventData = {
+            event: {
+                name: data.name,
+                description: data.description,
+                totalAmountEstimated: data.totalAmountEstimated,
+                amountPerRegisterEstimated: data.amountPerRegister,
+                amountFromClub: data.amountFromClub,
+                registrationMemberDeadline: moment(data.registrationMemberDeadline).format('yyyy-MM-DDTHH:mm:ss'),
+                registrationOrganizingCommitteeDeadline: moment(data.registrationOrganizingCommitteeDeadline).format(
+                    'yyyy-MM-DDTHH:mm:ss',
+                ),
+            },
+            rolesEventDto: datas,
+            listPreview: previewSchedule,
+        };
+        eventApi.createEvent(createEventData).then((response) => {
+            console.log(response);
+        });
+        console.log(data);
+        console.log(createEventData);
+    };
 
     const eventSchedule = previewSchedule.map((item, index) => {
         const container = {};
@@ -276,6 +315,16 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     useEffect(() => {
         control._updateValid();
     }, [activeStep, control]);
+
+    useEffect(() => {
+        console.log('skip', skipped);
+    }, [activeStep, skipped]);
+
+    useEffect(() => {
+        if (activeStep === 3) {
+            clearErrors('registrationOrganizingCommitteeDeadline');
+        }
+    }, [activeStep]);
 
     return (
         <Fragment>
@@ -324,7 +373,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                     <Box sx={{ flex: '1 1 auto' }} />
                                     <Button onClick={handleReset}>Reset</Button>
                                 </Box> */}
-                                <Grid container>
+                                <Grid container sx={{ mb: 3 }}>
                                     <Grid item xs={6}>
                                         <Box>
                                             <Box>
@@ -361,7 +410,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                             {datas.map((role) => {
                                                                 return (
                                                                     <li key={role.id}>
-                                                                        {role.name} - {role.numberOfRole} người
+                                                                        {role.roleName} - {role.maxQuantity} người
                                                                     </li>
                                                                 );
                                                             })}
@@ -382,7 +431,9 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                         >
                                                             Tổng chi phí dự kiến:{' '}
                                                         </Typography>
-                                                        <span>{previewEvent.totalAmountEstimated}</span>
+                                                        <span>
+                                                            {previewEvent.totalAmountEstimated.toLocaleString()} VND
+                                                        </span>
                                                     </Box>
                                                     <Box>
                                                         <Typography
@@ -391,7 +442,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                         >
                                                             Số tiền tài trợ từ CLB:{' '}
                                                         </Typography>
-                                                        <span>{previewEvent.amountFromClub}</span>
+                                                        <span>{previewEvent.amountFromClub.toLocaleString()} VND</span>
                                                     </Box>
                                                     <Box>
                                                         <Typography
@@ -403,7 +454,10 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                         {skipped.has(2) ? (
                                                             <span>Không</span>
                                                         ) : (
-                                                            <>{previewEvent.amountPerRegister}VND (dự kiến)</>
+                                                            <>
+                                                                {previewEvent.amountPerRegister.toLocaleString()} VND
+                                                                (dự kiến)
+                                                            </>
                                                         )}
                                                     </Box>
                                                 </>
@@ -415,7 +469,11 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                 >
                                                     Thời gian bắt đầu:{' '}
                                                 </Typography>
-                                                <span>{previewEvent.totalAmountEstimated}</span>
+                                                <span>
+                                                    {moment(new Date(previewEvent.startDate)).format(
+                                                        'HH:ss - DD/MM/yyyy',
+                                                    )}
+                                                </span>
                                             </Box>
                                             <Box>
                                                 <Typography
@@ -424,7 +482,11 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                 >
                                                     Thời gian kết thúc:{' '}
                                                 </Typography>
-                                                <span>{previewEvent.amountFromClub}</span>
+                                                <span>
+                                                    {moment(new Date(previewEvent.finishDate)).format(
+                                                        'HH:ss - DD/MM/yyyy',
+                                                    )}
+                                                </span>
                                             </Box>
                                             <Box>
                                                 <Typography
@@ -433,20 +495,30 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                 >
                                                     Deadline đăng ký tham gia:{' '}
                                                 </Typography>
-                                                {skipped.has(2) ? (
-                                                    <span>Không</span>
-                                                ) : (
-                                                    <>{previewEvent.amountPerRegister}VND (dự kiến)</>
-                                                )}
+
+                                                <span>
+                                                    {moment(new Date(previewEvent.registrationMemberDeadline)).format(
+                                                        'HH:ss - DD/MM/yyyy',
+                                                    )}
+                                                </span>
                                             </Box>
                                             <Box>
-                                                {skipped.has(2) ? null : (
-                                                    <Typography
-                                                        component="span"
-                                                        sx={{ fontSize: '16px', fontWeight: '700' }}
-                                                    >
-                                                        Deadline đăng ký ban tổ chức:{' '}
-                                                    </Typography>
+                                                {skipped.has(1) ? null : (
+                                                    <>
+                                                        <Typography
+                                                            component="span"
+                                                            sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                        >
+                                                            Deadline đăng ký ban tổ chức:{' '}
+                                                        </Typography>
+                                                        <span>
+                                                            {moment(
+                                                                new Date(
+                                                                    previewEvent.registrationOrganizingCommitteeDeadline,
+                                                                ),
+                                                            ).format('HH:ss - DD/MM/yyyy')}
+                                                        </span>
+                                                    </>
                                                 )}
                                             </Box>
                                         </Box>
@@ -503,7 +575,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                     {datas.map((data) => (
                                                         <TableRow key={data.id}>
                                                             <TableCell align="center">{data.roleName}</TableCell>
-                                                            <TableCell align="center">{data.numberOfRole}</TableCell>
+                                                            <TableCell align="center">{data.maxQuantity}</TableCell>
                                                             <TableCell>
                                                                 <IconButton
                                                                     aria-label="delete"
@@ -543,9 +615,9 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                             id="outlined-basic"
                                                             variant="outlined"
                                                             fullWidth
-                                                            {...register('numberOfRole')}
-                                                            error={errors.numberOfRole ? true : false}
-                                                            helperText={errors.numberOfRole?.message}
+                                                            {...register('maxQuantity')}
+                                                            error={errors.maxQuantity ? true : false}
+                                                            helperText={errors.maxQuantity?.message}
                                                         />
                                                     </Grid>
                                                 </Grid>
@@ -659,9 +731,9 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                 onChange={() => {
                                                     setIsAmountPerRegister(!isAmountPerRegister);
                                                 }}
-                                                onClick={() => {
-                                                    setFocus('amountPerRegister');
-                                                }}
+                                                // onClick={() => {
+                                                //     setFocus('amountPerRegister');
+                                                // }}
                                             />
                                         }
                                         label="Yêu cầu thành viên đóng tiền"
@@ -712,10 +784,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                             name="startDate"
                                             control={control}
                                             defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
+                                            render={({ field: { onChange, value }, fieldState: { error } }) => (
                                                 <DateTimePicker
                                                     label="Thời gian bắt đầu"
                                                     disablePast
@@ -735,8 +804,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                             {...params}
                                                             required
                                                             id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
+                                                            error={!!error}
+                                                            helperText={error ? error.message : null}
                                                             // id="startDate"
                                                             variant="outlined"
                                                             margin="dense"
@@ -753,10 +822,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                             name="finishDate"
                                             control={control}
                                             defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
+                                            render={({ field: { onChange, value }, fieldState: { error } }) => (
                                                 <DateTimePicker
                                                     label="Thời gian kết thúc"
                                                     disablePast
@@ -776,8 +842,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                             {...params}
                                                             required
                                                             id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
+                                                            error={!!error}
+                                                            helperText={error ? error.message : null}
                                                             // id="startDate"
                                                             variant="outlined"
                                                             margin="dense"
@@ -873,10 +939,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                             name="registrationMemberDeadline"
                                             control={control}
                                             defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
+                                            render={({ field: { onChange, value }, fieldState: { error } }) => (
                                                 <DateTimePicker
                                                     label="Deadline đăng ký tham gia"
                                                     disablePast
@@ -892,8 +955,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                             {...params}
                                                             required
                                                             id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
+                                                            error={!!error}
+                                                            helperText={error ? error.message : null}
                                                             // id="startDate"
                                                             variant="outlined"
                                                             margin="dense"
@@ -909,7 +972,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                             required
                                             name="registrationOrganizingCommitteeDeadline"
                                             control={control}
-                                            defaultValue={null}
+                                            defaultValue={skipped.has(1) ? null : null}
                                             render={({
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
@@ -985,14 +1048,17 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                             <Button onClick={handleNext} disabled={datas.length === 0}>
                                 {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}
                             </Button>
-                        ) : (
+                        ) : activeStep === 3 ? (
                             <Button
-                                onClick={
-                                    activeStep === steps.length - 2 ? handleSubmit(handlePreviewSchedule) : handleNext
-                                }
-                                disabled={!isValid}
+                                onClick={handleSubmit(handlePreviewSchedule)}
+                                // disabled={!isValid}
                             >
-                                {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}
+                                Xem trước
+                            </Button>
+                        ) : (
+                            <Button onClick={handleNext} disabled={!isValid}>
+                                {/* {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'} */}
+                                Tiếp tục
                             </Button>
                         )}
                     </Box>

@@ -30,7 +30,7 @@ const eventApi = {
         });
     },
     createEvent: (params) => {
-        const url = `/event/headculture/createevent`;
+        const url = `/event/headculture/createevent?isOverwritten=true`;
         return axiosClient.post(url, params);
     },
     createScheduleSession: (params, eventId) => {
