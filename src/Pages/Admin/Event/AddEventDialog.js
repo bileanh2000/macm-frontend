@@ -39,14 +39,15 @@ import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import NumberFormat from 'react-number-format';
 import facilityApi from 'src/api/facilityApi';
-import { DatePicker, DateTimePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
+import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
-import userApi from 'src/api/userApi';
 import moment from 'moment';
 import { useSnackbar } from 'notistack';
 import { Add, Delete } from '@mui/icons-material';
 import { useRef } from 'react';
+import eventApi from 'src/api/eventApi';
+import PreviewSchedule from './PreviewSchedule';
 
 const steps = ['Thông tin sự kiện', 'Thêm vai trò BTC', 'Thêm chi phí', 'Thêm lịch', 'Xem trước'];
 const eventRoles = [{ id: 1, name: 'hehe' }];
@@ -65,6 +66,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     const [thirdStepStatus, setThirdStepStatus] = useState(false);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [previewSchedule, setPreviewSchedule] = useState([]);
+    const [previewEvent, setPreviewEvent] = useState([]);
 
     const isStepOptional = (step) => {
         return step === 2 || step === 1;
@@ -113,10 +116,18 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
               }
             : activeStep === 1
             ? {
-                  roleName: Yup.string().nullable().required('Không được để trống trường này'),
+                  roleName: Yup.string()
+                      .nullable()
+                      .required('Không được để trống trường này')
+                      .test('len', 'Không hợp lệ', (val) => val.length > 1)
+                      .matches(
+                          /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ ]+$/,
+                          'Không hợp lệ: vui lòng nhập chữ',
+                      ),
                   numberOfRole: Yup.number()
                       .nullable()
                       .required('Không được để trống trường này')
+                      .min(1, 'Vui lòng nhập giá trị lớn hơn 0')
                       .max(1000, 'Số lượng không hợp lệ')
                       .typeError('Không được để trống trường này'),
               }
@@ -124,24 +135,29 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
             ? {
                   amountFromClub: Yup.number()
                       .required('Không được để trống trường này')
-                      .min(1, 'Vui lòng nhập giá trị lớn hơn 0')
+                      .min(1000, 'Vui lòng nhập giá trị lớn hơn 1000')
                       .max(totalClubFunds, 'Tiền quỹ CLB không đủ')
-                      .typeError('Vui lòng nhập giá trị lớn hơn 0'),
+                      .typeError('Vui lòng nhập giá trị lớn hơn 1000'),
                   totalAmountEstimated: Yup.number()
                       .required('Không được để trống trường này')
-                      .min(1, 'Vui lòng nhập giá trị lớn hơn 0')
-                      .typeError('Vui lòng nhập giá trị lớn hơn 0'),
-                  ...(isAmountPerRegister && {
-                      amountPerRegister: Yup.number()
-                          .required('Không được để trống trường này')
-                          .typeError('Vui lòng nhập số')
-                          .min(1, 'Vui lòng nhập giá trị lớn hơn 0')
-                          .typeError('Vui lòng nhập giá trị lớn hơn 0'),
-                  }),
+                      .min(1000, 'Vui lòng nhập giá trị lớn hơn 1000')
+                      .typeError('Vui lòng nhập giá trị lớn hơn 1000')
+                      .max(100000000, 'Giá trị không hợp lệ'),
+                  ...(isAmountPerRegister
+                      ? {
+                            amountPerRegister: Yup.number()
+                                .required('Không được để trống trường này')
+                                .typeError('Vui lòng nhập số')
+                                .min(1000, 'Vui lòng nhập giá trị lớn hơn 1000')
+                                .typeError('Vui lòng nhập giá trị lớn hơn 1000')
+                                .max(100000000, 'Giá trị không hợp lệ'),
+                        }
+                      : null),
               }
             : activeStep === 3
             ? {
                   startDate: Yup.date()
+                      //   .max(Yup.ref('finishDate'), ({ min }) => `Thời gian bắt không được bé hơn thời gian kết thúc`)
                       .typeError('Vui lòng không để trống trường này')
                       .required('Vui lòng không để trống trường này'),
                   finishDate: Yup.date()
@@ -149,39 +165,17 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                       .typeError('Vui lòng không để trống trường này')
                       .required('Vui lòng không để trống trường này'),
                   registrationMemberDeadline: Yup.date()
-                      .max(Yup.ref('startDate'), ({ min }) => `Deadline không được bé hơn thời gian bắt đầu`)
+                      .max(Yup.ref('startDate'), ({ max }) => `Deadline không được muộn hơn thời gian bắt đầu`)
                       .typeError('Vui lòng không để trống trường này')
                       .required('Vui lòng không để trống trường này'),
-                  registrationOrganizingCommitteeDeadline: Yup.date()
-                      .max(Yup.ref('startDate'), ({ min }) => `Deadline không được bé hơn thời gian bắt đầu`)
-                      .typeError('Vui lòng không để trống trường này')
-                      .required('Vui lòng không để trống trường này'),
+                  ...(!skipped.has(2) && {
+                      registrationOrganizingCommitteeDeadline: Yup.date()
+                          .max(Yup.ref('startDate'), ({ min }) => `Deadline không được muộn hơn thời gian bắt đầu`)
+                          .typeError('Vui lòng không để trống trường này')
+                          .required('Vui lòng không để trống trường này'),
+                  }),
               }
             : null),
-
-        // ...(activeStep === 3 && {
-        //     startTime: Yup.string().nullable().required('Không được để trống trường này'),
-        // },
-        // {
-        //     finishTime: Yup.string().nullable().required('Không được để trống trường này'),
-        // },
-        // {
-        //     startDate: Yup.string().nullable().required('Không được để trống trường này'),
-        // },
-        // {
-        //     finishDate: Yup.string().nullable().required('Không được để trống trường này'),
-        // }),
-        // cost: Yup.string().required('Không được để trống trường này').min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
-        // ...(isChecked && {
-        //     amountPerRegister: Yup.number()
-        //         .required('Không được để trống trường này')
-        //         .typeError('Vui lòng nhập số')
-        //         .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
-        // }),
-        // registrationMemberDeadline: Yup.string().nullable().required('Không được để trống trường này'),
-        // registrationOrganizingCommitteeDeadline: Yup.string().nullable().required('Không được để trống trường này'),
-        // roleName: Yup.string().nullable().required('Không được để trống trường này'),
-        // numberOfRole: Yup.string().nullable().required('Không được để trống trường này'),
     });
 
     const {
@@ -200,11 +194,6 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
         reValidateMode: 'onChange',
     });
 
-    const handleCancel = () => {
-        setIsChecked(!isChecked);
-        resetField('roleName');
-        resetField('numberOfRole');
-    };
     const handleDelete = (id) => {
         // datas.map((data) => {
         //     return data.id === id;
@@ -216,10 +205,19 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
         const newData = [...datas, { ...data, id: Math.random() }];
         setDatas(newData);
 
-        resetField('roleName');
-        resetField('numberOfRole');
+        /**
+         * Reset field keep error (isValid)
+         */
+        resetField('roleName', { keepError: true });
+        resetField('numberOfRole', { keepError: true });
 
         setIsChecked(!isChecked);
+    };
+    const handleCancel = () => {
+        setIsChecked(!isChecked);
+
+        resetField('roleName', { keepError: true });
+        resetField('numberOfRole', { keepError: true });
     };
 
     useEffect(() => {
@@ -235,18 +233,43 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
 
     console.log('isValid', isValid);
     const formRef = useRef(null);
-
-    const handlePreview = () => {
-        // let newSkipped = skipped;
-        // if (isStepSkipped(activeStep)) {
-        //     newSkipped = new Set(newSkipped.values());
-        //     newSkipped.delete(activeStep);
-        // }
-
-        // setActiveStep((prevActiveStep) => prevActiveStep + 1);
-        // setSkipped(newSkipped);
-        console.log('handlePreview');
+    /**
+     * Preview Event
+     */
+    const handlePreviewSchedule = (data) => {
+        setPreviewEvent(data);
+        let formatData = {
+            name: data.name,
+            startTime: moment(new Date(data.startDate)).format('HH:mm:ss'),
+            finishTime: moment(new Date(data.finishDate)).format('HH:mm:ss'),
+            startDate: moment(new Date(data.startDate)).format('DD/MM/yyyy'),
+            finishDate: moment(new Date(data.finishDate)).format('DD/MM/yyyy'),
+        };
+        eventApi.createPreviewEvent(formatData).then((response) => {
+            console.log('fetch preview schedule data', response);
+            setPreviewSchedule(response.data);
+        });
+        console.log('format Data', formatData);
+        handleNext();
     };
+    /**
+     * Create Event
+     */
+    const handleCreateEvent = () => {};
+
+    const eventSchedule = previewSchedule.map((item, index) => {
+        const container = {};
+        container['id'] = index;
+        container['date'] = item.date;
+        container['title'] = item.title;
+        container['time'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['description'] = item.title + ' ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['display'] = 'background';
+        // container['backgroundColor'] = isOverride === -1 || isOverride === 0 ? '#5ba8f5' : '#ff3d00';
+        container['backgroundColor'] = item.existed ? '#ffb199' : '#ccffe6';
+
+        return container;
+    });
     /**
      * Revalidate form after step changed
      */
@@ -272,7 +295,6 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                         autoComplete="off"
                         sx={{
                             '& .MuiTextField-root': { mb: 2 },
-                            '& .MuiBox-root': { width: '100%', ml: 1, mr: 2 },
                         }}
                         ref={formRef}
                     >
@@ -295,12 +317,146 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                         </Stepper>
                         {activeStep === steps.length - 1 ? (
                             <Fragment>
-                                <Typography sx={{ mt: 2, mb: 1 }}>
+                                {/* <Typography sx={{ mt: 2, mb: 1 }}>
                                     All steps completed - you&apos;re finished
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
                                     <Box sx={{ flex: '1 1 auto' }} />
                                     <Button onClick={handleReset}>Reset</Button>
+                                </Box> */}
+                                <Grid container>
+                                    <Grid item xs={6}>
+                                        <Box>
+                                            <Box>
+                                                <Typography
+                                                    component="span"
+                                                    sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                >
+                                                    Tên sự kiện:{' '}
+                                                </Typography>
+                                                <span>{previewEvent.name}</span>
+                                            </Box>
+                                            <Box>
+                                                <Typography
+                                                    component="span"
+                                                    sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                >
+                                                    Nội dung:{' '}
+                                                </Typography>
+                                                <span>{previewEvent.description}</span>
+                                            </Box>
+                                            <Box>
+                                                <Typography
+                                                    component="span"
+                                                    sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                >
+                                                    Vai trò trong sự kiện:{' '}
+                                                </Typography>
+                                                {skipped.has(1) ? (
+                                                    <span>Không có</span>
+                                                ) : (
+                                                    <>
+                                                        <br />
+                                                        <ul>
+                                                            {datas.map((role) => {
+                                                                return (
+                                                                    <li key={role.id}>
+                                                                        {role.name} - {role.numberOfRole} người
+                                                                    </li>
+                                                                );
+                                                            })}
+                                                        </ul>
+                                                    </>
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Box>
+                                            {!skipped.has(2) ? (
+                                                <>
+                                                    <Box>
+                                                        <Typography
+                                                            component="span"
+                                                            sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                        >
+                                                            Tổng chi phí dự kiến:{' '}
+                                                        </Typography>
+                                                        <span>{previewEvent.totalAmountEstimated}</span>
+                                                    </Box>
+                                                    <Box>
+                                                        <Typography
+                                                            component="span"
+                                                            sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                        >
+                                                            Số tiền tài trợ từ CLB:{' '}
+                                                        </Typography>
+                                                        <span>{previewEvent.amountFromClub}</span>
+                                                    </Box>
+                                                    <Box>
+                                                        <Typography
+                                                            component="span"
+                                                            sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                        >
+                                                            Yêu cầu thành viên đóng tiền:{' '}
+                                                        </Typography>
+                                                        {skipped.has(2) ? (
+                                                            <span>Không</span>
+                                                        ) : (
+                                                            <>{previewEvent.amountPerRegister}VND (dự kiến)</>
+                                                        )}
+                                                    </Box>
+                                                </>
+                                            ) : null}
+                                            <Box>
+                                                <Typography
+                                                    component="span"
+                                                    sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                >
+                                                    Thời gian bắt đầu:{' '}
+                                                </Typography>
+                                                <span>{previewEvent.totalAmountEstimated}</span>
+                                            </Box>
+                                            <Box>
+                                                <Typography
+                                                    component="span"
+                                                    sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                >
+                                                    Thời gian kết thúc:{' '}
+                                                </Typography>
+                                                <span>{previewEvent.amountFromClub}</span>
+                                            </Box>
+                                            <Box>
+                                                <Typography
+                                                    component="span"
+                                                    sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                >
+                                                    Deadline đăng ký tham gia:{' '}
+                                                </Typography>
+                                                {skipped.has(2) ? (
+                                                    <span>Không</span>
+                                                ) : (
+                                                    <>{previewEvent.amountPerRegister}VND (dự kiến)</>
+                                                )}
+                                            </Box>
+                                            <Box>
+                                                {skipped.has(2) ? null : (
+                                                    <Typography
+                                                        component="span"
+                                                        sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                    >
+                                                        Deadline đăng ký ban tổ chức:{' '}
+                                                    </Typography>
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    </Grid>
+                                </Grid>
+                                <Box sx={{ height: '50vh', ml: 0 }}>
+                                    <PreviewSchedule
+                                        dataPreview={eventSchedule}
+                                        initialDate={eventSchedule[0] && new Date(eventSchedule[0].date)}
+                                    />
                                 </Box>
                             </Fragment>
                         ) : // <Fragment>
@@ -435,7 +591,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                     variant="outlined"
                                     defaultValue=""
                                     control={control}
-                                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                    render={({ field: { onChange, value }, fieldState: { error } }) => (
                                         <NumberFormat
                                             name="cost"
                                             customInput={TextField}
@@ -451,8 +607,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                             InputProps={{
                                                 endAdornment: <InputAdornment position="end">VND</InputAdornment>,
                                             }}
-                                            error={invalid}
-                                            helperText={invalid ? error.message : null}
+                                            error={!!error}
+                                            helperText={error ? error.message : null}
                                             fullWidth
                                         />
                                     )}
@@ -500,7 +656,12 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                         control={
                                             <Switch
                                                 checked={isAmountPerRegister}
-                                                onChange={() => setIsAmountPerRegister(!isAmountPerRegister)}
+                                                onChange={() => {
+                                                    setIsAmountPerRegister(!isAmountPerRegister);
+                                                }}
+                                                onClick={() => {
+                                                    setFocus('amountPerRegister');
+                                                }}
                                             />
                                         }
                                         label="Yêu cầu thành viên đóng tiền"
@@ -517,7 +678,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                         // }
                                         // defaultValue={amountPerRegister}
                                         // defaultValue=""
-                                        defaultValue=""
+                                        // defaultValue="0"
                                         control={control}
                                         render={({ field: { onChange, value }, fieldState: { error } }) => (
                                             <NumberFormat
@@ -526,7 +687,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                 label="Dự kiến số tiền mỗi người cần phải đóng"
                                                 thousandSeparator={true}
                                                 variant="outlined"
-                                                // defaultValue={a.toLocaleString()}
+                                                // defaultValue={0}
                                                 value={value}
                                                 onValueChange={(v) => {
                                                     onChange(Number(v.value));
@@ -819,18 +980,16 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                             </Button>
                         )}
                         {activeStep === steps.length - 1 ? (
-                            <Button>Tạo sự kiện</Button>
+                            <Button onClick={handleSubmit(handleCreateEvent)}>Tạo sự kiện</Button>
                         ) : activeStep === 1 ? (
                             <Button onClick={handleNext} disabled={datas.length === 0}>
                                 {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}
                             </Button>
-                        ) : activeStep === 2 ? (
-                            <Button onClick={handleNext} disabled={!thirdStepStatus}>
-                                {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}
-                            </Button>
                         ) : (
                             <Button
-                                onClick={activeStep === steps.length - 2 ? handlePreview : handleNext}
+                                onClick={
+                                    activeStep === steps.length - 2 ? handleSubmit(handlePreviewSchedule) : handleNext
+                                }
                                 disabled={!isValid}
                             >
                                 {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}
