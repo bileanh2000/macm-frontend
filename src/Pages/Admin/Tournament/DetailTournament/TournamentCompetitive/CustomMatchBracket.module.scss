@@ -83,7 +83,7 @@ h2 {
 }
 
 .draggable {
-    cursor: grab;
+    cursor: grab !important;
 }
 
 .hidden {
@@ -258,7 +258,7 @@ h2 {
     border-radius: 0.1em;
     box-shadow: 0 2px 0 0 #e5e5e5;
     outline: none;
-    cursor: pointer;
+    // cursor: pointer;
     transition: padding 0.2s ease-in-out, border 0.2s linear;
     margin-top: 0.5em;
     margin-bottom: 0.5em;

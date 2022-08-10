@@ -23,6 +23,7 @@ function MemberTournament({ tournament, isUpdate }) {
     const [openDialogExhibition, setOpenDialogExhibition] = useState(false);
     const [tournamentStatus, setTournamentStatus] = useState(0);
     const [isRender, setIsRender] = useState(true);
+    const [isRenderCompe, setIsRenderCompe] = useState(true);
 
     const handleOpenDialogExhibition = () => {
         setOpenDialogExhibition(true);
@@ -95,6 +96,7 @@ function MemberTournament({ tournament, isUpdate }) {
                 setCompetitivePlayer(response.data[0].listPlayers);
                 setIsCreate(response.data[0].changed);
                 setTournamentStatus(response.data[0].status);
+                setIsRenderCompe(false);
             }
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
@@ -132,15 +134,15 @@ function MemberTournament({ tournament, isUpdate }) {
     };
 
     useEffect(() => {
-        type == 1 && fetchCompetitivePlayer(weightRange);
-    }, [weightRange, type]);
+        isRenderCompe && fetchCompetitivePlayer(weightRange);
+    }, [weightRange, competitivePlayer, isRenderCompe]);
 
     useEffect(() => {
         isRender && getAllCompetitiveType(tournamentId);
         fetchExhibitionType(tournamentId);
         isRender && fetchExhibitionTeam(tournamentId, exhibitionType == 0 ? { exhibitionType: 0 } : exhibitionType);
         setIsRender(false);
-    }, [tournamentId, competitivePlayer, exhibitionType, exhibitionTeam, isRender]);
+    }, [tournamentId, exhibitionType, exhibitionTeam, isRender]);
 
     return (
         <Fragment>
@@ -272,7 +274,10 @@ function MemberTournament({ tournament, isUpdate }) {
                                 setCompetitivePlayer([...newItem, ...competitivePlayer]);
                                 setOpenDialog(false);
                             }}
-                            onChangeData={() => setIsRender(true)}
+                            onChangeData={() => {
+                                console.log('change compe');
+                                return setIsRenderCompe(true);
+                            }}
                         />
                         <RegisterExhibition
                             title="Đăng kí tham gia biểu diễn"
@@ -284,14 +289,31 @@ function MemberTournament({ tournament, isUpdate }) {
                                 // fetchExhibitionTeam(tournamentId, exhibitionType);
                                 setOpenDialogExhibition(false);
                             }}
-                            onChangeData={() => setIsRender(true)}
+                            onChangeData={() => {
+                                console.log('change exhi');
+                                return setIsRender(true);
+                            }}
                         />
                     </Box>
                     {type == 1 && tournament.competitiveTypes.length > 0 && competitivePlayer && (
-                        <MemberList data={competitivePlayer} type={type} onChange={handleChange} />
+                        <MemberList
+                            data={competitivePlayer}
+                            type={type}
+                            onChange={() => {
+                                console.log('change compe');
+                                return setIsRenderCompe(true);
+                            }}
+                        />
                     )}
                     {type == 2 && tournament.exhibitionTypes.length > 0 > 0 && exhibitionTeam && (
-                        <MemberList data={exhibitionTeam} type={type} />
+                        <MemberList
+                            data={exhibitionTeam}
+                            type={type}
+                            onChange={() => {
+                                console.log('change exhi');
+                                return setIsRender(true);
+                            }}
+                        />
                     )}
                 </Box>
             )}
