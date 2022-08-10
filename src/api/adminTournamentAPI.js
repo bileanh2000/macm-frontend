@@ -137,6 +137,16 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
+    updateWeightForCompetitivePlayer: (competitivePlayerId, weight) => {
+        const url = `/competitive/headclub/updateweightplayer/${competitivePlayerId}`;
+        return axiosClient.put(url, null, { params: { weight: weight } });
+    },
+
+    deleteCompetitivePlayer: (competitivePlayerId) => {
+        const url = `/competitive/headclub/deletecompetitiveplayer/${competitivePlayerId}`;
+        return axiosClient.put(url);
+    },
+
     //Fee
 
     getAllTournamentOrganizingCommitteePaymentStatus: (tournamentId) => {
@@ -240,6 +250,11 @@ const adminTournament = {
     updateTimeAndPlaceMatch: (matchId, params) => {
         const url = `/competitive/headclub/updatetimeandplacematch/${matchId}`;
         return axiosClient.put(url, params);
+    },
+
+    getResultByType: (competitiveTypeId) => {
+        const url = `/competitive/getResult/${competitiveTypeId}`;
+        return axiosClient.post(url);
     },
 
     //////////// Exhibition
