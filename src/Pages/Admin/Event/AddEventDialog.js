@@ -6,18 +6,13 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
     Fab,
     FormControlLabel,
     Grid,
     IconButton,
-    Input,
     InputAdornment,
-    InputLabel,
-    MenuItem,
     Paper,
-    Snackbar,
     Step,
     StepLabel,
     Stepper,
@@ -32,13 +27,10 @@ import {
     Typography,
 } from '@mui/material';
 import { Fragment, useEffect, useState } from 'react';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
-import { styled } from '@mui/material/styles';
 import * as Yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import NumberFormat from 'react-number-format';
-import facilityApi from 'src/api/facilityApi';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
@@ -50,7 +42,6 @@ import eventApi from 'src/api/eventApi';
 import PreviewSchedule from './PreviewSchedule';
 
 const steps = ['Thông tin sự kiện', 'Thêm vai trò BTC', 'Thêm chi phí', 'Thêm lịch', 'Xem trước'];
-const eventRoles = [{ id: 1, name: 'hehe' }];
 const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [activeStep, setActiveStep] = useState(0);
@@ -59,13 +50,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     const [isChecked, setIsChecked] = useState(false);
     const [datas, setDatas] = useState([]);
     const [isAmountPerRegister, setIsAmountPerRegister] = useState(false);
-    const [totalAmountEstimated, setTotalAmountEstimated] = useState(0);
-    const [amountFromClub, setAmountFromClub] = useState(0);
     const [totalClubFunds, setTotalClubFunds] = useState(20000);
-    const [amountPerRegister, setAmountPerRegister] = useState();
-    const [thirdStepStatus, setThirdStepStatus] = useState(false);
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
     const [previewSchedule, setPreviewSchedule] = useState([]);
     const [previewEvent, setPreviewEvent] = useState([]);
 
@@ -166,15 +151,11 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                   //       .typeError('Vui lòng không để trống trường này')
                   //       .required('Vui lòng không để trống trường này'),
                   finishDate: Yup.date()
-                      .test(
-                          'same_dates_test',
-                          'Thời gian bắt đầu và thời gian kết thúc không được bằng nhau',
-                          function (value) {
-                              const { startDate } = this.parent;
-                              return value.getTime() !== startDate.getTime();
-                          },
-                      )
-                      .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
+                      .test('same_dates_test', 'Thời gian kết thúc phải muộn hơn thời gian bắt đầu', function (value) {
+                          const { startDate } = this.parent;
+                          return value.getTime() !== startDate.getTime();
+                      })
+                      .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc phải muộn hơn thời gian bắt đầu`)
                       .required('Vui lòng không để trống trường này')
                       .typeError('Vui lòng không để trống trường này')
                       .required('Vui lòng không để trống trường này'),
@@ -290,7 +271,13 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
             listPreview: previewSchedule,
         };
         eventApi.createEvent(createEventData).then((response) => {
-            console.log(response);
+            if (response.data.length !== 0) {
+                console.log(response);
+                enqueueSnackbar(response.message, { variant: 'success' });
+            } else {
+                console.log(response);
+                enqueueSnackbar(response.message, { variant: 'error' });
+            }
         });
         console.log(data);
         console.log(createEventData);
@@ -318,13 +305,16 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
 
     useEffect(() => {
         console.log('skip', skipped);
-    }, [activeStep, skipped]);
-
-    useEffect(() => {
-        if (activeStep === 3) {
-            clearErrors('registrationOrganizingCommitteeDeadline');
+        if (skipped.has(1)) {
+            resetField('registrationOrganizingCommitteeDeadline');
         }
-    }, [activeStep]);
+    }, [activeStep, skipped, resetField]);
+
+    // useEffect(() => {
+    //     if (activeStep === 3) {
+    //         clearErrors('registrationOrganizingCommitteeDeadline');
+    //     }
+    // }, [activeStep]);
 
     return (
         <Fragment>
@@ -674,7 +664,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                             value={value}
                                             onValueChange={(v) => {
                                                 onChange(Number(v.value));
-                                                setTotalAmountEstimated(Number(v.value));
+                                                // setTotalAmountEstimated(Number(v.value));
                                             }}
                                             InputProps={{
                                                 endAdornment: <InputAdornment position="end">VND</InputAdornment>,
@@ -704,7 +694,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                             onValueChange={(v) => {
                                                 onChange(Number(v.value));
                                                 // setAmountFromClub(Number(v.value));
-                                                setAmountPerRegister(Number(v.value));
+                                                // setAmountPerRegister(Number(v.value));
                                             }}
                                             InputProps={{
                                                 endAdornment: <InputAdornment position="end">VND</InputAdornment>,
@@ -793,7 +783,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                     onChange={(value) => {
                                                         onChange(value);
                                                         console.log('startDate value', value);
-                                                        setStartDate(value);
+                                                        // setStartDate(value);
                                                     }}
                                                     renderInput={(params) => (
                                                         <TextField
@@ -831,7 +821,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                     onChange={(value) => {
                                                         onChange(value);
                                                         console.log('endDate value', value);
-                                                        setEndDate(value);
+                                                        // setEndDate(value);
                                                     }}
                                                     renderInput={(params) => (
                                                         <TextField
@@ -855,83 +845,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                         />
                                     </Grid>
                                 </Grid>
-                                {/* <Grid container spacing={2}>
-                                    <Grid item xs={6}>
-                                        <Controller
-                                            required
-                                            name="startTime"
-                                            control={control}
-                                            defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <TimePicker
-                                                    label="Thời gian bắt đầu"
-                                                    // disablePast
-                                                    ampm={false}
-                                                    value={value}
-                                                    onChange={(value) => {
-                                                        onChange(value);
-                                                    }}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            sx={{
-                                                                marginTop: '0px !important',
-                                                                marginBottom: '16px !important',
-                                                            }}
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Controller
-                                            required
-                                            name="finishTime"
-                                            control={control}
-                                            defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <DateTimePicker
-                                                    label="Thời gian kết thúc"
-                                                    ampm={false}
-                                                    value={value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            sx={{
-                                                                marginTop: '0px !important',
-                                                                marginBottom: '16px !important',
-                                                            }}
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                </Grid> */}
+
                                 <Grid container spacing={2}>
                                     <Grid item xs={6}>
                                         <Controller
