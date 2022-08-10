@@ -1,14 +1,81 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/system';
-import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { styled } from '@mui/material/styles';
+import { Delete, Edit } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import * as Yup from 'yup';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useSnackbar } from 'notistack';
 
-function MemberList({ data, type }) {
-    console.log('member list', data);
+import adminTournament from 'src/api/adminTournamentAPI';
+
+function MemberList({ data, type, onChange }) {
+    const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
+    const [openDelete, setOpenDelete] = useState(false);
+    const [openUpdate, setOpenUpdate] = useState(false);
+    const [competitivePlayerId, setCompetitivePlayerId] = useState(0);
 
     let columns;
     let rowsPlayer;
+
+    const deleteCompetitivePlayer = async (competitivePlayerId) => {
+        try {
+            const response = await adminTournament.deleteCompetitivePlayer(competitivePlayerId);
+            enqueueSnackbar(response.message, {
+                variant: response.message.includes('Không thể xóa') ? 'error' : 'success',
+            });
+        } catch (error) {
+            console.warn('Failed to delete competitive player');
+        }
+    };
+
+    const updateWeightForCompetitivePlayer = async (competitivePlayerId, weight) => {
+        try {
+            const response = await adminTournament.updateWeightForCompetitivePlayer(competitivePlayerId, weight);
+            enqueueSnackbar(response.message, { variant: 'success' });
+        } catch (error) {
+            console.warn('Failed to delete competitive player');
+        }
+    };
+
+    const deleteUser = (competitivePlayerId) => {
+        setCompetitivePlayerId(competitivePlayerId);
+        setOpenDelete(true);
+    };
+    const handleCloseDelete = () => {
+        setOpenDelete(false);
+    };
+    const handleConfirmDelete = () => {
+        deleteCompetitivePlayer(competitivePlayerId);
+        // const newData = data.filter((player) => player.id != competitivePlayerId);
+        onChange && onChange();
+        handleCloseDelete();
+    };
+
+    const updateWeight = (competitivePlayerId) => {
+        setCompetitivePlayerId(competitivePlayerId);
+        setOpenUpdate(true);
+    };
+
+    const handleCloseUpdate = () => {
+        setOpenUpdate(false);
+        reset({
+            weight: '',
+        });
+    };
+
+    const onSubmit = (value) => {
+        updateWeightForCompetitivePlayer(competitivePlayerId, value.weight);
+        // const newData = data.map((player) =>
+        //     player.id === competitivePlayerId ? { ...player, weight: value.weight } : player,
+        // );
+        // console.log(newData);
+        onChange && onChange();
+        handleCloseUpdate();
+    };
 
     if (type === 2) {
         columns = [
@@ -54,13 +121,27 @@ function MemberList({ data, type }) {
             { field: 'playerGender', headerName: 'Giới tính', width: 150, flex: 1 },
             { field: 'weight', headerName: 'Cân nặng', width: 150, flex: 1 },
             { field: 'weightRange', headerName: 'Hạng cân thi đấu', width: 150, flex: 1 },
+            {
+                field: 'actions',
+                type: 'actions',
+                width: 80,
+                getActions: (params) => [
+                    <GridActionsCellItem
+                        icon={<Edit />}
+                        label="Edit weight"
+                        onClick={() => updateWeight(params.id)}
+                        // showInMenu
+                    />,
+                    <GridActionsCellItem icon={<Delete />} label="Delete" onClick={() => deleteUser(params.id)} />,
+                ],
+            },
         ];
 
         rowsPlayer =
             data &&
             data.map((item, index) => {
                 const container = {};
-                container['id'] = index + 1;
+                container['id'] = item.id;
                 container['studentName'] = item.tournamentPlayer.user.name;
                 container['weight'] = item.weight + 'Kg';
                 container['studentId'] = item.tournamentPlayer.user.studentId;
@@ -142,6 +223,24 @@ function MemberList({ data, type }) {
             </StyledGridOverlay>
         );
     }
+    const validationSchema = Yup.object().shape({
+        weight: Yup.number()
+            .required('Không được để trống trường này')
+            .typeError('Vui lòng nhập số')
+            .min(39, 'Vui lòng nhập giá trị lớn hơn 39 Kg')
+            .max(85, 'Vui lòng nhập giá trị nhỏ hơn 85 Kg'),
+    });
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+        setFocus,
+        setError,
+    } = useForm({
+        resolver: yupResolver(validationSchema),
+        mode: 'onBlur',
+    });
     return (
         <Box
             sx={{
@@ -170,6 +269,64 @@ function MemberList({ data, type }) {
                 },
             }}
         >
+            <Dialog
+                fullWidth
+                maxWidth="md"
+                open={openDelete}
+                onClose={handleCloseDelete}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    Xác nhận
+                </DialogTitle>
+                <DialogContent>Bạn có chắc chắn muốn xóa người chơi này</DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDelete}>Hủy</Button>
+                    <Button onClick={handleConfirmDelete} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                fullWidth
+                maxWidth="md"
+                open={openUpdate}
+                onClose={handleCloseUpdate}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    Chỉnh sửa cân nặng
+                </DialogTitle>
+                <DialogContent>
+                    <Box
+                        component="form"
+                        noValidate
+                        autoComplete="off"
+                        sx={{
+                            '& .MuiTextField-root': { mb: 2, mt: 2 },
+                        }}
+                    >
+                        <TextField
+                            type="number"
+                            id="outlined-basic"
+                            label="Vui lòng nhập hạng cân của bạn"
+                            variant="outlined"
+                            fullWidth
+                            {...register('weight')}
+                            error={errors.weight ? true : false}
+                            helperText={errors.weight?.message}
+                        />
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseUpdate}>Hủy</Button>
+                    <Button onClick={handleSubmit(onSubmit)} autoFocus>
+                        Xác nhận
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <DataGrid
                 // loading={data.length === 0}
                 disableSelectionOnClick={true}
