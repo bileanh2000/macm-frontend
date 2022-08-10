@@ -48,15 +48,31 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
         >
             {tournament && (
                 <Fragment>
-                    <Grid container columns={12} sx={{ mt: 2, ml: 0 }} spacing={2}>
+                    <Grid container columns={12} sx={{ mt: 2 }} spacing={2}>
                         <Grid item xs={7}>
-                            <Typography variant="body1" sx={{ p: 2, m: 1 }}>
+                            <Typography variant="body1" sx={{}}>
                                 <strong>Nội dung: </strong>
                                 {tournament.description}
                             </Typography>
-                            <Typography variant="body1" sx={{ p: 2, m: 1 }}>
-                                <strong>Hạng mục thi đấu:</strong>
+                            <Typography variant="body1" sx={{}}>
+                                <strong>Nội dung: </strong>
+                                {tournament.description}
                             </Typography>
+                            <Typography variant="body1" sx={{}}>
+                                <strong>Nội dung: </strong>
+                                {tournament.description}
+                            </Typography>
+                            <Typography variant="body1" sx={{}}>
+                                <strong>Nội dung: </strong>
+                                {tournament.description}
+                            </Typography>
+                            <Typography variant="body1" sx={{}}>
+                                <strong>Nội dung: </strong>
+                                {tournament.description}
+                            </Typography>
+                            {/* <Typography variant="body1" sx={{ p: 2, m: 1 }}>
+                                <strong>Hạng mục thi đấu:</strong>
+                            </Typography> */}
                         </Grid>
                         <Grid item xs={5}>
                             {!isUpdate && (
@@ -86,76 +102,6 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                                     startTime={startTime}
                                 />
                             )}
-                        </Grid>
-                        <Grid container columns={12} sx={{ mb: 2, ml: -4 }} spacing={6}>
-                            <Grid item xs={12} md={4}>
-                                <Paper elevation={3}>
-                                    {tournament.competitiveTypes.length > 0 && (
-                                        <TableContainer sx={{ maxHeight: 440 }}>
-                                            <Typography variant="body1">
-                                                <strong>Thi đấu đối kháng </strong>
-                                            </Typography>
-                                            <Table stickyHeader aria-label="sticky table">
-                                                <TableHead>
-                                                    <TableRow>
-                                                        <StyledTableCell align="center">Giới tính</StyledTableCell>
-                                                        <StyledTableCell align="center">Hạng cân</StyledTableCell>
-                                                    </TableRow>
-                                                </TableHead>
-                                                <TableBody>
-                                                    {tournament.competitiveTypes.map((data) => (
-                                                        <StyledTableRow key={data.id}>
-                                                            <StyledTableCell align="center">
-                                                                {data.gender ? 'Nam' : 'Nữ'}
-                                                            </StyledTableCell>
-                                                            <StyledTableCell align="center">
-                                                                {data.weightMin} - {data.weightMax} Kg
-                                                            </StyledTableCell>
-                                                        </StyledTableRow>
-                                                    ))}
-                                                </TableBody>
-                                            </Table>
-                                        </TableContainer>
-                                    )}
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} md={8}>
-                                <Paper elevation={3}>
-                                    {tournament.exhibitionTypes.length > 0 && (
-                                        <TableContainer sx={{ maxHeight: 440 }}>
-                                            <Typography variant="body1">
-                                                <strong>Thi đấu biểu diễn </strong>
-                                            </Typography>
-                                            <Table aria-label="sticky table">
-                                                <TableHead>
-                                                    <TableRow>
-                                                        <StyledTableCell align="center">
-                                                            Nội dung thi đấu
-                                                        </StyledTableCell>
-                                                        <StyledTableCell align="center">Số lượng nữ</StyledTableCell>
-                                                        <StyledTableCell align="center">Số lượng nam</StyledTableCell>
-                                                    </TableRow>
-                                                </TableHead>
-                                                <TableBody>
-                                                    {tournament.exhibitionTypes.map((data) => (
-                                                        <StyledTableRow key={data.id}>
-                                                            <StyledTableCell align="center">
-                                                                {data.name}
-                                                            </StyledTableCell>
-                                                            <StyledTableCell align="center">
-                                                                {data.numberFemale}
-                                                            </StyledTableCell>
-                                                            <StyledTableCell align="center">
-                                                                {data.numberMale}
-                                                            </StyledTableCell>
-                                                        </StyledTableRow>
-                                                    ))}
-                                                </TableBody>
-                                            </Table>
-                                        </TableContainer>
-                                    )}
-                                </Paper>
-                            </Grid>
                         </Grid>
                     </Grid>
                 </Fragment>

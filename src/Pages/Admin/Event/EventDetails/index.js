@@ -25,7 +25,6 @@ import PropTypes from 'prop-types';
 import { Box } from '@mui/system';
 import { useCallback, useState, Fragment, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import { Controller, useForm } from 'react-hook-form';
 import { Edit, EmojiEvents } from '@mui/icons-material';
 import NumberFormat from 'react-number-format';
@@ -34,8 +33,14 @@ import TournamentOverview from './EventOverview';
 import TournamentSchedule from './TournamentSchedule';
 import TournamentCompetitive from './TournamentCompetitive';
 import TournamentExhibition from './TournamentExhibition';
-import AdminTournament from '../AdminTournament';
-import MemberTournament from '../MemberTournament';
+import eventApi from 'src/api/eventApi';
+import MenberEvent from '../MenberEvent';
+import MemberList from '../MenberEvent/MemberList';
+import CelebrationIcon from '@mui/icons-material/Celebration';
+import moment from 'moment';
+import AdminTournament from './AdminTournament';
+// import AdminTournament from '../AdminTournament';
+// import MemberTournament from '../MemberTournament';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -68,7 +73,7 @@ function a11yProps(index) {
 }
 
 function EventDetails() {
-    let { tournamentId } = useParams();
+    let { id } = useParams();
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const [tournament, setTournament] = useState();
     const [scheduleList, setScheduleList] = useState([]);
@@ -84,18 +89,9 @@ function EventDetails() {
         setOpenDialog(false);
     };
 
-    // const fetchAdminInTournament = async (params) => {
-    //     try {
-    //         const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
-    //         console.log(response);
-    //     } catch (error) {
-    //         console.log('Failed to fetch admin list: ', error);
-    //     }
-    // };
-
-    const getTournamentById = async (tournamentId) => {
+    const getEventById = async (id) => {
         try {
-            const response = await adminTournamentAPI.getTournamentById(tournamentId);
+            const response = await eventApi.getEventById(id);
             console.log(response.data);
             setTournament(response.data[0]);
         } catch (error) {
@@ -104,7 +100,7 @@ function EventDetails() {
     };
     const fetchTournamentSchedule = async (params) => {
         try {
-            const response = await adminTournamentAPI.getTournamentSchedule(params);
+            const response = await eventApi.getEventScheduleByEvent(params);
             console.log('Thanh cong roi: ', response);
             setScheduleList(response.data);
         } catch (error) {
@@ -113,17 +109,16 @@ function EventDetails() {
     };
 
     useEffect(() => {
-        getTournamentById(tournamentId);
-        fetchTournamentSchedule(tournamentId);
+        getEventById(id);
+        fetchTournamentSchedule(id);
         window.scrollTo({ behavior: 'smooth', top: '0px' });
-    }, [tournamentId]);
+    }, [id]);
 
     const scheduleData = scheduleList.map((item) => {
         const container = {};
         container['id'] = item.id;
         container['date'] = item.date;
-        container['title'] =
-            item.tournament.name + ' - ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['title'] = item.name + ' - ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
         container['backgroundColor'] = '#5ba8f5';
         return container;
@@ -147,7 +142,7 @@ function EventDetails() {
         (id) => () => {
             handleCloseDialog();
             setTimeout(() => {
-                adminTournamentAPI.deleteTournament(id).then((res) => {
+                eventApi.deleteTournament(id).then((res) => {
                     console.log('delete', res);
                     console.log('delete', res.data);
                     navigate(-1);
@@ -176,7 +171,7 @@ function EventDetails() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
-                    <Button onClick={handleDelete(tournamentId)} autoFocus>
+                    <Button onClick={handleDelete(id)} autoFocus>
                         Đồng ý
                     </Button>
                 </DialogActions>
@@ -199,9 +194,10 @@ function EventDetails() {
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             flex: 1,
+                                            mb: 1,
                                         }}
                                     >
-                                        <EmojiEvents fontSize="large" sx={{ color: '#0ACE70' }} />
+                                        <CelebrationIcon fontSize="large" sx={{ color: '#0ACE70' }} />
                                     </Box>
                                 </Box>
                                 <Box>
@@ -209,7 +205,8 @@ function EventDetails() {
                                         {tournament.name}
                                     </Typography>
                                     <Typography variant="caption" sx={{ fontSize: 'bold' }}>
-                                        {scheduleData[0].date} - {scheduleData[scheduleData.length - 1].date}
+                                        {moment(scheduleData[0].date).format('DD/MM/yyyy')} -{' '}
+                                        {moment(scheduleData[scheduleData.length - 1].date).format('DD/MM/yyyy')}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -217,11 +214,11 @@ function EventDetails() {
                             <Box>
                                 <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
                                     <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
-                                    <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />
-                                    <Tab label="Bảng đấu đối kháng" {...a11yProps(2)} value={2} />
-                                    <Tab label="Bảng đấu biểu diễn" {...a11yProps(3)} value={3} />
-                                    <Tab label="Danh sách ban tổ chức" {...a11yProps(4)} value={4} />
-                                    <Tab label="Danh sách người chơi" {...a11yProps(5)} value={5} />
+                                    <Tab label="Lịch sự kiện" {...a11yProps(1)} value={1} />
+                                    <Tab label="Danh sách thành viên BTC" {...a11yProps(2)} value={2} />
+                                    <Tab label="Danh sách thành viên tham gia" {...a11yProps(3)} value={3} />
+                                    <Tab label="Chi phí" {...a11yProps(4)} value={4} />
+                                    <Tab label="Điểm danh" {...a11yProps(5)} value={5} />
                                 </Tabs>
                             </Box>
                         </Container>
@@ -240,17 +237,17 @@ function EventDetails() {
                                 <TournamentSchedule isUpdate={isUpdate} />
                             </TabPanel>
                             <TabPanel value={value} index={2}>
-                                <TournamentCompetitive tournamentStatus={tournament.status} />
+                                <AdminTournament isUpdate={isUpdate} user={user} />
                             </TabPanel>
                             <TabPanel value={value} index={3}>
-                                <TournamentExhibition tournamentStatus={tournament.status} />
+                                <MenberEvent />
                             </TabPanel>
-                            <TabPanel value={value} index={4}>
+                            {/* <TabPanel value={value} index={4}>
                                 <AdminTournament isUpdate={isUpdate} user={user} />
                             </TabPanel>
                             <TabPanel value={value} index={5}>
                                 <MemberTournament tournament={tournament} isUpdate={isUpdate} />
-                            </TabPanel>
+                            </TabPanel> */}
                         </Container>
                     </Paper>
                 </Fragment>

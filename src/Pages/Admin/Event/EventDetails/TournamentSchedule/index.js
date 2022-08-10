@@ -14,6 +14,7 @@ import {
     Grid,
     Paper,
     TextField,
+    Tooltip,
     Typography,
 } from '@mui/material';
 import { Box } from '@mui/system';
@@ -26,10 +27,11 @@ import { vi } from 'date-fns/locale';
 
 import adminTournament from 'src/api/adminTournamentAPI';
 import moment from 'moment';
+import eventApi from 'src/api/eventApi';
 
 function TournamentSchedule({ isUpdate }) {
     const nowDate = new Date();
-    let { tournamentId } = useParams();
+    let { id } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [scheduleList, setScheduleList] = useState([]);
     const [scheduleUpdate, setScheduleUpdate] = useState({});
@@ -39,7 +41,7 @@ function TournamentSchedule({ isUpdate }) {
 
     const fetchTournamentSchedule = async (params) => {
         try {
-            const response = await adminTournament.getTournamentSchedule(params);
+            const response = await eventApi.getEventScheduleByEvent(params);
             setScheduleList(response.data);
         } catch (error) {
             console.log('That bai roi huhu ', error);
@@ -47,18 +49,18 @@ function TournamentSchedule({ isUpdate }) {
     };
 
     useEffect(() => {
-        fetchTournamentSchedule(tournamentId);
+        fetchTournamentSchedule(id);
         window.scrollTo({ behavior: 'smooth', top: '0px' });
-    }, [tournamentId]);
+    }, [id]);
 
     const scheduleData = scheduleList.map((item) => {
         const container = {};
         container['id'] = item.id;
         container['date'] = item.date;
-        container['title'] =
-            item.tournament.name + ' - ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['title'] = item.event.name;
+        container['time'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
-        container['backgroundColor'] = '#5ba8f5';
+        container['backgroundColor'] = '#ccffe6';
         return container;
     });
 
@@ -123,7 +125,7 @@ function TournamentSchedule({ isUpdate }) {
                 }
             });
         } else {
-            adminTournament.createTournamentSession(tournamentId, newData).then((res) => {
+            adminTournament.createTournamentSession(id, newData).then((res) => {
                 if (res.data.length != 0) {
                     const newScheduleList = [...scheduleList, res.data[0]];
                     setScheduleList(newScheduleList);
@@ -178,6 +180,21 @@ function TournamentSchedule({ isUpdate }) {
                 return;
             }
         }
+    };
+    const renderEventContent = (eventInfo) => {
+        // console.log(eventInfo);
+        return (
+            <Tooltip title={eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time} placement="top">
+                <Box>
+                    <Box sx={{ mt: 3, ml: 0.5, fontWeight: '500', fontSize: '14px' }}>
+                        <div>
+                            {eventInfo.event.title} <br />
+                            {eventInfo.event.extendedProps.time}
+                        </div>
+                    </Box>
+                </Box>
+            </Tooltip>
+        );
     };
 
     const {
@@ -327,7 +344,7 @@ function TournamentSchedule({ isUpdate }) {
             )}
             {scheduleList[0] && (
                 <FullCalendar
-                    // initialDate={new Date('2022-09-01')}
+                    eventContent={renderEventContent}
                     initialDate={scheduleData[0] && new Date(scheduleData[0].date)}
                     locale="vie"
                     height="100%"

@@ -145,6 +145,11 @@ const eventApi = {
         return axiosClient.get(url);
     },
 
+    getAllOrganizingCommitteeRoleByEventId: (eventId) => {
+        const url = `/event/getallorganizingcommitteerolebyeventid/${eventId}`;
+        return axiosClient.get(url);
+    },
+
     // getAllOnGoingEvent:{}=>
 };
 export default eventApi;
