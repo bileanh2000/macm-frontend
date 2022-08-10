@@ -272,6 +272,7 @@ function MemberTournament({ tournament, isUpdate }) {
                                 setCompetitivePlayer([...newItem, ...competitivePlayer]);
                                 setOpenDialog(false);
                             }}
+                            onChangeData={() => setIsRender(true)}
                         />
                         <RegisterExhibition
                             title="Đăng kí tham gia biểu diễn"
@@ -283,6 +284,7 @@ function MemberTournament({ tournament, isUpdate }) {
                                 // fetchExhibitionTeam(tournamentId, exhibitionType);
                                 setOpenDialogExhibition(false);
                             }}
+                            onChangeData={() => setIsRender(true)}
                         />
                     </Box>
                     {type == 1 && tournament.competitiveTypes.length > 0 && competitivePlayer && (

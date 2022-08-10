@@ -54,8 +54,6 @@ function TournamentFeeReport({ tournament, tournamentStatus, value, index }) {
             flex: 0.1,
         },
         { field: 'note', headerName: 'Nội dung chỉnh sửa', flex: 0.5 },
-        //{ field: 'studentName', headerName: 'Tên người bị sửa', flex: 0.8 },
-
         {
             field: 'userStudentId',
             headerName: 'Mã sinh viên',
@@ -151,19 +149,21 @@ function TournamentFeeReport({ tournament, tournamentStatus, value, index }) {
                         },
                     }}
                 >
-                    <DataGrid
-                        // loading={!membershipReport.length}
-                        disableSelectionOnClick={true}
-                        rows={rowsUser}
-                        columns={columns}
-                        pageSize={pageSize}
-                        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                        rowsPerPageOptions={[10, 20, 30]}
-                        components={{
-                            Toolbar: CustomToolbar,
-                            NoRowsOverlay: CustomNoRowsOverlay,
-                        }}
-                    />
+                    {membershipReport && (
+                        <DataGrid
+                            // loading={!membershipReport.length}
+                            disableSelectionOnClick={true}
+                            rows={rowsUser}
+                            columns={columns}
+                            pageSize={pageSize}
+                            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                            rowsPerPageOptions={[10, 20, 30]}
+                            components={{
+                                Toolbar: CustomToolbar,
+                                NoRowsOverlay: CustomNoRowsOverlay,
+                            }}
+                        />
+                    )}
                 </Box>
             ) : (
                 <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>

@@ -38,10 +38,11 @@ function ViewAttendance({ data }) {
             }
             if (_type == 1) {
                 adminAttendanceAPI.getEventSessionByDate(_nowDate).then((res) => {
-                    adminAttendanceAPI.getAttendanceByEventId(res.data[0].id);
-                    setUserList(res.data);
-                    setTotalActive(res.totalActive);
-                    setTotalResult(res.totalResult);
+                    adminAttendanceAPI.getAttendanceByEventId(res.data[0].id).then((res) => {
+                        setUserList(res.data);
+                        setTotalActive(res.totalActive);
+                        setTotalResult(res.totalResult);
+                    });
                 });
             }
         } catch (error) {

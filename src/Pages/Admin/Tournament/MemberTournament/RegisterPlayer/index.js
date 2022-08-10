@@ -34,7 +34,7 @@ import { Delete } from '@mui/icons-material';
 import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
 
-function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
+function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [player, setPlayer] = useState([]);
@@ -96,6 +96,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
             const response = await adminTournament.addNewCompetitivePlayer(tournamentId, studentId, weight);
             let variant = response.data.length > 0 ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
+            onChangeData && onChangeData();
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar(error, { variant });

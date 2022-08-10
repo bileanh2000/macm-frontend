@@ -90,7 +90,7 @@ function PerformanceCompetition(props) {
         <Box>
             <Paper elevation={3} sx={{ width: '100%' }}>
                 {props.data.length > 0 && (
-                    <TableContainer sx={{ maxHeight: 440 }}>
+                    <TableContainer sx={{ maxHeight: 440, m: 1, p: 1, mb: 2 }}>
                         <Table stickyHeader aria-label="sticky table">
                             <TableHead>
                                 <TableRow>
