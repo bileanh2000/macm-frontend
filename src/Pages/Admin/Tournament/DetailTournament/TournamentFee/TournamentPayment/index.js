@@ -77,7 +77,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                 response.message === 'Giải đấu không yêu cầu ban tổ chức đóng phí tham gia'
                     ? setPaymentStatus(false)
                     : setPaymentStatus(true);
-                console.log(response.data);
+                console.log(response.message === 'Giải đấu không yêu cầu ban tổ chức đóng phí tham gia');
                 setUserPaymentStatus(response.data);
             } else {
                 const response = await adminTournamentAPI.getAllTournamentPlayerPaymentStatus(tournamentId);
@@ -85,6 +85,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                 response.message === 'Giải đấu không yêu cầu người chơi đóng phí tham gia'
                     ? setPaymentStatus(false)
                     : setPaymentStatus(true);
+                console.log(response.message === 'Giải đấu không yêu cầu người chơi đóng phí tham gia');
                 setUserPaymentStatus(response.data);
             }
         } catch (error) {
@@ -289,7 +290,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                         ''
                     )
                 ) : paymentStatus ? (
-                    <Typography variant="h6" sx={{ color: 'red', ml: 5 }}>
+                    <Typography variant="body1" sx={{ color: 'red', ml: 5 }}>
                         Số tiền mỗi người chơi phải đóng:{' '}
                         {tournament.feePlayerPay?.toLocaleString('vi-VN', {
                             style: 'currency',

@@ -10,10 +10,15 @@ import {
     DialogContent,
     DialogTitle,
     FormControl,
+    FormControlLabel,
     FormHelperText,
+    FormLabel,
     Grid,
     MenuItem,
+    Radio,
+    RadioGroup,
     Select,
+    Switch,
     Tab,
     Table,
     TableBody,
@@ -65,8 +70,9 @@ function CustomMatchBracket(params) {
     const [score2, setScore2] = useState(-1);
     const [isEdit, setEdit] = useState(false);
     const [areaName, setAreaId] = useState();
-    const [winner, setWinner] = useState({});
-    const [value, setValue] = useState(0);
+    const [winner, setWinner] = useState(0);
+    const [value, setValue] = useState(1);
+    const [winnerTemp, setWinnerTemp] = useState(0);
 
     const handleChangeTab = (event, newValue) => {
         setValue(newValue);
@@ -196,27 +202,38 @@ function CustomMatchBracket(params) {
         if (data == null) {
             return;
         }
+        setWinnerTemp(data.studentId);
         setWinner(data);
     };
 
     const handleClickResult = (e, data) => {
-        if (params.status === 3) {
-            if (data.firstPlayer == null || data.secondPlayer == null) {
-                return;
-            }
-            if (data.status) {
-                return;
-            }
-            setMatch(data);
-            setOpen(true);
-        } else if (params.status === 2) {
-            if (!params.matches[params.matches.length - 1].area) {
-                return;
-            }
-            setAreaId(data.area);
-            setMatch(data);
-            setOpenUpdateTime(true);
+        if (data.firstPlayer == null || data.secondPlayer == null) {
+            return;
         }
+        if (data.status) {
+            return;
+        }
+        if (!params.matches[params.matches.length - 1].area) {
+            return;
+        }
+        // if (params.status === 3) {
+        //     if (data.firstPlayer == null || data.secondPlayer == null) {
+        //         return;
+        //     }
+        //     if (data.status) {
+        //         return;
+        //     }
+        //     setMatch(data);
+        //     setOpen(true);
+        // } else if (params.status === 2) {
+        //     if (!params.matches[params.matches.length - 1].area) {
+        //         return;
+        //     }
+        //     setAreaId(data.area);
+        //     setMatch(data);
+        //     setOpenUpdateTime(true);
+        // }
+        setAreaId(data.area);
         setMatch(data);
         setOpen(true);
     };
@@ -224,9 +241,12 @@ function CustomMatchBracket(params) {
     const handleClose = () => {
         setOpen(false);
         reset({
-            score1: 0,
-            score2: 0,
+            score1: '',
+            score2: '',
         });
+        setWinnerTemp(0);
+        setWinner(0);
+        handleCloseUpdateTime();
     };
 
     const updateResult = async (params) => {
@@ -256,6 +276,7 @@ function CustomMatchBracket(params) {
     };
 
     const handleUpdateTime = (data) => {
+        console.log('time');
         const date = moment(data.date).format('YYYY-MM-DD');
         const time = moment(data.startTime).format('hh:mm:ss');
         const dateTime = date + 'T' + time;
@@ -266,10 +287,11 @@ function CustomMatchBracket(params) {
         updateTimeAndPlace(match.id, request);
         var merged = [].concat.apply([], __matches);
         params.onUpdateResult(merged);
-        handleCloseUpdateTime();
+        handleClose();
     };
 
     const handleUpdate = (data) => {
+        console.log('result');
         if (data.score1 == data.score2) {
             setError('score1', {
                 message: 'Điểm 2 người chơi không được bằng nhau',
@@ -286,14 +308,23 @@ function CustomMatchBracket(params) {
             params.onUpdateResult(merged);
             setOpen(false);
             reset({
-                score1: 0,
-                score2: 0,
+                score1: '',
+                score2: '',
             });
         }
     };
 
     const handleChange = (score, event) => {
         score == 1 ? setScore1(Number(event)) : setScore2(Number(event));
+        if (score == 1) {
+            Number(event) > score2
+                ? setWinnerTemp(match.firstPlayer.studentId)
+                : setWinnerTemp(match.secondPlayer.studentId);
+        } else {
+            Number(event) > score1
+                ? setWinnerTemp(match.secondPlayer.studentId)
+                : setWinnerTemp(match.firstPlayer.studentId);
+        }
     };
 
     const UpdateScore = ({ value, index }) => {
@@ -382,14 +413,47 @@ function CustomMatchBracket(params) {
                         </TableBody>
                     </Table>
                 </TableContainer>
-                {score1 > score2 ? (
-                    <Typography>Nguời chiến thắng: {match.firstPlayer.studentName} </Typography>
+                {/* {score1 > score2 ? (
+                    <Typography>
+                        Nguời chiến thắng: {match.firstPlayer.studentName} - {winnerTemp}{' '}
+                    </Typography>
                 ) : score1 < score2 ? (
                     <Typography>Nguời chiến thắng: {match.secondPlayer.studentName} </Typography>
                 ) : (
                     ''
-                )}
-                <Box></Box>
+                )} */}
+                <Box>
+                    <FormControl>
+                        <FormLabel id="demo-form-control-label-placement">Xác nhận người chiến thắng</FormLabel>
+                        <RadioGroup
+                            row
+                            aria-labelledby="demo-form-control-label-placement"
+                            name="position"
+                            defaultValue="top"
+                            value={winnerTemp}
+                            // onChange={handleChangeWinner}
+                        >
+                            <FormControlLabel
+                                value={match.firstPlayer.studentId}
+                                control={<Radio />}
+                                label={match.firstPlayer.studentName}
+                                labelPlacement="start"
+                                sx={{ mr: 1 }}
+                            />
+                            <FormControlLabel
+                                value={match.secondPlayer.studentId}
+                                control={<Radio />}
+                                label={match.secondPlayer.studentName}
+                                sx={{ ml: 1 }}
+                            />
+                        </RadioGroup>
+                    </FormControl>
+                    {winnerTemp !== winner.studentId && winner != 0 && (
+                        <Typography variant="body1" sx={{ color: 'red' }}>
+                            Người chiến thắng bạn chọn không trùng với kết quả, bạn có muốn tiếp tục lưu điểm số?
+                        </Typography>
+                    )}
+                </Box>
             </Box>
         );
     };
@@ -513,205 +577,15 @@ function CustomMatchBracket(params) {
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose}>Quay lại</Button>
-                            <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
+                            {value == 1 ? (
+                                <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
+                            ) : (
+                                <Button onClick={handleSubmit(handleUpdateTime)}>Đồng ý</Button>
+                            )}
                         </DialogActions>
                     </div>
                 )}
             </Dialog>
-            {/* <Dialog fullWidth maxWidth="lg" open={open}>
-                {match && (
-                    <div>
-                        <DialogTitle>Xác nhận người chiến thắng</DialogTitle>
-                        <DialogContent>
-                            <TableContainer sx={{ maxHeight: 440 }}>
-                                <Table stickyHeader aria-label="sticky table">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell align="center">Tên cầu thủ</TableCell>
-                                            <TableCell align="center">Điểm số</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        <TableRow>
-                                            <TableCell>{match.firstPlayer.studentName}</TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    name="score1"
-                                                    variant="outlined"
-                                                    defaultValue=""
-                                                    control={control}
-                                                    render={({
-                                                        field: { onChange, value, onBlur },
-                                                        fieldState: { error, invalid },
-                                                    }) => (
-                                                        <NumberFormat
-                                                            name="score1"
-                                                            customInput={TextField}
-                                                            label="Điểm số"
-                                                            variant="outlined"
-                                                            defaultValue=""
-                                                            value={value}
-                                                            onValueChange={(v) => {
-                                                                onChange(Number(v.value));
-                                                            }}
-                                                            onBlur={(v) => handleChange(1, v.target.value)}
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell>{match.secondPlayer.studentName}</TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    name="score2"
-                                                    variant="outlined"
-                                                    defaultValue=""
-                                                    control={control}
-                                                    render={({
-                                                        field: { onChange, value, onBlur },
-                                                        fieldState: { error, invalid },
-                                                    }) => (
-                                                        <NumberFormat
-                                                            name="score2"
-                                                            customInput={TextField}
-                                                            label="Điểm số"
-                                                            variant="outlined"
-                                                            defaultValue=""
-                                                            value={value}
-                                                            onValueChange={(v) => {
-                                                                onChange(Number(v.value));
-                                                            }}
-                                                            onBlur={(v) => handleChange(2, v.target.value)}
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                            {score1 > score2 ? (
-                                <Typography>Nguời chiến thắng: {match.firstPlayer.studentName} </Typography>
-                            ) : score1 < score2 ? (
-                                <Typography>Nguời chiến thắng: {match.secondPlayer.studentName} </Typography>
-                            ) : (
-                                ''
-                            )}
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleClose}>Quay lại</Button>
-                            <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
-                        </DialogActions>
-                    </div>
-                )}
-            </Dialog> */}
-            {/* <Dialog fullWidth maxWidth="md" open={openUpdateTime}>
-                {match && (
-                    <div>
-                        <DialogTitle>Thay đổi thời gian và địa điểm thi đấu</DialogTitle>
-                        <DialogContent>
-                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                                <Grid container spacing={3} columns={12}>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormControl size="medium">
-                                            <Typography variant="caption">Sân thi đấu</Typography>
-                                            <Select
-                                                id="demo-simple-select"
-                                                value={areaName}
-                                                displayEmpty
-                                                onChange={handleChangeAreaName}
-                                            >
-                                                {params.areaList.map((area) => (
-                                                    <MenuItem value={area.name} key={area.id}>
-                                                        {area.name}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <Controller
-                                            required
-                                            name="date"
-                                            control={control}
-                                            defaultValue={match.time ? match.time : null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <DatePicker
-                                                    disablePast
-                                                    label="Ngày tháng"
-                                                    inputFormat="dd/MM/yyyy"
-                                                    disableFuture={false}
-                                                    value={value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <Controller
-                                            required
-                                            name="startTime"
-                                            control={control}
-                                            defaultValue={match.time ? match.time : null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <TimePicker
-                                                    label="Thời gian bắt đầu"
-                                                    ampm={false}
-                                                    value={value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                </Grid>
-                            </LocalizationProvider>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleCloseUpdateTime}>Hủy</Button>
-                            <Button onClick={handleSubmit(handleUpdateTime)}>Đồng ý</Button>
-                        </DialogActions>
-                    </div>
-                )}
-            </Dialog> */}
             {params.status === 3 && <Typography variant="caption">*Chọn vào 1 cặp trận để cập nhật tỉ số</Typography>}
             {params.status === 2 && params.matches[params.matches.length - 1].area && (
                 <Typography variant="caption">

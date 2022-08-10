@@ -252,6 +252,11 @@ const adminTournament = {
         return axiosClient.put(url, params);
     },
 
+    getResultByType: (competitiveTypeId) => {
+        const url = `/competitive/getResult/${competitiveTypeId}`;
+        return axiosClient.post(url);
+    },
+
     //////////// Exhibition
     getListExhibitionType: (tournamentId) => {
         const url = `/exhibition/getlistexhibitiontype/${tournamentId}`;
