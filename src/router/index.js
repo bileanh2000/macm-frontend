@@ -140,9 +140,9 @@ const adminRouters = [
     //Tournament
     { path: '/admin/tournament', component: Tournament },
     { path: '/admin/tournament/:tournamentId', component: DetailTournament },
-    { path: '/admin/tournament/create', component: CreateTourament },
-    { path: '/admin/tournament/:tournamentId/update', component: UpdateTournament },
-    { path: '/admin/tournament/:tournamentId/tournamentschedule', component: TournamentSchedule },
+    // { path: '/admin/tournament/create', component: CreateTourament },
+    // { path: '/admin/tournament/:tournamentId/update', component: UpdateTournament },
+    // { path: '/admin/tournament/:tournamentId/tournamentschedule', component: TournamentSchedule },
     {
         path: '/admin/tournament/:tournamentId/tournamentschedule/:tournamentScheduleId/update',
         component: UpdateTouramentSchedule,

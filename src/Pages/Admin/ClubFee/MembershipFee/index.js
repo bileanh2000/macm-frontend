@@ -36,7 +36,7 @@ function MembershipFee() {
     const { enqueueSnackbar } = useSnackbar();
     const [userList, setUserList] = useState([]);
     const [semesterList, setSemesterList] = useState([]);
-    const [cost, setCost] = useState(0);
+    const [cost, setCost] = useState();
     const [funClub, setFunClub] = useState('');
     const [pageSize, setPageSize] = useState(10);
     const [semesterId, setSemesterId] = useState();
@@ -45,6 +45,7 @@ function MembershipFee() {
     const [open, setOpen] = useState(false);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [idMember, setIdMember] = useState();
+    const [isRender, setIsRender] = useState(true);
 
     let payment = userList.reduce((paymentCount, user) => {
         return user.status ? paymentCount + 1 : paymentCount;
@@ -62,6 +63,7 @@ function MembershipFee() {
     const getListMemberShip = async (data) => {
         try {
             const response = await adminClubFeeAPI.getListMembership(data);
+            console.log('dong tien', response);
             setUserList(response.data);
         } catch (error) {
             console.log('Không thể lấy dữ liệu các thành viên tham gia đóng tiền, error: ', error);
@@ -71,7 +73,11 @@ function MembershipFee() {
     const getCurrentSemester = async () => {
         try {
             const response = await adminClubFeeAPI.getCurrentSemester();
+            getListMemberShip(response.data[0].id);
+            getAmount(response.data[0].name);
             setCurrentSemester(response.data[0]);
+            setSemesterId(response.data[0].id);
+            setSemesterName(response.data[0].name);
         } catch (error) {
             console.log('Không thể lấy dữ liệu kì hiện tại, error: ', error);
         }
@@ -81,9 +87,6 @@ function MembershipFee() {
         try {
             const response = await adminClubFeeAPI.getSemester();
             // console.log('semester', response.data);
-            const array = response.data;
-            setSemesterId(Math.max(...array.map((o) => o.id)));
-            setSemesterName(array.find((semester) => semester.id == Math.max(...array.map((o) => o.id))).name);
             setSemesterList(response.data);
         } catch (error) {
             console.log('Không thể lấy được dữ liệu các kì, error: ', error);
@@ -93,8 +96,7 @@ function MembershipFee() {
     const getAmount = async (semesterName) => {
         try {
             const response = await adminClubFeeAPI.getSemesterFee(semesterName);
-            console.log(response.data);
-            setCost(response.data[0].amount);
+            response.data.length > 0 ? setCost(response.data[0].amount) : setCost();
         } catch (error) {
             console.log('Không thể lấy được dữ liệu phí thành viên, error: ', error);
         }
@@ -106,18 +108,16 @@ function MembershipFee() {
         getCurrentSemester();
     }, []);
 
-    useEffect(() => {
-        if (JSON.stringify(currentSemester) !== '{}') {
-            getListMemberShip(currentSemester.id);
-            getAmount(currentSemester.name);
-        }
-    }, [currentSemester]);
+    // useEffect(() => {
+    //     getListMemberShip(currentSemester.id);
+    //     getAmount(currentSemester.name);
+    // }, [currentSemester, cost]);
 
     const validationSchema = Yup.object().shape({
         cost: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+            .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
     });
 
     const {
@@ -145,7 +145,7 @@ function MembershipFee() {
 
     const handleClose = () => {
         setOpen(false);
-        reset({ cost: '' });
+        reset({ cost: cost });
     };
 
     const updateMembershipFee = async (semesterId, totalAmount) => {
@@ -160,6 +160,7 @@ function MembershipFee() {
     const onSubmit = (data) => {
         updateMembershipFee(currentSemester.name, data.cost);
         setCost(+data.cost);
+        handleClose();
     };
 
     const columns = [
@@ -364,7 +365,7 @@ function MembershipFee() {
         <Box sx={{ m: 1, p: 1 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
-                    Quản lý chi phí câu lạc bộ
+                    Danh sách đóng tiền phí duy trì CLB
                 </Typography>
                 <Box>
                     <Typography variant="h6" gutterBottom sx={{ marginBottom: 2 }}>
@@ -388,17 +389,19 @@ function MembershipFee() {
                                 </Select>
                             </FormControl>
                         )}
-                        <Box sx={{ display: 'flex', flexDirection: 'column', ml: 2 }}>
-                            <Typography variant="h6" sx={{ color: 'red' }}>
-                                Số tiền mỗi người phải đóng:{' '}
-                            </Typography>
-                            <Typography variant="h6" sx={{ color: 'red' }}>
-                                {cost.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-                                {semesterId == currentSemester.id && semesterId && currentSemester.id > 0 && (
-                                    <Button startIcon={<Edit />} onClick={handleOpen}></Button>
-                                )}
-                            </Typography>
-                        </Box>
+                        {cost && (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', ml: 2 }}>
+                                <Typography variant="h6" sx={{ color: 'red' }}>
+                                    Số tiền mỗi người phải đóng:{' '}
+                                </Typography>
+                                <Typography variant="h6" sx={{ color: 'red' }}>
+                                    {cost.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                    {semesterId == currentSemester.id && semesterId && currentSemester.id > 0 && (
+                                        <Button startIcon={<Edit />} onClick={handleOpen}></Button>
+                                    )}
+                                </Typography>
+                            </Box>
+                        )}
                     </Box>
                 </Grid>
                 <Grid item xs={4}>
@@ -435,7 +438,7 @@ function MembershipFee() {
                         <Controller
                             name="cost"
                             variant="outlined"
-                            defaultValue=""
+                            defaultValue={cost}
                             control={control}
                             render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                 <NumberFormat
@@ -444,7 +447,6 @@ function MembershipFee() {
                                     label="Nhập số tiền"
                                     thousandSeparator={true}
                                     variant="outlined"
-                                    defaultValue={cost}
                                     value={value}
                                     onValueChange={(v) => {
                                         onChange(Number(v.value));
@@ -467,6 +469,7 @@ function MembershipFee() {
                     </Button>
                 </DialogActions>
             </Dialog>
+
             <Dialog
                 fullWidth
                 maxWidth="md"

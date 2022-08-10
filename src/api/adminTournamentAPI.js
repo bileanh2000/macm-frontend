@@ -4,7 +4,7 @@ import axiosClient from './axiosClient';
 
 const adminTournament = {
     createTournament: (params) => {
-        const url = `/tournament/headclub/createtournament`;
+        const url = `/tournament/headclub/createtournament?isOverwritten=true`;
         return axiosClient.post(url, params);
     },
 

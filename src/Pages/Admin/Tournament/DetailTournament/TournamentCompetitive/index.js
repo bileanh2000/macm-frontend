@@ -29,6 +29,7 @@ function TournamentCompetitive() {
     const [areaList, setAreaList] = useState();
     const [open, setOpen] = useState(false);
     const [isCreate, setIsCreate] = useState(true);
+    const [isRender, setIsRender] = useState(true);
     // const [tournamentStatus, setTournamentStatus] = useState(-1);
 
     const handleChangeCompetitiveId = (event) => {
@@ -48,7 +49,6 @@ function TournamentCompetitive() {
     const getListPlayerByCompetitiveID = async (weightRange) => {
         try {
             const response = await adminTournament.listMatchs(weightRange);
-            console.log('lay data', response);
             if (response.data.length > 0) {
                 setListPlayer(response.data[0].listMatchDto);
                 setTournamentStatus(response.data[0].status);
@@ -70,21 +70,10 @@ function TournamentCompetitive() {
             const response = await adminTournament.spawnMatchs(weightRange);
             getListPlayerByCompetitiveID(weightRange);
             // setListPlayer(response.data)
+            setIsRender(true);
             enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.log('Failed to fetch match: ', error);
-        }
-    };
-
-    const fetchTournamentById = async (tournamentId) => {
-        try {
-            const response = await adminTournament.getAllCompetitiveType(tournamentId);
-            console.log(response.data[0]);
-            setListWeightRange(response.data[0]);
-            setCompetitiveId(response.data[0][0].id);
-            getListPlayerByCompetitiveID(response.data[0][0].id);
-        } catch (error) {
-            console.log('Failed to fetch user list: ', error);
         }
     };
 
@@ -101,6 +90,7 @@ function TournamentCompetitive() {
     const spawnTimeAndArea = async () => {
         try {
             const response = await adminTournament.spawnTimeAndArea(tournamentId);
+            setIsRender(true);
             getListPlayerByCompetitiveID(competitiveId);
             enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
@@ -111,6 +101,7 @@ function TournamentCompetitive() {
     const confirmListMatchsPlayer = async () => {
         try {
             const response = await adminTournament.confirmListMatchsPlayer(competitiveId);
+            setIsRender(true);
             enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.log('Failed to confirm match: ', error);
@@ -139,9 +130,21 @@ function TournamentCompetitive() {
     };
 
     useEffect(() => {
-        fetchTournamentById(tournamentId);
+        const fetchTournamentById = async (tournamentId) => {
+            try {
+                const response = await adminTournament.getAllCompetitiveType(tournamentId);
+                console.log(response.data[0]);
+                setListWeightRange(response.data[0]);
+                setCompetitiveId(response.data[0][0].id);
+                getListPlayerByCompetitiveID(response.data[0][0].id);
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
+        isRender && fetchTournamentById(tournamentId);
         getAllArea();
-    }, []);
+        setIsRender(false);
+    }, [tournamentId, isRender]);
 
     return (
         <Fragment>
@@ -186,7 +189,7 @@ function TournamentCompetitive() {
                 </FormControl>
                 {tournamentStatus == 0 && listPlayer.length > 0 && (
                     <Button variant="outlined" onClick={handleDialogConfirmMatch} sx={{ mr: 2, float: 'right' }}>
-                        Xác nhận danh sách thi đấu
+                        Xác nhận và bắt đầu bảng thi đấu
                     </Button>
                 )}
             </Box>
@@ -212,6 +215,7 @@ function TournamentCompetitive() {
                         onUpdateResult={UpdateResultHandler}
                         isCreate={isCreate}
                         onCreateMatches={handleDialogCreate}
+                        onChangeData={() => setIsRender(true)}
                     />
                 </div>
             ) : tournamentStatus == 1 ? (
