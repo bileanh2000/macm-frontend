@@ -27,7 +27,7 @@ import NumberFormat from 'react-number-format';
 import PreviewSchedule from '../../../PreviewSchedule';
 import eventApi from 'src/api/eventApi';
 
-function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess, schedule }) {
+function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessSchedule, onSuccessEvent, schedule }) {
     console.log(data);
     const { enqueueSnackbar } = useSnackbar();
     const [datasFightingCompetition, setDataFightingCompetition] = useState(data.competitiveTypes);
@@ -69,14 +69,19 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
             .max(Yup.ref('startDate'), ({ max }) => `Deadline không được muộn hơn thời gian bắt đầu`)
             .typeError('Vui lòng không để trống trường này')
             .required('Vui lòng không để trống trường này'),
-        registrationOrganizingCommitteeDeadline: Yup.date()
-            .max(Yup.ref('startDate'), ({ max }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`)
-            .typeError('Vui lòng không để trống trường này')
-            .required('Vui lòng không để trống trường này')
-            .test('same_dates_test', 'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu', function (value) {
-                const { startDate } = this.parent;
-                return value.getTime() !== startDate.getTime();
-            }),
+        ...(data.registrationOrganizingCommitteeDeadline === null
+            ? null
+            : {
+                  registrationOrganizingCommitteeDeadline: Yup.date()
+                      .max(Yup.ref('startDate'), ({ max }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`)
+                      .typeError('Vui lòng không để trống trường này')
+                      .required('Vui lòng không để trống trường này')
+                      .test('same_dates_test', 'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu', function (value) {
+                          const { startDate } = this.parent;
+                          return value.getTime() !== startDate.getTime();
+                      }),
+              }),
+
         // amountFromClub: Yup.number()
         //     .required('Không được để trống trường này')
         //     .min(0, 'Vui lòng nhập giá trị lớn hơn 0')
@@ -100,9 +105,13 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
         let eventInforPreview = {
             name: data.name,
             description: data.description,
-            registrationOrganizingCommitteeDeadline: moment(data.registrationOrganizingCommitteeDeadline).format(
-                'YYYY-MM-DDTHH:mm:ss',
-            ),
+            ...(data.registrationOrganizingCommitteeDeadline === null
+                ? null
+                : {
+                      registrationOrganizingCommitteeDeadline: moment(
+                          data.registrationOrganizingCommitteeDeadline,
+                      ).format('YYYY-MM-DDTHH:mm:ss'),
+                  }),
             registrationMemberDeadline: moment(data.registrationMemberDeadline).format('YYYY-MM-DDTHH:mm:ss'),
             amountPerRegisterEstimated: data.amountPerRegisterEstimated,
             totalAmountEstimated: data.totalAmountEstimated,
@@ -155,14 +164,16 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
         eventApi.updateEventSchedule(eventSchedule, id).then((res) => {
             console.log('updateEventSchedule', res);
             if (res.data.length !== 0) {
-                // enqueueSnackbar(res.message, { variant: 'success' });
+                onSuccessSchedule && onSuccessSchedule(res.data[0]);
             }
         });
         eventApi.updateEvent(previewEvent, id).then((res) => {
             console.log(res);
             if (res.data.length !== 0) {
                 enqueueSnackbar(res.message, { variant: 'success' });
+                onSuccessEvent && onSuccessEvent(true);
                 setIsOpenPreviewDialog(false);
+
                 handleClose();
             } else {
                 enqueueSnackbar(res.message, { variant: 'error' });
@@ -244,21 +255,25 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
                                                 )}
                                             </span>
                                         </Box>
-                                        <Box>
-                                            <>
-                                                <Typography
-                                                    component="span"
-                                                    sx={{ fontSize: '16px', fontWeight: '700' }}
-                                                >
-                                                    Deadline đăng ký ban tổ chức:{' '}
-                                                </Typography>
-                                                <span>
-                                                    {moment(
-                                                        new Date(previewEvent.registrationOrganizingCommitteeDeadline),
-                                                    ).format('HH:ss - DD/MM/yyyy')}
-                                                </span>
-                                            </>
-                                        </Box>
+                                        {data.registrationOrganizingCommitteeDeadline === null ? null : (
+                                            <Box>
+                                                <>
+                                                    <Typography
+                                                        component="span"
+                                                        sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                    >
+                                                        Deadline đăng ký ban tổ chức:{' '}
+                                                    </Typography>
+                                                    <span>
+                                                        {moment(
+                                                            new Date(
+                                                                previewEvent.registrationOrganizingCommitteeDeadline,
+                                                            ),
+                                                        ).format('HH:ss - DD/MM/yyyy')}
+                                                    </span>
+                                                </>
+                                            </Box>
+                                        )}
                                     </Box>
                                 </Grid>
                             </Grid>

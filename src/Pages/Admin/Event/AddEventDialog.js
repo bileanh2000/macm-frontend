@@ -40,6 +40,8 @@ import { Add, Delete } from '@mui/icons-material';
 import { useRef } from 'react';
 import eventApi from 'src/api/eventApi';
 import PreviewSchedule from './PreviewSchedule';
+import adminFunAPi from 'src/api/adminFunAPi';
+import { useNavigate } from 'react-router-dom';
 
 const steps = ['Thông tin sự kiện', 'Thêm vai trò BTC', 'Thêm chi phí', 'Thêm lịch', 'Xem trước'];
 const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
@@ -54,6 +56,16 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     const [previewSchedule, setPreviewSchedule] = useState([]);
     const [previewEvent, setPreviewEvent] = useState([]);
 
+    const getClubFund = async () => {
+        try {
+            const response = await adminFunAPi.getClubFund();
+            console.log('getClubFund', response);
+            setTotalClubFunds(response.data[0].fundAmount);
+        } catch (error) {
+            console.log('failed at getClubFund', error);
+        }
+    };
+    let navigate = useNavigate();
     const isStepOptional = (step) => {
         return step === 2 || step === 1;
     };
@@ -106,7 +118,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                       .required('Không được để trống trường này')
                       .test('len', 'Không hợp lệ', (val) => val.length > 1)
                       .matches(
-                          /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ ]+$/,
+                          /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹẾỀếề ]+$/,
                           'Không hợp lệ: vui lòng nhập chữ',
                       ),
                   maxQuantity: Yup.number()
@@ -120,7 +132,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
             ? {
                   amountFromClub: Yup.number()
                       .required('Không được để trống trường này')
-                      .min(1000, 'Vui lòng nhập giá trị lớn hơn 1000')
+                      .min(0, 'Vui lòng nhập giá trị lớn hơn 0')
                       .max(totalClubFunds, 'Tiền quỹ CLB không đủ')
                       .typeError('Vui lòng nhập giá trị lớn hơn 1000'),
                   totalAmountEstimated: Yup.number()
@@ -267,17 +279,19 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                           registrationOrganizingCommitteeDeadline: moment(
                               data.registrationOrganizingCommitteeDeadline,
                           ).format('yyyy-MM-DDTHH:mm:ss'),
+                          rolesEventDto: [],
                       }
-                    : null),
+                    : { rolesEventDto: datas }),
                 registrationMemberDeadline: moment(data.registrationMemberDeadline).format('yyyy-MM-DDTHH:mm:ss'),
             },
-            rolesEventDto: datas,
+            // rolesEventDto: datas,
             listPreview: previewSchedule,
         };
         eventApi.createEvent(createEventData).then((response) => {
             if (response.data.length !== 0) {
                 console.log(response);
                 enqueueSnackbar(response.message, { variant: 'success' });
+                navigate(`/admin/events/${response.data[0].id}`);
             } else {
                 console.log(response);
                 enqueueSnackbar(response.message, { variant: 'error' });
@@ -313,6 +327,10 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
             resetField('registrationOrganizingCommitteeDeadline');
         }
     }, [activeStep, skipped, resetField]);
+
+    useEffect(() => {
+        getClubFund();
+    }, []);
 
     // useEffect(() => {
     //     if (activeStep === 3) {
@@ -445,7 +463,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                         >
                                                             Yêu cầu thành viên đóng tiền:{' '}
                                                         </Typography>
-                                                        {skipped.has(2) ? (
+                                                        {!previewEvent.amountPerRegister ? (
                                                             <span>Không</span>
                                                         ) : (
                                                             <>
