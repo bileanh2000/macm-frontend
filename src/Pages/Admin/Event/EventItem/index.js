@@ -21,6 +21,7 @@ import moment from 'moment';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import { Fragment, useCallback, useState } from 'react';
 import { useSnackbar } from 'notistack';
+import eventApi from 'src/api/eventApi';
 
 function EventItem({ data, onSuccess }) {
     const [eventOnclick, SetEventOnclick] = useState({ name: '', id: '' });
