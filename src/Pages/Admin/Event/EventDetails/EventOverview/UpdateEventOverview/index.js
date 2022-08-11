@@ -69,14 +69,19 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
             .max(Yup.ref('startDate'), ({ max }) => `Deadline không được muộn hơn thời gian bắt đầu`)
             .typeError('Vui lòng không để trống trường này')
             .required('Vui lòng không để trống trường này'),
-        registrationOrganizingCommitteeDeadline: Yup.date()
-            .max(Yup.ref('startDate'), ({ max }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`)
-            .typeError('Vui lòng không để trống trường này')
-            .required('Vui lòng không để trống trường này')
-            .test('same_dates_test', 'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu', function (value) {
-                const { startDate } = this.parent;
-                return value.getTime() !== startDate.getTime();
-            }),
+        ...(data.registrationOrganizingCommitteeDeadline === null
+            ? null
+            : {
+                  registrationOrganizingCommitteeDeadline: Yup.date()
+                      .max(Yup.ref('startDate'), ({ max }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`)
+                      .typeError('Vui lòng không để trống trường này')
+                      .required('Vui lòng không để trống trường này')
+                      .test('same_dates_test', 'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu', function (value) {
+                          const { startDate } = this.parent;
+                          return value.getTime() !== startDate.getTime();
+                      }),
+              }),
+
         // amountFromClub: Yup.number()
         //     .required('Không được để trống trường này')
         //     .min(0, 'Vui lòng nhập giá trị lớn hơn 0')
@@ -100,9 +105,13 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
         let eventInforPreview = {
             name: data.name,
             description: data.description,
-            registrationOrganizingCommitteeDeadline: moment(data.registrationOrganizingCommitteeDeadline).format(
-                'YYYY-MM-DDTHH:mm:ss',
-            ),
+            ...(data.registrationOrganizingCommitteeDeadline === null
+                ? null
+                : {
+                      registrationOrganizingCommitteeDeadline: moment(
+                          data.registrationOrganizingCommitteeDeadline,
+                      ).format('YYYY-MM-DDTHH:mm:ss'),
+                  }),
             registrationMemberDeadline: moment(data.registrationMemberDeadline).format('YYYY-MM-DDTHH:mm:ss'),
             amountPerRegisterEstimated: data.amountPerRegisterEstimated,
             totalAmountEstimated: data.totalAmountEstimated,
@@ -246,21 +255,25 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
                                                 )}
                                             </span>
                                         </Box>
-                                        <Box>
-                                            <>
-                                                <Typography
-                                                    component="span"
-                                                    sx={{ fontSize: '16px', fontWeight: '700' }}
-                                                >
-                                                    Deadline đăng ký ban tổ chức:{' '}
-                                                </Typography>
-                                                <span>
-                                                    {moment(
-                                                        new Date(previewEvent.registrationOrganizingCommitteeDeadline),
-                                                    ).format('HH:ss - DD/MM/yyyy')}
-                                                </span>
-                                            </>
-                                        </Box>
+                                        {data.registrationOrganizingCommitteeDeadline === null ? null : (
+                                            <Box>
+                                                <>
+                                                    <Typography
+                                                        component="span"
+                                                        sx={{ fontSize: '16px', fontWeight: '700' }}
+                                                    >
+                                                        Deadline đăng ký ban tổ chức:{' '}
+                                                    </Typography>
+                                                    <span>
+                                                        {moment(
+                                                            new Date(
+                                                                previewEvent.registrationOrganizingCommitteeDeadline,
+                                                            ),
+                                                        ).format('HH:ss - DD/MM/yyyy')}
+                                                    </span>
+                                                </>
+                                            </Box>
+                                        )}
                                     </Box>
                                 </Grid>
                             </Grid>

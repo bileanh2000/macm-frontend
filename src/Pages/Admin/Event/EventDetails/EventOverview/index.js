@@ -138,13 +138,15 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, sche
                                                     'HH:mm - DD/MM/yyyy',
                                                 )}
                                             </li>
-                                            <li>
-                                                <strong>Deadline đăng ký BTC: </strong>
-                                                <br />
-                                                {moment(tournament.registrationOrganizingCommitteeDeadline).format(
-                                                    'HH:mm - DD/MM/yyyy',
-                                                )}
-                                            </li>
+                                            {tournament.registrationOrganizingCommitteeDeadline === null ? null : (
+                                                <li>
+                                                    <strong>Deadline đăng ký BTC: </strong>
+                                                    <br />
+                                                    {moment(tournament.registrationOrganizingCommitteeDeadline).format(
+                                                        'HH:mm - DD/MM/yyyy',
+                                                    )}
+                                                </li>
+                                            )}
                                         </ul>
                                     </TableCell>
                                 </TableRow>

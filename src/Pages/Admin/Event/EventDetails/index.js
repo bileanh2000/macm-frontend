@@ -131,7 +131,7 @@ function EventDetails() {
         container['backgroundColor'] = '#5ba8f5';
         return container;
     });
-    console.log(tournament);
+    // console.log(tournament);
 
     const checkUpdate = () => {
         const nowDate = new Date();
