@@ -56,7 +56,7 @@ function MenberEvent() {
                     >
                         Thêm thành viên vào sự kiện
                     </Button>
-                    <Button
+                    {/* <Button
                         variant="outlined"
                         // component={Link}
                         // to={`/admin/events/${id}/member/addtoadmin`}
@@ -64,7 +64,7 @@ function MenberEvent() {
                         sx={{ mr: 2 }}
                     >
                         Cập nhật thành viên ban tổ chức
-                    </Button>
+                    </Button> */}
                     {/* <Button variant="contained">
                         <Link to="./addtoadmin">Điểm danh</Link>
                     </Button> */}
