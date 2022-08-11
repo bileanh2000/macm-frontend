@@ -48,7 +48,7 @@ const ConfirmCancel = ({ isOpen, handleClose, onSucess, data }) => {
                 enqueueSnackbar(res.message, { variant: 'error', preventDuplicate: true });
             }
             if (res.data.length !== 0) {
-                onSucess && onSucess(res.data[0]);
+                onSucess && onSucess(id);
                 enqueueSnackbar(res.message, { variant: 'success', preventDuplicate: true });
             }
             handleClose();

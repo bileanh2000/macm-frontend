@@ -42,6 +42,7 @@ import { useSnackbar } from 'notistack';
 import NoValuePage from 'src/Components/NoValuePage';
 import LoadingProgress from 'src/Components/LoadingProgress';
 import RegisterEventDialog from '../RegisterEventDialog';
+import ConfirmCancel from '../ConfirmDialog';
 // import AdminTournament from '../AdminTournament';
 // import MemberTournament from '../MemberTournament';
 
@@ -90,6 +91,7 @@ function UserEventDetails() {
     const [dataStatus, setDataStatus] = useState('');
     const [eventJoined, setEventJoined] = useState([]);
     const [isJoined, setIsJoined] = useState(false);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -215,11 +217,27 @@ function UserEventDetails() {
                             data={tournament}
                             onSucess={(newEvent) => {
                                 console.log('newEvent', newEvent);
-
                                 eventJoined && setEventJoined([newEvent, ...eventJoined]);
+                            }}
+                            onUpdateRoleQuantity={() => {
+                                setIsUpdateEvent(true);
                             }}
                         />
                     )}
+                    <ConfirmCancel
+                        isOpen={openConfirmDialog}
+                        handleClose={() => {
+                            setOpenConfirmDialog(false);
+                        }}
+                        onSucess={(deleteEventId) => {
+                            console.log('deleteEventId', deleteEventId);
+                            eventJoined &&
+                                setEventJoined((prev) =>
+                                    prev.filter((item) => item.eventId !== parseInt(deleteEventId)),
+                                );
+                            // setChange(deleteEventId);
+                        }}
+                    />
                     <Paper elevation={3}>
                         <Container maxWidth="lg">
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -273,7 +291,7 @@ function UserEventDetails() {
                                             <Button
                                                 variant="outlined"
                                                 color="error"
-                                                // onClick={() => setOpenConfirmDialog(true)}
+                                                onClick={() => setOpenConfirmDialog(true)}
                                                 {...(handleRegisterEventDeadline()
                                                     ? { disabled: false }
                                                     : { disabled: true })}
@@ -303,7 +321,7 @@ function UserEventDetails() {
                                 value={value}
                                 index={0}
                                 schedule={scheduleList}
-                                isUpdate={isUpdate}
+                                isUpdate={isUpdateEvent}
                             />
                             <TabPanel value={value} index={1}>
                                 <TournamentSchedule isUpdate={isUpdate} />

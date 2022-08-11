@@ -33,9 +33,10 @@ import { useParams } from 'react-router-dom';
 import eventApi from 'src/api/eventApi';
 import { useSnackbar } from 'notistack';
 
-const RegisterEventDialog = ({ isOpen, handleClose, onSucess, data }) => {
+const RegisterEventDialog = ({ isOpen, handleClose, onSucess, data, onUpdateRoleQuantity }) => {
     const [value, setValue] = useState(null);
     const [checked, setChecked] = useState(false);
+    const [roleList, setRoleList] = useState([]);
     const now = new Date();
     const { enqueueSnackbar } = useSnackbar();
 
@@ -65,6 +66,16 @@ const RegisterEventDialog = ({ isOpen, handleClose, onSucess, data }) => {
             return false;
         }
     };
+
+    const getAllOrganizingCommitteeRoleByEventId = async (id) => {
+        try {
+            const response = await eventApi.getAllOrganizingCommitteeRoleByEventId(id);
+            console.log(`getAllOrganizingCommitteeRoleByEventId`, response.data);
+            setRoleList(response.data);
+        } catch (error) {
+            console.log('Lấy dữ liệu thất bại getAllOrganizingCommitteeRoleByEventId', error);
+        }
+    };
     const validationSchema = Yup.object().shape({});
 
     const {
@@ -79,6 +90,9 @@ const RegisterEventDialog = ({ isOpen, handleClose, onSucess, data }) => {
         mode: 'onBlur',
     });
 
+    useEffect(() => {
+        getAllOrganizingCommitteeRoleByEventId(id);
+    }, [id]);
     const onSubmit = (data) => {
         let studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
@@ -92,6 +106,7 @@ const RegisterEventDialog = ({ isOpen, handleClose, onSucess, data }) => {
                 }
                 if (res.data.length !== 0) {
                     onSucess && onSucess(res.data[0]);
+                    onUpdateRoleQuantity && onUpdateRoleQuantity(true);
                     enqueueSnackbar(res.message, { variant: 'success', preventDuplicate: true });
                 }
                 handleClose();
@@ -150,13 +165,31 @@ const RegisterEventDialog = ({ isOpen, handleClose, onSucess, data }) => {
                                     value={value}
                                     onChange={handleChange}
                                 >
-                                    <FormControlLabel value="4" control={<Radio />} label="Thành viên ban văn hóa" />
-                                    <FormControlLabel
+                                    {roleList &&
+                                        roleList.map((role) => {
+                                            return (
+                                                <FormControlLabel
+                                                    key={role.id}
+                                                    value={role.id}
+                                                    control={<Radio />}
+                                                    label={
+                                                        role.name +
+                                                        ' (' +
+                                                        (role.maxQuantity - role.availableQuantity) +
+                                                        '/' +
+                                                        role.maxQuantity +
+                                                        ' người)'
+                                                    }
+                                                    disabled={role.availableQuantity === 0}
+                                                />
+                                            );
+                                        })}
+                                    {/* <FormControlLabel
                                         value="2"
                                         control={<Radio />}
                                         label="Thành viên ban truyền thông"
                                     />
-                                    <FormControlLabel value="3" control={<Radio />} label="Thành viên ban hậu cần" />
+                                    <FormControlLabel value="3" control={<Radio />} label="Thành viên ban hậu cần" /> */}
                                 </RadioGroup>
                             </FormControl>
                         </Box>

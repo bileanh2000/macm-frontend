@@ -192,6 +192,14 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                         const { startDate } = this.parent;
                                         return value.getTime() !== startDate.getTime();
                                     },
+                                )
+                                .test(
+                                    'deadline_test',
+                                    'Deadline đăng ký BTC phải muộn hơn deadline đăng ký tham gia',
+                                    function (value) {
+                                        const { registrationMemberDeadline } = this.parent;
+                                        return value.getTime() <= registrationMemberDeadline.getTime();
+                                    },
                                 ),
                         }
                       : null),

@@ -36,7 +36,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, sche
 
     useEffect(() => {
         fetchAllRoleByEventId(id);
-    }, [id, value]);
+    }, [id, isUpdate]);
 
     return (
         <div

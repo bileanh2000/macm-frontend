@@ -79,7 +79,15 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
                       .test('same_dates_test', 'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu', function (value) {
                           const { startDate } = this.parent;
                           return value.getTime() !== startDate.getTime();
-                      }),
+                      })
+                      .test(
+                          'deadline_test',
+                          'Deadline đăng ký BTC phải muộn hơn deadline đăng ký tham gia',
+                          function (value) {
+                              const { registrationMemberDeadline } = this.parent;
+                              return value.getTime() <= registrationMemberDeadline.getTime();
+                          },
+                      ),
               }),
 
         // amountFromClub: Yup.number()
