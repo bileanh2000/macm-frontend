@@ -29,15 +29,6 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
-    let navigate = useNavigate();
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpenSnackBar(false);
-    };
-
     const handleCloseDialog = () => {
         setOpenDialog(false);
     };
@@ -68,6 +59,7 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
     const roles = roleList.map((role) => {
         return { roleId: role.id, roleName: role.name };
     });
+    const formatRoles = [{ id: 0, roleId: 1, roleName: 'Thành viên tham gia' }, ...roles];
     // const roles = [
     //     { roleId: 1, roleName: 'Thành viên tham gia' },
     //     { roleId: 2, roleName: 'Thành viên ban truyền thông' },
@@ -77,8 +69,7 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
     useEffect(() => {
         fetchUserInEvent(id);
         fetchRoleInEvent(id);
-        // console.log('role', roleList);
-        console.log(roles);
+        // console.log('role', formatRoles);
     }, [index, id, value]);
 
     const columns = [
@@ -109,7 +100,7 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
             flex: 1,
             editable: true,
             type: 'singleSelect',
-            valueOptions: roleList.map((role) => role.name),
+            valueOptions: formatRoles.map((role) => role.roleName),
             // valueOptions: roleValueOptions,
             cellClassName: (params) => {
                 if (params.value == null) {
@@ -134,8 +125,6 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
         return container;
     });
 
-    const { handleSubmit } = useForm({});
-
     const handleRowEditCommit = React.useCallback(
         (params) => {
             const id = params.id;
@@ -143,7 +132,8 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
             const value = params.value;
             console.log(id, key, value, params);
             console.log(roles);
-            const newRole = roles && roles.find((role) => role.roleName === value);
+
+            const newRole = formatRoles && formatRoles.find((role) => role.roleName === value);
             console.log('new role', newRole);
             console.log(userList);
             const newMemberList =
@@ -163,6 +153,7 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
             console.log(res);
             console.log(res.data);
             enqueueSnackbar(res.message, { variant: 'success' });
+            handleCloseDialog();
             // navigate(-1);
             // if (res.message === 'Cập nhật chức vụ cho thành viên trong sự kiện thành công') {
 

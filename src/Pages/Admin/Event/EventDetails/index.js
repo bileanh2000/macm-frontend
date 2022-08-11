@@ -8,6 +8,7 @@ import {
     DialogTitle,
     Divider,
     Grid,
+    IconButton,
     InputAdornment,
     Paper,
     Tab,
@@ -19,6 +20,7 @@ import {
     TableRow,
     Tabs,
     TextField,
+    Tooltip,
     Typography,
 } from '@mui/material';
 import PropTypes from 'prop-types';
@@ -31,14 +33,16 @@ import NumberFormat from 'react-number-format';
 
 import TournamentOverview from './EventOverview';
 import TournamentSchedule from './TournamentSchedule';
-import TournamentCompetitive from './TournamentCompetitive';
-import TournamentExhibition from './TournamentExhibition';
 import eventApi from 'src/api/eventApi';
 import MenberEvent from '../MenberEvent';
 import MemberList from '../MenberEvent/MemberList';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import moment from 'moment';
 import AdminTournament from './AdminTournament';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import UpdateTournamentOverview from './EventOverview/UpdateEventOverview';
+import { useSnackbar } from 'notistack';
 // import AdminTournament from '../AdminTournament';
 // import MemberTournament from '../MemberTournament';
 
@@ -78,7 +82,9 @@ function EventDetails() {
     const [tournament, setTournament] = useState();
     const [scheduleList, setScheduleList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
+    const [openEditDialog, setOpenEditDialog] = useState(false);
     const [value, setValue] = useState(0);
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -140,12 +146,19 @@ function EventDetails() {
 
     const handleDelete = useCallback(
         (id) => () => {
-            handleCloseDialog();
             setTimeout(() => {
-                eventApi.deleteTournament(id).then((res) => {
-                    console.log('delete', res);
-                    console.log('delete', res.data);
-                    navigate(-1);
+                eventApi.deleteEvent(id).then((res) => {
+                    if (res.data.length !== 0) {
+                        console.log('delete', res);
+                        console.log('delete', res.data);
+                        enqueueSnackbar(res.message, { variant: 'success' });
+                        handleCloseDialog();
+
+                        navigate(-1);
+                    } else {
+                        enqueueSnackbar(res.message, { variant: 'error' });
+                        handleCloseDialog();
+                    }
                 });
             });
         },
@@ -157,6 +170,23 @@ function EventDetails() {
 
     return (
         <Box sx={{ m: 1, p: 1, height: '80vh' }}>
+            {tournament && scheduleList[0] && (
+                <UpdateTournamentOverview
+                    // DialogOpen={true}
+                    data={tournament}
+                    title="Cập nhật thông tin sự kiện"
+                    isOpen={openEditDialog}
+                    handleClose={() => {
+                        setOpenEditDialog(false);
+                        // reload();
+                    }}
+                    onSuccess={(newItem) => {
+                        // onUpdateTournament(newItem);
+                        setOpenEditDialog(false);
+                    }}
+                    schedule={scheduleList}
+                />
+            )}
             <Dialog
                 open={openDialog}
                 onClose={handleCloseDialog}
@@ -180,35 +210,51 @@ function EventDetails() {
                 <Fragment>
                     <Paper elevation={3}>
                         <Container maxWidth="lg">
-                            <Box sx={{ display: 'flex', pt: 1 }}>
-                                <Box>
-                                    <Box
-                                        sx={{
-                                            backgroundColor: '#F0F0F0',
-                                            padding: 0.8,
-                                            mr: 2,
-                                            borderRadius: '10px',
-                                            width: '4em',
-                                            height: '4em',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            flex: 1,
-                                            mb: 1,
-                                        }}
-                                    >
-                                        <CelebrationIcon fontSize="large" sx={{ color: '#0ACE70' }} />
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Box sx={{ display: 'flex', pt: 1 }}>
+                                    <Box>
+                                        <Box
+                                            sx={{
+                                                backgroundColor: '#F0F0F0',
+                                                padding: 0.8,
+                                                mr: 2,
+                                                borderRadius: '10px',
+                                                width: '4em',
+                                                height: '4em',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flex: 1,
+                                                mb: 1,
+                                            }}
+                                        >
+                                            <CelebrationIcon fontSize="large" sx={{ color: '#0ACE70' }} />
+                                        </Box>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="h4" sx={{ fontSize: 'bold' }}>
+                                            {tournament.name}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ fontSize: 'bold' }}>
+                                            {moment(scheduleData[0].date).format('DD/MM/yyyy')} -{' '}
+                                            {moment(scheduleData[scheduleData.length - 1].date).format('DD/MM/yyyy')}
+                                        </Typography>
                                     </Box>
                                 </Box>
-                                <Box>
-                                    <Typography variant="h4" sx={{ fontSize: 'bold' }}>
-                                        {tournament.name}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ fontSize: 'bold' }}>
-                                        {moment(scheduleData[0].date).format('DD/MM/yyyy')} -{' '}
-                                        {moment(scheduleData[scheduleData.length - 1].date).format('DD/MM/yyyy')}
-                                    </Typography>
-                                </Box>
+                                {new Date(scheduleData[0].date) > new Date() ? (
+                                    <Box>
+                                        <Tooltip title="Chỉnh sửa">
+                                            <IconButton aria-label="edit" onClick={() => setOpenEditDialog(true)}>
+                                                <EditIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Xóa">
+                                            <IconButton aria-label="delete" onClick={() => setOpenDialog(true)}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Box>
+                                ) : null}
                             </Box>
                             <Divider />
                             <Box>
@@ -230,7 +276,7 @@ function EventDetails() {
                                 onUpdateTournament={handleUpdateTournament}
                                 value={value}
                                 index={0}
-                                startTime={scheduleList[0].date}
+                                schedule={scheduleList}
                                 isUpdate={isUpdate}
                             />
                             <TabPanel value={value} index={1}>

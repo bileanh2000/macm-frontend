@@ -212,7 +212,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     };
     const handleAddEventRoles = (data) => {
         console.log(data);
-        const newData = [...datas, { id: Math.random(), roleName: data.roleName, maxQuantity: data.maxQuantity }];
+        const newData = [...datas, { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity }];
         setDatas(newData);
 
         /**
@@ -262,10 +262,14 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                 totalAmountEstimated: data.totalAmountEstimated,
                 amountPerRegisterEstimated: data.amountPerRegister,
                 amountFromClub: data.amountFromClub,
+                ...(!skipped.has(1)
+                    ? {
+                          registrationOrganizingCommitteeDeadline: moment(
+                              data.registrationOrganizingCommitteeDeadline,
+                          ).format('yyyy-MM-DDTHH:mm:ss'),
+                      }
+                    : null),
                 registrationMemberDeadline: moment(data.registrationMemberDeadline).format('yyyy-MM-DDTHH:mm:ss'),
-                registrationOrganizingCommitteeDeadline: moment(data.registrationOrganizingCommitteeDeadline).format(
-                    'yyyy-MM-DDTHH:mm:ss',
-                ),
             },
             rolesEventDto: datas,
             listPreview: previewSchedule,
@@ -280,7 +284,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
             }
         });
         console.log(data);
-        console.log(createEventData);
+        console.log('submit event data', createEventData);
     };
 
     const eventSchedule = previewSchedule.map((item, index) => {
@@ -289,7 +293,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
         container['date'] = item.date;
         container['title'] = item.title;
         container['time'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
-        container['description'] = item.title + ' ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['description'] = item.title;
         container['display'] = 'background';
         // container['backgroundColor'] = isOverride === -1 || isOverride === 0 ? '#5ba8f5' : '#ff3d00';
         container['backgroundColor'] = item.existed ? '#ffb199' : '#ccffe6';
@@ -400,7 +404,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                             {datas.map((role) => {
                                                                 return (
                                                                     <li key={role.id}>
-                                                                        {role.roleName} - {role.maxQuantity} người
+                                                                        {role.name} - {role.maxQuantity} người
                                                                     </li>
                                                                 );
                                                             })}
@@ -564,7 +568,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                 <TableBody>
                                                     {datas.map((data) => (
                                                         <TableRow key={data.id}>
-                                                            <TableCell align="center">{data.roleName}</TableCell>
+                                                            <TableCell align="center">{data.name}</TableCell>
                                                             <TableCell align="center">{data.maxQuantity}</TableCell>
                                                             <TableCell>
                                                                 <IconButton

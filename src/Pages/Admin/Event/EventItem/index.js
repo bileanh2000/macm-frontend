@@ -23,12 +23,14 @@ import moment from 'moment';
 
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import { Fragment, useCallback, useState } from 'react';
+import { useSnackbar } from 'notistack';
 
 const cx = classNames.bind(styles);
 
 function EventItem({ data, onSuccess }) {
     const [eventOnclick, SetEventOnclick] = useState({ name: '', id: '' });
     const [openDialog, setOpenDialog] = useState(false);
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     let navigator = useNavigate();
 
@@ -42,8 +44,20 @@ function EventItem({ data, onSuccess }) {
         (id) => () => {
             handleCloseDialog();
             setTimeout(() => {
+                eventApi.deleteEvent(id).then((res) => {
+                    if (res.data.length !== 0) {
+                        console.log('delete', res);
+                        console.log('delete', res.data);
+                        enqueueSnackbar(res.message, { variant: 'success' });
+                        handleCloseDialog();
+                        onSuccess && onSuccess(id);
+                    } else {
+                        enqueueSnackbar(res.message, { variant: 'error' });
+                        handleCloseDialog();
+                    }
+                });
                 // const params = { studentId: id, semester: semester };
-                onSuccess && onSuccess(id);
+                // onSuccess && onSuccess(id);
                 // eventApi.deleteEvent(id).then((res) => {
                 //     console.log('delete', res);
 
