@@ -204,7 +204,7 @@ function Tournament() {
             />
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
-                    Quản lý giải đấu
+                    Danh sách giải đấu
                 </Typography>
 
                 <Button
@@ -221,7 +221,7 @@ function Tournament() {
                 </Button>
             </Box>
             <Divider />
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', m: 2 }}>
+            <Box sx={{ m: 2 }}>
                 <TextField
                     id="outlined-select-currency"
                     select
@@ -229,6 +229,7 @@ function Tournament() {
                     label="Chọn kỳ"
                     value={semester}
                     onChange={handleChange}
+                    sx={{ mr: 2 }}
                 >
                     {semesterList.map((option) => (
                         <MenuItem key={option.id} value={option.name}>
@@ -240,9 +241,10 @@ function Tournament() {
                     id="outlined-select-currency"
                     select
                     size="small"
-                    label="Trạng thái sự kiện"
+                    label="Trạng thái giải đấu"
                     value={status}
                     onChange={handleChangeStatus}
+                    sx={{ minWidth: '10rem' }}
                 >
                     <MenuItem value={0}>Tất cả</MenuItem>
                     <MenuItem value={2}>Đang diễn ra</MenuItem>
@@ -251,7 +253,7 @@ function Tournament() {
             </Box>
 
             <Grid container spacing={4}>
-                <Grid item xs={4}>
+                <Grid item xs={12} md={4}>
                     {tournaments && tournaments.length === 0 ? (
                         <Typography variant="h5" sx={{ textAlign: 'center', mt: 3 }}>
                             KHÔNG CÓ GIẢI ĐẤU NÀO
@@ -298,7 +300,7 @@ function Tournament() {
                         <Typography sx={{ textAlign: 'center' }}>Hiện đang không có giải đấu nào</Typography>
                     )}
                 </Grid>
-                <Grid item xs={8}>
+                <Grid item xs={12} md={8}>
                     <Paper elevation={1} sx={{ height: '80vh', p: 1 }}>
                         <FullCalendar
                             // initialDate={new Date(2022, month - 1, 1)}

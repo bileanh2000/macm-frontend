@@ -301,7 +301,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                         height: '70vh',
                         width: '100%',
                         '& .status-rows': {
-                            justifyContent: 'center !important',
+                            // justifyContent: 'center !important',
                         },
                         '& .status-rows.active .MuiDataGrid-cellContent': {
                             backgroundColor: '#56f000',

@@ -83,7 +83,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
     };
 
     const isStepOptional = (step) => {
-        return step === 2; // cho phep nhap sau
+        return false; // cho phep nhap sau
     };
 
     const isStepSkipped = (step) => {
@@ -153,20 +153,32 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
               }
             : activeStep === 3
             ? {
-                  cost: Yup.string().required('Không được để trống trường này'),
+                  cost: Yup.number()
+                      .required('Không được để trống trường này')
+                      .typeError('Vui lòng nhập số')
+                      .min(0, 'Vui lòng nhập giá trị lớn hơn hoặc bằng 0')
+                      .max(1000000000, 'Vui lòng nhập giá trị hợp lệ'),
                   numOfOrganizingCommitee: Yup.number()
                       .required('Không được để trống trường này')
                       .typeError('Vui lòng nhập số')
-                      .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+                      .min(0, 'Vui lòng nhập giá trị lớn hơn 0')
+                      .max(1000, 'Số lượng không hợp lệ'),
                   numOfParticipants: Yup.number()
                       .required('Không được để trống trường này')
                       .typeError('Vui lòng nhập số')
-                      .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+                      .min(0, 'Vui lòng nhập giá trị lớn hơn 0')
+                      .max(1000, 'Số lượng không hợp lệ'),
 
-                  feePlayerPay: Yup.number().required('Không được để trống trường này').typeError('Vui lòng nhập số'),
+                  feePlayerPay: Yup.number()
+                      .required('Không được để trống trường này')
+                      .typeError('Vui lòng nhập số')
+                      .min(0, 'Vui lòng nhập giá trị lớn hơn hoặc bằng 0')
+                      .max(1000000000, 'Vui lòng nhập giá trị hợp lệ'),
                   feeOrganizingCommiteePay: Yup.number()
                       .required('Không được để trống trường này')
-                      .typeError('Vui lòng nhập số'),
+                      .typeError('Vui lòng nhập số')
+                      .min(0, 'Vui lòng nhập giá trị lớn hơn hoặc bằng 0')
+                      .max(1000000000, 'Vui lòng nhập giá trị hợp lệ'),
               }
             : activeStep === 4
             ? {
@@ -255,7 +267,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
     };
     const handleAddEventRoles = (data) => {
         console.log(data);
-        const newData = [...datas, { id: Math.random(), roleName: data.roleName, maxQuantity: data.maxQuantity }];
+        const newData = [...datas, { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity }];
         setDatas(newData);
 
         /**
@@ -312,8 +324,8 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
         console.log(data);
         let formatData = {
             tournamentName: data.name,
-            finishTime: moment(new Date(new Date(2022, 5, 21, 20, 0, 0))).format('HH:mm:ss'),
-            startTime: moment(new Date(new Date(2022, 5, 20, 8, 0, 0))).format('HH:mm:ss'),
+            finishTime: moment(new Date(data.finishDate)).format('HH:mm:ss'),
+            startTime: moment(new Date(data.startDate)).format('HH:mm:ss'),
             startDate: moment(new Date(data.startDate)).format('DD/MM/yyyy'),
             finishDate: moment(new Date(data.finishDate)).format('DD/MM/yyyy'),
         };
@@ -670,7 +682,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                 <TableBody>
                                                     {datas.map((data) => (
                                                         <TableRow key={data.id}>
-                                                            <TableCell align="center">{data.roleName}</TableCell>
+                                                            <TableCell align="center">{data.name}</TableCell>
                                                             <TableCell align="center">{data.maxQuantity}</TableCell>
                                                             <TableCell>
                                                                 <IconButton
@@ -935,13 +947,16 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
                                             }) => (
-                                                <DatePicker
-                                                    label="Ngày bắt đầu"
-                                                    inputFormat="dd/MM/yyyy"
+                                                <DateTimePicker
+                                                    label="Thời gian bắt đầu"
                                                     disablePast
                                                     ampm={false}
                                                     value={value}
-                                                    onChange={(value) => onChange(value)}
+                                                    onChange={(value) => {
+                                                        onChange(value);
+                                                        console.log('startDate value', value);
+                                                        // setStartDate(value);
+                                                    }}
                                                     renderInput={(params) => (
                                                         <TextField
                                                             sx={{
@@ -951,8 +966,8 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                             {...params}
                                                             required
                                                             id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
+                                                            error={!!error}
+                                                            helperText={error ? error.message : null}
                                                             // id="startDate"
                                                             variant="outlined"
                                                             margin="dense"
@@ -967,21 +982,22 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                         <Controller
                                             required
                                             name="finishDate"
-                                            inputFormat="dd/MM/yyyy"
                                             control={control}
                                             defaultValue={null}
                                             render={({
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
                                             }) => (
-                                                <DatePicker
-                                                    label="Ngày kết thúc"
-                                                    minDate={startDate}
+                                                <DateTimePicker
+                                                    label="Thời gian kết thúc"
                                                     disablePast
                                                     ampm={false}
-                                                    inputFormat="dd/MM/yyyy"
                                                     value={value}
-                                                    onChange={(value) => onChange(value)}
+                                                    onChange={(value) => {
+                                                        onChange(value);
+                                                        console.log('endDate value', value);
+                                                        // setEndDate(value);
+                                                    }}
                                                     renderInput={(params) => (
                                                         <TextField
                                                             sx={{
@@ -991,8 +1007,8 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                             {...params}
                                                             required
                                                             id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
+                                                            error={!!error}
+                                                            helperText={error ? error.message : null}
                                                             // id="startDate"
                                                             variant="outlined"
                                                             margin="dense"
@@ -1013,12 +1029,10 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
                                             }) => (
-                                                <DatePicker
+                                                <DateTimePicker
                                                     label="Hạn đăng kí cho người chơi"
-                                                    inputFormat="dd/MM/yyyy"
                                                     disablePast
                                                     ampm={false}
-                                                    minDate={startDate}
                                                     value={value}
                                                     onChange={(value) => onChange(value)}
                                                     renderInput={(params) => (
@@ -1030,8 +1044,8 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                             {...params}
                                                             required
                                                             id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
+                                                            error={!!error}
+                                                            helperText={error ? error.message : null}
                                                             // id="startDate"
                                                             variant="outlined"
                                                             margin="dense"
@@ -1046,20 +1060,18 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                         <Controller
                                             required
                                             name="dateCommitteeDeadline"
-                                            inputFormat="dd/MM/yyyy"
                                             control={control}
                                             defaultValue={skipped.has(1) ? null : null}
                                             render={({
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
                                             }) => (
-                                                <DatePicker
+                                                <DateTimePicker
                                                     label="Hạn đăng kí tham gia ban tổ chức"
                                                     minDate={startDate}
-                                                    disabled={skipped.has(1)}
                                                     disablePast
+                                                    disabled={skipped.has(1)}
                                                     ampm={false}
-                                                    inputFormat="dd/MM/yyyy"
                                                     value={value}
                                                     onChange={(value) => onChange(value)}
                                                     renderInput={(params) => (

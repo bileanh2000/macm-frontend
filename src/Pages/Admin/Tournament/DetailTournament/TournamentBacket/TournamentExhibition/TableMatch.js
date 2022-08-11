@@ -117,12 +117,12 @@ function TableMatch(params) {
                     <TableCell component="th" scope="row">
                         {index + 1}
                     </TableCell>
-                    <TableCell align="right">{row.team.teamName}</TableCell>
-                    <TableCell align="right">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
-                    <TableCell align="right">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
-                    {/* {params.status === 2 && <TableCell align="right"></TableCell>} */}
+                    <TableCell align="left">{row.team.teamName}</TableCell>
+                    <TableCell align="left">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
+                    <TableCell align="left">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
+                    {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
                     {status === 3 && (
-                        <TableCell align="right">
+                        <TableCell align="left">
                             <Chip
                                 icon={<SportsScore />}
                                 label={row.score == null ? 'Cập nhật điểm số' : 'Đã cập nhật'}
@@ -144,8 +144,8 @@ function TableMatch(params) {
                                         <TableRow>
                                             <TableCell>Tên thành viên</TableCell>
                                             <TableCell>Mã số sinh viên</TableCell>
-                                            <TableCell align="right">Giới tính</TableCell>
-                                            <TableCell align="right">Vai trò</TableCell>
+                                            <TableCell align="left">Giới tính</TableCell>
+                                            <TableCell align="left">Vai trò</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -155,10 +155,10 @@ function TableMatch(params) {
                                                     {player.tournamentPlayer.user.name}
                                                 </TableCell>
                                                 <TableCell>{player.tournamentPlayer.user.studentId}</TableCell>
-                                                <TableCell align="right">
+                                                <TableCell align="left">
                                                     {player.tournamentPlayer.user.gender ? 'Nam' : 'Nữ'}
                                                 </TableCell>
-                                                <TableCell align="right">
+                                                <TableCell align="left">
                                                     {player.roleInTeam ? 'Trưởng nhóm' : ''}
                                                 </TableCell>
                                             </TableRow>
@@ -337,11 +337,11 @@ function TableMatch(params) {
                         <TableRow>
                             <TableCell></TableCell>
                             <TableCell>STT</TableCell>
-                            <TableCell align="right">Tên đội</TableCell>
-                            <TableCell align="right">Thời gian thi đấu</TableCell>
-                            <TableCell align="right">Điểm số</TableCell>
-                            {/* {params.status === 2 && <TableCell align="right"></TableCell>} */}
-                            {params.status === 3 && <TableCell align="right"></TableCell>}
+                            <TableCell align="left">Tên đội</TableCell>
+                            <TableCell align="left">Thời gian thi đấu</TableCell>
+                            <TableCell align="left">Điểm số</TableCell>
+                            {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
+                            {params.status === 3 && <TableCell align="left"></TableCell>}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -351,12 +351,12 @@ function TableMatch(params) {
                             //     <TableCell component="th" scope="row">
                             //         {index + 1}
                             //     </TableCell>
-                            //     <TableCell align="right">{row.team.teamName}</TableCell>
-                            //     <TableCell align="right">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
-                            //     <TableCell align="right">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
-                            //     {/* {params.status === 2 && <TableCell align="right"></TableCell>} */}
+                            //     <TableCell align="left">{row.team.teamName}</TableCell>
+                            //     <TableCell align="left">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
+                            //     <TableCell align="left">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
+                            //     {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
                             //     {params.status === 3 && (
-                            //         <TableCell align="right">
+                            //         <TableCell align="left">
                             //             <Chip
                             //                 icon={<SportsScore />}
                             //                 label={row.score == null ? 'Cập nhật điểm số' : 'Đã cập nhật'}

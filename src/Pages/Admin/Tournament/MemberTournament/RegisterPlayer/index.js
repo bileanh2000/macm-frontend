@@ -4,7 +4,6 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
     FormControl,
     Grid,
@@ -16,29 +15,21 @@ import {
     TableBody,
     TableCell,
     TableContainer,
-    TableHead,
     TableRow,
-    TextField,
-    Typography,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import * as Yup from 'yup';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 
 import adminTournament from 'src/api/adminTournamentAPI';
 import AddMember from './AddMember';
-import userApi from 'src/api/userApi';
 import { Delete } from '@mui/icons-material';
-import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
 
-function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData }) {
+function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competitiveId }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [player, setPlayer] = useState([]);
-    const [weightRange, setWeightRange] = useState(0);
+    const [weightRange, setWeightRange] = useState(competitiveId);
     const [gender, setGender] = useState();
     const [listWeightRange, setListWeightRange] = useState([]);
     const [minWeight, setMinWeight] = useState();
@@ -46,23 +37,6 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData }) {
     const [allMember, setAllMember] = useState();
     const [isRender, setIsRender] = useState(true);
 
-    // const validationSchema = Yup.object().shape({
-    //     weight: Yup.number()
-    //         .required('Không được để trống trường này')
-    //         .typeError('Vui lòng nhập số')
-    //         .min(minWeight, `Vui lòng nhập hạng cân trong khoảng ${minWeight} - ${maxWeight} Kg`)
-    //         .max(maxWeight, `Vui lòng nhập hạng cân trong khoảng ${minWeight} - ${maxWeight} Kg`),
-    // });
-
-    // const {
-    //     register,
-    //     handleSubmit,
-    //     formState: { errors },
-    //     reset,
-    // } = useForm({
-    //     resolver: yupResolver(validationSchema),
-    //     mode: 'onBlur',
-    // });
     const AddPlayerHandler = (data) => {
         setPlayer(data);
     };
@@ -152,7 +126,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData }) {
             const response = await adminTournament.getAllCompetitiveType(tournamentId);
             console.log(response.data[0]);
             setListWeightRange(response.data[0]);
-            setWeightRange(response.data[0][0].id);
+            // setWeightRange(response.data[0][0].id);
             setGender(response.data[0][0].gender);
             setMinWeight(response.data[0][0].weightMin);
             setMaxWeight(response.data[0][0].weightMax);
@@ -164,6 +138,10 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData }) {
     useEffect(() => {
         fetchCompetitiveType(tournamentId);
     }, [tournamentId]);
+
+    useEffect(() => {
+        setWeightRange(competitiveId);
+    }, [competitiveId]);
 
     useEffect(() => {
         isRender && getAllMember(weightRange);

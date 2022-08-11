@@ -7,7 +7,7 @@ import moment from 'moment';
 import adminTournament from 'src/api/adminTournamentAPI';
 import TableMatch from './TableMatch';
 
-function TournamentExhibition({ tournamentStatus }) {
+function TournamentExhibition({ tournamentStatus, reload }) {
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
 
     let { tournamentId } = useParams();
@@ -141,14 +141,14 @@ function TournamentExhibition({ tournamentStatus }) {
                         onUpdateResult={UpdateResultHandler}
                     />
                 </div>
-            ) : tournamentStatus == 1 ? (
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="body1">Thể thức thi đấu đang chưa có lịch thi đấu</Typography>
-                    <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2, float: 'right' }}>
-                        Tạo bảng đấu
-                    </Button>
-                </Box>
             ) : (
+                // ) : tournamentStatus == 1 ? (
+                //     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                //         <Typography variant="body1">Thể thức thi đấu đang chưa có lịch thi đấu</Typography>
+                //         <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2, float: 'right' }}>
+                //             Tạo bảng đấu
+                //         </Button>
+                //     </Box>
                 <Box sx={{ d: 'flex' }}>
                     <Typography variant="body1" sx={{ m: 'auto' }}>
                         Thể thức thi đấu này không tổ chức

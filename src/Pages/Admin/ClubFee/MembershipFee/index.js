@@ -117,7 +117,8 @@ function MembershipFee() {
         cost: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
+            .min(1, 'Vui lòng nhập giá trị lớn hơn 0')
+            .max(100000000, 'Vui lòng không nhập số quá lớn (dưới 1 trăm triệu)'),
     });
 
     const {

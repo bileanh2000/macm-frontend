@@ -70,8 +70,8 @@ function MemberTournament({ tournament, isUpdate }) {
     const fetchExhibitionType = async (tournamentId) => {
         try {
             const response = await adminTournamentAPI.getAllExhibitionType(tournamentId);
-            console.log(response.data);
             setListExhibitionType(response.data);
+            setExhibitionType(response.data[0].id);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -80,7 +80,6 @@ function MemberTournament({ tournament, isUpdate }) {
     const getAllCompetitiveType = async (tournamentId) => {
         try {
             const response = await adminTournamentAPI.getAllCompetitiveType(tournamentId);
-            console.log(response.data[0]);
             setListWeightRange(response.data[0]);
             setWeightRange(response.data[0][0].id);
         } catch (error) {
@@ -105,6 +104,7 @@ function MemberTournament({ tournament, isUpdate }) {
     const fetchExhibitionTeam = async (params, exhibitionType) => {
         try {
             const response = await adminTournamentAPI.getAllExhibitionTeam(params, exhibitionType);
+
             setExhibitionTeam(response.data);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
@@ -139,7 +139,7 @@ function MemberTournament({ tournament, isUpdate }) {
 
     useEffect(() => {
         isRender && getAllCompetitiveType(tournamentId);
-        fetchExhibitionType(tournamentId);
+        isRender && fetchExhibitionType(tournamentId);
         isRender && fetchExhibitionTeam(tournamentId, exhibitionType == 0 ? { exhibitionType: 0 } : exhibitionType);
         setIsRender(false);
     }, [tournamentId, exhibitionType, exhibitionTeam, isRender]);
@@ -244,9 +244,6 @@ function MemberTournament({ tournament, isUpdate }) {
                                         displayEmpty
                                         onChange={handleChangeExhibitionType}
                                     >
-                                        <MenuItem value={0}>
-                                            <em>Tất cả</em>
-                                        </MenuItem>
                                         {listExhibitionType &&
                                             listExhibitionType.map((type) => (
                                                 <MenuItem value={type.id} key={type.id}>
@@ -264,6 +261,7 @@ function MemberTournament({ tournament, isUpdate }) {
                         <RegisterPlayer
                             title="Đăng kí tham gia thi đấu"
                             isOpen={openDialog}
+                            competitiveId={weightRange}
                             handleClose={() => {
                                 setOpenDialog(false);
                             }}
@@ -282,6 +280,7 @@ function MemberTournament({ tournament, isUpdate }) {
                         <RegisterExhibition
                             title="Đăng kí tham gia biểu diễn"
                             isOpen={openDialogExhibition}
+                            exhibitionId={exhibitionType}
                             handleClose={() => {
                                 setOpenDialogExhibition(false);
                             }}

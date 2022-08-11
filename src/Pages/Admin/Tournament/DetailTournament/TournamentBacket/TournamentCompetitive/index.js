@@ -18,7 +18,7 @@ import { useParams } from 'react-router-dom';
 import CustomMatchBracket from './CustomMatchBracket';
 import adminTournament from 'src/api/adminTournamentAPI';
 
-function TournamentCompetitive() {
+function TournamentCompetitive({ reload }) {
     let { tournamentId } = useParams();
     const [tournamentStatus, setTournamentStatus] = useState(0);
     const { enqueueSnackbar } = useSnackbar();
@@ -126,6 +126,7 @@ function TournamentCompetitive() {
 
     const UpdateResultHandler = (newMatches) => {
         setListPlayer(newMatches);
+        setIsRender(true);
         // getListPlayerByCompetitiveID(competitiveId);
     };
 
@@ -144,6 +145,7 @@ function TournamentCompetitive() {
         isRender && fetchTournamentById(tournamentId);
         getAllArea();
         setIsRender(false);
+        console.log('re-render');
     }, [tournamentId, isRender]);
 
     return (
@@ -189,13 +191,13 @@ function TournamentCompetitive() {
                 </FormControl>
                 {tournamentStatus == 0 && listPlayer.length > 0 && (
                     <Button variant="outlined" onClick={handleDialogConfirmMatch} sx={{ mr: 2, float: 'right' }}>
-                        Xác nhận và bắt đầu bảng thi đấu
+                        Xác nhận bảng thi đấu
                     </Button>
                 )}
             </Box>
             {listPlayer && areaList && listPlayer.length > 0 ? (
                 <div>
-                    {tournamentStatus == 2 ? (
+                    {/* {tournamentStatus == 2 ? (
                         listPlayer[listPlayer.length - 1].area ? (
                             ''
                         ) : (
@@ -205,7 +207,7 @@ function TournamentCompetitive() {
                         )
                     ) : (
                         ''
-                    )}
+                    )} */}
                     <CustomMatchBracket
                         matches={listPlayer}
                         competitiveId={competitiveId}
@@ -217,20 +219,20 @@ function TournamentCompetitive() {
                         onCreateMatches={handleDialogCreate}
                         onChangeData={() => {
                             console.log('render data bracket');
-                            return setIsRender(true);
+                            setIsRender(true);
                         }}
                     />
                 </div>
-            ) : tournamentStatus == 1 ? (
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="body1" sx={{ m: '0 auto' }}>
-                        Thể thức này chưa có bảng thi đấu
-                    </Typography>
-                    <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2, float: 'right' }}>
-                        Tạo bảng đấu
-                    </Button>
-                </Box>
             ) : (
+                // ) : tournamentStatus == 1 ? (
+                //     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                //         <Typography variant="body1" sx={{ m: '0 auto' }}>
+                //             Thể thức này chưa có bảng thi đấu
+                //         </Typography>
+                //         <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2, float: 'right' }}>
+                //             Tạo bảng đấu
+                //         </Button>
+                //     </Box>
                 <Box sx={{ display: 'flex' }}>
                     <Typography variant="body1" sx={{ m: 'auto' }}>
                         Thể thức này chưa tổ chức

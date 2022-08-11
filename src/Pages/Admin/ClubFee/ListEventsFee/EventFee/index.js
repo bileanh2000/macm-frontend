@@ -11,7 +11,6 @@ import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 import adminFunAPi from 'src/api/adminFunAPi';
 import eventApi from 'src/api/eventApi';
 import EventSumUp from '../EventSumUp';
-import ClubFee from '../..';
 
 function EventFee() {
     const [userList, setUserList] = useState([]);

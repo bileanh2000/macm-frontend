@@ -31,14 +31,13 @@ import adminTournament from 'src/api/adminTournamentAPI';
 import AddMember from './AddMember';
 import userApi from 'src/api/userApi';
 import { Delete } from '@mui/icons-material';
-import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData }) {
+function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhibitionId }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
-    const [exhibitionType, setExhibitionType] = useState(0);
+    const [exhibitionType, setExhibitionType] = useState(exhibitionId);
     const [numberMale, setNumberMale] = useState();
     const [numberFemale, setNumberFemale] = useState();
     const [listExhibitionType, setListExhibitionType] = useState([]);
@@ -98,7 +97,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData }) {
         try {
             const response = await adminTournament.getAllExhibitionType(tournamentId);
             setListExhibitionType(response.data);
-            setExhibitionType(response.data[0].id);
+            // setExhibitionType(response.data[0].id);
             setNumberMale(response.data[0].numberMale);
             setNumberFemale(response.data[0].numberFemale);
         } catch (error) {
@@ -161,6 +160,10 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData }) {
     useEffect(() => {
         getAllMember();
     }, []);
+
+    useEffect(() => {
+        setExhibitionType(exhibitionId);
+    }, [exhibitionId]);
 
     return (
         <Fragment>
