@@ -85,6 +85,7 @@ function EventDetails() {
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [value, setValue] = useState(0);
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const [isUpdateEvent, setIsUpdateEvent] = useState(false);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -118,7 +119,8 @@ function EventDetails() {
         getEventById(id);
         fetchTournamentSchedule(id);
         window.scrollTo({ behavior: 'smooth', top: '0px' });
-    }, [id]);
+        setIsUpdateEvent(false);
+    }, [id, isUpdateEvent]);
 
     const scheduleData = scheduleList.map((item) => {
         const container = {};
@@ -182,7 +184,10 @@ function EventDetails() {
                     }}
                     onSuccess={(newItem) => {
                         // onUpdateTournament(newItem);
-                        setOpenEditDialog(false);
+                        // setOpenEditDialog(false);
+                    }}
+                    onSuccessEvent={(status) => {
+                        setIsUpdateEvent(status);
                     }}
                     schedule={scheduleList}
                 />

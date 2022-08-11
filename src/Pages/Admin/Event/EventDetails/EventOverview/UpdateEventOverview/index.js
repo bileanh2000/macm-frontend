@@ -27,7 +27,7 @@ import NumberFormat from 'react-number-format';
 import PreviewSchedule from '../../../PreviewSchedule';
 import eventApi from 'src/api/eventApi';
 
-function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess, schedule }) {
+function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessSchedule, onSuccessEvent, schedule }) {
     console.log(data);
     const { enqueueSnackbar } = useSnackbar();
     const [datasFightingCompetition, setDataFightingCompetition] = useState(data.competitiveTypes);
@@ -155,14 +155,16 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
         eventApi.updateEventSchedule(eventSchedule, id).then((res) => {
             console.log('updateEventSchedule', res);
             if (res.data.length !== 0) {
-                // enqueueSnackbar(res.message, { variant: 'success' });
+                onSuccessSchedule && onSuccessSchedule(res.data[0]);
             }
         });
         eventApi.updateEvent(previewEvent, id).then((res) => {
             console.log(res);
             if (res.data.length !== 0) {
                 enqueueSnackbar(res.message, { variant: 'success' });
+                onSuccessEvent && onSuccessEvent(true);
                 setIsOpenPreviewDialog(false);
+
                 handleClose();
             } else {
                 enqueueSnackbar(res.message, { variant: 'error' });
