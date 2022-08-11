@@ -118,7 +118,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                       .required('Không được để trống trường này')
                       .test('len', 'Không hợp lệ', (val) => val.length > 1)
                       .matches(
-                          /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ ]+$/,
+                          /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹẾỀếề ]+$/,
                           'Không hợp lệ: vui lòng nhập chữ',
                       ),
                   maxQuantity: Yup.number()
@@ -132,7 +132,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
             ? {
                   amountFromClub: Yup.number()
                       .required('Không được để trống trường này')
-                      .min(1000, 'Vui lòng nhập giá trị lớn hơn 1000')
+                      .min(0, 'Vui lòng nhập giá trị lớn hơn 0')
                       .max(totalClubFunds, 'Tiền quỹ CLB không đủ')
                       .typeError('Vui lòng nhập giá trị lớn hơn 1000'),
                   totalAmountEstimated: Yup.number()
@@ -291,7 +291,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
             if (response.data.length !== 0) {
                 console.log(response);
                 enqueueSnackbar(response.message, { variant: 'success' });
-                navigate(`admin/events/${response.data[0].id}`);
+                navigate(`/admin/events/${response.data[0].id}`);
             } else {
                 console.log(response);
                 enqueueSnackbar(response.message, { variant: 'error' });
@@ -463,7 +463,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                         >
                                                             Yêu cầu thành viên đóng tiền:{' '}
                                                         </Typography>
-                                                        {skipped.has(2) ? (
+                                                        {!previewEvent.amountPerRegister ? (
                                                             <span>Không</span>
                                                         ) : (
                                                             <>
