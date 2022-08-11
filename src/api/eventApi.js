@@ -29,6 +29,22 @@ const eventApi = {
             },
         });
     },
+    udpateEventPreview: (params) => {
+        const url = `/eventschedule/headculture/updatepreview/${params.id}`;
+        return axiosClient.post(url, null, {
+            params: {
+                startDate: params.startDate,
+                finishDate: params.finishDate,
+                startTime: params.startTime,
+                finishTime: params.finishTime,
+                // IsContinuous: params.IsContinuous,
+            },
+        });
+    },
+    updateEventSchedule: (params, id) => {
+        const url = `/eventschedule/headculture/updateschedule/${id}?isOverwritten=true`;
+        return axiosClient.post(url, params);
+    },
     createEvent: (params) => {
         const url = `/event/headculture/createevent?isOverwritten=true`;
         return axiosClient.post(url, params);
@@ -92,10 +108,10 @@ const eventApi = {
             },
         });
     },
-    updateEventSchedule: (eventId, params) => {
-        const url = `/eventschedule/headculture/updateschedule/${eventId}?isOverwritten=true`;
-        return axiosClient.post(url, params);
-    },
+    // updateEventSchedule: (eventId, params) => {
+    //     const url = `/eventschedule/headculture/updateschedule/${eventId}?isOverwritten=true`;
+    //     return axiosClient.post(url, params);
+    // },
 
     getMonthsBySemester: (semester) => {
         const url = `/semester/getlistmonths?semester=${semester}`;
@@ -142,6 +158,11 @@ const eventApi = {
 
     getAllEventByStudentId: (studentId) => {
         const url = `/event/getalleventbystudentid/${studentId}`;
+        return axiosClient.get(url);
+    },
+
+    getAllOrganizingCommitteeRoleByEventId: (eventId) => {
+        const url = `/event/getallorganizingcommitteerolebyeventid/${eventId}`;
         return axiosClient.get(url);
     },
 

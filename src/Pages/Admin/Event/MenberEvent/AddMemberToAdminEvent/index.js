@@ -21,29 +21,13 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 
-const roles = [
-    { roleId: 1, roleName: 'Thành viên tham gia' },
-    { roleId: 2, roleName: 'Thành viên ban truyền thông' },
-    { roleId: 3, roleName: 'Thành viên ban văn hóa' },
-    { roleId: 4, roleName: 'Thành viên ban hậu cần' },
-];
-
-function AddMemberToAdminEvent() {
+function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdate, user, Success }) {
     const [pageSize, setPageSize] = useState(30);
-    const [newList, setNewList] = useState([]);
     const [userList, setUserList] = useState([]);
+    const [roleList, setRoleList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
-    let navigate = useNavigate();
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpenSnackBar(false);
-    };
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -63,30 +47,47 @@ function AddMemberToAdminEvent() {
             console.log('Failed to fetch user list: ', error);
         }
     };
-
+    const fetchRoleInEvent = async (params) => {
+        try {
+            const response = await eventApi.getAllOrganizingCommitteeRoleByEventId(params);
+            console.log(response);
+            setRoleList(response.data);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
+    const roles = roleList.map((role) => {
+        return { roleId: role.id, roleName: role.name };
+    });
+    const formatRoles = [{ id: 0, roleId: 1, roleName: 'Thành viên tham gia' }, ...roles];
+    // const roles = [
+    //     { roleId: 1, roleName: 'Thành viên tham gia' },
+    //     { roleId: 2, roleName: 'Thành viên ban truyền thông' },
+    //     { roleId: 3, roleName: 'Thành viên ban văn hóa' },
+    //     { roleId: 4, roleName: 'Thành viên ban hậu cần' },
+    // ];
     useEffect(() => {
         fetchUserInEvent(id);
-    }, []);
+        fetchRoleInEvent(id);
+        // console.log('role', formatRoles);
+    }, [index, id, value]);
 
     const columns = [
-        { field: 'studentName', headerName: 'Tên', flex: 0.8 },
-        {
-            field: 'userMail',
-            headerName: 'Email',
-            width: 150,
-            flex: 0.6,
-        },
+        { field: 'studentName', headerName: 'Tên', flex: 1 },
+        // {
+        //     field: 'userMail',
+        //     headerName: 'Email',
+        //     flex: 1,
+        // },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
-            width: 150,
-            flex: 0.6,
+            flex: 1,
         },
         {
             field: 'roleInClub',
             headerName: 'Vai trò trong CLB',
-            width: 150,
-            flex: 0.6,
+            flex: 1,
         },
 
         // <MenuItem value={1}>Thành viên tham gia</MenuItem>
@@ -96,17 +97,11 @@ function AddMemberToAdminEvent() {
         {
             field: 'role',
             headerName: `Vai trò trong sự kiện`,
-            width: 150,
-            flex: 0.6,
+            flex: 1,
             editable: true,
             type: 'singleSelect',
-            // valueOptions: roles.map((role) => role.roleName),
-            valueOptions: [
-                { label: 'Thành viên tham gia', value: 'Thành viên tham gia' },
-                { label: 'Thành viên ban truyền thông', value: 'Thành viên ban truyền thông' },
-                { label: 'Thành viên ban hậu cần', value: 'Thành viên ban hậu cần' },
-                { label: 'Thành viên ban văn hóa', value: 'Thành viên ban văn hóa' },
-            ],
+            valueOptions: formatRoles.map((role) => role.roleName),
+            // valueOptions: roleValueOptions,
             cellClassName: (params) => {
                 if (params.value == null) {
                     return '';
@@ -130,16 +125,16 @@ function AddMemberToAdminEvent() {
         return container;
     });
 
-    const { handleSubmit } = useForm({});
-
     const handleRowEditCommit = React.useCallback(
         (params) => {
             const id = params.id;
             const key = params.field;
             const value = params.value;
             console.log(id, key, value, params);
-            const newRole = roles.find((role) => role.roleName === value);
-            console.log(newRole);
+            console.log(roles);
+
+            const newRole = formatRoles && formatRoles.find((role) => role.roleName === value);
+            console.log('new role', newRole);
             console.log(userList);
             const newMemberList =
                 userList &&
@@ -152,24 +147,14 @@ function AddMemberToAdminEvent() {
         },
         [userList],
     );
-
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
     const handleUpdate = () => {
         console.log('submit', userList);
         eventApi.updateMemberRole(userList).then((res) => {
             console.log(res);
             console.log(res.data);
             enqueueSnackbar(res.message, { variant: 'success' });
-            navigate(-1);
+            handleCloseDialog();
+            // navigate(-1);
             // if (res.message === 'Cập nhật chức vụ cho thành viên trong sự kiện thành công') {
 
             // }
@@ -189,9 +174,16 @@ function AddMemberToAdminEvent() {
             </GridToolbarContainer>
         );
     };
-
+    // if (index === 1) {
+    //     return null;
+    // } else
     return (
-        <div>
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+        >
             <Dialog
                 open={openDialog}
                 onClose={handleCloseDialog}
@@ -209,23 +201,9 @@ function AddMemberToAdminEvent() {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
-            <Typography variant="h4" sx={{ mb: 3 }}>
-                Cập nhật vai trò thành viên trong sự kiện
+
+            <Typography variant="caption" sx={{ mb: 3 }}>
+                Bấm vào vai trò của từng người để chỉnh sửa
             </Typography>
             <p></p>
             <Box

@@ -25,7 +25,8 @@ import Contact from '../Pages/Admin/Contact';
 import Event from '../Pages/Admin/Event';
 
 import AddEvent from '../Pages/Admin/Event/AddEvent';
-import EventDetails from '../Pages/Admin/Event/EventDetail';
+// import EventDetails from '../Pages/Admin/Event/EventDetail';
+import EventDetails from '../Pages/Admin/Event/EventDetails';
 import MemberEvent from '../Pages/Admin/Event/MenberEvent';
 import MemberCancelEvent from '../Pages/Admin/Event/MenberEvent/MemberCancelEvent';
 import AddToAdmin from '../Pages/Admin/Event/MenberEvent/AddMemberToAdminEvent';
