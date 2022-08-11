@@ -274,16 +274,22 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                 totalAmountEstimated: data.totalAmountEstimated,
                 amountPerRegisterEstimated: data.amountPerRegister,
                 amountFromClub: data.amountFromClub,
-                ...(!skipped.has(1)
-                    ? {
+                ...(skipped.has(1)
+                    ? null
+                    : {
                           registrationOrganizingCommitteeDeadline: moment(
                               data.registrationOrganizingCommitteeDeadline,
                           ).format('yyyy-MM-DDTHH:mm:ss'),
-                          rolesEventDto: [],
-                      }
-                    : { rolesEventDto: datas }),
+                      }),
                 registrationMemberDeadline: moment(data.registrationMemberDeadline).format('yyyy-MM-DDTHH:mm:ss'),
             },
+            ...(skipped.has(1)
+                ? {
+                      rolesEventDto: [],
+                  }
+                : {
+                      rolesEventDto: datas,
+                  }),
             // rolesEventDto: datas,
             listPreview: previewSchedule,
         };

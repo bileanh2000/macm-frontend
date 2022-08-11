@@ -53,6 +53,10 @@ const adminAttendanceAPI = {
         const url = '/commonschedule/getcommonsessionbydate';
         return axiosClient.get(url, { params: { date } });
     },
+    getAttendanceTrainingStatistic: (semesterName) => {
+        const url = `/admin/headtechnique/getattendancetrainingstatistic/${semesterName}`;
+        return axiosClient.get(url);
+    },
 };
 
 export default adminAttendanceAPI;

@@ -90,7 +90,7 @@ function EventList() {
         getListEventsBySemester(JSON.parse(localStorage.getItem('currentUser')).studentId, month, page - 1, semester);
     }, [semester, month, page]);
 
-    if (!events.length) {
+    if (!events.length && totalResult) {
         return <LoadingProgress />;
     }
 

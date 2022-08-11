@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import semesterApi from 'src/api/semesterApi';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 import clsx from 'clsx';
+import moment from 'moment';
 
 function ReportAttendance() {
     const [semester, setSemester] = useState('Summer2022');
@@ -28,15 +29,30 @@ function ReportAttendance() {
 
     const fetchAttendanceReportBySemester = async (semester) => {
         try {
-            const response = await adminAttendanceAPI.attendanceReportBySemester(semester);
-            console.log('Thanh cong roi, semester: ', response);
+            const response = await adminAttendanceAPI.getAttendanceTrainingStatistic(semester);
+            console.log('fetchAttendanceReportBySemester: ', response);
             setAttendanceList(response.data);
         } catch (error) {
-            console.log('That bai roi huhu, semester: ', error);
+            console.log('failed when fetchAttendanceReportBySemester: ', error);
         }
     };
 
-    const header = [{ id: 1 }];
+    // const header = c.map(i=>i.attendanceTrainingsDto)[0].map(i=>i.date)
+    const dateList =
+        attendanceList[0] &&
+        attendanceList
+            .map((i) => i.attendanceTrainingsDto)[0]
+            .map((i, index) => {
+                return { field: index, headerName: moment(i.date).format('DD/MM') };
+            });
+
+    const header = dateList && [
+        ...[
+            { field: 'userStudentId', headerName: 'Mã sinh viên' },
+            { field: 'userName', headerName: 'Tên', width: 200 },
+        ],
+        ...dateList,
+    ];
     useEffect(() => {
         fetchSemester();
         fetchAttendanceReportBySemester(semester);
@@ -75,15 +91,15 @@ function ReportAttendance() {
     //     },
     // ];
 
-    const columns = header.map((i) => {
-        return i;
-    });
+    // const columns = header.map((i) => {
+    //     return i;
+    // });
 
     const rowsAttendance = attendanceList.map((item, index) => {
         const container = {};
         container['id'] = index + 1;
-        container['studentName'] = item.studentName;
-        container['studentId'] = item.studentId;
+        container['userName'] = item.userName;
+        container['userStudentId'] = item.userStudentId;
         container['roleName'] = item.roleName;
         container['percentAbsent'] = item.percentAbsent + '%';
         container['totalAbsent'] = item.totalAbsent;
@@ -156,7 +172,7 @@ function ReportAttendance() {
                         loading={!attendanceList.length}
                         disableSelectionOnClick={true}
                         rows={rowsAttendance}
-                        columns={columns}
+                        columns={header}
                         pageSize={pageSize}
                         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                         rowsPerPageOptions={[10, 20, 30]}

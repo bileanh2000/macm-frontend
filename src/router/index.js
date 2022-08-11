@@ -84,6 +84,8 @@ import EventDetail from 'src/Pages/User/Events/EventDetail';
 import Notification from 'src/Pages/Notification';
 import AttendanceReport from 'src/Pages/Home/AttendanceReport';
 
+import UserEventDetails from 'src/Pages/User/Events/EventDetails';
+
 const adminRouters = [
     // { path: '/:userId', component: UserProfile, layout: HeaderOnly },
     // { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
@@ -184,7 +186,7 @@ const adminRouters = [
 
 const userRouter = [
     { path: '/events', component: EventListPage, layout: HeaderOnly },
-    { path: '/events/:id', component: EventDetail, layout: HeaderOnly },
+    { path: '/events/:id', component: UserEventDetails, layout: HeaderOnly },
     { path: '/home', component: Home, layout: HeaderOnly },
     { path: '/:userId', component: UserProfile, layout: HeaderOnly },
     { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
