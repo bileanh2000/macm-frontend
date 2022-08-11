@@ -163,7 +163,7 @@ function EventItem({ data, onSuccess }) {
                                         </IconButton>
                                     </Tooltip>
 
-                                    <Tooltip title="Chỉnh sửa">
+                                    {/* <Tooltip title="Chỉnh sửa">
                                         <IconButton
                                             aria-label="edit"
                                             component={Link}
@@ -174,7 +174,7 @@ function EventItem({ data, onSuccess }) {
                                         >
                                             <EditIcon />
                                         </IconButton>
-                                    </Tooltip>
+                                    </Tooltip> */}
                                 </Box>
                             ) : (
                                 ''
