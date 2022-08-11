@@ -127,7 +127,8 @@ function CustomMatchBracket(params) {
         }
         setDragItem({ ...match, index: index, round: round, isFirst: isFirst });
         e.dataTransfer.effectAllowed = 'move';
-        // e.dataTransfer.setData('text/html', this.innerHTML);
+        e.dataTransfer.setData('text/html', e.target.childNodes[0]);
+        e.dataTransfer.setDragImage(e.target.childNodes[0], 20, 20);
     };
 
     const onDragOver = (e) => {
@@ -185,11 +186,11 @@ function CustomMatchBracket(params) {
     const updateListMatchesPlayer = async (params) => {
         try {
             const res = await adminTournament.updateListMatchsPlayer(params);
-            params.onChangeData();
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
+            params.onChangeData && params.onChangeData();
         } catch (error) {
-            console.log('Khong the update');
+            console.log('Khong the update', error);
         }
     };
     const handleCreateMatches = () => {
@@ -197,8 +198,9 @@ function CustomMatchBracket(params) {
     };
 
     const handleUpdateMatches = () => {
-        console.log(matches[0]);
-        updateListMatchesPlayer(matches[0]);
+        var merged = [].concat.apply([], __matches);
+        console.log(merged);
+        updateListMatchesPlayer(merged);
         setEdit(false);
     };
 
@@ -242,9 +244,9 @@ function CustomMatchBracket(params) {
     const updateResult = async (params) => {
         try {
             const res = await adminTournament.updateResultMatch(params);
-            params.onChangeData();
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
+            params.onChangeData && params.onChangeData();
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar('khong the cap nhat ket quá', { variant });
@@ -254,9 +256,9 @@ function CustomMatchBracket(params) {
     const updateTimeAndPlace = async (matchId, params) => {
         try {
             const res = await adminTournament.updateTimeAndPlaceMatch(matchId, params);
-            params.onChangeData();
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
+            params.onChangeData && params.onChangeData();
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar('khong the cap nhat thoi gian', { variant });

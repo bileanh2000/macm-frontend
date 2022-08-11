@@ -140,7 +140,7 @@ function DetailTournament() {
 
     const getRoleInTournament = async () => {
         try {
-            const response = await userTournamentAPI.getAllOrginizingCommitteeRole();
+            const response = await userTournamentAPI.getAllOrginizingCommitteeRole(tournamentId);
             setRoleInTournament(response.data);
         } catch (error) {
             console.log('Khong the lay duoc role', error);
@@ -268,41 +268,52 @@ function DetailTournament() {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">Đăng kí tham gia ban tổ chức</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        <Typography variant="caption">Bạn muốn đăng kí vào ban nào?</Typography>
-                    </DialogContentText>
-                    <form onSubmit={handleSubmit}>
-                        <FormControl sx={{ m: 3 }} error={error} variant="standard">
-                            {roleInTournament && (
-                                <RadioGroup
-                                    aria-labelledby="demo-error-radios"
-                                    name="quiz"
-                                    value={valueRadio}
-                                    onChange={handleRadioChange}
-                                >
-                                    {roleInTournament.map((role, index) => (
-                                        <FormControlLabel
-                                            key={index}
-                                            value={role.id}
-                                            control={<Radio />}
-                                            label={role.name}
-                                        />
-                                    ))}
-                                </RadioGroup>
-                            )}
-                            <FormHelperText>{helperText}</FormHelperText>
-                            <Box sx={{ display: 'flex', alignContent: 'space-between' }}>
-                                <Button sx={{ mt: 1, mr: 1 }} type="submit" variant="outlined">
-                                    Đăng kí
-                                </Button>
-                                <Button sx={{ mt: 1, mr: 1 }} onClick={handleCloseDialogAdmin} variant="outlined">
-                                    Hủy bỏ
-                                </Button>
-                            </Box>
-                        </FormControl>
-                    </form>
-                </DialogContent>
+                {roleInTournament.length > 0 ? (
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            <Typography variant="caption">Bạn muốn đăng kí vào ban nào?</Typography>
+                        </DialogContentText>
+                        <form onSubmit={handleSubmit}>
+                            <FormControl sx={{ m: 3 }} error={error} variant="standard">
+                                {roleInTournament && (
+                                    <RadioGroup
+                                        aria-labelledby="demo-error-radios"
+                                        name="quiz"
+                                        value={valueRadio}
+                                        onChange={handleRadioChange}
+                                    >
+                                        {roleInTournament.map((role, index) => (
+                                            <FormControlLabel
+                                                key={index}
+                                                value={role.id}
+                                                control={<Radio />}
+                                                label={`${role.name} - SL còn lại: ${role.availableQuantity} người`}
+                                                disabled={role.availableQuantity === 0}
+                                            />
+                                        ))}
+                                    </RadioGroup>
+                                )}
+                                <FormHelperText>{helperText}</FormHelperText>
+                                <Box sx={{ display: 'flex', alignContent: 'space-between' }}>
+                                    <Button sx={{ mt: 1, mr: 1 }} type="submit" variant="outlined">
+                                        Đăng kí
+                                    </Button>
+                                    <Button sx={{ mt: 1, mr: 1 }} onClick={handleCloseDialogAdmin} variant="outlined">
+                                        Hủy bỏ
+                                    </Button>
+                                </Box>
+                            </FormControl>
+                        </form>
+                    </DialogContent>
+                ) : (
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            <Typography variant="caption">
+                                Giải đấu chưa yêu cầu có ban tổ chức, bạn vui lòng quay lại sau!
+                            </Typography>
+                        </DialogContentText>
+                    </DialogContent>
+                )}
                 {/* <DialogActions></DialogActions> */}
             </Dialog>
             {tournament && scheduleData.length > 0 && (
@@ -376,14 +387,18 @@ function DetailTournament() {
                                                         {...(handleRegisterDeadline(1)
                                                             ? { disabled: false }
                                                             : { disabled: true })}
-                                                        {...(isJoinAdmin.message
-                                                            ? { disabled: true }
-                                                            : { disabled: false })}
+                                                        {...(isJoinAdmin.message.includes(
+                                                            'Bạn chưa tham gia ban tổ chức giải đấu',
+                                                        )
+                                                            ? { disabled: false }
+                                                            : { disabled: true })}
                                                         sx={{ float: 'right' }}
                                                     >
-                                                        {isJoinAdmin.message
-                                                            ? isJoinAdmin.message + 'vào ban tổ chức'
-                                                            : 'Đăng kí vào ban tổ chức'}
+                                                        {isJoinAdmin.message.includes(
+                                                            'Bạn chưa tham gia ban tổ chức giải đấu',
+                                                        )
+                                                            ? 'Đăng kí vào ban tổ chức'
+                                                            : isJoinAdmin.message + 'vào ban tổ chức'}
                                                     </Button>
                                                 )}
                                             </Box>

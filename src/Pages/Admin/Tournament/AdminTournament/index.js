@@ -19,8 +19,7 @@ function AdminTournament({ isUpdate, user }) {
     const [adminList, setAdminList] = useState([]);
     const [active, setActive] = useState(-1);
     const [total, setTotal] = useState(-1);
-    const [updateRoleDialog, setUpdateRoleDialog] = useState(false);
-    const [addAdminDialog, setAddAdminDialog] = useState(false);
+    const [isRender, SetIsRender] = useState(true);
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
@@ -31,8 +30,8 @@ function AdminTournament({ isUpdate, user }) {
         try {
             const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
             console.log(response);
-            const newUser = response.data.filter((user) => user.registerStatus === 'Đã chấp nhận');
-            setAdminList(newUser);
+            // const newUser = response.data.filter((user) => user.registerStatus === 'Đã chấp nhận');
+            setAdminList(response.data);
             setActive(response.totalActive);
             setTotal(response.totalResult);
         } catch (error) {
@@ -41,8 +40,9 @@ function AdminTournament({ isUpdate, user }) {
     };
 
     useEffect(() => {
-        fetchAdminInTournament(tournamentId);
-    }, [tournamentId]);
+        isRender && fetchAdminInTournament(tournamentId);
+        SetIsRender(false);
+    }, [tournamentId, adminList, isRender]);
 
     return (
         <Fragment>
@@ -77,11 +77,19 @@ function AdminTournament({ isUpdate, user }) {
                         // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
                         //     return;
                         // }
-                        console.log(newItem);
                         setAdminList([...newItem, ...adminList]);
+                        SetIsRender(true);
                     }}
+                    tournamentId={tournamentId}
+                    onChange={() => SetIsRender(true)}
                 />
-                <UpdateAdminTournament value={value} active={active} total={total} index={1} />
+                <UpdateAdminTournament
+                    value={value}
+                    active={active}
+                    total={total}
+                    index={1}
+                    onChange={() => SetIsRender(true)}
+                />
                 {/* <AddAdminTourament value={value} active={active} total={total} index={2} /> */}
             </Box>
         </Fragment>
