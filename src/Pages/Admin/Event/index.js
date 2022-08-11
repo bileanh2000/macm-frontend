@@ -365,14 +365,14 @@ function Event() {
                 </Grid>
             </Grid>
             <Box>
-                <Pagination
+                {/* <Pagination
                     count={events && Math.floor(events.length / 5) + 1}
                     // count={3}
                     page={page}
                     color="primary"
                     sx={{ display: 'flex', mt: 4, justifyContent: 'flex-end' }}
                     onChange={(event, value) => setPage(value)}
-                />
+                /> */}
             </Box>
         </Fragment>
     );

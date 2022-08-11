@@ -74,7 +74,7 @@ function TournamentExhibition({ tournamentStatus }) {
     useEffect(() => {
         fetchExhibitionType(tournamentId);
         getExhibitionResult(exhibitionType, nowDate);
-    }, [tournamentId]);
+    }, []);
 
     const handleDialogCreate = () => {
         if (exhibitionType == 0) {

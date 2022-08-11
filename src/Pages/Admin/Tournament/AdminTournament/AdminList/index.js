@@ -1,19 +1,24 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Box } from '@mui/system';
-import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { styled } from '@mui/material/styles';
-import { Button, Typography } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Add, Delete } from '@mui/icons-material';
+import { useSnackbar } from 'notistack';
 
 import RegisterAdmin from './RegisterAdmin';
 import userTournamentAPI from 'src/api/userTournamentAPI';
+import adminTournament from 'src/api/adminTournamentAPI';
 
-function AdminList({ adminList, value, index, active, total, isUpdate, user, Success }) {
+function AdminList({ adminList, value, index, active, total, isUpdate, user, Success, tournamentId, onChange }) {
+    const { enqueueSnackbar } = useSnackbar();
     const [data, setData] = useState(adminList);
     const [pageSize, setPageSize] = useState(10);
     const [open, setOpen] = useState(false);
     const [roleInTournament, setRoleInTournament] = useState([]);
+    const [openDelete, setOpenDelete] = useState(false);
+    const [tournamentAdminId, setTournamentAdminId] = useState(0);
 
     useEffect(() => {
         setData(adminList);
@@ -25,11 +30,22 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
 
     const getRoleInTournament = async () => {
         try {
-            const response = await userTournamentAPI.getAllOrginizingCommitteeRole();
+            const response = await userTournamentAPI.getAllOrginizingCommitteeRole(tournamentId);
             console.log(response);
             setRoleInTournament(response.data);
         } catch (error) {
             console.log('Khong the lay duoc role', error);
+        }
+    };
+    const deleteTournamentOrganizingCommittee = async (tournamentAdminId) => {
+        try {
+            const response = await adminTournament.deleteTournamentOrganizingCommittee(tournamentAdminId);
+            onChange && onChange();
+            enqueueSnackbar(response.message, {
+                variant: response.message.includes('Không thể xóa') ? 'error' : 'success',
+            });
+        } catch (error) {
+            console.warn('Failed to delete competitive player');
         }
     };
 
@@ -46,6 +62,14 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             flex: 0.6,
         },
         { field: 'role', headerName: 'Vai trò trong sự kiện', width: 150, flex: 1 },
+        {
+            field: 'actions',
+            type: 'actions',
+            width: 80,
+            getActions: (params) => [
+                <GridActionsCellItem icon={<Delete />} label="Delete" onClick={() => deleteUser(params.id)} />,
+            ],
+        },
     ];
 
     const rowsUser =
@@ -60,6 +84,19 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
             return container;
         });
+
+    const deleteUser = (tournamentAdminId) => {
+        setTournamentAdminId(tournamentAdminId);
+        setOpenDelete(true);
+    };
+
+    const handleCloseDelete = () => {
+        setOpenDelete(false);
+    };
+    const handleConfirmDelete = () => {
+        deleteTournamentOrganizingCommittee(tournamentAdminId);
+        handleCloseDelete();
+    };
 
     function CustomToolbar() {
         return (
@@ -179,6 +216,25 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 },
             }}
         >
+            <Dialog
+                fullWidth
+                maxWidth="md"
+                open={openDelete}
+                onClose={handleCloseDelete}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    Xác nhận
+                </DialogTitle>
+                <DialogContent>Bạn có chắc chắn muốn xóa người này ra khỏi ban tổ chức</DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDelete}>Hủy</Button>
+                    <Button onClick={handleConfirmDelete} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <DataGrid
                 // loading={data.length === 0}
                 disableSelectionOnClick={true}
@@ -194,7 +250,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             />
             {roleInTournament.length > 0 && (
                 <RegisterAdmin
-                    title="Đăng kí tham gia thi đấu"
+                    title="Đăng kí tham gia ban tổ chức"
                     isOpen={open}
                     handleClose={() => {
                         setOpen(false);
@@ -209,6 +265,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                         Success && Success(newItem);
                         setOpen(false);
                     }}
+                    onChange={onChange}
                 />
             )}
         </Box>

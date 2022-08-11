@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
@@ -17,27 +17,20 @@ import {
 import eventApi from 'src/api/eventApi';
 import { useParams } from 'react-router-dom';
 import { useEffect } from 'react';
-let snackBarStatus;
+import { useSnackbar } from 'notistack';
 
-function AddMemberToEvent() {
+function AddMemberToEvent({ title, children, isOpen, handleClose, onSucess }) {
     const [pageSize, setPageSize] = useState(30);
     const [memberList, setMemberList] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
     const [open, setOpen] = useState(false);
     const [selectionModel, setSelectionModel] = useState([]);
-    const [openSnackBar, setOpenSnackBar] = useState(false);
-    const handleCloseSnackBar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpenSnackBar(false);
-    };
-    const handleClickOpen = () => {
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const handleClickOpenConfirmDialog = () => {
         setOpen(true);
     };
 
-    const handleClose = () => {
+    const handleCloseConfirmDialog = () => {
         setOpen(false);
     };
 
@@ -55,7 +48,7 @@ function AddMemberToEvent() {
 
     useEffect(() => {
         fetchListMemberToAdd(id);
-    }, [id]);
+    }, [id, isOpen]);
 
     const columns = [
         { field: 'studentName', headerName: 'Tên', flex: 0.8 },
@@ -67,114 +60,7 @@ function AddMemberToEvent() {
             flex: 0.6,
         },
         { field: 'roleInClub', headerName: 'Vai trò trong CLB', width: 150, flex: 1 },
-        // { field: 'role', headerName: 'Vai trò trong sự kiện', width: 150, flex: 1 },
-        // {
-        //     field: 'attendanceStatus',
-        //     headerName: 'Trạng thái',
-        //     flex: 0.5,
-        //     renderCell: (cellValues) => {
-        //         return (
-        //             <Button
-        //                 Continue
-        //                 sx={{
-        //                     // borderRadius: '5px',
-        //                     ...(cellValues.row.attendanceStatus === 'Đã đăng kí'
-        //                         ? {
-        //                               backgroundColor: '#00AD31',
-        //                               boxShadow: 'none',
-        //                               width: '112px',
-        //                               '&:hover': {
-        //                                   backgroundColor: '#00AD31',
-        //                                   boxShadow: 'none',
-        //                               },
-        //                               '&:active': {
-        //                                   boxShadow: 'none',
-        //                                   backgroundColor: '#00AD31',
-        //                               },
-        //                           }
-        //                         : {
-        //                               backgroundColor: '#ff3838',
-        //                               boxShadow: 'none',
-        //                               width: '112px',
-        //                               '&:hover': {
-        //                                   backgroundColor: '#ff3838',
-        //                                   boxShadow: 'none',
-        //                               },
-        //                               '&:active': {
-        //                                   boxShadow: 'none',
-        //                                   backgroundColor: '#ff3838',
-        //                               },
-        //                           }),
-        //                 }}
-        //                 variant="contained"
-        //                 color="primary"
-        //                 // onClick={(event) => {
-        //                 //     handleUpdateStatus(cellValues.row.studentId);
-        //                 // }}
-        //                 // onClick={(event) => {
-        //                 //     toggleStatus(cellValues.row.studentId);
-        //                 // }}
-        //             >
-        //                 {cellValues.row.attendanceStatus}
-        //             </Button>
-        //         );
-        //     },
-        // },
-        // {
-        //     field: 'paymentStatus',
-        //     headerName: 'Đóng tiền',
-        //     flex: 0.5,
-        //     renderCell: (cellValues) => {
-        //         return (
-        //             <Button
-        //                 sx={{
-        //                     // borderRadius: '5px',
-        //                     ...(cellValues.row.paymentStatus === 'Đã đóng'
-        //                         ? {
-        //                               backgroundColor: '#00AD31',
-        //                               boxShadow: 'none',
-        //                               width: '112px',
-        //                               '&:hover': {
-        //                                   backgroundColor: '#00AD31',
-        //                                   boxShadow: 'none',
-        //                               },
-        //                               '&:active': {
-        //                                   boxShadow: 'none',
-        //                                   backgroundColor: '#00AD31',
-        //                               },
-        //                           }
-        //                         : {
-        //                               backgroundColor: '#ff3838',
-        //                               boxShadow: 'none',
-        //                               width: '112px',
-        //                               '&:hover': {
-        //                                   backgroundColor: '#ff3838',
-        //                                   boxShadow: 'none',
-        //                               },
-        //                               '&:active': {
-        //                                   boxShadow: 'none',
-        //                                   backgroundColor: '#ff3838',
-        //                               },
-        //                           }),
-        //                 }}
-        //                 variant="contained"
-        //                 color="primary"
-        //             >
-        //                 {cellValues.row.paymentStatus}
-        //             </Button>
-        //         );
-        //     },
-        // },
     ];
-    const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
-    const dynamicAlert = (status, message) => {
-        console.log('status of dynamicAlert', status);
-        if (status) {
-            setCustomAlert({ severity: 'success', message: message });
-        } else {
-            setCustomAlert({ severity: 'error', message: message });
-        }
-    };
 
     const rowsUser =
         memberList &&
@@ -195,18 +81,17 @@ function AddMemberToEvent() {
     const addMemberToEvent = () => {
         eventApi.updateMemberToJoinEvent(id, selectedRows).then((res) => {
             console.log(res);
-            if (res.data !== 0) {
-                setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
+            if (res.data.length !== 0) {
                 const selectedIDs = new Set(selectionModel);
                 setMemberList((prev) => prev.filter((item) => !selectedIDs.has(item.userId)));
+                enqueueSnackbar(res.message, { variant: 'success' });
+                onSucess && onSucess(res.data);
                 handleClose();
+                handleCloseConfirmDialog();
+            } else {
+                enqueueSnackbar(res.message, { variant: 'error' });
             }
         });
-        // console.log(selectedRows);
-        // console.log('addMemberToEvent', selectedRows);
     };
 
     function CustomToolbar() {
@@ -282,51 +167,10 @@ function AddMemberToEvent() {
     }
 
     return (
-        <Box
-            sx={{
-                height: '70vh',
-                width: '100%',
-                '& .status-rows': {
-                    justifyContent: 'center !important',
-                    minHeight: '0px !important',
-                    maxHeight: '35px !important',
-                    borderRadius: '100px',
-                    position: 'relative',
-                    top: '9px',
-                },
-                '& .status-rows.active': {
-                    backgroundColor: '#56f000',
-                    color: '#fff',
-                    fontWeight: '600',
-                    textAlign: 'center',
-                    // minWidth: '80px !important',
-                },
-                '& .status-rows.deactive': {
-                    backgroundColor: '#ff3838',
-                    color: '#fff',
-                    fontWeight: '600',
-                    // minWidth: '80px !important',
-                },
-            }}
-        >
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={5000}
-                onClose={handleCloseSnackBar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-                <Alert
-                    onClose={handleCloseSnackBar}
-                    variant="filled"
-                    severity={customAlert.severity || 'success'}
-                    sx={{ width: '100%' }}
-                >
-                    {customAlert.message}
-                </Alert>
-            </Snackbar>
+        <Fragment>
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={handleCloseConfirmDialog}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
@@ -338,49 +182,152 @@ function AddMemberToEvent() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Từ chối</Button>
+                    <Button onClick={handleCloseConfirmDialog}>Từ chối</Button>
                     <Button onClick={addMemberToEvent} autoFocus>
                         Đồng ý
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Typography variant="h4" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Thêm thành viên vào sự kiện
-            </Typography>
+            <Dialog fullWidth maxWidth="md" open={!!isOpen} onClose={handleClose} sx={{ height: 'fit-content' }}>
+                <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ height: '500px' }}>
+                        <DataGrid
+                            rows={rowsUser}
+                            checkboxSelection
+                            onSelectionModelChange={(ids) => {
+                                setSelectionModel(ids);
+                                const selectedIDs = new Set(ids);
+                                const selectedRows =
+                                    memberList && memberList.filter((row) => selectedIDs.has(row.userId));
+                                setSelectedRows(selectedRows);
+                                console.log(selectedRows);
+                                console.log('addMemberToEvent', selectedRows);
+                            }}
+                            disableSelectionOnClick={true}
+                            columns={columns}
+                            pageSize={pageSize}
+                            rowsPerPageOptions={[30, 40, 50]}
+                            components={{
+                                Toolbar: CustomToolbar,
+                                NoRowsOverlay: CustomNoRowsOverlay,
+                            }}
+                        />
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Hủy</Button>
+                    <Button
+                        // variant="contained"
+                        onClick={() => {
+                            setOpen(true);
+                        }}
+                        disabled={selectionModel.length === 0 ? true : false}
+                    >
+                        Lưu lại
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Fragment>
+        // <Box
+        //     sx={{
+        //         height: '70vh',
+        //         width: '100%',
+        //         '& .status-rows': {
+        //             justifyContent: 'center !important',
+        //             minHeight: '0px !important',
+        //             maxHeight: '35px !important',
+        //             borderRadius: '100px',
+        //             position: 'relative',
+        //             top: '9px',
+        //         },
+        //         '& .status-rows.active': {
+        //             backgroundColor: '#56f000',
+        //             color: '#fff',
+        //             fontWeight: '600',
+        //             textAlign: 'center',
+        //             // minWidth: '80px !important',
+        //         },
+        //         '& .status-rows.deactive': {
+        //             backgroundColor: '#ff3838',
+        //             color: '#fff',
+        //             fontWeight: '600',
+        //             // minWidth: '80px !important',
+        //         },
+        //     }}
+        // >
+        //     <Snackbar
+        //         open={openSnackBar}
+        //         autoHideDuration={5000}
+        //         onClose={handleCloseSnackBar}
+        //         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        //     >
+        //         <Alert
+        //             onClose={handleCloseSnackBar}
+        //             variant="filled"
+        //             severity={customAlert.severity || 'success'}
+        //             sx={{ width: '100%' }}
+        //         >
+        //             {customAlert.message}
+        //         </Alert>
+        //     </Snackbar>
+        //     <Dialog
+        //         open={open}
+        //         onClose={handleClose}
+        //         aria-labelledby="alert-dialog-title"
+        //         aria-describedby="alert-dialog-description"
+        //     >
+        //         <DialogTitle id="alert-dialog-title">Xác nhận thêm thành viên vào sự kiện?</DialogTitle>
+        //         <DialogContent>
+        //             <DialogContentText id="alert-dialog-description">
+        //                 {selectedRows && selectedRows.map((item) => '"' + item.userName + '"' + ', ')} sẽ được thêm vào
+        //                 sự kiện?
+        //             </DialogContentText>
+        //         </DialogContent>
+        //         <DialogActions>
+        //             <Button onClick={handleClose}>Từ chối</Button>
+        //             <Button onClick={addMemberToEvent} autoFocus>
+        //                 Đồng ý
+        //             </Button>
+        //         </DialogActions>
+        //     </Dialog>
+        //     <Typography variant="h4" sx={{ fontWeight: 500, marginBottom: 2 }}>
+        //         Thêm thành viên vào sự kiện
+        //     </Typography>
 
-            <DataGrid
-                // loading={data.length === 0}
-                rows={rowsUser}
-                checkboxSelection
-                onSelectionModelChange={(ids) => {
-                    setSelectionModel(ids);
-                    const selectedIDs = new Set(ids);
-                    const selectedRows = memberList && memberList.filter((row) => selectedIDs.has(row.userId));
-                    setSelectedRows(selectedRows);
-                    // console.log(selectedRows);
-                    console.log('addMemberToEvent', selectedRows);
-                }}
-                // disableSelectionOnClick={true}
-                columns={columns}
-                pageSize={pageSize}
-                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                rowsPerPageOptions={[30, 40, 50]}
-                components={{
-                    Toolbar: CustomToolbar,
-                    NoRowsOverlay: CustomNoRowsOverlay,
-                }}
-            />
-            {/* <pre style={{ fontSize: 10 }}>{JSON.stringify(selectedRows, null, 4)}</pre> */}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                <Button
-                    variant="contained"
-                    onClick={handleClickOpen}
-                    disabled={selectionModel.length === 0 ? true : false}
-                >
-                    Lưu lại
-                </Button>
-            </Box>
-        </Box>
+        //     <DataGrid
+        //         // loading={data.length === 0}
+        //         rows={rowsUser}
+        //         checkboxSelection
+        //         onSelectionModelChange={(ids) => {
+        //             setSelectionModel(ids);
+        //             const selectedIDs = new Set(ids);
+        //             const selectedRows = memberList && memberList.filter((row) => selectedIDs.has(row.userId));
+        //             setSelectedRows(selectedRows);
+        //             // console.log(selectedRows);
+        //             console.log('addMemberToEvent', selectedRows);
+        //         }}
+        //         // disableSelectionOnClick={true}
+        //         columns={columns}
+        //         pageSize={pageSize}
+        //         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        //         rowsPerPageOptions={[30, 40, 50]}
+        //         components={{
+        //             Toolbar: CustomToolbar,
+        //             NoRowsOverlay: CustomNoRowsOverlay,
+        //         }}
+        //     />
+        //     {/* <pre style={{ fontSize: 10 }}>{JSON.stringify(selectedRows, null, 4)}</pre> */}
+        //     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+        //         <Button
+        //             variant="contained"
+        //             onClick={handleClickOpen}
+        //             disabled={selectionModel.length === 0 ? true : false}
+        //         >
+        //             Lưu lại
+        //         </Button>
+        //     </Box>
+        // </Box>
     );
 }
 

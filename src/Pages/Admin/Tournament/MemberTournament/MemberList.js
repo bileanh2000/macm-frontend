@@ -24,6 +24,7 @@ function MemberList({ data, type, onChange }) {
     const deleteCompetitivePlayer = async (competitivePlayerId) => {
         try {
             const response = await adminTournament.deleteCompetitivePlayer(competitivePlayerId);
+            onChange && onChange();
             enqueueSnackbar(response.message, {
                 variant: response.message.includes('Không thể xóa') ? 'error' : 'success',
             });
@@ -35,6 +36,7 @@ function MemberList({ data, type, onChange }) {
     const updateWeightForCompetitivePlayer = async (competitivePlayerId, weight) => {
         try {
             const response = await adminTournament.updateWeightForCompetitivePlayer(competitivePlayerId, weight);
+            onChange && onChange();
             enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.warn('Failed to delete competitive player');

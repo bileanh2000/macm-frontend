@@ -4,7 +4,7 @@ import axiosClient from './axiosClient';
 
 const adminTournament = {
     createTournament: (params) => {
-        const url = `/tournament/headclub/createtournament`;
+        const url = `/tournament/headclub/createtournament?isOverwritten=true`;
         return axiosClient.post(url, params);
     },
 
@@ -67,6 +67,11 @@ const adminTournament = {
         return axiosClient.delete(url);
     },
 
+    getAllSuggestionRole: () => {
+        const url = '/event/headculture/getallsuggestionrole';
+        return axiosClient.get(url);
+    },
+
     //Member
 
     addListOrganizingCommittee: (studentId, tournamentId, params) => {
@@ -117,8 +122,18 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
-    getAllOrginizingCommitteeRole: () => {
-        const url = `/tournament/headclub/getallorganizingcommitteerole`;
+    // getAllOrginizingCommitteeRole: () => {
+    //     const url = `/tournament/headclub/getallorganizingcommitteerole`;
+    //     return axiosClient.get(url);
+    // },
+
+    getAllOrginizingCommitteeRole: (tournamentId) => {
+        const url = `/tournament/headclub/getallorganizingcommitteerole/${tournamentId}`;
+        return axiosClient.get(url);
+    },
+
+    deleteTournamentOrganizingCommittee: (tournamentOrganizingCommitteeId) => {
+        const url = `/tournament/headclub/deletetournamentorganizingcommittee/${tournamentOrganizingCommitteeId}`;
         return axiosClient.get(url);
     },
 

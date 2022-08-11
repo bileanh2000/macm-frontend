@@ -9,7 +9,7 @@ function PreviewSchedule({ dataPreview, initialDate }) {
         return (
             <Tooltip title={eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time} placement="top">
                 <Box>
-                    <Box sx={{ mt: 2, ml: 0.5, fontWeight: '500', fontSize: '14px' }}>
+                    <Box sx={{ mt: 3, ml: 0.5, fontWeight: '500', fontSize: '14px' }}>
                         <div>
                             {eventInfo.event.title} <br />
                             {eventInfo.event.extendedProps.time}
@@ -62,4 +62,5 @@ function PreviewSchedule({ dataPreview, initialDate }) {
         />
     );
 }
+
 export default PreviewSchedule;

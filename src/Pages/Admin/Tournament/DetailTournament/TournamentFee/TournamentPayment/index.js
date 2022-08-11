@@ -20,13 +20,14 @@ import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFi
 import clsx from 'clsx';
 import DialogCommon from 'src/Components/Dialog/Dialog';
 import { Link, useParams } from 'react-router-dom';
-import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import adminFunAPi from 'src/api/adminFunAPi';
 import { styled } from '@mui/system';
+import { useSnackbar } from 'notistack';
 
 function TournamentPayment({ tournament, tournamentStatus, value, index }) {
     let { tournamentId } = useParams();
+    const { enqueueSnackbar } = useSnackbar();
     const [funClub, setFunClub] = useState('');
     const [type, setType] = useState(1);
     const [userPaymentStatus, setUserPaymentStatus] = useState([]);
@@ -47,8 +48,9 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
     const handleOpenConfirm = () => {
         updateUserPayment(idMember);
         const newUserList = userPaymentStatus.map((user) => {
-            return user.id === idMember ? { ...user, status: !user.status } : user;
+            return user.id === idMember ? { ...user, paymentStatus: !user.paymentStatus } : user;
         });
+        console.log(newUserList);
         setUserPaymentStatus(newUserList);
         handleCloseConfirm();
     };
@@ -117,46 +119,6 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                 });
             },
         },
-        // {
-        //     field: 'actions',
-        //     type: 'actions',
-        //     headerName: 'Đã đóng - Chưa đóng',
-        //     width: 100,
-        //     flex: 0.5,
-        //     cellClassName: 'actions',
-        //     getActions: (params) => {
-        //         if (params.row.paymentStatus == 'Đã đóng') {
-        //             return [
-        //                 <GridActionsCellItem
-        //                     icon={<RadioButtonChecked />}
-        //                     label="Đã đóng"
-        //                     onClick={() => toggleStatus(params.row.id, type)}
-        //                     color="primary"
-        //                     aria-details="Đã đóng"
-        //                 />,
-        //                 <GridActionsCellItem
-        //                     icon={<RadioButtonUnchecked />}
-        //                     label="Chưa đóng"
-        //                     onClick={() => toggleStatus(params.row.id, type)}
-        //                 />,
-        //             ];
-        //         }
-        //         return [
-        //             <GridActionsCellItem
-        //                 icon={<RadioButtonUnchecked />}
-        //                 label="Đã đóng"
-        //                 onClick={() => toggleStatus(params.row.id, type)}
-        //             />,
-        //             <GridActionsCellItem
-        //                 icon={<RadioButtonChecked />}
-        //                 label="Chưa đóng"
-        //                 onClick={() => toggleStatus(params.row.id, type)}
-        //                 color="primary"
-        //             />,
-        //         ];
-        //     },
-        //     // hide: tournament.status !== 'Chưa diễn ra',
-        // },
         {
             field: 'pay',
             type: 'actions',
@@ -165,7 +127,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
             flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
-                if (params.row.status == 'Đã đóng') {
+                if (params.row.paymentStatus == 'Đã đóng') {
                     return [
                         <GridActionsCellItem
                             icon={<RadioButtonChecked />}
@@ -193,7 +155,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
             flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
-                if (params.row.status == 'Đã đóng') {
+                if (params.row.paymentStatus == 'Đã đóng') {
                     return [
                         <GridActionsCellItem
                             icon={<RadioButtonUnchecked />}
@@ -226,9 +188,11 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
     const updateUserPayment = async (id) => {
         try {
             if (type === 1) {
-                await adminTournamentAPI.updateTournamentOrganizingCommitteePaymentStatus(id);
+                const response = await adminTournamentAPI.updateTournamentOrganizingCommitteePaymentStatus(id);
+                enqueueSnackbar(response.message, { variant: 'success' });
             } else {
-                await adminTournamentAPI.updateTournamentPlayerPaymentStatus(id);
+                const response = await adminTournamentAPI.updateTournamentPlayerPaymentStatus(id);
+                enqueueSnackbar(response.message, { variant: 'success' });
             }
         } catch (error) {
             console.log('không thể cập nhật trạng thái đóng tiền');
@@ -248,7 +212,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                         <GridToolbarQuickFilter />
                         {/* <GridToolbarFilterButton /> */}
                     </Box>
-                    <Button
+                    {/* <Button
                         startIcon={<Assessment />}
                         size="small"
                         sx={{ marginLeft: 'auto', marginRight: '1rem' }}
@@ -256,7 +220,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                         to={`report/${type}`}
                     >
                         Lịch sử đóng tiền sự kiện
-                    </Button>
+                    </Button>*/}
                 </GridToolbarContainer>
             </Fragment>
         );

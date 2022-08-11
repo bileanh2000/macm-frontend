@@ -1,92 +1,18 @@
-import {
-    Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    IconButton,
-    Paper,
-    Tooltip,
-    Typography,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-
-import { Link, useNavigate } from 'react-router-dom';
-
+import { Fragment } from 'react';
+import { Box, Paper, Typography } from '@mui/material';
 import moment from 'moment';
+import { EmojiEvents } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
-import CelebrationIcon from '@mui/icons-material/Celebration';
-import { Fragment, useCallback, useState } from 'react';
-import { useSnackbar } from 'notistack';
-
-function EventItem({ data, onSuccess }) {
-    const [eventOnclick, SetEventOnclick] = useState({ name: '', id: '' });
-    const [openDialog, setOpenDialog] = useState(false);
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
+function TournamentItem({ data }) {
     let navigator = useNavigate();
-
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-    };
-    const handleOpenDialog = () => {
-        setOpenDialog(true);
-    };
-    const handleDelete = useCallback(
-        (id) => () => {
-            handleCloseDialog();
-            setTimeout(() => {
-                eventApi.deleteEvent(id).then((res) => {
-                    if (res.data.length !== 0) {
-                        console.log('delete', res);
-                        console.log('delete', res.data);
-                        enqueueSnackbar(res.message, { variant: 'success' });
-                        handleCloseDialog();
-                        onSuccess && onSuccess(id);
-                    } else {
-                        enqueueSnackbar(res.message, { variant: 'error' });
-                        handleCloseDialog();
-                    }
-                });
-                // const params = { studentId: id, semester: semester };
-                // onSuccess && onSuccess(id);
-                // eventApi.deleteEvent(id).then((res) => {
-                //     console.log('delete', res);
-
-                // });
-            });
-        },
-        [],
-    );
     return (
         <Fragment>
-            <Dialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa sự kiện "${eventOnclick.name}"?`}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        "{eventOnclick.name}" sẽ được xóa khỏi danh sách sự kiện!
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog}>Từ chối</Button>
-                    <Button onClick={handleDelete(eventOnclick.id)} autoFocus>
-                        Đồng ý
-                    </Button>
-                </DialogActions>
-            </Dialog>
             <Box item sx={{ mb: 2 }}>
                 <Paper
                     onClick={(event) => {
                         console.log(data.id);
-                        navigator(`/admin/events/${data.id}`);
+                        navigator(`/admin/tournament/${data.id}`);
                     }}
                     elevation={2}
                     sx={{
@@ -117,12 +43,12 @@ function EventItem({ data, onSuccess }) {
                                     flex: 1,
                                 }}
                             >
-                                {data.status === 'Chưa diễn ra' ? (
-                                    <CelebrationIcon fontSize="large" sx={{ color: '#ffd24d' }} />
-                                ) : data.status === 'Đang diễn ra' ? (
-                                    <CelebrationIcon fontSize="large" sx={{ color: '#6c86c6' }} />
+                                {data.status === 3 ? (
+                                    <EmojiEvents fontSize="large" sx={{ color: '#ffd24d' }} />
+                                ) : data.status === 2 ? (
+                                    <EmojiEvents fontSize="large" sx={{ color: '#6c86c6' }} />
                                 ) : (
-                                    <CelebrationIcon fontSize="large" sx={{ color: '#758a8a' }} />
+                                    <EmojiEvents fontSize="large" sx={{ color: '#758a8a' }} />
                                 )}
                             </Box>
                             <Box>
@@ -147,15 +73,15 @@ function EventItem({ data, onSuccess }) {
                                     >
                                         {moment(new Date(data.startDate)).format('DD/MM/yyyy')}
                                     </Typography>
-                                    <Typography sx={{ fontSize: '14px', lineHeight: '1.2' }}>
+                                    {/* <Typography sx={{ fontSize: '14px', lineHeight: '1.2' }}>
                                         {data.amountPerMemberRegister === 0
                                             ? 'Không thu phí'
                                             : 'Dự kiến ' + data.amountPerMemberRegister.toLocaleString() + ' VND/người'}
-                                    </Typography>
+                                    </Typography> */}
                                 </Box>
                             </Box>
                         </Box>
-                        <Box>
+                        {/* <Box>
                             {data.status === 'Chưa diễn ra' ? (
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     <Tooltip title="Xóa sự kiện">
@@ -172,7 +98,7 @@ function EventItem({ data, onSuccess }) {
                                         </IconButton>
                                     </Tooltip>
 
-                                    {/* <Tooltip title="Chỉnh sửa">
+                                    <Tooltip title="Chỉnh sửa">
                                         <IconButton
                                             aria-label="edit"
                                             component={Link}
@@ -183,12 +109,12 @@ function EventItem({ data, onSuccess }) {
                                         >
                                             <EditIcon />
                                         </IconButton>
-                                    </Tooltip> */}
+                                    </Tooltip>
                                 </Box>
                             ) : (
                                 ''
                             )}
-                        </Box>
+                        </Box> */}
                     </Box>
 
                     {/* <Box sx={{ display: 'flex', mt: 1, justifyContent: 'flex-end' }}>
@@ -216,4 +142,4 @@ function EventItem({ data, onSuccess }) {
     );
 }
 
-export default EventItem;
+export default TournamentItem;

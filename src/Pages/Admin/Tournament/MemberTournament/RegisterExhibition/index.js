@@ -35,7 +35,7 @@ import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
+function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [exhibitionType, setExhibitionType] = useState(0);
@@ -111,6 +111,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess }) {
             const response = await adminTournament.registerTeam(exhibitionType, params);
             let variant = response.message.includes('thành công') ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
+            onChangeData && onChangeData();
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar(error, { variant });

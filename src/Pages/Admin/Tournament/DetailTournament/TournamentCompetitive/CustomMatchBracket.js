@@ -15,6 +15,7 @@ import {
     FormLabel,
     Grid,
     MenuItem,
+    Paper,
     Radio,
     RadioGroup,
     Select,
@@ -28,6 +29,7 @@ import {
     TableRow,
     Tabs,
     TextField,
+    Tooltip,
     Typography,
     useFormControl,
 } from '@mui/material';
@@ -87,20 +89,20 @@ function CustomMatchBracket(params) {
     }, [params.matches]);
 
     const validationSchema = Yup.object().shape({
-        ...(open && {
+        ...(value === 1 && {
             score1: Yup.number()
                 .required('Không được để trống trường này')
                 .typeError('Vui lòng nhập số')
                 .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
         }),
-        ...(open && {
+        ...(value === 1 && {
             score2: Yup.number()
                 .required('Không được để trống trường này')
                 .typeError('Vui lòng nhập số')
                 .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
         }),
-        ...(openUpdateTime && { date: Yup.string().nullable().required('Điền đi') }),
-        ...(openUpdateTime && { startTime: Yup.string().nullable().required('Điền đi') }),
+        ...(value === 0 && { date: Yup.string().nullable().required('Điền đi') }),
+        ...(value === 0 && { startTime: Yup.string().nullable().required('Điền đi') }),
     });
 
     const {
@@ -125,6 +127,8 @@ function CustomMatchBracket(params) {
         }
         setDragItem({ ...match, index: index, round: round, isFirst: isFirst });
         e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', e.target.childNodes[0]);
+        e.dataTransfer.setDragImage(e.target.childNodes[0], 20, 20);
     };
 
     const onDragOver = (e) => {
@@ -184,8 +188,9 @@ function CustomMatchBracket(params) {
             const res = await adminTournament.updateListMatchsPlayer(params);
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
+            params.onChangeData && params.onChangeData();
         } catch (error) {
-            console.log('Khong the update');
+            console.log('Khong the update', error);
         }
     };
     const handleCreateMatches = () => {
@@ -193,8 +198,9 @@ function CustomMatchBracket(params) {
     };
 
     const handleUpdateMatches = () => {
-        console.log(matches[0]);
-        updateListMatchesPlayer(matches[0]);
+        var merged = [].concat.apply([], __matches);
+        console.log(merged);
+        updateListMatchesPlayer(merged);
         setEdit(false);
     };
 
@@ -207,43 +213,29 @@ function CustomMatchBracket(params) {
     };
 
     const handleClickResult = (e, data) => {
-        if (data.firstPlayer == null || data.secondPlayer == null) {
+        if (params.status < 2) {
             return;
         }
-        if (data.status) {
-            return;
+        if (data.firstPlayer == null || data.secondPlayer == null) {
+            setMatch(data);
+            setValue(0);
+        } else {
+            setMatch(data);
+            setValue(1);
         }
         if (!params.matches[params.matches.length - 1].area) {
             return;
         }
-        // if (params.status === 3) {
-        //     if (data.firstPlayer == null || data.secondPlayer == null) {
-        //         return;
-        //     }
-        //     if (data.status) {
-        //         return;
-        //     }
-        //     setMatch(data);
-        //     setOpen(true);
-        // } else if (params.status === 2) {
-        //     if (!params.matches[params.matches.length - 1].area) {
-        //         return;
-        //     }
-        //     setAreaId(data.area);
-        //     setMatch(data);
-        //     setOpenUpdateTime(true);
-        // }
         setAreaId(data.area);
-        setMatch(data);
         setOpen(true);
     };
 
     const handleClose = () => {
         setOpen(false);
-        reset({
-            score1: '',
-            score2: '',
-        });
+        // reset({
+        //     score1: '',
+        //     score2: '',
+        // });
         setWinnerTemp(0);
         setWinner(0);
         handleCloseUpdateTime();
@@ -254,6 +246,7 @@ function CustomMatchBracket(params) {
             const res = await adminTournament.updateResultMatch(params);
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
+            params.onChangeData && params.onChangeData();
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar('khong the cap nhat ket quá', { variant });
@@ -265,6 +258,7 @@ function CustomMatchBracket(params) {
             const res = await adminTournament.updateTimeAndPlaceMatch(matchId, params);
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
+            params.onChangeData && params.onChangeData();
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar('khong the cap nhat thoi gian', { variant });
@@ -307,10 +301,10 @@ function CustomMatchBracket(params) {
             var merged = [].concat.apply([], __matches);
             params.onUpdateResult(merged);
             setOpen(false);
-            reset({
-                score1: '',
-                score2: '',
-            });
+            // reset({
+            //     score1: '',
+            //     score2: '',
+            // });
         }
     };
 
@@ -335,125 +329,125 @@ function CustomMatchBracket(params) {
                 id={`simple-tabpanel-${index}`}
                 aria-labelledby={`simple-tab-${index}`}
             >
-                <TableContainer sx={{ maxHeight: 440 }}>
-                    <Table stickyHeader aria-label="sticky table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell align="center">Tên cầu thủ</TableCell>
-                                <TableCell align="center">Điểm số</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            <TableRow>
-                                <TableCell>
-                                    {match.firstPlayer.studentName} - {match.firstPlayer.studentId}
-                                </TableCell>
-                                <TableCell>
-                                    <Controller
-                                        name="score1"
-                                        variant="outlined"
-                                        defaultValue=""
-                                        control={control}
-                                        render={({
-                                            field: { onChange, value, onBlur },
-                                            fieldState: { error, invalid },
-                                        }) => (
-                                            <NumberFormat
+                {match && (
+                    <>
+                        <TableContainer sx={{ maxHeight: 440 }}>
+                            <Table stickyHeader aria-label="sticky table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell align="center">Tên cầu thủ</TableCell>
+                                        <TableCell align="center">Điểm số</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell>
+                                            {match.firstPlayer.studentName} - {match.firstPlayer.studentId}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Controller
                                                 name="score1"
-                                                customInput={TextField}
-                                                label="Điểm số"
                                                 variant="outlined"
-                                                defaultValue=""
-                                                value={value}
-                                                onValueChange={(v) => {
-                                                    onChange(Number(v.value));
-                                                }}
-                                                onBlur={(v) => handleChange(1, v.target.value)}
-                                                error={invalid}
-                                                helperText={invalid ? error.message : null}
-                                                fullWidth
+                                                defaultValue={
+                                                    match.firstPlayer.point !== null ? match.firstPlayer.point : ''
+                                                }
+                                                control={control}
+                                                render={({
+                                                    field: { onChange, value, onBlur },
+                                                    fieldState: { error, invalid },
+                                                }) => (
+                                                    <NumberFormat
+                                                        name="score1"
+                                                        customInput={TextField}
+                                                        label="Điểm số"
+                                                        variant="outlined"
+                                                        defaultValue=""
+                                                        value={value}
+                                                        onValueChange={(v) => {
+                                                            onChange(Number(v.value));
+                                                        }}
+                                                        onBlur={(v) => handleChange(1, v.target.value)}
+                                                        error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        fullWidth
+                                                    />
+                                                )}
                                             />
-                                        )}
-                                    />
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell>
-                                    {match.secondPlayer.studentName} - {match.secondPlayer.studentId}
-                                </TableCell>
-                                <TableCell>
-                                    <Controller
-                                        name="score2"
-                                        variant="outlined"
-                                        defaultValue=""
-                                        control={control}
-                                        render={({
-                                            field: { onChange, value, onBlur },
-                                            fieldState: { error, invalid },
-                                        }) => (
-                                            <NumberFormat
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>
+                                            {match.secondPlayer.studentName} - {match.secondPlayer.studentId}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Controller
                                                 name="score2"
-                                                customInput={TextField}
-                                                label="Điểm số"
                                                 variant="outlined"
-                                                defaultValue=""
-                                                value={value}
-                                                onValueChange={(v) => {
-                                                    onChange(Number(v.value));
-                                                }}
-                                                onBlur={(v) => handleChange(2, v.target.value)}
-                                                error={invalid}
-                                                helperText={invalid ? error.message : null}
-                                                fullWidth
+                                                defaultValue={
+                                                    match.secondPlayer.point !== null ? match.secondPlayer.point : ''
+                                                }
+                                                control={control}
+                                                render={({
+                                                    field: { onChange, value, onBlur },
+                                                    fieldState: { error, invalid },
+                                                }) => (
+                                                    <NumberFormat
+                                                        name="score2"
+                                                        customInput={TextField}
+                                                        label="Điểm số"
+                                                        variant="outlined"
+                                                        defaultValue=""
+                                                        value={value}
+                                                        onValueChange={(v) => {
+                                                            onChange(Number(v.value));
+                                                        }}
+                                                        onBlur={(v) => handleChange(2, v.target.value)}
+                                                        error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        fullWidth
+                                                    />
+                                                )}
                                             />
-                                        )}
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <Box>
+                            <FormControl>
+                                <FormLabel id="demo-form-control-label-placement">Xác nhận người chiến thắng</FormLabel>
+                                <RadioGroup
+                                    row
+                                    aria-labelledby="demo-form-control-label-placement"
+                                    name="position"
+                                    defaultValue="top"
+                                    value={winnerTemp}
+                                    // onChange={handleChangeWinner}
+                                >
+                                    <FormControlLabel
+                                        value={match.firstPlayer.studentId}
+                                        control={<Radio />}
+                                        label={match.firstPlayer.studentName}
+                                        labelPlacement="start"
+                                        sx={{ mr: 1 }}
                                     />
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                {/* {score1 > score2 ? (
-                    <Typography>
-                        Nguời chiến thắng: {match.firstPlayer.studentName} - {winnerTemp}{' '}
-                    </Typography>
-                ) : score1 < score2 ? (
-                    <Typography>Nguời chiến thắng: {match.secondPlayer.studentName} </Typography>
-                ) : (
-                    ''
-                )} */}
-                <Box>
-                    <FormControl>
-                        <FormLabel id="demo-form-control-label-placement">Xác nhận người chiến thắng</FormLabel>
-                        <RadioGroup
-                            row
-                            aria-labelledby="demo-form-control-label-placement"
-                            name="position"
-                            defaultValue="top"
-                            value={winnerTemp}
-                            // onChange={handleChangeWinner}
-                        >
-                            <FormControlLabel
-                                value={match.firstPlayer.studentId}
-                                control={<Radio />}
-                                label={match.firstPlayer.studentName}
-                                labelPlacement="start"
-                                sx={{ mr: 1 }}
-                            />
-                            <FormControlLabel
-                                value={match.secondPlayer.studentId}
-                                control={<Radio />}
-                                label={match.secondPlayer.studentName}
-                                sx={{ ml: 1 }}
-                            />
-                        </RadioGroup>
-                    </FormControl>
-                    {winnerTemp !== winner.studentId && winner != 0 && (
-                        <Typography variant="body1" sx={{ color: 'red' }}>
-                            Người chiến thắng bạn chọn không trùng với kết quả, bạn có muốn tiếp tục lưu điểm số?
-                        </Typography>
-                    )}
-                </Box>
+                                    <FormControlLabel
+                                        value={match.secondPlayer.studentId}
+                                        control={<Radio />}
+                                        label={match.secondPlayer.studentName}
+                                        sx={{ ml: 1 }}
+                                    />
+                                </RadioGroup>
+                            </FormControl>
+                            {winnerTemp !== winner.studentId && winner != 0 && (
+                                <Typography variant="body1" sx={{ color: 'red' }}>
+                                    Người chiến thắng bạn chọn không trùng với kết quả, bạn có muốn tiếp tục lưu điểm
+                                    số?
+                                </Typography>
+                            )}
+                        </Box>
+                    </>
+                )}
             </Box>
         );
     };
@@ -467,7 +461,7 @@ function CustomMatchBracket(params) {
                 aria-labelledby={`simple-tab-${index}`}
             >
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                    <Grid container spacing={3} columns={12}>
+                    <Grid container spacing={3} columns={12} sx={{ mt: 2, alignItems: 'flex-end' }}>
                         <Grid item xs={12} sm={4}>
                             <FormControl size="medium">
                                 <Typography variant="caption">Sân thi đấu</Typography>
@@ -554,37 +548,41 @@ function CustomMatchBracket(params) {
     return (
         <Fragment>
             <Dialog fullWidth maxWidth="lg" open={open}>
-                {match && (
-                    <div>
-                        <DialogTitle>Xác nhận người chiến thắng</DialogTitle>
-                        <DialogContent>
-                            <Box sx={{ width: '100%' }}>
-                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                                    <Tabs
-                                        value={value}
-                                        onChange={handleChangeTab}
-                                        variant="scrollable"
-                                        scrollButtons="auto"
-                                        aria-label="basic tabs example"
-                                    >
-                                        <Tab label="Thời gian và địa điểm" {...a11yProps(0)} />
+                <div>
+                    <DialogTitle>
+                        {value == 0 ? 'Thời gian và địa điểm thi đấu' : 'Xác nhận người chiến thắng'}
+                    </DialogTitle>
+                    <DialogContent>
+                        <Box sx={{ width: '100%' }}>
+                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                <Tabs
+                                    value={value}
+                                    onChange={handleChangeTab}
+                                    variant="scrollable"
+                                    scrollButtons="auto"
+                                    aria-label="basic tabs example"
+                                >
+                                    <Tab label="Thời gian và địa điểm" {...a11yProps(0)} />
+                                    {match && match.firstPlayer !== null && match.secondPlayer !== null && (
                                         <Tab label="Điểm số" {...a11yProps(1)} />
-                                    </Tabs>
-                                </Box>
-                                <UpdateTime value={value} index={0} />
-                                <UpdateScore value={value} index={1} />
+                                    )}
+                                </Tabs>
                             </Box>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleClose}>Quay lại</Button>
-                            {value == 1 ? (
-                                <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
-                            ) : (
-                                <Button onClick={handleSubmit(handleUpdateTime)}>Đồng ý</Button>
+                            <UpdateTime value={value} index={0} />
+                            {match && match.firstPlayer !== null && match.secondPlayer !== null && (
+                                <UpdateScore value={value} index={1} />
                             )}
-                        </DialogActions>
-                    </div>
-                )}
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>Quay lại</Button>
+                        {value == 1 ? (
+                            <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
+                        ) : (
+                            <Button onClick={handleSubmit(handleUpdateTime)}>Đồng ý</Button>
+                        )}
+                    </DialogActions>
+                </div>
             </Dialog>
             {params.status === 3 && <Typography variant="caption">*Chọn vào 1 cặp trận để cập nhật tỉ số</Typography>}
             {params.status === 2 && params.matches[params.matches.length - 1].area && (
@@ -594,143 +592,199 @@ function CustomMatchBracket(params) {
             )}
             {params.status === 0 ? (
                 !params.isCreate ? (
-                    <Box>
+                    <Paper sx={{ p: 2 }}>
+                        <Typography variant="caption">
+                            Bảng đấu này chỉ là tạm thời, và có thể thay đổi được trước khi giải đấu bắt đầu
+                        </Typography>
                         {!isEdit ? (
-                            <Button onClick={() => setEdit(true)}>Chỉnh sửa bảng đấu</Button>
+                            <Typography variant="caption" component={Box}>
+                                Bấm chỉnh sửa để chỉnh sửa thứ tự thi đấu
+                                <Button variant="outlined" onClick={() => setEdit(true)} sx={{ ml: 2 }}>
+                                    Chỉnh sửa bảng đấu
+                                </Button>
+                            </Typography>
                         ) : (
-                            <Button onClick={handleUpdateMatches}>Xác nhận</Button>
+                            <Typography variant="caption" component={Box}>
+                                Kéo thả thứ tự thi đấu của vận động viên để cập nhật vị trí
+                                <Button variant="outlined" onClick={handleUpdateMatches} sx={{ ml: 2 }}>
+                                    Xác nhận
+                                </Button>
+                            </Typography>
                         )}
-                    </Box>
+                    </Paper>
                 ) : (
-                    <Button onClick={handleCreateMatches}>Tạo bảng đấu</Button>
+                    <Paper sx={{ p: 2 }}>
+                        <Typography variant="caption">
+                            Danh sách thi đấu có sự thay đổi, bấm tạo để có thể cập nhật số lượng tuyển thủ
+                        </Typography>
+                        <Button variant="outlined" onClick={handleCreateMatches}>
+                            Tạo bảng đấu
+                        </Button>
+                    </Paper>
                 )
             ) : (
                 ''
             )}
-            <Box className={cx('tournament-bracket', 'tournament-bracket--rounded')} sx={{ mt: 2, mb: 2 }}>
-                {matches.map((matchs, index) => (
-                    <div className={cx('tournament-bracket__round')} key={index}>
-                        <h3 className={cx('tournament-bracket__round-title')}>
-                            Trận{' '}
-                            {index == matches.length - 1
-                                ? 'tranh hạng 3'
-                                : index == matches.length - 2
-                                ? 'chung kết'
-                                : index == matches.length - 3
-                                ? 'bán kết'
-                                : index + 1}
-                        </h3>
-                        <ul className={cx('tournament-bracket__list')}>
-                            {matchs.map((match, i) =>
-                                index === 0 || index === 1 ? (
-                                    <li
-                                        className={cx(
-                                            'tournament-bracket__item',
-                                            (match.firstPlayer && match.secondPlayer) || index === 1 ? '' : 'hidden',
-                                        )}
-                                        key={match.id}
-                                        onClick={(e) => handleClickResult(e, match)}
-                                    >
-                                        <Box sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}>
-                                            <div>
-                                                <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                            </div>
-                                            <div
-                                                className={cx('tournament-bracket__match', isEdit ? 'draggable' : '')}
-                                                draggable={isEdit ? true : false}
-                                                onDragOver={(e) => onDragOver(e)}
-                                                onDragStart={(e) =>
-                                                    onDragStart(e, { firstPlayer: match.firstPlayer }, i, index, 0)
-                                                }
-                                                onDragEnd={() => onDragEnd()}
-                                                onDrop={(e) =>
-                                                    onDragDrop(e, { firstPlayer: match.firstPlayer }, i, index, 0)
-                                                }
-                                                onClick={(e) => handleClickWinner(e, match.firstPlayer)}
+            <Paper sx={{ overflow: 'auto', maxHeight: '80vh', mt: 2 }}>
+                <Box className={cx('tournament-bracket', 'tournament-bracket--rounded')} sx={{ mt: 2, mb: 2 }}>
+                    {matches.map((matchs, index) => (
+                        <div className={cx('tournament-bracket__round')} key={index}>
+                            <h3 className={cx('tournament-bracket__round-title')}>
+                                Trận{' '}
+                                {index == matches.length - 1
+                                    ? 'tranh hạng 3'
+                                    : index == matches.length - 2
+                                    ? 'chung kết'
+                                    : index == matches.length - 3
+                                    ? 'bán kết'
+                                    : index + 1}
+                            </h3>
+                            <ul className={cx('tournament-bracket__list')}>
+                                {matchs.map((match, i) =>
+                                    index === 0 || index === 1 ? (
+                                        <li
+                                            className={cx(
+                                                'tournament-bracket__item',
+                                                (match.firstPlayer && match.secondPlayer) || index === 1
+                                                    ? ''
+                                                    : 'hidden',
+                                            )}
+                                            key={match.id}
+                                        >
+                                            <Box
+                                                sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}
+                                                onClick={(e) => handleClickResult(e, match)}
                                             >
-                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                    <small>{match.firstPlayer?.studentName}</small>
-                                                </Box>
-                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                    <small>{match.firstPlayer?.point}</small>
-                                                </Box>
-                                            </div>
-                                            <div
-                                                className={cx('tournament-bracket__match', isEdit ? 'draggable' : '')}
-                                                draggable={isEdit ? true : false}
-                                                onDragOver={(e) => onDragOver(e)}
-                                                onDragStart={(e) =>
-                                                    onDragStart(e, { secondPlayer: match.secondPlayer }, i, index, 1)
-                                                }
-                                                onDragEnd={() => onDragEnd()}
-                                                onDrop={(e) =>
-                                                    onDragDrop(e, { secondPlayer: match.secondPlayer }, i, index, 1)
-                                                }
-                                                onClick={(e) => handleClickWinner(e, match.secondPlayer)}
+                                                <div>
+                                                    <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
+                                                </div>
+                                                {/* <Tooltip
+                                                    title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
+                                                > */}
+                                                <div
+                                                    className={cx(
+                                                        'tournament-bracket__match',
+                                                        isEdit ? 'draggable' : '',
+                                                    )}
+                                                    draggable={isEdit ? true : false}
+                                                    onDragOver={(e) => onDragOver(e)}
+                                                    onDragStart={(e) =>
+                                                        onDragStart(e, { firstPlayer: match.firstPlayer }, i, index, 0)
+                                                    }
+                                                    onDragEnd={() => onDragEnd()}
+                                                    onDrop={(e) =>
+                                                        onDragDrop(e, { firstPlayer: match.firstPlayer }, i, index, 0)
+                                                    }
+                                                    onClick={(e) => handleClickWinner(e, match.firstPlayer)}
+                                                >
+                                                    <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                        <small>{match.firstPlayer?.studentName}</small>
+                                                    </Box>
+                                                    <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                        <small>{match.firstPlayer?.point}</small>
+                                                    </Box>
+                                                </div>
+                                                {/* </Tooltip> */}
+                                                {/* <Tooltip
+                                                    title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
+                                                > */}
+                                                <div
+                                                    className={cx(
+                                                        'tournament-bracket__match',
+                                                        isEdit ? 'draggable' : '',
+                                                    )}
+                                                    draggable={isEdit ? true : false}
+                                                    onDragOver={(e) => onDragOver(e)}
+                                                    onDragStart={(e) =>
+                                                        onDragStart(
+                                                            e,
+                                                            { secondPlayer: match.secondPlayer },
+                                                            i,
+                                                            index,
+                                                            1,
+                                                        )
+                                                    }
+                                                    onDragEnd={() => onDragEnd()}
+                                                    onDrop={(e) =>
+                                                        onDragDrop(e, { secondPlayer: match.secondPlayer }, i, index, 1)
+                                                    }
+                                                    onClick={(e) => handleClickWinner(e, match.secondPlayer)}
+                                                >
+                                                    <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                        <small>{match.secondPlayer?.studentName}</small>
+                                                    </Box>
+                                                    <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                        <small>{match.secondPlayer?.point}</small>
+                                                    </Box>
+                                                </div>
+                                                {/* </Tooltip> */}
+
+                                                <div>
+                                                    <small>
+                                                        {match.time
+                                                            ? 'Thời gian: ' +
+                                                              moment(match.time).format('hh:mm -- DD-MM')
+                                                            : ''}
+                                                    </small>
+                                                </div>
+                                            </Box>
+                                        </li>
+                                    ) : (
+                                        <li className={cx('tournament-bracket__item')} key={match.id}>
+                                            <Box
+                                                sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}
+                                                onClick={(e) => handleClickResult(e, match)}
                                             >
-                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                    <small>{match.secondPlayer?.studentName}</small>
-                                                </Box>
-                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                    <small>{match.secondPlayer?.point}</small>
-                                                </Box>
-                                            </div>
-                                            <div>
-                                                <small>
-                                                    {match.time
-                                                        ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
-                                                        : ''}
-                                                </small>
-                                            </div>
-                                        </Box>
-                                    </li>
-                                ) : (
-                                    <li
-                                        className={cx('tournament-bracket__item')}
-                                        key={match.id}
-                                        onClick={(e) => handleClickResult(e, match)}
-                                    >
-                                        <Box sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}>
-                                            <div>
-                                                <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                            </div>
-                                            <div
-                                                className={cx('tournament-bracket__match')}
-                                                onClick={(e) => handleClickWinner(e, match.firstPlayer)}
-                                            >
-                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                    <small>{match.firstPlayer?.studentName}</small>
-                                                </Box>
-                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                    <small>{match.firstPlayer?.point}</small>
-                                                </Box>
-                                            </div>
-                                            <div
-                                                className={cx('tournament-bracket__match')}
-                                                onClick={(e) => handleClickWinner(e, match.secondPlayer)}
-                                            >
-                                                <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                    <small>{match.secondPlayer?.studentName}</small>
-                                                </Box>
-                                                <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                    <small>{match.secondPlayer?.point}</small>
-                                                </Box>
-                                            </div>
-                                            <div>
-                                                <small>
-                                                    {match.time
-                                                        ? 'Thời gian: ' + moment(match.time).format('hh:mm -- DD-MM')
-                                                        : ''}
-                                                </small>
-                                            </div>
-                                        </Box>
-                                    </li>
-                                ),
-                            )}
-                        </ul>
-                    </div>
-                ))}
-            </Box>
+                                                <div>
+                                                    <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
+                                                </div>
+                                                {/* <Tooltip
+                                                    title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
+                                                > */}
+                                                <div
+                                                    className={cx('tournament-bracket__match')}
+                                                    onClick={(e) => handleClickWinner(e, match.firstPlayer)}
+                                                >
+                                                    <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                        <small>{match.firstPlayer?.studentName}</small>
+                                                    </Box>
+                                                    <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                        <small>{match.firstPlayer?.point}</small>
+                                                    </Box>
+                                                </div>
+                                                {/* </Tooltip>
+                                                <Tooltip
+                                                    title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
+                                                > */}
+                                                <div
+                                                    className={cx('tournament-bracket__match')}
+                                                    onClick={(e) => handleClickWinner(e, match.secondPlayer)}
+                                                >
+                                                    <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                        <small>{match.secondPlayer?.studentName}</small>
+                                                    </Box>
+                                                    <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                        <small>{match.secondPlayer?.point}</small>
+                                                    </Box>
+                                                </div>
+                                                {/* </Tooltip> */}
+                                                <div>
+                                                    <small>
+                                                        {match.time
+                                                            ? 'Thời gian: ' +
+                                                              moment(match.time).format('hh:mm -- DD-MM')
+                                                            : ''}
+                                                    </small>
+                                                </div>
+                                            </Box>
+                                        </li>
+                                    ),
+                                )}
+                            </ul>
+                        </div>
+                    ))}
+                </Box>
+            </Paper>
         </Fragment>
     );
 }

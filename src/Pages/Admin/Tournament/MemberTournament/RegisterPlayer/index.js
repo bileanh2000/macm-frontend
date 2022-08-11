@@ -34,7 +34,7 @@ import { Delete } from '@mui/icons-material';
 import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
 
-function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
+function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [player, setPlayer] = useState([]);
@@ -44,6 +44,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
     const [minWeight, setMinWeight] = useState();
     const [maxWeight, setMaxWeight] = useState();
     const [allMember, setAllMember] = useState();
+    const [isRender, setIsRender] = useState(true);
 
     // const validationSchema = Yup.object().shape({
     //     weight: Yup.number()
@@ -96,6 +97,8 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
             const response = await adminTournament.addNewCompetitivePlayer(tournamentId, studentId, weight);
             let variant = response.data.length > 0 ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
+            onChangeData && onChangeData();
+            setIsRender(true);
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar(error, { variant });
@@ -130,9 +133,9 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
         addNewCompetitivePlayer(weightRange, player);
         const newPlayer = player.map((p) => {
             return {
+                id: p.id,
                 tournamentPlayer: { user: { gender: p.gender, name: p.name, studentId: p.studentId } },
                 weight: 0,
-
                 competitiveType: { weightMax: maxWeight, weightMin: minWeight },
             };
         });
@@ -163,8 +166,9 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess }) {
     }, [tournamentId]);
 
     useEffect(() => {
-        getAllMember(weightRange);
-    }, [weightRange]);
+        isRender && getAllMember(weightRange);
+        setIsRender(false);
+    }, [weightRange, allMember, isRender]);
 
     return (
         <Dialog

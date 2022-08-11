@@ -3,7 +3,7 @@ import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { styled } from '@mui/material/styles';
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 
 function MemberList({ data }) {
     const [pageSize, setPageSize] = useState(10);
@@ -72,51 +72,51 @@ function MemberList({ data }) {
         //         );
         //     },
         // },
-        {
-            field: 'paymentStatus',
-            headerName: 'Đóng tiền',
-            flex: 0.5,
-            renderCell: (cellValues) => {
-                return (
-                    <Button
-                        sx={{
-                            // borderRadius: '5px',
-                            ...(cellValues.row.paymentStatus === 'Đã đóng'
-                                ? {
-                                      backgroundColor: '#00AD31',
-                                      boxShadow: 'none',
-                                      width: '112px',
-                                      '&:hover': {
-                                          backgroundColor: '#00AD31',
-                                          boxShadow: 'none',
-                                      },
-                                      '&:active': {
-                                          boxShadow: 'none',
-                                          backgroundColor: '#00AD31',
-                                      },
-                                  }
-                                : {
-                                      backgroundColor: '#ff3838',
-                                      boxShadow: 'none',
-                                      width: '112px',
-                                      '&:hover': {
-                                          backgroundColor: '#ff3838',
-                                          boxShadow: 'none',
-                                      },
-                                      '&:active': {
-                                          boxShadow: 'none',
-                                          backgroundColor: '#ff3838',
-                                      },
-                                  }),
-                        }}
-                        variant="contained"
-                        color="primary"
-                    >
-                        {cellValues.row.paymentStatus}
-                    </Button>
-                );
-            },
-        },
+        // {
+        //     field: 'paymentStatus',
+        //     headerName: 'Đóng tiền',
+        //     flex: 0.5,
+        //     renderCell: (cellValues) => {
+        //         return (
+        //             <Button
+        //                 sx={{
+        //                     // borderRadius: '5px',
+        //                     ...(cellValues.row.paymentStatus === 'Đã đóng'
+        //                         ? {
+        //                               backgroundColor: '#00AD31',
+        //                               boxShadow: 'none',
+        //                               width: '112px',
+        //                               '&:hover': {
+        //                                   backgroundColor: '#00AD31',
+        //                                   boxShadow: 'none',
+        //                               },
+        //                               '&:active': {
+        //                                   boxShadow: 'none',
+        //                                   backgroundColor: '#00AD31',
+        //                               },
+        //                           }
+        //                         : {
+        //                               backgroundColor: '#ff3838',
+        //                               boxShadow: 'none',
+        //                               width: '112px',
+        //                               '&:hover': {
+        //                                   backgroundColor: '#ff3838',
+        //                                   boxShadow: 'none',
+        //                               },
+        //                               '&:active': {
+        //                                   boxShadow: 'none',
+        //                                   backgroundColor: '#ff3838',
+        //                               },
+        //                           }),
+        //                 }}
+        //                 variant="contained"
+        //                 color="primary"
+        //             >
+        //                 {cellValues.row.paymentStatus}
+        //             </Button>
+        //         );
+        //     },
+        // },
     ];
 
     const rowsUser =
@@ -130,7 +130,7 @@ function MemberList({ data }) {
             container['attendanceStatus'] = item.attendanceStatus ? 'Đã đăng kí' : 'Đã hủy';
             container['role'] = item.roleEventDto.name;
             container['roleInClub'] = item.roleInClub;
-            container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
+            // container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
             return container;
         });
 
@@ -141,10 +141,15 @@ function MemberList({ data }) {
                     sx={{
                         p: 0.5,
                         pb: 0,
+                        display: 'flex',
+                        alignItems: 'center',
                     }}
                 >
                     <GridToolbarQuickFilter />
                 </Box>
+                <Typography variant="button" color="initial" sx={{ marginLeft: 'auto', marginRight: '1rem' }}>
+                    Tổng thành viên tham gia: {rowsUser.length}
+                </Typography>
             </GridToolbarContainer>
         );
     }
