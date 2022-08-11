@@ -127,6 +127,8 @@ function CustomMatchBracket(params) {
         }
         setDragItem({ ...match, index: index, round: round, isFirst: isFirst });
         e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', e.target.childNodes[0]);
+        e.dataTransfer.setDragImage(e.target.childNodes[0], 20, 20);
     };
 
     const onDragOver = (e) => {
@@ -184,11 +186,11 @@ function CustomMatchBracket(params) {
     const updateListMatchesPlayer = async (params) => {
         try {
             const res = await adminTournament.updateListMatchsPlayer(params);
-            params.onChangeData();
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
+            params.onChangeData && params.onChangeData();
         } catch (error) {
-            console.log('Khong the update');
+            console.log('Khong the update', error);
         }
     };
     const handleCreateMatches = () => {
@@ -196,8 +198,9 @@ function CustomMatchBracket(params) {
     };
 
     const handleUpdateMatches = () => {
-        console.log(matches[0]);
-        updateListMatchesPlayer(matches[0]);
+        var merged = [].concat.apply([], __matches);
+        console.log(merged);
+        updateListMatchesPlayer(merged);
         setEdit(false);
     };
 
@@ -229,10 +232,10 @@ function CustomMatchBracket(params) {
 
     const handleClose = () => {
         setOpen(false);
-        reset({
-            score1: '',
-            score2: '',
-        });
+        // reset({
+        //     score1: '',
+        //     score2: '',
+        // });
         setWinnerTemp(0);
         setWinner(0);
         handleCloseUpdateTime();
@@ -241,9 +244,9 @@ function CustomMatchBracket(params) {
     const updateResult = async (params) => {
         try {
             const res = await adminTournament.updateResultMatch(params);
-            params.onChangeData();
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
+            params.onChangeData && params.onChangeData();
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar('khong the cap nhat ket quá', { variant });
@@ -253,9 +256,9 @@ function CustomMatchBracket(params) {
     const updateTimeAndPlace = async (matchId, params) => {
         try {
             const res = await adminTournament.updateTimeAndPlaceMatch(matchId, params);
-            params.onChangeData();
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
+            params.onChangeData && params.onChangeData();
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar('khong the cap nhat thoi gian', { variant });
@@ -298,10 +301,10 @@ function CustomMatchBracket(params) {
             var merged = [].concat.apply([], __matches);
             params.onUpdateResult(merged);
             setOpen(false);
-            reset({
-                score1: '',
-                score2: '',
-            });
+            // reset({
+            //     score1: '',
+            //     score2: '',
+            // });
         }
     };
 
@@ -345,7 +348,9 @@ function CustomMatchBracket(params) {
                                             <Controller
                                                 name="score1"
                                                 variant="outlined"
-                                                defaultValue=""
+                                                defaultValue={
+                                                    match.firstPlayer.point !== null ? match.firstPlayer.point : ''
+                                                }
                                                 control={control}
                                                 render={({
                                                     field: { onChange, value, onBlur },
@@ -378,7 +383,9 @@ function CustomMatchBracket(params) {
                                             <Controller
                                                 name="score2"
                                                 variant="outlined"
-                                                defaultValue=""
+                                                defaultValue={
+                                                    match.secondPlayer.point !== null ? match.secondPlayer.point : ''
+                                                }
                                                 control={control}
                                                 render={({
                                                     field: { onChange, value, onBlur },
@@ -651,84 +658,66 @@ function CustomMatchBracket(params) {
                                                 <div>
                                                     <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
                                                 </div>
-                                                <Tooltip
+                                                {/* <Tooltip
                                                     title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
+                                                > */}
+                                                <div
+                                                    className={cx(
+                                                        'tournament-bracket__match',
+                                                        isEdit ? 'draggable' : '',
+                                                    )}
+                                                    draggable={isEdit ? true : false}
+                                                    onDragOver={(e) => onDragOver(e)}
+                                                    onDragStart={(e) =>
+                                                        onDragStart(e, { firstPlayer: match.firstPlayer }, i, index, 0)
+                                                    }
+                                                    onDragEnd={() => onDragEnd()}
+                                                    onDrop={(e) =>
+                                                        onDragDrop(e, { firstPlayer: match.firstPlayer }, i, index, 0)
+                                                    }
+                                                    onClick={(e) => handleClickWinner(e, match.firstPlayer)}
                                                 >
-                                                    <div
-                                                        className={cx(
-                                                            'tournament-bracket__match',
-                                                            isEdit ? 'draggable' : '',
-                                                        )}
-                                                        draggable={isEdit ? true : false}
-                                                        onDragOver={(e) => onDragOver(e)}
-                                                        onDragStart={(e) =>
-                                                            onDragStart(
-                                                                e,
-                                                                { firstPlayer: match.firstPlayer },
-                                                                i,
-                                                                index,
-                                                                0,
-                                                            )
-                                                        }
-                                                        onDragEnd={() => onDragEnd()}
-                                                        onDrop={(e) =>
-                                                            onDragDrop(
-                                                                e,
-                                                                { firstPlayer: match.firstPlayer },
-                                                                i,
-                                                                index,
-                                                                0,
-                                                            )
-                                                        }
-                                                        onClick={(e) => handleClickWinner(e, match.firstPlayer)}
-                                                    >
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.firstPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.firstPlayer?.point}</small>
-                                                        </Box>
-                                                    </div>
-                                                </Tooltip>
-                                                <Tooltip
+                                                    <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                        <small>{match.firstPlayer?.studentName}</small>
+                                                    </Box>
+                                                    <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                        <small>{match.firstPlayer?.point}</small>
+                                                    </Box>
+                                                </div>
+                                                {/* </Tooltip> */}
+                                                {/* <Tooltip
                                                     title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
+                                                > */}
+                                                <div
+                                                    className={cx(
+                                                        'tournament-bracket__match',
+                                                        isEdit ? 'draggable' : '',
+                                                    )}
+                                                    draggable={isEdit ? true : false}
+                                                    onDragOver={(e) => onDragOver(e)}
+                                                    onDragStart={(e) =>
+                                                        onDragStart(
+                                                            e,
+                                                            { secondPlayer: match.secondPlayer },
+                                                            i,
+                                                            index,
+                                                            1,
+                                                        )
+                                                    }
+                                                    onDragEnd={() => onDragEnd()}
+                                                    onDrop={(e) =>
+                                                        onDragDrop(e, { secondPlayer: match.secondPlayer }, i, index, 1)
+                                                    }
+                                                    onClick={(e) => handleClickWinner(e, match.secondPlayer)}
                                                 >
-                                                    <div
-                                                        className={cx(
-                                                            'tournament-bracket__match',
-                                                            isEdit ? 'draggable' : '',
-                                                        )}
-                                                        draggable={isEdit ? true : false}
-                                                        onDragOver={(e) => onDragOver(e)}
-                                                        onDragStart={(e) =>
-                                                            onDragStart(
-                                                                e,
-                                                                { secondPlayer: match.secondPlayer },
-                                                                i,
-                                                                index,
-                                                                1,
-                                                            )
-                                                        }
-                                                        onDragEnd={() => onDragEnd()}
-                                                        onDrop={(e) =>
-                                                            onDragDrop(
-                                                                e,
-                                                                { secondPlayer: match.secondPlayer },
-                                                                i,
-                                                                index,
-                                                                1,
-                                                            )
-                                                        }
-                                                        onClick={(e) => handleClickWinner(e, match.secondPlayer)}
-                                                    >
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.secondPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.secondPlayer?.point}</small>
-                                                        </Box>
-                                                    </div>
-                                                </Tooltip>
+                                                    <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                        <small>{match.secondPlayer?.studentName}</small>
+                                                    </Box>
+                                                    <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                        <small>{match.secondPlayer?.point}</small>
+                                                    </Box>
+                                                </div>
+                                                {/* </Tooltip> */}
 
                                                 <div>
                                                     <small>
@@ -749,36 +738,36 @@ function CustomMatchBracket(params) {
                                                 <div>
                                                     <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
                                                 </div>
-                                                <Tooltip
+                                                {/* <Tooltip
                                                     title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
+                                                > */}
+                                                <div
+                                                    className={cx('tournament-bracket__match')}
+                                                    onClick={(e) => handleClickWinner(e, match.firstPlayer)}
                                                 >
-                                                    <div
-                                                        className={cx('tournament-bracket__match')}
-                                                        onClick={(e) => handleClickWinner(e, match.firstPlayer)}
-                                                    >
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.firstPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.firstPlayer?.point}</small>
-                                                        </Box>
-                                                    </div>
-                                                </Tooltip>
+                                                    <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                        <small>{match.firstPlayer?.studentName}</small>
+                                                    </Box>
+                                                    <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                        <small>{match.firstPlayer?.point}</small>
+                                                    </Box>
+                                                </div>
+                                                {/* </Tooltip>
                                                 <Tooltip
                                                     title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
+                                                > */}
+                                                <div
+                                                    className={cx('tournament-bracket__match')}
+                                                    onClick={(e) => handleClickWinner(e, match.secondPlayer)}
                                                 >
-                                                    <div
-                                                        className={cx('tournament-bracket__match')}
-                                                        onClick={(e) => handleClickWinner(e, match.secondPlayer)}
-                                                    >
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.secondPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.secondPlayer?.point}</small>
-                                                        </Box>
-                                                    </div>
-                                                </Tooltip>
+                                                    <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                        <small>{match.secondPlayer?.studentName}</small>
+                                                    </Box>
+                                                    <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                        <small>{match.secondPlayer?.point}</small>
+                                                    </Box>
+                                                </div>
+                                                {/* </Tooltip> */}
                                                 <div>
                                                     <small>
                                                         {match.time

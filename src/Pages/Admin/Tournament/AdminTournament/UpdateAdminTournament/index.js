@@ -18,7 +18,7 @@ import { useSnackbar } from 'notistack';
 
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 
-function UpdateAdminTournament({ value, index }) {
+function UpdateAdminTournament({ value, index, onChange }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
@@ -49,6 +49,7 @@ function UpdateAdminTournament({ value, index }) {
             console.log(res);
             console.log(res.data);
             enqueueSnackbar(res.message, { variant: 'success' });
+            onChange && onChange();
         });
         setOpenDialog(false);
         // navigate(-1);
@@ -58,24 +59,23 @@ function UpdateAdminTournament({ value, index }) {
         try {
             const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
             console.log(response);
-            const newUser = response.data.filter((user) => user.registerStatus === 'Đã chấp nhận');
-            setAdminList(newUser);
+            // const newUser = response.data.filter((user) => user.registerStatus === 'Đã chấp nhận');
+            setAdminList(response.data);
         } catch (error) {
             console.log('Failed to fetch admin list: ', error);
         }
     };
 
-    const fetchRolesInTournament = async () => {
-        try {
-            const response = await adminTournamentAPI.getAllOrginizingCommitteeRole();
-            console.log(response.data);
-            setRoles(response.data);
-        } catch (error) {
-            console.log('Không thể lấy danh sách vai trò  trong giải đấu, error: ', error);
-        }
-    };
-
     useEffect(() => {
+        const fetchRolesInTournament = async () => {
+            try {
+                const response = await adminTournamentAPI.getAllOrginizingCommitteeRole(tournamentId);
+                console.log(response.data);
+                setRoles(response.data);
+            } catch (error) {
+                console.log('Không thể lấy danh sách vai trò  trong giải đấu, error: ', error);
+            }
+        };
         fetchAdminInTournament(tournamentId);
         fetchRolesInTournament();
     }, [tournamentId]);
@@ -227,11 +227,18 @@ function UpdateAdminTournament({ value, index }) {
                 sx={{
                     height: '70vh',
                     width: '100%',
-                    '& .role-edit::before': {
+                    '& .role-edit::after': {
                         // backgroundColor: 'red !important',
                         content: "'\\270E'",
                         // color: 'red',
                         fontSize: '1.2rem',
+                    },
+                    '& .role-edit:hover': {
+                        // backgroundColor: '#655151 !important',
+                        border: '1px dashed #655151',
+                        // content: "'\\270E'",
+                        // // color: 'red',
+                        // fontSize: '1.2rem',
                     },
                 }}
             >

@@ -215,7 +215,10 @@ function TournamentCompetitive() {
                         onUpdateResult={UpdateResultHandler}
                         isCreate={isCreate}
                         onCreateMatches={handleDialogCreate}
-                        onChangeData={() => setIsRender(true)}
+                        onChangeData={() => {
+                            console.log('render data bracket');
+                            return setIsRender(true);
+                        }}
                     />
                 </div>
             ) : tournamentStatus == 1 ? (

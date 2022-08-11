@@ -23,8 +23,8 @@ const userTournamentAPI = {
             params: { exhibitionTypeId: params.exhibitionTypeId, teamName: params.teamName },
         });
     },
-    getAllOrginizingCommitteeRole: () => {
-        const url = '/tournament/headclub/getallorganizingcommitteerole';
+    getAllOrginizingCommitteeRole: (tournamentId) => {
+        const url = `/tournament/headclub/getallorganizingcommitteerole/${tournamentId}`;
         return axiosClient.get(url);
     },
     getAllUserCompetitivePlayer: (tournamentId, studentId) => {

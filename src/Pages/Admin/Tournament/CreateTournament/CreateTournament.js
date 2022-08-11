@@ -1,24 +1,18 @@
 import {
-    Alert,
+    Autocomplete,
     Box,
     Button,
     Collapse,
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
-    Divider,
     Fab,
     FormControlLabel,
     Grid,
     IconButton,
-    Input,
     InputAdornment,
-    InputLabel,
-    MenuItem,
     Paper,
-    Snackbar,
     Step,
     StepLabel,
     Stepper,
@@ -33,13 +27,10 @@ import {
     Typography,
 } from '@mui/material';
 import { Fragment, useEffect, useState } from 'react';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
-import { styled } from '@mui/material/styles';
 import * as Yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import NumberFormat from 'react-number-format';
-import facilityApi from 'src/api/facilityApi';
 import { DatePicker, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
@@ -48,7 +39,6 @@ import { useSnackbar } from 'notistack';
 import { Add, Delete } from '@mui/icons-material';
 import { useRef } from 'react';
 
-import eventApi from 'src/api/eventApi';
 import PreviewSchedule from './PreviewSchedule';
 import adminTournament from 'src/api/adminTournamentAPI';
 import FightingCompetition from './FightingCompetition';
@@ -56,12 +46,11 @@ import PerformanceCompetition from './PerformanceCompetition';
 import { useNavigate } from 'react-router-dom';
 
 const steps = ['Thông tin sự kiện', 'Thêm vai trò BTC', 'Nội dung thi đấu', 'Thêm chi phí', 'Thêm lịch', 'Xem trước'];
-const eventRoles = [{ id: 1, name: 'hehe' }];
 
-function CreateTournament({ title, children, isOpen, handleClose, onSucess }) {
+function CreateTournament({ title, children, isOpen, handleClose, onSucess, roles }) {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [activeStep, setActiveStep] = useState(0);
-    const [description, setDescription] = useState('');
+    // const [description, setDescription] = useState('');
     const [skipped, setSkipped] = useState(new Set());
     const [isChecked, setIsChecked] = useState(false);
     const [datas, setDatas] = useState([]);
@@ -94,7 +83,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess }) {
     };
 
     const isStepOptional = (step) => {
-        return step === 2 || step === 1;
+        return step === 2; // cho phep nhap sau
     };
 
     const isStepSkipped = (step) => {
@@ -139,6 +128,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess }) {
         ...(activeStep === 0
             ? {
                   name: Yup.string().required('Không được để trống trường này'),
+                  description: Yup.string().required('Không được để trống trường này'),
               }
             : activeStep === 1
             ? {
@@ -397,6 +387,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess }) {
 
         return container;
     });
+
     /**
      * Revalidate form after step changed
      */
@@ -659,6 +650,8 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess }) {
                                     rows={4}
                                     defaultValue=""
                                     {...register('description')}
+                                    error={errors.description ? true : false}
+                                    helperText={errors.description?.message}
                                 />
                             </>
                         ) : activeStep === 1 ? (
@@ -701,15 +694,36 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess }) {
                                             <Grid container spacing={2} sx={{ p: 2 }}>
                                                 <Grid item xs={12} container spacing={2}>
                                                     <Grid item xs={6}>
-                                                        <TextField
-                                                            id="outlined-basic"
-                                                            label="Tên vai trò"
-                                                            variant="outlined"
-                                                            fullWidth
-                                                            {...register('roleName')}
-                                                            error={errors.roleName ? true : false}
-                                                            helperText={errors.roleName?.message}
-                                                        />
+                                                        {roles.length > 0 ? (
+                                                            <Autocomplete
+                                                                id="free-solo-demo"
+                                                                freeSolo
+                                                                options={roles}
+                                                                getOptionLabel={(option) => {
+                                                                    console.log(option);
+                                                                    return option.name;
+                                                                }}
+                                                                renderInput={(params) => (
+                                                                    <TextField
+                                                                        {...params}
+                                                                        label="Tên vai trò"
+                                                                        {...register('roleName')}
+                                                                        error={errors.roleName ? true : false}
+                                                                        helperText={errors.roleName?.message}
+                                                                    />
+                                                                )}
+                                                            />
+                                                        ) : (
+                                                            <TextField
+                                                                id="outlined-basic"
+                                                                label="Tên vai trò"
+                                                                variant="outlined"
+                                                                fullWidth
+                                                                {...register('roleName')}
+                                                                error={errors.roleName ? true : false}
+                                                                helperText={errors.roleName?.message}
+                                                            />
+                                                        )}
                                                     </Grid>
                                                     <Grid item xs={6}>
                                                         <TextField
@@ -815,6 +829,11 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess }) {
                                             id="outlined-basic"
                                             label="Số người dự kiến tham gia ban tổ chức"
                                             variant="outlined"
+                                            defaultValue={
+                                                datas.length > 0
+                                                    ? datas.reduce((total, data) => total + data.maxQuantity, 0)
+                                                    : ''
+                                            }
                                             fullWidth
                                             {...register('numOfOrganizingCommitee')}
                                             error={errors.numOfOrganizingCommitee ? true : false}

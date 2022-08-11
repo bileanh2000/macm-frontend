@@ -28,7 +28,7 @@ import userTournamentAPI from 'src/api/userTournamentAPI';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 
-function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user }) {
+function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [admin, setAdmin] = useState([]);
@@ -52,6 +52,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user }) {
         try {
             const response = await adminTournament.addListOrganizingCommittee(user.studentId, tournamentId, admin);
             enqueueSnackbar(response.message, { variant: response.data ? 'success' : 'error' });
+            onChange && onChange();
         } catch (error) {}
     };
 
@@ -246,7 +247,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user }) {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
-            <DialogTitle id="alert-dialog-title">Thêm thành viên vào giải đấu</DialogTitle>
+            <DialogTitle id="alert-dialog-title">Thêm thành viên vào ban tổ chức</DialogTitle>
             <DialogContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', m: 2 }}>
                     {allMember && <AddAdmin data={admin} onAddPlayer={AddPlayerHandler} allMember={allMember} />}
@@ -270,11 +271,18 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user }) {
                                     sx={{
                                         height: '60vh',
                                         width: '100%',
-                                        '& .role-edit::before': {
+                                        '& .role-edit::after': {
                                             // backgroundColor: 'red !important',
                                             content: "'\\270E'",
                                             // color: 'red',
                                             fontSize: '1.2rem',
+                                        },
+                                        '& .role-edit:hover': {
+                                            // backgroundColor: '#655151 !important',
+                                            border: '1px dashed #655151',
+                                            // content: "'\\270E'",
+                                            // // color: 'red',
+                                            // fontSize: '1.2rem',
                                         },
                                     }}
                                 >

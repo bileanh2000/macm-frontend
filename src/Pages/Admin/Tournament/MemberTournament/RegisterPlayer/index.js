@@ -44,6 +44,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData }) {
     const [minWeight, setMinWeight] = useState();
     const [maxWeight, setMaxWeight] = useState();
     const [allMember, setAllMember] = useState();
+    const [isRender, setIsRender] = useState(true);
 
     // const validationSchema = Yup.object().shape({
     //     weight: Yup.number()
@@ -97,6 +98,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData }) {
             let variant = response.data.length > 0 ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
             onChangeData && onChangeData();
+            setIsRender(true);
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar(error, { variant });
@@ -131,9 +133,9 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData }) {
         addNewCompetitivePlayer(weightRange, player);
         const newPlayer = player.map((p) => {
             return {
+                id: p.id,
                 tournamentPlayer: { user: { gender: p.gender, name: p.name, studentId: p.studentId } },
                 weight: 0,
-
                 competitiveType: { weightMax: maxWeight, weightMin: minWeight },
             };
         });
@@ -164,8 +166,9 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData }) {
     }, [tournamentId]);
 
     useEffect(() => {
-        getAllMember(weightRange);
-    }, [weightRange]);
+        isRender && getAllMember(weightRange);
+        setIsRender(false);
+    }, [weightRange, allMember, isRender]);
 
     return (
         <Dialog

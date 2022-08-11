@@ -40,6 +40,7 @@ function Tournament() {
     const [commonList, setCommonList] = useState([]);
     const calendarComponentRef = useRef(null);
     const [openDialogCreate, setOpenDialogCreate] = useState(false);
+    const [suggestionRole, setSuggestionRole] = useState([]);
 
     const handleChange = (event) => {
         setSemester(event.target.value);
@@ -52,6 +53,16 @@ function Tournament() {
     const calendarFilter = (date) => {
         let calApi = calendarComponentRef.current.getApi();
         calApi.gotoDate(date);
+    };
+
+    const getAllSuggestionRole = async () => {
+        try {
+            const response = await adminTournamentAPI.getAllSuggestionRole();
+            console.log(response);
+            setSuggestionRole(response.data);
+        } catch (error) {
+            console.warn('Failed to get all suggestion role', error);
+        }
     };
 
     const getListTournamentBySemester = async (params, status) => {
@@ -104,6 +115,7 @@ function Tournament() {
 
     useEffect(() => {
         fetchSemester();
+        getAllSuggestionRole();
     }, []);
 
     const handleCloseDialog = () => {
@@ -184,6 +196,7 @@ function Tournament() {
             </Dialog>
             <CreateTournament
                 title="Tạo giải đấu"
+                roles={suggestionRole}
                 isOpen={openDialogCreate}
                 handleClose={() => {
                     setOpenDialogCreate(false);
