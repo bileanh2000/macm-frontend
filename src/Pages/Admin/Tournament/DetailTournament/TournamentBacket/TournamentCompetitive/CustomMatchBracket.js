@@ -81,9 +81,9 @@ function CustomMatchBracket(params) {
         setAreaId(event.target.value);
     };
 
-    // useEffect(() => {
-    //     setMatches(__matches);
-    // }, [__matches]);
+    useEffect(() => {
+        setMatches(__matches);
+    }, [params.matches]);
 
     const validationSchema = Yup.object().shape({
         ...(value === 1 && {
