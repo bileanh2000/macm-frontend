@@ -128,7 +128,22 @@ function Home() {
                                     </Typography>
 
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <CustomPersentStatus
+                                        {memberReport[1] === undefined ? (
+                                            <CustomPersentStatus persent={0} />
+                                        ) : (
+                                            <CustomPersentStatus
+                                                persent={
+                                                    memberReport[1] &&
+                                                    Math.floor(
+                                                        (memberReport[0].totalNumberUserInSemester /
+                                                            memberReport[1].totalNumberUserInSemester) *
+                                                            100 -
+                                                            100,
+                                                    )
+                                                }
+                                            />
+                                        )}
+                                        {/* <CustomPersentStatus
                                             persent={
                                                 memberReport[0] &&
                                                 Math.floor(
@@ -138,7 +153,7 @@ function Home() {
                                                         100,
                                                 )
                                             }
-                                        />
+                                        /> */}
                                         <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
                                             so với kỳ trước
                                         </Typography>
