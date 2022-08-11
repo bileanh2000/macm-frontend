@@ -43,6 +43,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import UpdateTournamentOverview from './EventOverview/UpdateEventOverview';
 import { useSnackbar } from 'notistack';
+import EventFee from './EventFee';
 // import AdminTournament from '../AdminTournament';
 // import MemberTournament from '../MemberTournament';
 
@@ -293,10 +294,10 @@ function EventDetails() {
                             <TabPanel value={value} index={3}>
                                 <MenberEvent />
                             </TabPanel>
-                            {/* <TabPanel value={value} index={4}>
-                                <AdminTournament isUpdate={isUpdate} user={user} />
+                            <TabPanel value={value} index={4}>
+                                <EventFee event={tournament} isUpdate={isUpdate} user={user} />
                             </TabPanel>
-                            <TabPanel value={value} index={5}>
+                            {/*<TabPanel value={value} index={5}>
                                 <MemberTournament tournament={tournament} isUpdate={isUpdate} />
                             </TabPanel> */}
                         </Container>

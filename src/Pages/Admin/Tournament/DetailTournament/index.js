@@ -32,11 +32,10 @@ import NumberFormat from 'react-number-format';
 
 import TournamentOverview from './TournamentOverview';
 import TournamentSchedule from './TournamentSchedule';
-import TournamentCompetitive from './TournamentCompetitive';
-import TournamentExhibition from './TournamentExhibition';
 import AdminTournament from '../AdminTournament';
 import MemberTournament from '../MemberTournament';
 import TournamentFee from './TournamentFee';
+import TournamentBacket from './TournamentBacket';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -222,8 +221,7 @@ function DetailTournament() {
                                     <Tab label="Chi phí" {...a11yProps(2)} value={2} />
                                     <Tab label="Danh sách ban tổ chức" {...a11yProps(3)} value={3} />
                                     <Tab label="Danh sách người chơi" {...a11yProps(4)} value={4} />
-                                    <Tab label="Bảng đấu đối kháng" {...a11yProps(5)} value={5} />
-                                    <Tab label="Bảng đấu biểu diễn" {...a11yProps(6)} value={6} />
+                                    <Tab label="Bảng đấu" {...a11yProps(5)} value={5} />
                                 </Tabs>
                             </Box>
                         </Container>
@@ -255,10 +253,7 @@ function DetailTournament() {
                                 />
                             </TabPanel>
                             <TabPanel value={value} index={5}>
-                                <TournamentCompetitive tournamentStatus={tournament.status} />
-                            </TabPanel>
-                            <TabPanel value={value} index={6}>
-                                <TournamentExhibition tournamentStatus={tournament.status} />
+                                <TournamentBacket tournamentStatus={tournament.status} />
                             </TabPanel>
                         </Container>
                     </Paper>

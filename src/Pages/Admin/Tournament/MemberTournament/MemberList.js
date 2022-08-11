@@ -230,7 +230,7 @@ function MemberList({ data, type, onChange }) {
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
             .min(39, 'Vui lòng nhập giá trị lớn hơn 39 Kg')
-            .max(85, 'Vui lòng nhập giá trị nhỏ hơn 85 Kg'),
+            .max(120, 'Vui lòng nhập giá trị cân nặng thực tế'),
     });
     const {
         register,
@@ -282,7 +282,7 @@ function MemberList({ data, type, onChange }) {
                 <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     Xác nhận
                 </DialogTitle>
-                <DialogContent>Bạn có chắc chắn muốn xóa người chơi này</DialogContent>
+                <DialogContent>Bạn có chắc chắn muốn xóa vận động viên này</DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDelete}>Hủy</Button>
                     <Button onClick={handleConfirmDelete} autoFocus>
@@ -313,7 +313,7 @@ function MemberList({ data, type, onChange }) {
                         <TextField
                             type="number"
                             id="outlined-basic"
-                            label="Vui lòng nhập hạng cân của bạn"
+                            label="Vui lòng nhập hạng cân vận động viên"
                             variant="outlined"
                             fullWidth
                             {...register('weight')}
