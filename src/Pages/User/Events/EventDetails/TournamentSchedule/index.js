@@ -210,7 +210,7 @@ function TournamentSchedule({ isUpdate }) {
 
     return (
         <Box sx={{ mt: 1, mb: 2, height: '35rem', display: 'flex', flexDirection: 'column' }}>
-            {!isUpdate && (
+            {/* {!isUpdate && (
                 <Box component="div" sx={{ mb: 2 }}>
                     <Button
                         variant="outlined"
@@ -225,7 +225,7 @@ function TournamentSchedule({ isUpdate }) {
                         {isEdit ? '*Để chỉnh sửa, vui lòng chọn 1 ngày trên lịch' : ''}
                     </Typography>
                 </Box>
-            )}
+            )} */}
 
             {scheduleUpdate && (
                 <Dialog fullWidth maxWidth="lg" open={open}>
