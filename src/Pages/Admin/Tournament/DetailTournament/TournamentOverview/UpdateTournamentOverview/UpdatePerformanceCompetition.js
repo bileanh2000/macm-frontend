@@ -32,11 +32,13 @@ function PerformanceCompetition(props) {
         numberMale: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+            .min(0, 'Vui lòng nhập giá trị lớn hơn 0')
+            .max(1000, 'Vui lòng nhập giá trị phù hợp thực tế'),
         numberFemale: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+            .min(0, 'Vui lòng nhập giá trị lớn hơn 0')
+            .max(1000, 'Vui lòng nhập giá trị phù hợp thực tế'),
     });
 
     const {

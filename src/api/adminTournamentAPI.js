@@ -134,7 +134,7 @@ const adminTournament = {
 
     deleteTournamentOrganizingCommittee: (tournamentOrganizingCommitteeId) => {
         const url = `/tournament/headclub/deletetournamentorganizingcommittee/${tournamentOrganizingCommitteeId}`;
-        return axiosClient.get(url);
+        return axiosClient.delete(url);
     },
 
     declineRequestToJoinOrganizingCommittee: (organizingCommitteeId) => {
@@ -196,6 +196,13 @@ const adminTournament = {
 
     ///////////////////////////
 
+    spawnTimeAndArea: (tournamentId) => {
+        const url = `/tournament/headclub/spawntimeandarea/${tournamentId}`;
+        return axiosClient.post(url);
+    },
+
+    ///////
+
     listUserNotJoinCompetitive: (tournamentId) => {
         const url = `competitive/headclub/listusernotjoincompetitive/${tournamentId}`;
         return axiosClient.get(url);
@@ -253,10 +260,10 @@ const adminTournament = {
         return axiosClient.put(url, params);
     },
 
-    spawnTimeAndArea: (tournamentId) => {
-        const url = `/competitive/headclub/spawntimeandarea/${tournamentId}`;
-        return axiosClient.post(url);
-    },
+    // spawnTimeAndArea: (tournamentId) => {
+    //     const url = `/competitive/headclub/spawntimeandarea/${tournamentId}`;
+    //     return axiosClient.post(url);
+    // },
 
     getAllArea: () => {
         const url = `/area/headclub/getallarea`;
@@ -298,10 +305,10 @@ const adminTournament = {
         return axiosClient.post(url, params.listStudentId, { params: { name: params.teamName } });
     },
 
-    spawnTimeAndAreaEx: (tournamentId) => {
-        const url = `/exhibition/headclub/spawntimeandarea/${tournamentId}`;
-        return axiosClient.post(url);
-    },
+    // spawnTimeAndAreaEx: (tournamentId) => {
+    //     const url = `/exhibition/headclub/spawntimeandarea/${tournamentId}`;
+    //     return axiosClient.post(url);
+    // },
     updateExhibitionResult: (exhibitionTeamId, score) => {
         const url = `/exhibition/headclub/updateexhibitionresult/${exhibitionTeamId}`;
         return axiosClient.put(url, null, { params: { score: score } });

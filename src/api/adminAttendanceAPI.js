@@ -35,7 +35,7 @@ const adminAttendanceAPI = {
 
     takeAttendanceEvent: (eventId, studentId, status) => {
         const url = `/event/headculture/takeattendanceevent/${eventId}/${studentId}`;
-        return axiosClient.get(url, { params: { status: status } });
+        return axiosClient.put(url, { params: { status: status } });
     },
 
     getEventSessionByDate: (date) => {
