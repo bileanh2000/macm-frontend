@@ -11,10 +11,10 @@ import { useSnackbar } from 'notistack';
 import moment from 'moment';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 
-const LIMIT_DATE = 1; //day
+const LIMIT_TIME = 1; //HOURS
 const TIME_OUT = 100000; //ms
 
-function QRScanner() {
+function QRScanner({ activityData, activityType }) {
     const { enqueueSnackbar } = useSnackbar();
     const [attendanceMessages, setAttendanceMessages] = useState('');
     const [qrStatus, setQrStatus] = useState(true);
@@ -58,24 +58,33 @@ function QRScanner() {
         return () => clearTimeout(timer);
     }, []);
 
+    useEffect(() => {
+        let setupTime = localStorage.getItem('setupTime');
+        if (setupTime == null) {
+            localStorage.setItem('setupTime', now);
+        } else {
+            if (now - setupTime > LIMIT_TIME * 60 * 60 * 1000) {
+                localStorage.removeItem('attendanced');
+                localStorage.removeItem('setupTime');
+                localStorage.setItem('setupTime', now);
+            }
+        }
+    });
+
     const reload = () => {
         window.location.reload();
     };
-    const takeAttendance = async (studentId, status) => {
+    const takeAttendance = async (studentId) => {
         try {
-            const response = await adminAttendanceAPI.takeAttendance(studentId, status);
+            let response;
+            if (!activityType) {
+                response = await adminAttendanceAPI.takeAttendance(studentId, activityData.id, 1);
+            } else {
+                response = await adminAttendanceAPI.takeAttendanceEvent(activityData.id, studentId, 1);
+            }
             // const response = await userApi.updateUserStatus(studentId);
 
             let localData = [];
-            let setupTime = localStorage.getItem('setupTime');
-            if (setupTime == null) {
-                localStorage.setItem('setupTime', now);
-            } else {
-                if (now - setupTime > LIMIT_DATE) {
-                    localStorage.clear();
-                    localStorage.setItem('setupTime', now);
-                }
-            }
 
             localData = JSON.parse(localStorage.getItem('attendanced')) || [];
             if (localData.length === 0) {
@@ -112,6 +121,7 @@ function QRScanner() {
     const onQrSuccess = (result, error) => {
         if (!!result) {
             audioPlayer.current.play();
+
             try {
                 let JSONResult = JSON.parse(result?.text);
                 let attendancedLocal = JSON.parse(localStorage.getItem('attendanced')) || [];
@@ -132,7 +142,7 @@ function QRScanner() {
 
                     // setTest('Đã điểm danh cho thằng ' + JSONResult.studentId + 'rồi!');
                 } else if (JSONResult.studentId !== undefined) {
-                    takeAttendance(JSONResult.studentId, 1);
+                    takeAttendance(JSONResult.studentId);
                 } else {
                     enqueueSnackbar('Mã QR không hợp hệ', {
                         variant: 'error',
@@ -157,6 +167,8 @@ function QRScanner() {
     };
     return (
         <Fragment>
+            {activityData.id}
+            {activityType}
             <Dialog
                 open={!isSessionTime}
                 onClose={handleReset}
@@ -176,7 +188,7 @@ function QRScanner() {
             <Typography variant="h6" color="initial" sx={{ lineHeight: 1 }}>
                 Điểm danh cho buổi tập ngày: {moment(now).format('DD/MM/YYYY')}
             </Typography>
-            <button onClick={handleClickVariant('hehehe', 'success')}>hien len di dmm</button>
+            {/* <button onClick={handleClickVariant('hehehe', 'success')}>hien len di dmm</button> */}
 
             <audio ref={audioPlayer} src={qrSuccessSound} />
             {isSessionTime ? (
@@ -222,9 +234,9 @@ function QRScanner() {
                 )}
                 <Typography sx={{ fontWeight: 500 }}>{attendanceMessages}</Typography>
             </Box>
-            <Typography variant="body1" color="initial">
+            {/* <Typography variant="body1" color="initial">
                 {JSON.stringify(test)}
-            </Typography>
+            </Typography> */}
         </Fragment>
     );
 }
