@@ -74,6 +74,7 @@ function DetailTournament() {
     const [scheduleList, setScheduleList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [value, setValue] = useState(0);
+    const [isRender, setIsRender] = useState(true);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -92,16 +93,18 @@ function DetailTournament() {
     //         console.log('Failed to fetch admin list: ', error);
     //     }
     // };
-
     const getTournamentById = async (tournamentId) => {
         try {
             const response = await adminTournamentAPI.getTournamentById(tournamentId);
             console.log(response.data);
             setTournament(response.data[0]);
+
+            setIsRender(false);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
     };
+
     const fetchTournamentSchedule = async (params) => {
         try {
             const response = await adminTournamentAPI.getTournamentSchedule(params);
@@ -113,10 +116,10 @@ function DetailTournament() {
     };
 
     useEffect(() => {
-        getTournamentById(tournamentId);
+        isRender && getTournamentById(tournamentId);
         fetchTournamentSchedule(tournamentId);
         window.scrollTo({ behavior: 'smooth', top: '0px' });
-    }, [tournamentId]);
+    }, [tournamentId, tournament, isRender]);
 
     const scheduleData = scheduleList.map((item) => {
         const container = {};
@@ -253,7 +256,7 @@ function DetailTournament() {
                                 />
                             </TabPanel>
                             <TabPanel value={value} index={5}>
-                                <TournamentBacket tournamentStatus={tournament.status} />
+                                <TournamentBacket tournament={tournament} tournamentStatus={tournament.status} />
                             </TabPanel>
                         </Container>
                     </Paper>

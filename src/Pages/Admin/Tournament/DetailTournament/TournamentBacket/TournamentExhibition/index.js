@@ -7,7 +7,7 @@ import moment from 'moment';
 import adminTournament from 'src/api/adminTournamentAPI';
 import TableMatch from './TableMatch';
 
-function TournamentExhibition({ tournamentStatus, reload }) {
+function TournamentExhibition({ reload }) {
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
 
     let { tournamentId } = useParams();
@@ -15,7 +15,7 @@ function TournamentExhibition({ tournamentStatus, reload }) {
     const [exhibitionType, setExhibitionType] = useState(0);
     const [exhibitionTeam, setExhibitionTeam] = useState([]);
     const [listExhibitionType, setListExhibitionType] = useState([]);
-    // const [tournamentStatus, setTournamentStatus] = useState(-1);
+    const [tournamentStatus, setTournamentStatus] = useState();
 
     const handleChangeExhibitionType = (event) => {
         console.log(event.target.value);
@@ -37,7 +37,7 @@ function TournamentExhibition({ tournamentStatus, reload }) {
             setListExhibitionType(response.data);
             setExhibitionType(response.data[0].id);
             getExhibitionResult(response.data[0].id, nowDate);
-            // setTournamentStatus(response.code);
+            setTournamentStatus(response.data[0].status);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -124,7 +124,7 @@ function TournamentExhibition({ tournamentStatus, reload }) {
             </Box>
             {exhibitionTeam && exhibitionTeam.length > 0 ? (
                 <div>
-                    {tournamentStatus == 2 ? (
+                    {/* {tournamentStatus == 2 ? (
                         exhibitionTeam[0].area ? (
                             ''
                         ) : (
@@ -134,7 +134,7 @@ function TournamentExhibition({ tournamentStatus, reload }) {
                         )
                     ) : (
                         ''
-                    )}
+                    )} */}
                     <TableMatch
                         matches={exhibitionTeam}
                         status={tournamentStatus}

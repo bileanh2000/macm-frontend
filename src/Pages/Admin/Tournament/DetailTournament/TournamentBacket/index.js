@@ -42,7 +42,17 @@ function TabPanel(props) {
     );
 }
 
-function TournamentBacket({ tournamentStatus }) {
+function TournamentBacket({ tournament, tournamentStatus }) {
+    let isDisplay = false;
+    if (tournament.competitiveTypes.length > 0 || tournament.exhibitionTypes.length > 0) {
+        const competitiveStatus = tournament.competitiveTypes.map((competitive) => competitive.status);
+        const exhibitionStatus = tournament.exhibitionTypes.map((exhibition) => exhibition.status);
+        isDisplay =
+            competitiveStatus.findIndex((status) => status == 3) >= 0 ||
+            exhibitionStatus.findIndex((status) => status == 3) >= 0;
+        console.log(isDisplay);
+    }
+    console.log(isDisplay);
     const { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [value, setValue] = useState(0);
@@ -139,7 +149,12 @@ function TournamentBacket({ tournamentStatus }) {
                             <Tab label="Đối kháng" {...a11yProps(0)} />
                             <Tab label="Biểu diễn" {...a11yProps(1)} />
                         </Tabs>
-                        <Button variant="outlined" onClick={handleDialogConfirmMatch} sx={{ mb: 2, float: 'right' }}>
+                        <Button
+                            variant="outlined"
+                            onClick={handleDialogConfirmMatch}
+                            sx={{ mb: 2, float: 'right' }}
+                            disabled={isDisplay}
+                        >
                             Cập nhật thời gian thi đấu cho giải đấu
                         </Button>
                     </Box>

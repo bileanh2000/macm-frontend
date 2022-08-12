@@ -1,8 +1,11 @@
-import { Box, Button, FormControl, MenuItem, Select, Typography } from '@mui/material';
+import { Box, Button, FormControl, MenuItem, Paper, Select, Tooltip, Typography } from '@mui/material';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import adminTournament from 'src/api/adminTournamentAPI';
+import Brone from 'src/Components/Common/Material/Brone';
+import Gold from 'src/Components/Common/Material/Gold';
+import Sliver from 'src/Components/Common/Material/Sliver';
 import CustomMatchBracket from './CustomMatchBracket';
 
 function TournamentCompetitive({ competitive }) {
@@ -12,6 +15,7 @@ function TournamentCompetitive({ competitive }) {
     const [listWeightRange, setListWeightRange] = useState([]);
     const [listPlayer, setListPlayer] = useState();
     const [rounds, setRounds] = useState();
+    const [tournamentResult, setTournamentResult] = useState();
     // const [tournamentStatus, setTournamentStatus] = useState(-1);
 
     const handleChangeCompetitiveId = (event) => {
@@ -79,6 +83,34 @@ function TournamentCompetitive({ competitive }) {
                     )}
                 </Box>
             </Box>
+            {tournamentResult != null && (
+                <Paper elevation={3} sx={{ m: 2, p: 2 }}>
+                    <Typography variant="h6">Kết quả bảng đấu</Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Tooltip title="Huy chương vàng">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Gold />
+
+                                <Typography variant="body1">{tournamentResult[0].name}</Typography>
+                            </Box>
+                        </Tooltip>
+                        <Tooltip title="Huy chương bạc">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Sliver />
+
+                                <Typography variant="body1">{tournamentResult[1].name}</Typography>
+                            </Box>
+                        </Tooltip>
+                        <Tooltip title="Huy chương đồng">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Brone />
+
+                                <Typography variant="body1">{tournamentResult[2].name}</Typography>
+                            </Box>
+                        </Tooltip>
+                    </Box>
+                </Paper>
+            )}
 
             {listPlayer && listPlayer.length > 0 ? (
                 <div>
