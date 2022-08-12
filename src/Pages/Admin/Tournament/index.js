@@ -33,14 +33,13 @@ function Tournament() {
     const [tournaments, setTournaments] = useState();
     const [semester, setSemester] = useState('Summer2022');
     const [semesterList, setSemesterList] = useState([]);
-    const [openDialog, setOpenDialog] = useState(false);
     const [openClosedTournament, setOpenClosedTournament] = useState(false);
-    const [tournamentOnclick, setTournamentOnclick] = useState({ name: '', id: '' });
     const [status, setStatus] = useState(0);
     const [commonList, setCommonList] = useState([]);
     const calendarComponentRef = useRef(null);
     const [openDialogCreate, setOpenDialogCreate] = useState(false);
     const [suggestionRole, setSuggestionRole] = useState([]);
+    const [isRender, setIsRender] = useState(true);
 
     const handleChange = (event) => {
         setSemester(event.target.value);
@@ -109,22 +108,15 @@ function Tournament() {
     });
 
     useEffect(() => {
-        getListTournamentBySemester(semester, status);
+        isRender && getListTournamentBySemester(semester, status);
         fetchCommonScheduleBySemester();
-    }, [semester, status]);
+        setIsRender(false);
+    }, [semester, status, tournaments, isRender]);
 
     useEffect(() => {
         fetchSemester();
         getAllSuggestionRole();
     }, []);
-
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-    };
-
-    const handleOpenDialog = () => {
-        setOpenDialog(true);
-    };
 
     const handleOpenDialogTournament = () => {
         setOpenClosedTournament(true);
@@ -134,42 +126,8 @@ function Tournament() {
         setOpenClosedTournament(false);
     };
 
-    const handleDelete = useCallback(
-        (id) => () => {
-            handleCloseDialog();
-            setTimeout(() => {
-                // const params = { studentId: id, semester: semester };
-                adminTournamentAPI.deleteTournament(id).then((res) => {
-                    setTournaments((prev) => prev.filter((item) => item.id !== id));
-                    console.log('delete', res);
-                    console.log('delete', res.data);
-                });
-            });
-        },
-        [],
-    );
-
     return (
         <Box sx={{ m: 1, p: 1 }}>
-            <Dialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa sự kiện "${tournamentOnclick.name}"?`}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        "{tournamentOnclick.name}" sẽ được xóa khỏi danh sách sự kiện!
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog}>Từ chối</Button>
-                    <Button onClick={handleDelete(tournamentOnclick.id)} autoFocus>
-                        Đồng ý
-                    </Button>
-                </DialogActions>
-            </Dialog>
             <Dialog
                 open={openClosedTournament}
                 onClose={handleCloseDialogTournament}
@@ -183,7 +141,13 @@ function Tournament() {
                     {tournaments && tournaments.filter((t) => t.status === 1).length > 0 ? (
                         tournaments
                             .filter((t) => t.status === 1)
-                            .map((tournament) => <TournamentItem key={tournament.id} data={tournament} />)
+                            .map((tournament) => (
+                                <TournamentItem
+                                    key={tournament.id}
+                                    data={tournament}
+                                    onSuccess={() => setIsRender(true)}
+                                />
+                            ))
                     ) : (
                         <DialogContentText>Không có sự kiện đã kết thúc</DialogContentText>
                     )}
@@ -270,7 +234,11 @@ function Tournament() {
                                     {tournaments
                                         .filter((t) => t.status === 2)
                                         .map((tournament) => (
-                                            <TournamentItem key={tournament.id} data={tournament} />
+                                            <TournamentItem
+                                                key={tournament.id}
+                                                data={tournament}
+                                                onSuccess={() => setIsRender(true)}
+                                            />
                                         ))}
                                 </Paper>
                             ) : (
@@ -284,7 +252,11 @@ function Tournament() {
                                     {tournaments
                                         .filter((t) => t.status === 3)
                                         .map((tournament) => (
-                                            <TournamentItem key={tournament.id} data={tournament} />
+                                            <TournamentItem
+                                                key={tournament.id}
+                                                data={tournament}
+                                                onSuccess={() => setIsRender(true)}
+                                            />
                                         ))}
                                 </Paper>
                             ) : (

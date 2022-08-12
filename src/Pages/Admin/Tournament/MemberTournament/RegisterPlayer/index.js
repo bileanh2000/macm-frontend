@@ -61,6 +61,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
             const response = await adminTournament.listUserNotJoinCompetitive(weightRange);
             console.log(response.data);
             setAllMember(response.data);
+            // setIsRender(true);
         } catch (error) {
             console.log('khong the lay data');
         }

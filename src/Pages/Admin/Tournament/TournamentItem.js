@@ -1,13 +1,79 @@
-import { Fragment } from 'react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Fragment, useCallback, useState } from 'react';
+import {
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    IconButton,
+    Paper,
+    Tooltip,
+    Typography,
+} from '@mui/material';
 import moment from 'moment';
-import { EmojiEvents } from '@mui/icons-material';
+import { Delete, EmojiEvents } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
-function TournamentItem({ data }) {
+import adminTournament from 'src/api/adminTournamentAPI';
+
+function TournamentItem({ data, onSuccess }) {
     let navigator = useNavigate();
+    const [tournamentOnclick, SetTournamentOnclick] = useState({ name: '', id: '' });
+    const [openDialog, setOpenDialog] = useState(false);
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
+    };
+    const handleDelete = useCallback(
+        (id) => () => {
+            handleCloseDialog();
+            setTimeout(() => {
+                adminTournament.deleteTournament(id).then((res) => {
+                    if (res.data.length !== 0) {
+                        console.log('delete', res);
+                        console.log('delete', res.data);
+                        enqueueSnackbar(res.message, { variant: 'success' });
+                        handleCloseDialog();
+                        onSuccess && onSuccess();
+                    } else {
+                        enqueueSnackbar(res.message, { variant: 'error' });
+                        handleCloseDialog();
+                    }
+                });
+            });
+        },
+        [],
+    );
+
     return (
         <Fragment>
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa sự kiện "${tournamentOnclick.name}"?`}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        "{tournamentOnclick.name}" sẽ được xóa khỏi danh sách sự kiện!
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>Từ chối</Button>
+                    <Button onClick={handleDelete(tournamentOnclick.id)} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <Box item sx={{ mb: 2 }}>
                 <Paper
                     onClick={(event) => {
@@ -81,24 +147,24 @@ function TournamentItem({ data }) {
                                 </Box>
                             </Box>
                         </Box>
-                        {/* <Box>
-                            {data.status === 'Chưa diễn ra' ? (
+                        <Box>
+                            {data.status === 3 ? (
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Tooltip title="Xóa sự kiện">
+                                    <Tooltip title="Xóa giải đấu">
                                         <IconButton
                                             aria-label="delete"
                                             onClick={(event) => {
                                                 handleOpenDialog();
-                                                SetEventOnclick({ name: data.name, id: data.id });
+                                                SetTournamentOnclick({ name: data.name, id: data.id });
                                                 event.preventDefault();
                                                 event.stopPropagation();
                                             }}
                                         >
-                                            <DeleteIcon />
+                                            <Delete />
                                         </IconButton>
                                     </Tooltip>
 
-                                    <Tooltip title="Chỉnh sửa">
+                                    {/* <Tooltip title="Chỉnh sửa">
                                         <IconButton
                                             aria-label="edit"
                                             component={Link}
@@ -109,12 +175,12 @@ function TournamentItem({ data }) {
                                         >
                                             <EditIcon />
                                         </IconButton>
-                                    </Tooltip>
+                                    </Tooltip> */}
                                 </Box>
                             ) : (
                                 ''
                             )}
-                        </Box> */}
+                        </Box>
                     </Box>
 
                     {/* <Box sx={{ display: 'flex', mt: 1, justifyContent: 'flex-end' }}>

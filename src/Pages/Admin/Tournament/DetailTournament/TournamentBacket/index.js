@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -47,11 +47,22 @@ function TournamentBacket({ tournamentStatus }) {
     const { enqueueSnackbar } = useSnackbar();
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(false);
+    const [tournamentResult, setTournamentResult] = useState();
     const [isRender, setIsRender] = useState(false);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    // const gettournamentresult = async () => {
+    //     try {
+    //         const response = await adminTournament.getTournamentResult(tournamentId);
+    //         console.log('result', response.data);
+    //         setTournamentResult([]);
+    //     } catch (error) {
+    //         console.warn('Failed to get tournament result', error);
+    //     }
+    // };
 
     const spawnTimeAndArea = async () => {
         try {
@@ -63,6 +74,19 @@ function TournamentBacket({ tournamentStatus }) {
         }
     };
 
+    useEffect(() => {
+        const getTournamentResult = async () => {
+            try {
+                const response = await adminTournament.getTournamentResult(tournamentId);
+                console.log('result', response.data);
+                setTournamentResult(response.data[0]);
+            } catch (error) {
+                console.warn('Failed to get tournament result', error);
+            }
+        };
+        getTournamentResult();
+    }, [tournamentId]);
+
     const handleDialogConfirmMatch = () => {
         setOpen(true);
     };
@@ -73,6 +97,8 @@ function TournamentBacket({ tournamentStatus }) {
         spawnTimeAndArea();
         handleCancel();
     };
+
+    console.log(tournamentResult);
 
     return (
         <Box>
@@ -93,30 +119,47 @@ function TournamentBacket({ tournamentStatus }) {
                     <Button onClick={handleOk}>Đồng ý</Button>
                 </DialogActions>
             </Dialog>
-            <Box sx={{ width: '100%' }}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between' }}>
-                    <Tabs
-                        value={value}
-                        onChange={handleChange}
-                        variant="scrollable"
-                        scrollButtons="auto"
-                        aria-label="basic tabs example"
+            {tournamentResult && (
+                <Box sx={{ width: '100%' }}>
+                    <Box
+                        sx={{
+                            borderBottom: 1,
+                            borderColor: 'divider',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                        }}
                     >
-                        <Tab label="Đối kháng" {...a11yProps(0)} />
-                        <Tab label="Biểu diễn" {...a11yProps(1)} />
-                    </Tabs>
-                    <Button variant="outlined" onClick={handleDialogConfirmMatch} sx={{ mb: 2, float: 'right' }}>
-                        Cập nhật thời gian thi đấu cho giải đấu
-                    </Button>
-                </Box>
+                        <Tabs
+                            value={value}
+                            onChange={handleChange}
+                            variant="scrollable"
+                            scrollButtons="auto"
+                            aria-label="basic tabs example"
+                        >
+                            <Tab label="Đối kháng" {...a11yProps(0)} />
+                            <Tab label="Biểu diễn" {...a11yProps(1)} />
+                        </Tabs>
+                        <Button variant="outlined" onClick={handleDialogConfirmMatch} sx={{ mb: 2, float: 'right' }}>
+                            Cập nhật thời gian thi đấu cho giải đấu
+                        </Button>
+                    </Box>
 
-                <TabPanel value={value} index={0}>
-                    <TournamentCompetitive tournamentStatus={tournamentStatus} reload={isRender} />
-                </TabPanel>
-                <TabPanel value={value} index={1}>
-                    <TournamentExhibition tournamentStatus={tournamentStatus} reload={isRender} />
-                </TabPanel>
-            </Box>
+                    <TabPanel value={value} index={0}>
+                        <TournamentCompetitive
+                            tournamentStatus={tournamentStatus}
+                            reload={isRender}
+                            result={tournamentResult.listCompetitiveResult}
+                        />
+                    </TabPanel>
+                    <TabPanel value={value} index={1}>
+                        <TournamentExhibition
+                            tournamentStatus={tournamentStatus}
+                            reload={isRender}
+                            result={tournamentResult.listExhibitionResult}
+                        />
+                    </TabPanel>
+                </Box>
+            )}
         </Box>
     );
 }

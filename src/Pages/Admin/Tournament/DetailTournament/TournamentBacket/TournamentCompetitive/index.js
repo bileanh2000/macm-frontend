@@ -9,7 +9,9 @@ import {
     DialogTitle,
     FormControl,
     MenuItem,
+    Paper,
     Select,
+    Tooltip,
     Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
@@ -17,9 +19,15 @@ import { useParams } from 'react-router-dom';
 
 import CustomMatchBracket from './CustomMatchBracket';
 import adminTournament from 'src/api/adminTournamentAPI';
+import Gold from 'src/Components/Common/Material/Gold';
+import Sliver from 'src/Components/Common/Material/Sliver';
+import Trophy from 'src/Components/Common/Material/Trophy';
+import Brone from 'src/Components/Common/Material/Brone';
 
-function TournamentCompetitive({ reload }) {
+function TournamentCompetitive({ reload, result }) {
+    console.log(result);
     let { tournamentId } = useParams();
+    const [tournamentResult, setTournamentResult] = useState();
     const [tournamentStatus, setTournamentStatus] = useState(0);
     const { enqueueSnackbar } = useSnackbar();
     const [competitiveId, setCompetitiveId] = useState(0);
@@ -32,7 +40,17 @@ function TournamentCompetitive({ reload }) {
     const [isRender, setIsRender] = useState(true);
     // const [tournamentStatus, setTournamentStatus] = useState(-1);
 
+    console.log('ewsult', tournamentResult);
+
     const handleChangeCompetitiveId = (event) => {
+        if (result && result.length > 0) {
+            const _result = result.find((subResult) =>
+                subResult.data.find((d) => d.competitiveType.id == event.target.value),
+            ).data[0].listResult;
+            setTournamentResult(_result);
+            console.log('result', _result);
+        }
+
         setCompetitiveId(event.target.value);
         getListPlayerByCompetitiveID(event.target.value);
     };
@@ -134,19 +152,27 @@ function TournamentCompetitive({ reload }) {
         const fetchTournamentById = async (tournamentId) => {
             try {
                 const response = await adminTournament.getAllCompetitiveType(tournamentId);
-                console.log(response.data[0]);
-                setListWeightRange(response.data[0]);
-                setCompetitiveId(response.data[0][0].id);
-                getListPlayerByCompetitiveID(response.data[0][0].id);
+                if (response.data.length > 0) {
+                    setListWeightRange(response.data[0]);
+                    setCompetitiveId(response.data[0][0].id);
+                    console.log(response.data[0][0].id, result);
+                    const _result = result.find((subResult) =>
+                        subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id),
+                    ).data[0].listResult;
+                    setTournamentResult(_result);
+                    console.log('result', _result);
+
+                    getListPlayerByCompetitiveID(response.data[0][0].id);
+                }
+                setIsRender(false);
             } catch (error) {
                 console.log('Failed to fetch user list: ', error);
             }
         };
         isRender && fetchTournamentById(tournamentId);
         getAllArea();
-        setIsRender(false);
         console.log('re-render');
-    }, [tournamentId, isRender]);
+    }, [tournamentId, isRender, result]);
 
     return (
         <Fragment>
@@ -195,6 +221,35 @@ function TournamentCompetitive({ reload }) {
                     </Button>
                 )}
             </Box>
+
+            {tournamentResult != null && (
+                <Paper elevation={3} sx={{ m: 2, p: 2 }}>
+                    <Typography variant="h6">Kết quả bảng đấu</Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Tooltip title="Huy chương vàng">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Gold />
+
+                                <Typography variant="body1">{tournamentResult[0].name}</Typography>
+                            </Box>
+                        </Tooltip>
+                        <Tooltip title="Huy chương bạc">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Sliver />
+
+                                <Typography variant="body1">{tournamentResult[1].name}</Typography>
+                            </Box>
+                        </Tooltip>
+                        <Tooltip title="Huy chương đồng">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Brone />
+
+                                <Typography variant="body1">{tournamentResult[2].name}</Typography>
+                            </Box>
+                        </Tooltip>
+                    </Box>
+                </Paper>
+            )}
             {listPlayer && areaList && listPlayer.length > 0 ? (
                 <div>
                     {/* {tournamentStatus == 2 ? (

@@ -113,20 +113,21 @@ function MemberList({ data, type, onChange }) {
         rowsPlayer = [].concat(...newRowsPlayer);
     } else {
         columns = [
-            { field: 'studentName', headerName: 'Tên', flex: 0.8 },
+            { field: 'studentName', headerName: 'Tên', flex: 1 },
             {
                 field: 'studentId',
                 headerName: 'Mã sinh viên',
                 width: 150,
                 flex: 0.6,
             },
-            { field: 'playerGender', headerName: 'Giới tính', width: 150, flex: 1 },
-            { field: 'weight', headerName: 'Cân nặng', width: 150, flex: 1 },
+            { field: 'playerGender', headerName: 'Giới tính', width: 150, flex: 0.8 },
+            { field: 'weight', headerName: 'Cân nặng', width: 150, flex: 0.8 },
+            { field: 'isEligible', headerName: 'Điều kiện cân nặng', width: 150, flex: 1 },
             { field: 'weightRange', headerName: 'Hạng cân thi đấu', width: 150, flex: 1 },
             {
                 field: 'actions',
                 type: 'actions',
-                width: 80,
+                flex: 0.8,
                 getActions: (params) => [
                     <GridActionsCellItem
                         icon={<Edit />}
@@ -146,6 +147,7 @@ function MemberList({ data, type, onChange }) {
                 container['id'] = item.id;
                 container['studentName'] = item.tournamentPlayer.user.name;
                 container['weight'] = item.weight + 'Kg';
+                container['isEligible'] = item.isEligible ? 'Đạt tiêu chuẩn' : 'Không đạt tiêu chuẩn';
                 container['studentId'] = item.tournamentPlayer.user.studentId;
                 container['playerGender'] = item.tournamentPlayer.user.gender ? 'Nam' : 'Nữ';
                 container['weightRange'] =
