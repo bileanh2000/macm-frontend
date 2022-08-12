@@ -15,6 +15,7 @@ import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
 import { Edit } from '@mui/icons-material';
 import UpdateTournamentOverview from './UpdateTournamentOverview';
+import { hover } from '@testing-library/user-event/dist/hover';
 
 function TournamentOverview({ tournament, onUpdateTournament, value, index, startTime, isUpdate, onChangeTab }) {
     const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -36,6 +37,10 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
         // hide last border
         '&:last-child td, &:last-child th': {
             border: 0,
+        },
+        '&:hover': {
+            backgroundColor: '#57a6f4 !important',
+            cursor: 'pointer',
         },
     }));
 
