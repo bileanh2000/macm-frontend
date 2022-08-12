@@ -129,17 +129,17 @@ function EditAttendance() {
                                     <TableCell component="th" scope="row">
                                         {index + 1}
                                     </TableCell>
-                                    <TableCell>{type == 0 ? 'Lịch tập' : 'Sự kiện'}</TableCell>
+                                    <TableCell>{type == 0 ? 'Lịch tập' : row.name}</TableCell>
                                     <TableCell>
                                         {moment(row.date).format('dddd')}
                                         <br />
                                         {moment(row.date).format('DD/MM/YYYY')}
                                     </TableCell>
                                     <TableCell>
-                                        {row.startTime} - {row.finishTime}
+                                        {row.startTime} - {type == 0 ? row.finishTime : row.endTime}
                                     </TableCell>
                                     <TableCell>
-                                        {row.totalAttend}/{row.totalSize}
+                                        {row.totalAttend}/{type == 0 ? row.totalSize : row.totalJoin}
                                     </TableCell>
                                     <TableCell>
                                         <Tooltip title="Xem trạng thái điểm danh">

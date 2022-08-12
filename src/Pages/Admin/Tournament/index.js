@@ -40,6 +40,7 @@ function Tournament() {
     const [openDialogCreate, setOpenDialogCreate] = useState(false);
     const [suggestionRole, setSuggestionRole] = useState([]);
     const [isRender, setIsRender] = useState(true);
+    let navigate = useNavigate();
 
     const handleChange = (event) => {
         setSemester(event.target.value);
@@ -87,18 +88,40 @@ function Tournament() {
     const fetchCommonScheduleBySemester = async () => {
         try {
             const response = await trainingScheduleApi.commonSchedule();
-            console.log('Thanh cong roi: ', response);
+            console.log('Thanh cong roi: 90', response);
             let eventSchedule = response.data.filter((event) => event.type === 2);
             setCommonList(eventSchedule);
         } catch (error) {
             console.log('That bai roi huhu ', error);
         }
     };
+    const getAllTournamentSchedule = async () => {
+        try {
+            const response = await adminTournamentAPI.getAllTournamentSchedule();
+            console.log('Thanh cong roi: 100', response);
+            // let eventSchedule = response.data.filter((event) => event.type === 2);
+            setCommonList(response.data);
+        } catch (error) {
+            console.log('That bai roi huhu ', error);
+        }
+    };
+
+    const navigateToUpdate = (params, date) => {
+        console.log(params);
+        navigate(`/admin/tournament/${params}`);
+        // let formatDate = moment(date).format('DD/MM/yyyy');
+        // console.log(formatDate);
+        // eventApi.getEventByDate(formatDate).then((res) => {
+        //     console.log('selected id', res.data[0].event.id);
+        //     navigate(`/admin/events/${res.data[0].event.id}`);
+        // });
+    };
+
     const scheduleData = commonList.map((item) => {
         const container = {};
-        container['id'] = item.id;
+        container['id'] = item.tournament.id;
         container['date'] = item.date;
-        container['title'] = item.title;
+        container['title'] = item.tournament.name;
         container['display'] = 'background';
         container['type'] = item.type;
 
@@ -109,13 +132,14 @@ function Tournament() {
 
     useEffect(() => {
         isRender && getListTournamentBySemester(semester, status);
-        fetchCommonScheduleBySemester();
+        // fetchCommonScheduleBySemester();
         setIsRender(false);
     }, [semester, status, tournaments, isRender]);
 
     useEffect(() => {
         fetchSemester();
         getAllSuggestionRole();
+        getAllTournamentSchedule();
     }, []);
 
     const handleOpenDialogTournament = () => {
@@ -307,10 +331,10 @@ function Tournament() {
                             // datesSet={(dateInfo) => {
                             //     getMonthInCurrentTableView(dateInfo.start);
                             // }}
-                            // eventClick={(args) => {
-                            //     navigateToUpdate(args.event, args.event.start);
-                            //     // console.log(args);
-                            // }}
+                            eventClick={(args) => {
+                                navigateToUpdate(args.event.id, args.event.start);
+                                // console.log(args);
+                            }}
                             dateClick={function (arg) {
                                 // console.log(arg.dateStr);
                                 // navigateToCreate(arg.dateStr);

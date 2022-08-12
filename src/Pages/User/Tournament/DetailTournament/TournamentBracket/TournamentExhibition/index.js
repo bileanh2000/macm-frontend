@@ -18,14 +18,18 @@ import {
     TableHead,
     TableRow,
     Typography,
+    Tooltip,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import moment from 'moment';
 
 import adminTournament from 'src/api/adminTournamentAPI';
 import TableMatch from './TableMatch';
+import Gold from 'src/Components/Common/Material/Gold';
+import Sliver from 'src/Components/Common/Material/Sliver';
+import Brone from 'src/Components/Common/Material/Brone';
 
-function TournamentExhibition({ exhibition }) {
+function TournamentExhibition({ exhibition, result }) {
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
     console.log(exhibition);
     let { tournamentId } = useParams();
@@ -35,9 +39,17 @@ function TournamentExhibition({ exhibition }) {
     const [tournamentStatus, setTournamentStatus] = useState(-1);
     const [open, setOpen] = useState(false);
     const [myTeam, setMyTeam] = useState();
+    const [tournamentResult, setTournamentResult] = useState();
 
     const handleChangeExhibitionType = (event) => {
         console.log(event.target.value);
+        if (result && result.length > 0) {
+            const _result = result.find((subResult) =>
+                subResult.data.find((d) => d.exhibitionType.id == event.target.value),
+            ).data[0].listResult;
+            setTournamentResult(_result);
+            console.log('result', _result);
+        }
         setExhibitionType(event.target.value);
         const team = exhibition.find((t) => t.exhibitionTypeId === event.target.value);
         setMyTeam(team);
@@ -57,6 +69,10 @@ function TournamentExhibition({ exhibition }) {
             console.log(response);
             setListExhibitionType(response.data);
             setExhibitionType(response.data[0].id);
+            const _result = result.find((subResult) =>
+                subResult.data.find((d) => d.exhibitionType.id == response.data[0].id),
+            ).data[0].listResult;
+            setTournamentResult(_result);
             const team = exhibition.find((t) => t.exhibitionTypeId === response.data[0].id);
             setMyTeam(team);
             getExhibitionResult(response.data[0].id, nowDate);
@@ -172,7 +188,34 @@ function TournamentExhibition({ exhibition }) {
                     </Dialog>
                 )}
             </Box>
+            {tournamentResult != null && (
+                <Paper elevation={3} sx={{ m: 2, p: 2 }}>
+                    <Typography variant="h6">Kết quả bảng đấu</Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Tooltip title="Huy chương vàng">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Gold />
 
+                                <Typography variant="body1">{tournamentResult[0].teamName}</Typography>
+                            </Box>
+                        </Tooltip>
+                        <Tooltip title="Huy chương bạc">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Sliver />
+
+                                <Typography variant="body1">{tournamentResult[1].teamName}</Typography>
+                            </Box>
+                        </Tooltip>
+                        <Tooltip title="Huy chương đồng">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Brone />
+
+                                <Typography variant="body1">{tournamentResult[2].teamName}</Typography>
+                            </Box>
+                        </Tooltip>
+                    </Box>
+                </Paper>
+            )}
             {exhibitionTeam && exhibitionTeam.length > 0 ? (
                 <div>
                     <TableMatch matches={exhibitionTeam} status={tournamentStatus} />
