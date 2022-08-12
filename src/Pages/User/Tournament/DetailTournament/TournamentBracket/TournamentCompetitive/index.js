@@ -8,7 +8,7 @@ import Gold from 'src/Components/Common/Material/Gold';
 import Sliver from 'src/Components/Common/Material/Sliver';
 import CustomMatchBracket from './CustomMatchBracket';
 
-function TournamentCompetitive({ competitive }) {
+function TournamentCompetitive({ competitive, result }) {
     console.log(competitive);
     let { tournamentId } = useParams();
     const [competitiveId, setCompetitiveId] = useState(0);
@@ -19,6 +19,13 @@ function TournamentCompetitive({ competitive }) {
     // const [tournamentStatus, setTournamentStatus] = useState(-1);
 
     const handleChangeCompetitiveId = (event) => {
+        if (result && result.length > 0) {
+            const _result = result.find((subResult) =>
+                subResult.data.find((d) => d.competitiveType.id == event.target.value),
+            ).data[0].listResult;
+            setTournamentResult(_result);
+            console.log('result', _result);
+        }
         setCompetitiveId(event.target.value);
         getListPlayerByCompetitiveID(event.target.value);
     };
@@ -26,9 +33,13 @@ function TournamentCompetitive({ competitive }) {
     const getListPlayerByCompetitiveID = async (competitiveId) => {
         try {
             const response = await adminTournament.listMatchs(competitiveId);
-            setListPlayer(response.data);
-            console.log('lay data', response);
-            setRounds(response.totalResult);
+            if (response.data.length > 0) {
+                setListPlayer(response.data[0].listMatchDto);
+                setRounds(response.totalResult);
+            } else {
+                setListPlayer(response.data);
+                setRounds(0);
+            }
         } catch (error) {
             console.log('Failed to fetch match: ', error);
         }
@@ -37,18 +48,45 @@ function TournamentCompetitive({ competitive }) {
     const fetchTournamentById = async (tournamentId) => {
         try {
             const response = await adminTournament.getAllCompetitiveType(tournamentId);
-            console.log(response.data[0]);
-            setListWeightRange(response.data[0]);
-            setCompetitiveId(response.data[0][0].id);
-            getListPlayerByCompetitiveID(response.data[0][0].id);
+            if (response.data.length > 0) {
+                setListWeightRange(response.data[0]);
+                setCompetitiveId(response.data[0][0].id);
+                console.log(response.data[0][0].id, result);
+                const _result = result.find((subResult) =>
+                    subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id),
+                ).data[0].listResult;
+                setTournamentResult(_result);
+                console.log('result', _result);
+
+                getListPlayerByCompetitiveID(response.data[0][0].id);
+            }
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
     };
 
     useEffect(() => {
+        const fetchTournamentById = async (tournamentId) => {
+            try {
+                const response = await adminTournament.getAllCompetitiveType(tournamentId);
+                if (response.data.length > 0) {
+                    setListWeightRange(response.data[0]);
+                    setCompetitiveId(response.data[0][0].id);
+                    console.log(response.data[0][0].id, result);
+                    const _result = result.find((subResult) =>
+                        subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id),
+                    ).data[0].listResult;
+                    setTournamentResult(_result);
+                    console.log('result', _result);
+
+                    getListPlayerByCompetitiveID(response.data[0][0].id);
+                }
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
         fetchTournamentById(tournamentId);
-    }, [tournamentId]);
+    }, [tournamentId, result]);
 
     return (
         <Fragment>

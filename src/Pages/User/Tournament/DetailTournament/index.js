@@ -28,14 +28,13 @@ import { Delete, Edit, EmojiEvents } from '@mui/icons-material';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import TournamentOverview from './TournamentOverview';
 import TournamentSchedule from './TournamentSchedule';
-import TournamentCompetitive from './TournamentCompetitive';
-import TournamentExhibition from './TournamentExhibition';
 import AdminTournament from './AdminTournament';
 import MemberTournament from './MemberTournament';
 import RegisterPlayer from './RegisterPlayer';
 import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
 import moment from 'moment';
+import TournamentBracket from './TournamentBracket';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -429,14 +428,9 @@ function DetailTournament() {
                                 <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
                                     <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
                                     <Tab label="Lịch thi đấu" {...a11yProps(1)} value={1} />
-                                    {(tournament.competitiveTypes.length > 0 || isJoinCompetitive.length > 0) && (
-                                        <Tab label="Bảng đấu đối kháng" {...a11yProps(2)} value={2} />
-                                    )}
-                                    {(tournament.exhibitionTypes.length > 0 || isJoinExhibition.length > 0) && (
-                                        <Tab label="Bảng đấu biểu diễn" {...a11yProps(3)} value={3} />
-                                    )}
-                                    <Tab label="Danh sách ban tổ chức" {...a11yProps(4)} value={4} />
-                                    <Tab label="Danh sách người chơi" {...a11yProps(5)} value={5} />
+                                    <Tab label="Danh sách ban tổ chức" {...a11yProps(2)} value={2} />
+                                    <Tab label="Danh sách người chơi" {...a11yProps(3)} value={3} />
+                                    <Tab label="Bảng đấu" {...a11yProps(4)} value={4} />
                                 </Tabs>
                             </Box>
                         </Container>
@@ -448,16 +442,17 @@ function DetailTournament() {
                                 <TournamentSchedule />
                             </TabPanel>
                             <TabPanel value={value} index={2}>
-                                <TournamentCompetitive competitive={isJoinCompetitive} />
-                            </TabPanel>
-                            <TabPanel value={value} index={3}>
-                                <TournamentExhibition exhibition={isJoinExhibition} />
-                            </TabPanel>
-                            <TabPanel value={value} index={4}>
                                 <AdminTournament />
                             </TabPanel>
-                            <TabPanel value={value} index={5}>
+                            <TabPanel value={value} index={3}>
                                 <MemberTournament competitive={isJoinCompetitive} exhibition={isJoinExhibition} />
+                            </TabPanel>
+                            <TabPanel value={value} index={4}>
+                                <TournamentBracket
+                                    tournament={tournament}
+                                    competitive={isJoinCompetitive}
+                                    exhibition={isJoinExhibition}
+                                />
                             </TabPanel>
                         </Container>
                     </Paper>

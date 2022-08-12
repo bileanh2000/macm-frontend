@@ -636,7 +636,7 @@ function CustomMatchBracket(params) {
                     {matches.map((matchs, index) => (
                         <div className={cx('tournament-bracket__round')} key={index}>
                             <h3 className={cx('tournament-bracket__round-title')}>
-                                Trận{' '}
+                                Vòng{' '}
                                 {index == matches.length - 1
                                     ? 'tranh hạng 3'
                                     : index == matches.length - 2
