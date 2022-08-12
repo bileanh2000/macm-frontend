@@ -123,7 +123,7 @@ function Sidebar() {
                 button
                 component={Link}
                 to="/admin/trainingschedules"
-                selected={selectedIndex === 4}
+                selected={selectedIndex === 3}
                 onClick={(event) => handleListItemClick(event, 4)}
             >
                 <ListItemIcon>
@@ -158,7 +158,7 @@ function Sidebar() {
                             id: null,
                             date: null,
                         }}
-                        selected={selectedIndex === 1}
+                        selected={selectedIndex === 4}
                         onClick={(event) => handleListItemClick(event, 1)}
                     >
                         <ListItemIcon>
@@ -171,7 +171,7 @@ function Sidebar() {
                         sx={{ pl: 4 }}
                         component={Link}
                         to="/admin/editattendance"
-                        selected={selectedIndex === 2}
+                        selected={selectedIndex === 5}
                         onClick={(event) => handleListItemClick(event, 2)}
                     >
                         <ListItemIcon>
@@ -210,7 +210,7 @@ function Sidebar() {
                         sx={{ pl: 4 }}
                         component={Link}
                         to="/admin/membership"
-                        selected={selectedIndex === 1}
+                        selected={selectedIndex === 7}
                         onClick={(event) => handleListItemClick(event, 1)}
                     >
                         <ListItemIcon>
@@ -223,7 +223,7 @@ function Sidebar() {
                         sx={{ pl: 4 }}
                         component={Link}
                         to="/admin/fund"
-                        selected={selectedIndex === 2}
+                        selected={selectedIndex === 8}
                         onClick={(event) => handleListItemClick(event, 2)}
                     >
                         <ListItemIcon>
@@ -239,7 +239,7 @@ function Sidebar() {
                 button
                 component={Link}
                 to="/admin/rules"
-                selected={selectedIndex === 8}
+                selected={selectedIndex === 9}
                 onClick={(event) => handleListItemClick(event, 8)}
             >
                 <ListItemIcon>
@@ -253,7 +253,7 @@ function Sidebar() {
                 button
                 component={Link}
                 to="/admin/tournament"
-                selected={selectedIndex === 9}
+                selected={selectedIndex === 10}
                 onClick={(event) => handleListItemClick(event, 9)}
             >
                 <ListItemIcon>
