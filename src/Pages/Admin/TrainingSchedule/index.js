@@ -199,6 +199,7 @@ function TrainingSchedule() {
                     <Box>
                         <Box sx={{ ml: 0.5 }}>
                             <div className={cx('event-title')} style={{ opacity: 0 }}>
+                                {eventInfo.event.title} <br />
                                 {eventInfo.event.extendedProps.time}
                             </div>
                         </Box>
