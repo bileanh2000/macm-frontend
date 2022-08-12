@@ -83,6 +83,9 @@ function Index() {
                 {/* <Typography variant="h6">Bạn đéo cần phải đóng tiền kỳ này</Typography> */}
             </Box>
             <Grid container spacing={2}>
+                <Grid item md={10} xs={12}>
+                    <Schedule />
+                </Grid>
                 <Grid item md={2} xs={12}>
                     <News
                         name={JSON.parse(localStorage.getItem('currentUser')).name}
@@ -91,9 +94,6 @@ function Index() {
                         email={JSON.parse(localStorage.getItem('currentUser')).email}
                         isAdmin={isAdmin}
                     />
-                </Grid>
-                <Grid item md={10} xs={12}>
-                    <Schedule />
                 </Grid>
             </Grid>
         </Fragment>

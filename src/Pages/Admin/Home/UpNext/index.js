@@ -1,73 +1,84 @@
 import { Fragment, useState } from 'react';
-import { Avatar, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
+import { Avatar, Box, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import ImageIcon from '@mui/icons-material/Image';
 import WorkIcon from '@mui/icons-material/Work';
 import BeachAccessIcon from '@mui/icons-material/BeachAccess';
 import EmojiEventsRoundedIcon from '@mui/icons-material/EmojiEventsRounded';
 import trainingScheduleApi from 'src/api/trainingScheduleApi';
+import CelebrationIcon from '@mui/icons-material/Celebration';
 import { bn } from 'date-fns/locale';
 import moment from 'moment';
+import dashboardApi from 'src/api/dashboardApi';
+import { useNavigate } from 'react-router-dom';
 
-function UpNext() {
-    const [eventSchedule, setCommonList] = useState([]);
-    const fetchCommonSchedule = async () => {
+function UpNext({ isAdmin }) {
+    const [upcomingActivity, setUpcomingActivity] = useState([]);
+    let navigate = useNavigate();
+
+    const getAllUpcomingActivities = async () => {
         try {
-            const response = await trainingScheduleApi.commonSchedule();
-            console.log('commonSchedule: ', response.data);
-            let filterEvent = response.data.filter((item) => {
-                return item.type !== 0;
-            });
-            let reverseEvent = filterEvent.sort((a, b) => a.id - b.id);
-
-            let checkDublicate = reverseEvent.filter(
-                (value, index, self) => index === self.findIndex((t) => t.title === value.title),
-            );
-            let reverseCheckDublicate = checkDublicate.sort((a, b) => b.id - a.id);
-            let getTop2Event = reverseCheckDublicate.slice(0, 2);
-            console.log('filterEvent', checkDublicate);
-            setCommonList(getTop2Event);
+            const response = await dashboardApi.getAllUpcomingActivities();
+            setUpcomingActivity(response.data);
         } catch (error) {
-            console.log('failed at fetchCommonSchedule:', error);
+            console.log('failed at getAllUpcomingActivities:', error);
+        }
+    };
+
+    const handleNavigate = (activityId, activityType) => {
+        if (activityType === 1) {
+            if (isAdmin) {
+                navigate(`/admin/events/${activityId}`);
+            } else {
+                navigate(`/events/${activityId}`);
+            }
+        } else {
+            if (isAdmin) {
+                navigate(`/admin/tournament/${activityId}`);
+            } else {
+                navigate(`/tournament/${activityId}`);
+            }
         }
     };
 
     useState(() => {
-        fetchCommonSchedule();
+        getAllUpcomingActivities();
     }, []);
     return (
         <Fragment>
             <Typography variant="h6" color="initial">
                 Hoạt động sắp tới
             </Typography>
-            <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                {eventSchedule.map((event) => {
-                    return (
-                        <ListItem key={event.id}>
-                            <ListItemAvatar>
-                                {event.type === 1 ? (
-                                    <Avatar sx={{ backgroundColor: '#16ce8e' }}>
-                                        <BeachAccessIcon />
-                                    </Avatar>
-                                ) : (
-                                    <Avatar sx={{ backgroundColor: '#f9d441' }}>
-                                        <EmojiEventsRoundedIcon />
-                                    </Avatar>
-                                )}
-                            </ListItemAvatar>
-                            <ListItemText primary={event.title} secondary={moment(event.date).format('DD/MM/YYYY')} />
-                        </ListItem>
-                    );
-                })}
-
-                {/* <ListItem>
-                    <ListItemAvatar>
-                        <Avatar sx={{ backgroundColor: '#f9d441' }}>
-                            <EmojiEventsRoundedIcon />
-                        </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText primary="Giải đấu nội bộ FNC" secondary="Jan 9, 2014" />
-                </ListItem> */}
-            </List>
+            <Box sx={{ height: '328px', overflow: 'auto' }}>
+                <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                    {upcomingActivity.map((activity, index) => {
+                        return (
+                            <Fragment key={index}>
+                                <ListItem
+                                    sx={{ cursor: 'pointer' }}
+                                    onClick={() => handleNavigate(activity.id, activity.type)}
+                                >
+                                    <ListItemAvatar>
+                                        {activity.type === 1 ? (
+                                            <Avatar sx={{ backgroundColor: '#16ce8e' }}>
+                                                <CelebrationIcon />
+                                            </Avatar>
+                                        ) : (
+                                            <Avatar sx={{ backgroundColor: '#f9d441' }}>
+                                                <EmojiEventsRoundedIcon />
+                                            </Avatar>
+                                        )}
+                                    </ListItemAvatar>
+                                    <ListItemText
+                                        primary={activity.name}
+                                        secondary={moment(activity.date).format('DD/MM/YYYY')}
+                                    />
+                                </ListItem>
+                                <Divider light />
+                            </Fragment>
+                        );
+                    })}
+                </List>
+            </Box>
         </Fragment>
     );
 }

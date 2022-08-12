@@ -212,23 +212,25 @@ function Home() {
                                         {balanceInCurrentMonth[0] && balanceInCurrentMonth[0].balance.toLocaleString()}{' '}
                                         VND
                                     </Typography>
-
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <CustomPersentStatus
-                                            persent={
-                                                balanceInLastMonth[0] &&
-                                                balanceInCurrentMonth[0] &&
-                                                Math.floor(
-                                                    (balanceInCurrentMonth[0].balance / balanceInLastMonth[0].balance) *
-                                                        100 -
-                                                        100,
-                                                )
-                                            }
-                                        />
-                                        <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
-                                            so với tháng trước
-                                        </Typography>
-                                    </Box>
+                                    {balanceInLastMonth[0] && balanceInLastMonth[0].balance === 0 ? null : (
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <CustomPersentStatus
+                                                persent={
+                                                    balanceInLastMonth[0] &&
+                                                    balanceInCurrentMonth[0] &&
+                                                    Math.floor(
+                                                        (balanceInCurrentMonth[0].balance /
+                                                            balanceInLastMonth[0].balance) *
+                                                            100 -
+                                                            100,
+                                                    )
+                                                }
+                                            />
+                                            <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
+                                                so với tháng trước
+                                            </Typography>
+                                        </Box>
+                                    )}
                                 </Box>
                                 <Avatar sx={{ bgcolor: '#16ce8e', width: 48, height: 48 }}>
                                     <AttachMoneyRoundedIcon sx={{ fontSize: '2rem' }} />
@@ -244,7 +246,7 @@ function Home() {
                         </Grid>
                         <Grid item xs={12} md={3} order={{ xs: 1, md: 2 }}>
                             <Paper elevation={2} sx={{ padding: '16px' }}>
-                                <UpNext />
+                                <UpNext isAdmin={true} />
                             </Paper>
                         </Grid>
                     </Grid>

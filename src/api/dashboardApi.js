@@ -18,6 +18,11 @@ const dashboardApi = {
         const url = `/admin/dashboard/fee?semester=${semester}`;
         return axiosClient.get(url);
     },
+
+    getAllUpcomingActivities: () => {
+        const url = `/admin/dashboard/getallupcomingactivities`;
+        return axiosClient.get(url);
+    },
 };
 
 export default dashboardApi;
