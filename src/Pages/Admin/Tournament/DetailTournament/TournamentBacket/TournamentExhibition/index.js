@@ -10,13 +10,14 @@ import Gold from 'src/Components/Common/Material/Gold';
 import Sliver from 'src/Components/Common/Material/Sliver';
 import Brone from 'src/Components/Common/Material/Brone';
 
-function TournamentExhibition({ reload, result }) {
+function TournamentExhibition({ reload, result, type }) {
+    console.log(type);
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
 
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [tournamentResult, setTournamentResult] = useState();
-    const [exhibitionType, setExhibitionType] = useState(0);
+    const [exhibitionType, setExhibitionType] = useState(type);
     const [exhibitionTeam, setExhibitionTeam] = useState([]);
     const [listExhibitionType, setListExhibitionType] = useState([]);
     const [tournamentStatus, setTournamentStatus] = useState();
@@ -47,7 +48,7 @@ function TournamentExhibition({ reload, result }) {
             console.log(response);
             setTournamentStatus(response.data[0].status);
             setListExhibitionType(response.data);
-            setExhibitionType(response.data[0].id);
+            type == 0 && setExhibitionType(response.data[0].id);
             console.log(response.data[0].id, result);
             const _result = result.find((subResult) =>
                 subResult.data.find((d) => d.exhibitionType.id == response.data[0].id),

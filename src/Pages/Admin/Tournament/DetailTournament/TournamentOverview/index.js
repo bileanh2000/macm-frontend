@@ -112,7 +112,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                                                         <StyledTableRow
                                                             key={data.id}
                                                             onClick={(e) => {
-                                                                onChangeTab && onChangeTab(5, 0);
+                                                                onChangeTab && onChangeTab(5, 0, data.id);
                                                             }}
                                                         >
                                                             <StyledTableCell align="center">
@@ -151,7 +151,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                                                         <StyledTableRow
                                                             key={data.id}
                                                             onClick={(e) => {
-                                                                onChangeTab && onChangeTab(5, 1);
+                                                                onChangeTab && onChangeTab(5, 1, data.id);
                                                             }}
                                                         >
                                                             <StyledTableCell align="center">
