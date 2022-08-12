@@ -34,6 +34,8 @@ const adminTournament = {
 
     //schedule
 
+    getAllTournamentSchedule: () => {},
+
     createPreviewTournamentSchedule: (params) => {
         const url = '/tournamentschedule/headclub/createpreview';
         return axiosClient.post(url, null, {
