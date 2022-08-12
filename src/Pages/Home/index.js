@@ -20,6 +20,7 @@ import News from './News/News';
 import { getAllRole } from 'src/Roles/index';
 import { IfAllGranted, IfAuthorized } from 'react-authorization';
 import ForbiddenPage from '../ForbiddenPage';
+import UpNext from '../Admin/Home/UpNext';
 
 function Index() {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -68,9 +69,8 @@ function Index() {
             >
                 <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        <PaymentNotification />
-                    </DialogContentText>
+                    {/* <DialogContentText id="alert-dialog-description"></DialogContentText> */}
+                    <PaymentNotification />
                 </DialogContent>
                 <DialogActions>
                     {/* <Button onClick={handleCloseNotificationDialog}>Disagree</Button> */}
@@ -83,17 +83,24 @@ function Index() {
                 {/* <Typography variant="h6">Bạn đéo cần phải đóng tiền kỳ này</Typography> */}
             </Box>
             <Grid container spacing={2}>
-                <Grid item md={10} xs={12}>
+                <Grid item md={10} xs={12} order={{ md: 1, xs: 2 }}>
                     <Schedule />
                 </Grid>
-                <Grid item md={2} xs={12}>
-                    <News
-                        name={JSON.parse(localStorage.getItem('currentUser')).name}
-                        studentId={JSON.parse(localStorage.getItem('currentUser')).studentId}
-                        roleName={JSON.parse(localStorage.getItem('currentUser')).role.name}
-                        email={JSON.parse(localStorage.getItem('currentUser')).email}
-                        isAdmin={isAdmin}
-                    />
+                <Grid item md={2} xs={12} order={{ md: 2, xs: 1 }}>
+                    <Grid item md={12}>
+                        <News
+                            name={JSON.parse(localStorage.getItem('currentUser')).name}
+                            studentId={JSON.parse(localStorage.getItem('currentUser')).studentId}
+                            roleName={JSON.parse(localStorage.getItem('currentUser')).role.name}
+                            email={JSON.parse(localStorage.getItem('currentUser')).email}
+                            isAdmin={isAdmin}
+                        />
+                    </Grid>
+                    <Grid item md={12}>
+                        <Paper sx={{ p: 2 }}>
+                            <UpNext />
+                        </Paper>
+                    </Grid>
                 </Grid>
             </Grid>
         </Fragment>

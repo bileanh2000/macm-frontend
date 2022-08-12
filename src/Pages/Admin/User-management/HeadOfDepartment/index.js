@@ -73,21 +73,22 @@ function HeadOfDepartment() {
         console.log(stageStudentId);
     }, [stageStudentId]);
     const columns = [
-        { field: 'id', headerName: 'ID', flex: 0.5 },
+        // { field: 'id', headerName: 'ID', flex: 0.5 },
         { field: 'name', headerName: 'Tên', flex: 1 },
+        { field: 'studentId', headerName: 'Mã sinh viên', flex: 0.9 },
+
         {
             field: 'email',
             headerName: 'Email',
             width: 220,
             renderCell: (params) => <Link href={`mailto:${params.value}`}>{params.value.toString()}</Link>,
-            flex: 2,
+            flex: 1,
         },
 
-        { field: 'gender', headerName: 'Giới tính', flex: 1 },
-        { field: 'dateOfBirth', headerName: 'Ngày sinh', flex: 1 },
+        { field: 'gender', headerName: 'Giới tính', flex: 0.5 },
+        { field: 'dateOfBirth', headerName: 'Ngày sinh', flex: 0.7 },
         { field: 'month', headerName: 'Tháng sinh', flex: 0.5, hide: true, hideable: false },
-        { field: 'generation', headerName: 'Gen', flex: 1 },
-        { field: 'studentId', headerName: 'Mã sinh viên', flex: 1 },
+        { field: 'generation', headerName: 'Gen', flex: 0.5 },
         { field: 'role', headerName: 'Vai trò', flex: 1 },
         {
             hideable: !editable,

@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import notificationApi from 'src/api/notificationApi';
 
 function PaymentNotification() {
-    const [paymentStatus, setPaymentStatus] = useState();
+    const [paymentStatus, setPaymentStatus] = useState([]);
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
     const fetchPaymentNotification = async (studentId) => {
         try {
@@ -20,7 +20,18 @@ function PaymentNotification() {
         fetchPaymentNotification(studentId);
     }, [studentId]);
 
-    return <Typography>{paymentStatus}</Typography>;
+    return (
+        <ul>
+            {paymentStatus.map((i, index) => {
+                return (
+                    <li key={index} style={{ marginBottom: '5px' }}>
+                        - Bạn cần phải đóng tiền cho: {i}
+                    </li>
+                );
+            })}
+        </ul>
+    );
+    // return <Typography>{paymentStatus}</Typography>;
 }
 
 export default PaymentNotification;

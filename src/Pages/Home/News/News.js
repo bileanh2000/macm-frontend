@@ -87,9 +87,6 @@ function News({ name, studentId, roleName, email, isAdmin }) {
                     ) : null}
                 </Box>
             </Paper>
-            <Paper sx={{ p: 2 }}>
-                <UpNext />
-            </Paper>
         </Fragment>
     );
 }
