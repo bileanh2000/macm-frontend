@@ -152,6 +152,7 @@ function MembershipFee() {
     const updateMembershipFee = async (semesterId, totalAmount) => {
         try {
             const res = await adminClubFeeAPI.updateMembershipFee(semesterId, totalAmount);
+            console.log(res.message);
             enqueueSnackbar(res.message, { variant: 'success' });
         } catch (error) {
             console.log('Không thể chỉnh sửa tiền phí, error: ', error);
@@ -254,7 +255,13 @@ function MembershipFee() {
     });
 
     const updateMembership = async (id) => {
-        await adminClubFeeAPI.updateMembership(id);
+        try {
+            const res = await adminClubFeeAPI.updateMembership(id);
+            console.log(res.message);
+            enqueueSnackbar(res.message, { variant: 'success' });
+        } catch (error) {
+            console.log('Không thể chỉnh sửa tiền phí, error: ', error);
+        }
     };
 
     const toggleStatus = (id) => {

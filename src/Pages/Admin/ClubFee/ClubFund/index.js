@@ -299,12 +299,19 @@ function ClubFund() {
                         // loading={!userList.length}
                         disableSelectionOnClick={true}
                         rows={rowsUser}
+                        getRowHeight={() => 'auto'}
+                        getEstimatedRowHeight={() => 200}
                         columns={columns}
                         pageSize={pageSize}
                         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                         rowsPerPageOptions={[10, 20, 30]}
                         components={{
                             Toolbar: CustomToolbar,
+                        }}
+                        sx={{
+                            '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
+                            '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
+                            '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' },
                         }}
                     />
                 </Box>

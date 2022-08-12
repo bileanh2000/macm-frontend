@@ -31,7 +31,7 @@ import * as Yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import NumberFormat from 'react-number-format';
-import { DatePicker, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { DatePicker, DateTimePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
 import moment from 'moment';
@@ -55,6 +55,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
     const [isChecked, setIsChecked] = useState(false);
     const [datas, setDatas] = useState([]);
     const [startDate, setStartDate] = useState('');
+    const [startTime, setStartTime] = useState('');
     const [previewSchedule, setPreviewSchedule] = useState([]);
     const [previewTournament, setPreviewTournament] = useState([]);
     const [isOverride, setIsOverride] = useState(-1);
@@ -192,19 +193,19 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                   //       .typeError('Vui lòng không để trống trường này')
                   //       .required('Vui lòng không để trống trường này'),
                   finishDate: Yup.date()
-                      .test(
-                          'same_dates_test',
-                          'Thời gian bắt đầu và thời gian kết thúc không được bằng nhau',
-                          function (value) {
-                              const { startDate } = this.parent;
-                              return value.getDate() !== startDate.getDate();
-                          },
-                      )
+                      .test('same_dates_test', 'Ngày bắt đầu và ngày kết thúc không được bằng nhau', function (value) {
+                          const { startDate } = this.parent;
+                          //   console.log(value, this.parent);
+                          return value.getDate() !== startDate.getDate();
+                      })
                       .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
                       .required('Vui lòng không để trống trường này')
                       .typeError('Vui lòng không để trống trường này')
                       .required('Vui lòng không để trống trường này'),
-
+                  startTime: Yup.date().typeError('Vui lòng không để trống trường này'),
+                  endTime: Yup.date()
+                      .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được bé hơn thời gian bắt đầu`)
+                      .typeError('Vui lòng không để trống trường này'),
                   datePlayerDeadline: Yup.date()
                       .max(Yup.ref('startDate'), ({ max }) => `Deadline không được muộn hơn thời gian bắt đầu`)
                       .typeError('Vui lòng không để trống trường này')
@@ -267,12 +268,20 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
     };
     const handleAddEventRoles = (data) => {
         console.log(data);
+        if (datas.findIndex((d) => d.name.includes(data.roleName)) >= 0) {
+            setError('roleName', {
+                message: 'Vai trò này đã tồn tại, vui lòng chọn vai trò khác',
+            });
+            return;
+        }
+
         const newData = [...datas, { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity }];
         setDatas(newData);
 
         /**
          * Reset field keep error (isValid)
          */
+
         resetField('roleName', { keepError: true });
         resetField('maxQuantity', { keepError: true });
 
@@ -324,17 +333,13 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
         console.log(data);
         let formatData = {
             tournamentName: data.name,
-            finishTime: moment(new Date(data.finishDate)).format('HH:mm:ss'),
-            startTime: moment(new Date(data.startDate)).format('HH:mm:ss'),
+            finishTime: moment(new Date(data.finishTime)).format('HH:mm:ss'),
+            startTime: moment(new Date(data.startTime)).format('HH:mm:ss'),
             startDate: moment(new Date(data.startDate)).format('DD/MM/yyyy'),
             finishDate: moment(new Date(data.finishDate)).format('DD/MM/yyyy'),
         };
-        // eventApi.createPreviewTournament(formatData).then((response) => {
-        //     console.log('fetch preview schedule data', response);
-        //     setPreviewSchedule(response.data);
-        // });
         console.log('format Data', formatData);
-        handleNext();
+
         adminTournament.createPreviewTournamentSchedule(formatData).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
@@ -343,8 +348,12 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                 setPreviewSchedule(res.data);
                 // setPreviewTournament(res.data);
                 checkOverride(res.data);
+                handleNext();
             } else {
                 console.log('huhu');
+                setError('startDate', {
+                    message: res.message,
+                });
             }
         });
     };
@@ -494,7 +503,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                             {datas.map((role) => {
                                                                 return (
                                                                     <li key={role.id}>
-                                                                        {role.roleName} - {role.maxQuantity} người
+                                                                        {role.name} - {role.maxQuantity} người
                                                                     </li>
                                                                 );
                                                             })}
@@ -634,10 +643,12 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                             label="Lịch đang trùng với lịch tập, bạn có muốn tạo không"
                                         />
                                     )}
-                                    <PreviewSchedule
-                                        dataPreview={eventSchedule}
-                                        initialDate={eventSchedule[0] && new Date(eventSchedule[0].date)}
-                                    />
+                                    {eventSchedule && (
+                                        <PreviewSchedule
+                                            dataPreview={eventSchedule}
+                                            initialDate={eventSchedule[0] && new Date(eventSchedule[0].date)}
+                                        />
+                                    )}
                                 </Box>
                             </Fragment>
                         ) : // <Fragment>
@@ -817,7 +828,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                         <NumberFormat
                                             name="cost"
                                             customInput={TextField}
-                                            label="Tổng chi phí tổ chức"
+                                            label="Tổng chi phí tổ chức (dự kiến)"
                                             thousandSeparator={true}
                                             variant="outlined"
                                             defaultValue=""
@@ -947,16 +958,13 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
                                             }) => (
-                                                <DateTimePicker
-                                                    label="Thời gian bắt đầu"
+                                                <DatePicker
+                                                    label="Ngày bắt đầu"
+                                                    inputFormat="dd/MM/yyyy"
                                                     disablePast
                                                     ampm={false}
                                                     value={value}
-                                                    onChange={(value) => {
-                                                        onChange(value);
-                                                        console.log('startDate value', value);
-                                                        // setStartDate(value);
-                                                    }}
+                                                    onChange={(value) => onChange(value)}
                                                     renderInput={(params) => (
                                                         <TextField
                                                             sx={{
@@ -966,8 +974,8 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                             {...params}
                                                             required
                                                             id="outlined-disabled"
-                                                            error={!!error}
-                                                            helperText={error ? error.message : null}
+                                                            error={invalid}
+                                                            helperText={invalid ? error.message : null}
                                                             // id="startDate"
                                                             variant="outlined"
                                                             margin="dense"
@@ -988,16 +996,14 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
                                             }) => (
-                                                <DateTimePicker
-                                                    label="Thời gian kết thúc"
+                                                <DatePicker
+                                                    label="Ngày kết thúc"
+                                                    minDate={startDate}
                                                     disablePast
                                                     ampm={false}
+                                                    inputFormat="dd/MM/yyyy"
                                                     value={value}
-                                                    onChange={(value) => {
-                                                        onChange(value);
-                                                        console.log('endDate value', value);
-                                                        // setEndDate(value);
-                                                    }}
+                                                    onChange={(value) => onChange(value)}
                                                     renderInput={(params) => (
                                                         <TextField
                                                             sx={{
@@ -1007,8 +1013,77 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                             {...params}
                                                             required
                                                             id="outlined-disabled"
-                                                            error={!!error}
-                                                            helperText={error ? error.message : null}
+                                                            error={invalid}
+                                                            helperText={invalid ? error.message : null}
+                                                            // id="startDate"
+                                                            variant="outlined"
+                                                            margin="dense"
+                                                            fullWidth
+                                                        />
+                                                    )}
+                                                />
+                                            )}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Controller
+                                            required
+                                            name="startTime"
+                                            control={control}
+                                            defaultValue={new Date('1/1/2000 18:00:00')}
+                                            render={({
+                                                field: { onChange, value },
+                                                fieldState: { error, invalid },
+                                            }) => (
+                                                <TimePicker
+                                                    label="Thời gian bắt đầu mỗi buổi"
+                                                    ampm={false}
+                                                    value={value}
+                                                    onChange={(value) => {
+                                                        setStartTime(value);
+                                                        console.log(value);
+                                                        onChange(value);
+                                                    }}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            required
+                                                            id="outlined-disabled"
+                                                            error={invalid}
+                                                            helperText={invalid ? error.message : null}
+                                                            // id="startDate"
+                                                            variant="outlined"
+                                                            margin="dense"
+                                                            fullWidth
+                                                        />
+                                                    )}
+                                                />
+                                            )}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Controller
+                                            required
+                                            name="finishTime"
+                                            control={control}
+                                            defaultValue={new Date('1/1/2000 19:45:00')}
+                                            render={({
+                                                field: { onChange, value },
+                                                fieldState: { error, invalid },
+                                            }) => (
+                                                <TimePicker
+                                                    label="Thời gian kết thúc mỗi buổi"
+                                                    ampm={false}
+                                                    minTime={startTime}
+                                                    value={value}
+                                                    onChange={(value) => onChange(value)}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            required
+                                                            id="outlined-disabled"
+                                                            error={invalid}
+                                                            helperText={invalid ? error.message : null}
                                                             // id="startDate"
                                                             variant="outlined"
                                                             margin="dense"

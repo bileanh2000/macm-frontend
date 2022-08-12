@@ -43,7 +43,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
     const [listExhibitionType, setListExhibitionType] = useState([]);
     const [dataMale, setDataMale] = useState([]);
     const [dataFemale, setDateFemale] = useState([]);
-
+    const [isRender, setIsRender] = useState(true);
     const [allMember, setAllMember] = useState([]);
 
     const AddMaleHandler = (data) => {
@@ -84,9 +84,9 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
         setDataMale([]);
         setDateFemale([]);
     };
-    const getAllMember = async () => {
+    const getAllMember = async (exhibitionType) => {
         try {
-            const response = await userApi.getAllMember();
+            const response = await adminTournament.listUserNotJoinExhibition(exhibitionType);
             setAllMember(response.data);
         } catch (error) {
             console.log('khong the lay data');
@@ -110,6 +110,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
             const response = await adminTournament.registerTeam(exhibitionType, params);
             let variant = response.message.includes('thành công') ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
+            setIsRender(true);
             onChangeData && onChangeData();
         } catch (error) {
             let variant = 'error';
@@ -158,8 +159,9 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
     }, [tournamentId]);
 
     useEffect(() => {
-        getAllMember();
-    }, []);
+        isRender && getAllMember(exhibitionType);
+        setIsRender(false);
+    }, [exhibitionType, isRender, allMember]);
 
     useEffect(() => {
         setExhibitionType(exhibitionId);
@@ -245,7 +247,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
                                                         {dataMale.map((data, index) => (
                                                             <TableRow key={index}>
                                                                 <TableCell align="center">{data.studentId}</TableCell>
-                                                                <TableCell align="center">{data.studentName}</TableCell>
+                                                                <TableCell align="center">{data.name}</TableCell>
                                                                 <TableCell align="center">
                                                                     {data.gender ? 'Nam' : 'Nữ'}
                                                                 </TableCell>
@@ -299,7 +301,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
                                                         {dataFemale.map((data, index) => (
                                                             <TableRow key={index}>
                                                                 <TableCell align="center">{data.studentId}</TableCell>
-                                                                <TableCell align="center">{data.studentName}</TableCell>
+                                                                <TableCell align="center">{data.name}</TableCell>
                                                                 <TableCell align="center">
                                                                     {data.gender ? 'Nam' : 'Nữ'}
                                                                 </TableCell>
