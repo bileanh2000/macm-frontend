@@ -44,6 +44,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import UpdateTournamentOverview from './EventOverview/UpdateEventOverview';
 import { useSnackbar } from 'notistack';
 import EventFee from './EventFee';
+import EventAttendance from './EventAttendance';
 // import AdminTournament from '../AdminTournament';
 // import MemberTournament from '../MemberTournament';
 
@@ -270,7 +271,7 @@ function EventDetails() {
                                     <Tab label="Danh sách thành viên BTC" {...a11yProps(2)} value={2} />
                                     <Tab label="Danh sách thành viên tham gia" {...a11yProps(3)} value={3} />
                                     <Tab label="Chi phí" {...a11yProps(4)} value={4} />
-                                    <Tab label="Điểm danh" {...a11yProps(5)} value={5} />
+                                    <Tab label="Trạng thái điểm danh" {...a11yProps(5)} value={5} />
                                 </Tabs>
                             </Box>
                         </Container>
@@ -297,9 +298,10 @@ function EventDetails() {
                             <TabPanel value={value} index={4}>
                                 <EventFee event={tournament} isUpdate={isUpdate} user={user} />
                             </TabPanel>
-                            {/*<TabPanel value={value} index={5}>
-                                <MemberTournament tournament={tournament} isUpdate={isUpdate} />
-                            </TabPanel> */}
+                            <TabPanel value={value} index={5}>
+                                {/* <MemberTournament tournament={tournament} isUpdate={isUpdate} /> */}
+                                <EventAttendance />
+                            </TabPanel>
                         </Container>
                     </Paper>
                 </Fragment>

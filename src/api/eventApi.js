@@ -166,6 +166,11 @@ const eventApi = {
         return axiosClient.get(url);
     },
 
+    getEventByDate: (date) => {
+        const url = `/eventschedule/geteventsessionbydate?date=${date}`;
+        return axiosClient.get(url);
+    },
+
     // getAllOnGoingEvent:{}=>
 };
 export default eventApi;

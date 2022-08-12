@@ -127,9 +127,12 @@ function Event() {
         return container;
     });
     const navigateToUpdate = (params, date) => {
-        console.log(params);
-        // let path = `${moment(date).format('YYYY-MM-DD')}/edit`;
-        // navigate(path);
+        let formatDate = moment(date).format('DD/MM/yyyy');
+        console.log(formatDate);
+        eventApi.getEventByDate(formatDate).then((res) => {
+            console.log('selected id', res.data[0].event.id);
+            navigate(`/admin/events/${res.data[0].event.id}`);
+        });
     };
 
     useEffect(() => {
@@ -149,26 +152,6 @@ function Event() {
     }, [semester]);
     useEffect(() => {
         getStartDateBySemesterName(semester);
-
-        // let newDate = moment(new Date()).format('yyyy-MM-DD');
-        // let formatMonth = month;
-
-        // if (month) {
-        //     newDate =
-        //         startDateOfSemester &&
-        //         startDateOfSemester.split('-')[0] + '-' + formatMonth + '-' + startDateOfSemester.split('-')[2];
-        // }
-        // if (month < 10) {
-        //     formatMonth = '0' + month;
-        // }
-
-        // newDate && calendarFilter(newDate);
-        // console.log('heheeeee', newDate);
-        // console.log('heheeeee', formatMonth);
-        // month &&
-        //     calendarFilter(
-        //         new Date(`${startDateOfSemester.split('-')[0]}-${month}-${startDateOfSemester.split('-')[2]}`),
-        //     );
         month &&
             startDateOfSemester &&
             calendarFilter(
@@ -212,8 +195,6 @@ function Event() {
                     onChange={handleChange}
                     sx={{ mr: 2 }}
                 >
-                    {/* {semesterList[0] && <MenuItem value={semesterList[0].name}>{semesterList[0].name}</MenuItem>} */}
-
                     {semesterList.map((option) => (
                         <MenuItem key={option.id} value={option.name}>
                             {option.name}
@@ -319,18 +300,6 @@ function Event() {
                         height="100%"
                         plugins={[dayGridPlugin, interactionPlugin]}
                         initialView="dayGridMonth"
-                        // events={[
-                        //     {
-                        //         id: 1,
-                        //         title: 'Teambuiding Tam đảo 18:00-19:00',
-                        //         start: '2022-06-24',
-                        //         end: '2022-06-27',
-                        //         // display: 'background',
-                        //         // textColor: 'white',
-                        //         // backgroundColor: '#5ba8f5',
-                        //         classNames: ['test-css'],
-                        //     },
-                        // ]}
                         events={scheduleData}
                         weekends={true}
                         headerToolbar={{

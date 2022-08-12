@@ -6,6 +6,7 @@ import eventApi from 'src/api/eventApi';
 import AddMemberToAdminEvent from './AddMemberToAdminEvent';
 import AddMemberToEvent from './AddMemberToEvent';
 import Header from './Header';
+import MemberCancelEvent from './MemberCancelEvent';
 import MemberList from './MemberList';
 
 function MenberEvent() {
@@ -13,6 +14,7 @@ function MenberEvent() {
     const [type, setType] = useState(0);
     const [userList, setUserList] = useState([]);
     const [isOpenAddMemberDialog, setIsOpenAddMemberDialog] = useState(false);
+    const [isMemberCancelDialog, setIsMemberCancelDialog] = useState(false);
     const [isUpdateRole, setisUpdateRole] = useState(false);
 
     const handleChangeType = (event) => {
@@ -45,32 +47,21 @@ function MenberEvent() {
                     return setUserList([...newMembers, ...userList]);
                 }}
             />
+
+            <MemberCancelEvent
+                title="Danh sách thành viên hủy tham gia sự kiện"
+                isOpen={isMemberCancelDialog}
+                handleClose={() => setIsMemberCancelDialog(false)}
+            />
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Box>
-                    <Button
-                        variant="outlined"
-                        // component={Link}
-                        // to={`/admin/events/${id}/member/addmember`}
-                        onClick={() => setIsOpenAddMemberDialog(true)}
-                        sx={{ mr: 2 }}
-                    >
+                    <Button variant="outlined" onClick={() => setIsOpenAddMemberDialog(true)} sx={{ mr: 2 }}>
                         Thêm thành viên vào sự kiện
                     </Button>
-                    {/* <Button
-                        variant="outlined"
-                        // component={Link}
-                        // to={`/admin/events/${id}/member/addtoadmin`}
-                        onClick={() => setisUpdateRole(true)}
-                        sx={{ mr: 2 }}
-                    >
-                        Cập nhật thành viên ban tổ chức
-                    </Button> */}
-                    {/* <Button variant="contained">
-                        <Link to="./addtoadmin">Điểm danh</Link>
-                    </Button> */}
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}></Box>
-                <Link to={`../admin/events/${id}/membercancel`}>Danh sách thành viên hủy đăng ký tham gia sự kiện</Link>
+                {/* <Link to={`../admin/events/${id}/membercancel`}>Danh sách thành viên hủy đăng ký tham gia sự kiện</Link> */}
+                <Button onClick={() => setIsMemberCancelDialog(true)}>Danh sách thành viên hủy đăng ký tham gia</Button>
             </Box>
             <MemberList data={userList} />
         </Fragment>

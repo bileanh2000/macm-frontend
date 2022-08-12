@@ -26,6 +26,7 @@ import CelebrationIcon from '@mui/icons-material/Celebration';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import EventItem from './EventItem';
 
 const cx = classNames.bind(styles);
 
@@ -39,7 +40,10 @@ function EventList() {
     const [semesterList, setSemesterList] = useState([]);
     const [totalResult, setTotalResult] = useState([]);
     const theme = useTheme();
-    const matches = useMediaQuery(theme.breakpoints.up('sm'));
+    const matches = useMediaQuery(theme.breakpoints.up('md'));
+    const [upComingEvents, setUpComingEvents] = useState([]);
+    const [goingOnEvents, setGoingOnEvents] = useState([]);
+    const [closedEvent, setClosedEvent] = useState([]);
 
     let navigator = useNavigate();
 
@@ -54,6 +58,13 @@ function EventList() {
             console.log('getListEventsBySemester', response);
             setPageSize(Math.ceil(response.totalResult / 5));
             setTotalResult(response.totalResult);
+            let upComing = response.data.filter((event) => event.eventDto.status === 'Chưa diễn ra');
+            let goingOn = response.data.filter((event) => event.eventDto.status === 'Đang diễn ra');
+            let closed = response.data.filter((event) => event.eventDto.status === 'Đã kết thúc');
+            setEvents(response.data);
+            setUpComingEvents(upComing);
+            setGoingOnEvents(goingOn);
+            setClosedEvent(closed);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
@@ -137,207 +148,81 @@ function EventList() {
             </Box>
             <Box sx={{}}>
                 <Box>
-                    {!totalResult ? (
+                    {/* {!totalResult ? (
                         <Typography variant="h5" sx={{ textAlign: 'center', mt: 3 }}>
                             KHÔNG CÓ SỰ KIỆN NÀO
                         </Typography>
                     ) : (
                         ''
-                    )}
+                    )} */}
 
-                    <Grid justifyContent="center" container spacing={2}>
-                        {events &&
-                            events.map((item) => {
-                                return matches ? (
-                                    <Grid item xs={12} md={8} key={item.eventDto.id}>
-                                        <Paper
-                                            onClick={() => {
-                                                console.log(item.eventDto.id);
-                                                navigator(`/events/${item.eventDto.id}`);
-                                            }}
-                                            elevation={2}
-                                            sx={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                padding: 2,
-                                                flexWrap: 'wrap',
-                                                transition: 'box-shadow 100ms linear',
-                                                cursor: 'pointer',
+                    <Grid container spacing={4}>
+                        <Grid item xs={12}>
+                            {events.length !== 0 ? null : (
+                                <Typography sx={{ fontWeight: 'bold', mt: 3, textAlign: 'center', xs: { ml: 3 } }}>
+                                    Không có sự kiện nào !
+                                </Typography>
+                            )}
+                            {goingOnEvents.length !== 0 ? (
+                                <Box sx={{ mb: 2 }}>
+                                    {matches ? (
+                                        <Typography sx={{ fontWeight: 'bold', mb: 1, ml: 32 }}>Đang diễn ra</Typography>
+                                    ) : (
+                                        <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Đang diễn ra</Typography>
+                                    )}
+                                    <ul>
+                                        {goingOnEvents &&
+                                            goingOnEvents.map((item) => {
+                                                return <EventItem key={item.id} data={item} />;
+                                            })}
+                                    </ul>
+                                </Box>
+                            ) : null}
 
-                                                '&:hover': {
-                                                    boxShadow: '0px 0px 16px 1px rgba(0,0,0,0.2)',
-                                                    // opacity: [0.9, 0.8, 0.7],
-                                                },
-                                            }}
-                                        >
-                                            <Box sx={{ display: 'flex' }}>
-                                                <Box
-                                                    sx={{
-                                                        backgroundColor: '#F0F0F0',
-                                                        padding: 0.8,
-                                                        mr: 2,
-                                                        borderRadius: '10px',
-                                                        width: '50px',
-                                                        height: '50px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <CelebrationIcon fontSize="large" sx={{ color: '#0ACE70' }} />
-                                                </Box>
-                                                <Box>
-                                                    <Box>
-                                                        <Typography
-                                                            sx={{
-                                                                fontSize: '20px',
-                                                                lineHeight: '1.2',
-                                                                fontWeight: '500',
-                                                            }}
-                                                        >
-                                                            {item.eventDto.name}
-                                                        </Typography>
-                                                    </Box>
-                                                    <Box sx={{ mt: 0.5 }}>
-                                                        <Typography sx={{ fontSize: '14px', lineHeight: '1.2' }}>
-                                                            {item.eventDto.amountPerMemberRegister === 0
-                                                                ? 'Không thu phí'
-                                                                : 'Dự kiến ' +
-                                                                  item.eventDto.amountPerMemberRegister.toLocaleString() +
-                                                                  ' VND/người'}
-                                                        </Typography>
-                                                    </Box>
-                                                </Box>
-                                            </Box>
-                                            <Box sx={{ display: 'flex', flex: 1 }}>
-                                                <Box sx={{ mr: 1.5, ml: 2 }}>
-                                                    {item.eventDto.status === 'Chưa diễn ra' ? (
-                                                        <div className={cx('upcoming')}>Sắp diễn ra</div>
-                                                    ) : item.eventDto.status === 'Đang diễn ra' ? (
-                                                        <div className={cx('going-on')}>Đang diễn ra</div>
-                                                    ) : (
-                                                        <div className={cx('closed')}>Đã kết thúc</div>
-                                                    )}
-                                                </Box>
-                                                <Box>
-                                                    {item.join ? <div className={cx('joined')}>Đã đăng ký</div> : null}
-                                                </Box>
-                                            </Box>
-
-                                            <Box sx={{}}>
-                                                <Typography
-                                                    sx={{ fontSize: '16px', lineHeight: '1.2', fontWeight: '500' }}
-                                                >
-                                                    {moment(new Date(item.eventDto.startDate)).format('DD/MM/yyyy')}
-                                                </Typography>
-                                            </Box>
-                                        </Paper>
-                                    </Grid>
-                                ) : (
-                                    // Mobile --------------------------------
-
-                                    <Grid item xs={12} md={8} key={item.eventDto.id}>
-                                        <Paper
-                                            onClick={() => {
-                                                console.log(item.eventDto.id);
-                                                navigator(`/events/${item.eventDto.id}`);
-                                            }}
-                                            elevation={2}
-                                            sx={{
-                                                padding: 2,
-                                                flexWrap: 'wrap',
-                                                transition: 'box-shadow 100ms linear',
-                                                cursor: 'pointer',
-
-                                                '&:hover': {
-                                                    boxShadow: '0px 0px 16px 1px rgba(0,0,0,0.2)',
-                                                    // opacity: [0.9, 0.8, 0.7],
-                                                },
-                                            }}
-                                        >
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <Box sx={{ display: 'flex' }}>
-                                                    <Box
-                                                        sx={{
-                                                            backgroundColor: '#F0F0F0',
-                                                            padding: 0.8,
-                                                            mr: 2,
-                                                            borderRadius: '10px',
-                                                            width: '50px',
-                                                            height: '50px',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            flex: 1,
-                                                        }}
-                                                    >
-                                                        <CelebrationIcon fontSize="large" sx={{ color: '#0ACE70' }} />
-                                                    </Box>
-                                                    <Box>
-                                                        <Box>
-                                                            <Typography
-                                                                sx={{
-                                                                    fontSize: '20px',
-                                                                    lineHeight: '1.2',
-                                                                    fontWeight: '500',
-                                                                }}
-                                                            >
-                                                                {item.eventDto.name}
-                                                            </Typography>
-                                                        </Box>
-                                                        <Box>
-                                                            <Typography
-                                                                sx={{
-                                                                    fontSize: '14px',
-                                                                    lineHeight: '1.2',
-                                                                    fontWeight: '500',
-                                                                }}
-                                                            >
-                                                                {moment(new Date(item.eventDto.startDate)).format(
-                                                                    'DD/MM/yyyy',
-                                                                )}
-                                                            </Typography>
-                                                            <Typography sx={{ fontSize: '14px', lineHeight: '1.2' }}>
-                                                                {item.eventDto.amountPerMemberRegister === 0
-                                                                    ? 'Không thu phí'
-                                                                    : 'Dự kiến ' +
-                                                                      item.eventDto.amountPerMemberRegister.toLocaleString() +
-                                                                      ' VND/người'}
-                                                            </Typography>
-                                                        </Box>
-                                                    </Box>
-                                                </Box>
-                                            </Box>
-
-                                            <Box sx={{ display: 'flex', mt: 1, justifyContent: 'flex-end' }}>
-                                                <Box sx={{}}>
-                                                    {item.eventDto.status === 'Chưa diễn ra' ? (
-                                                        <div className={cx('upcoming')}>Sắp diễn ra</div>
-                                                    ) : item.eventDto.status === 'Đang diễn ra' ? (
-                                                        <div className={cx('going-on')}>Đang diễn ra</div>
-                                                    ) : (
-                                                        <div className={cx('closed')}>Đã kết thúc</div>
-                                                    )}
-                                                </Box>
-                                                {item.join ? (
-                                                    <Box sx={{ ml: 2 }}>
-                                                        <div className={cx('joined')}>Đã đăng ký</div>
-                                                    </Box>
-                                                ) : null}
-                                            </Box>
-
-                                            {/* <Box sx={{}}>
-                                                <Typography
-                                                    sx={{ fontSize: '16px', lineHeight: '1.2', fontWeight: '500' }}
-                                                >
-                                                    {moment(new Date(item.eventDto.startDate)).format('DD/MM/yyyy')}
-                                                </Typography>
-                                            </Box> */}
-                                        </Paper>
-                                    </Grid>
-                                );
-                            })}
+                            {upComingEvents.length !== 0 ? (
+                                <Box>
+                                    {matches ? (
+                                        <Typography sx={{ fontWeight: 'bold', mb: 1, ml: 32 }}>Sắp diễn ra</Typography>
+                                    ) : (
+                                        <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Sắp diễn ra</Typography>
+                                    )}
+                                    {/* <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Sắp diễn ra</Typography> */}
+                                    <ul>
+                                        {upComingEvents &&
+                                            upComingEvents.map((item) => {
+                                                return (
+                                                    <EventItem
+                                                        key={item.id}
+                                                        data={item}
+                                                        onSuccess={(deletedId) =>
+                                                            setUpComingEvents((prev) =>
+                                                                prev.filter((item) => item.id !== deletedId),
+                                                            )
+                                                        }
+                                                    />
+                                                );
+                                            })}
+                                    </ul>
+                                </Box>
+                            ) : null}
+                            {closedEvent.length !== 0 ? (
+                                <>
+                                    {matches ? (
+                                        <Typography sx={{ fontWeight: 'bold', mb: 1, ml: 32 }}>Đã kết thúc</Typography>
+                                    ) : (
+                                        <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Đã kết thúc</Typography>
+                                    )}
+                                    <Box sx={{ height: '40vh', overflowY: 'overlay' }}>
+                                        <ul>
+                                            {closedEvent &&
+                                                closedEvent.map((item) => {
+                                                    return <EventItem key={item.id} data={item} isMember={true} />;
+                                                })}
+                                        </ul>
+                                    </Box>
+                                </>
+                            ) : null}
+                        </Grid>
                     </Grid>
                     <Box>
                         <Pagination

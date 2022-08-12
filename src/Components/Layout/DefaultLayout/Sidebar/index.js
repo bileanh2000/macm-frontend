@@ -245,7 +245,7 @@ function Sidebar() {
                 <ListItemIcon>
                     <RuleIcon />
                 </ListItemIcon>
-                <ListItemText primary="Quản Lý Nội Quy" />
+                <ListItemText primary="Danh Sách Nội Quy CLB" />
             </ListItem>
             <Divider />
 
