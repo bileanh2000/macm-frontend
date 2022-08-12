@@ -121,7 +121,7 @@ function TableMatch(params) {
                     <TableCell align="left">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
                     <TableCell align="left">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
                     {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
-                    {status === 3 && (
+                    {status >= 2 && (
                         <TableCell align="left">
                             <Chip
                                 icon={<SportsScore />}

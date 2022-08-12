@@ -53,7 +53,7 @@ function TakeAttendance() {
             }
             if (_type == 1) {
                 adminAttendanceAPI.getEventSessionByDate(_nowDate).then((res) => {
-                    setEventId(res.data[0].id);
+                    setEventId(res.data[0].event.id);
                     adminAttendanceAPI.getAttendanceByEventId(res.data[0].event.id).then((res) => {
                         setUserList(res.data);
                     });

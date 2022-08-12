@@ -636,7 +636,7 @@ function CustomMatchBracket(params) {
                     {matches.map((matchs, index) => (
                         <div className={cx('tournament-bracket__round')} key={index}>
                             <h3 className={cx('tournament-bracket__round-title')}>
-                                Trận{' '}
+                                Vòng{' '}
                                 {index == matches.length - 1
                                     ? 'tranh hạng 3'
                                     : index == matches.length - 2
@@ -658,150 +658,187 @@ function CustomMatchBracket(params) {
                                             key={match.id}
                                         >
                                             <Box
-                                                sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}
+                                                sx={{
+                                                    p: '1em',
+                                                    backgroundColor: '#0000000a',
+                                                    width: '100%',
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    pl: 0,
+                                                }}
                                                 onClick={(e) => handleClickResult(e, match)}
                                             >
-                                                <div>
-                                                    <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                                </div>
-                                                <Tooltip
-                                                    title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
-                                                    disableHoverListener={isEdit || match.firstPlayer === null}
+                                                <Typography variant="caption" sx={{ m: 1 }}>
+                                                    Cặp: {match.matchNo}
+                                                </Typography>
+                                                <Box
+                                                    sx={{
+                                                        width: '100%',
+                                                    }}
                                                 >
-                                                    <div
-                                                        className={cx(
-                                                            'tournament-bracket__match',
-                                                            isEdit ? 'draggable' : '',
-                                                        )}
-                                                        draggable={isEdit}
-                                                        onDragOver={(e) => onDragOver(e)}
-                                                        onDragStart={(e) =>
-                                                            onDragStart(
-                                                                e,
-                                                                { firstPlayer: match.firstPlayer },
-                                                                i,
-                                                                index,
-                                                                0,
-                                                            )
-                                                        }
-                                                        onDragEnd={() => onDragEnd()}
-                                                        onDrop={(e) =>
-                                                            onDragDrop(
-                                                                e,
-                                                                { firstPlayer: match.firstPlayer },
-                                                                i,
-                                                                index,
-                                                                0,
-                                                            )
-                                                        }
-                                                        onClick={(e) => handleClickWinner(e, match.firstPlayer)}
-                                                    >
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.firstPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.firstPlayer?.point}</small>
-                                                        </Box>
+                                                    <div>
+                                                        <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
                                                     </div>
-                                                </Tooltip>
-                                                <Tooltip
-                                                    title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
-                                                    disableHoverListener={isEdit || match.secondPlayer === null}
-                                                >
-                                                    <div
-                                                        className={cx(
-                                                            'tournament-bracket__match',
-                                                            isEdit ? 'draggable' : '',
-                                                        )}
-                                                        draggable={isEdit}
-                                                        onDragOver={(e) => onDragOver(e)}
-                                                        onDragStart={(e) =>
-                                                            onDragStart(
-                                                                e,
-                                                                { secondPlayer: match.secondPlayer },
-                                                                i,
-                                                                index,
-                                                                1,
-                                                            )
-                                                        }
-                                                        onDragEnd={() => onDragEnd()}
-                                                        onDrop={(e) =>
-                                                            onDragDrop(
-                                                                e,
-                                                                { secondPlayer: match.secondPlayer },
-                                                                i,
-                                                                index,
-                                                                1,
-                                                            )
-                                                        }
-                                                        onClick={(e) => handleClickWinner(e, match.secondPlayer)}
-                                                    >
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.secondPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.secondPlayer?.point}</small>
-                                                        </Box>
-                                                    </div>
-                                                </Tooltip>
 
-                                                <div>
-                                                    <small>
-                                                        {match.time
-                                                            ? 'Thời gian: ' + moment(match.time).format('hh:mm - DD/MM')
-                                                            : ''}
-                                                    </small>
-                                                </div>
+                                                    <Tooltip
+                                                        title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
+                                                        disableHoverListener={isEdit || match.firstPlayer === null}
+                                                    >
+                                                        <div
+                                                            className={cx(
+                                                                'tournament-bracket__match',
+                                                                isEdit ? 'draggable' : '',
+                                                            )}
+                                                            draggable={isEdit}
+                                                            onDragOver={(e) => onDragOver(e)}
+                                                            onDragStart={(e) =>
+                                                                onDragStart(
+                                                                    e,
+                                                                    { firstPlayer: match.firstPlayer },
+                                                                    i,
+                                                                    index,
+                                                                    0,
+                                                                )
+                                                            }
+                                                            onDragEnd={() => onDragEnd()}
+                                                            onDrop={(e) =>
+                                                                onDragDrop(
+                                                                    e,
+                                                                    { firstPlayer: match.firstPlayer },
+                                                                    i,
+                                                                    index,
+                                                                    0,
+                                                                )
+                                                            }
+                                                            onClick={(e) => handleClickWinner(e, match.firstPlayer)}
+                                                        >
+                                                            <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                                <small>{match.firstPlayer?.studentName}</small>
+                                                            </Box>
+                                                            <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                                <small>{match.firstPlayer?.point}</small>
+                                                            </Box>
+                                                        </div>
+                                                    </Tooltip>
+                                                    <Tooltip
+                                                        title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
+                                                        disableHoverListener={isEdit || match.secondPlayer === null}
+                                                    >
+                                                        <div
+                                                            className={cx(
+                                                                'tournament-bracket__match',
+                                                                isEdit ? 'draggable' : '',
+                                                            )}
+                                                            draggable={isEdit}
+                                                            onDragOver={(e) => onDragOver(e)}
+                                                            onDragStart={(e) =>
+                                                                onDragStart(
+                                                                    e,
+                                                                    { secondPlayer: match.secondPlayer },
+                                                                    i,
+                                                                    index,
+                                                                    1,
+                                                                )
+                                                            }
+                                                            onDragEnd={() => onDragEnd()}
+                                                            onDrop={(e) =>
+                                                                onDragDrop(
+                                                                    e,
+                                                                    { secondPlayer: match.secondPlayer },
+                                                                    i,
+                                                                    index,
+                                                                    1,
+                                                                )
+                                                            }
+                                                            onClick={(e) => handleClickWinner(e, match.secondPlayer)}
+                                                        >
+                                                            <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                                <small>{match.secondPlayer?.studentName}</small>
+                                                            </Box>
+                                                            <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                                <small>{match.secondPlayer?.point}</small>
+                                                            </Box>
+                                                        </div>
+                                                    </Tooltip>
+
+                                                    <div>
+                                                        <small>
+                                                            {match.time
+                                                                ? 'Thời gian: ' +
+                                                                  moment(match.time).format('hh:mm - DD/MM')
+                                                                : ''}
+                                                        </small>
+                                                    </div>
+                                                </Box>
                                             </Box>
                                         </li>
                                     ) : (
                                         <li className={cx('tournament-bracket__item')} key={match.id}>
                                             <Box
-                                                sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}
+                                                sx={{
+                                                    p: '1em',
+                                                    backgroundColor: '#0000000a',
+                                                    width: '100%',
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    pl: 0,
+                                                }}
                                                 onClick={(e) => handleClickResult(e, match)}
                                             >
-                                                <div>
-                                                    <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                                </div>
-                                                <Tooltip
-                                                    title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
-                                                    disableHoverListener={match.firstPlayer === null}
+                                                <Typography variant="caption" sx={{ m: 1 }}>
+                                                    Cặp: {match.matchNo}
+                                                </Typography>
+                                                <Box
+                                                    sx={{
+                                                        width: '100%',
+                                                    }}
                                                 >
-                                                    <div
-                                                        className={cx('tournament-bracket__match')}
-                                                        onClick={(e) => handleClickWinner(e, match.firstPlayer)}
-                                                    >
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.firstPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.firstPlayer?.point}</small>
-                                                        </Box>
+                                                    <div>
+                                                        <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
                                                     </div>
-                                                </Tooltip>
-                                                <Tooltip
-                                                    title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
-                                                    disableHoverListener={match.secondPlayer === null}
-                                                >
-                                                    <div
-                                                        className={cx('tournament-bracket__match')}
-                                                        onClick={(e) => handleClickWinner(e, match.secondPlayer)}
+                                                    <Tooltip
+                                                        title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
+                                                        disableHoverListener={match.firstPlayer === null}
                                                     >
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.secondPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.secondPlayer?.point}</small>
-                                                        </Box>
+                                                        <div
+                                                            className={cx('tournament-bracket__match')}
+                                                            onClick={(e) => handleClickWinner(e, match.firstPlayer)}
+                                                        >
+                                                            <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                                <small>{match.firstPlayer?.studentName}</small>
+                                                            </Box>
+                                                            <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                                <small>{match.firstPlayer?.point}</small>
+                                                            </Box>
+                                                        </div>
+                                                    </Tooltip>
+                                                    <Tooltip
+                                                        title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
+                                                        disableHoverListener={match.secondPlayer === null}
+                                                    >
+                                                        <div
+                                                            className={cx('tournament-bracket__match')}
+                                                            onClick={(e) => handleClickWinner(e, match.secondPlayer)}
+                                                        >
+                                                            <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                                <small>{match.secondPlayer?.studentName}</small>
+                                                            </Box>
+                                                            <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                                <small>{match.secondPlayer?.point}</small>
+                                                            </Box>
+                                                        </div>
+                                                    </Tooltip>
+                                                    <div>
+                                                        <small>
+                                                            {match.time
+                                                                ? 'Thời gian: ' +
+                                                                  moment(match.time).format('hh:mm - DD/MM')
+                                                                : ''}
+                                                        </small>
                                                     </div>
-                                                </Tooltip>
-                                                <div>
-                                                    <small>
-                                                        {match.time
-                                                            ? 'Thời gian: ' + moment(match.time).format('hh:mm - DD/MM')
-                                                            : ''}
-                                                    </small>
-                                                </div>
+                                                </Box>
                                             </Box>
                                         </li>
                                     ),

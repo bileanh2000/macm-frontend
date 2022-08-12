@@ -1,24 +1,35 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { Box, Button, FormControl, MenuItem, Select, Typography } from '@mui/material';
+import { Box, Button, FormControl, MenuItem, Paper, Select, Tooltip, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import moment from 'moment';
 
 import adminTournament from 'src/api/adminTournamentAPI';
 import TableMatch from './TableMatch';
+import Gold from 'src/Components/Common/Material/Gold';
+import Sliver from 'src/Components/Common/Material/Sliver';
+import Brone from 'src/Components/Common/Material/Brone';
 
-function TournamentExhibition({ tournamentStatus, reload }) {
+function TournamentExhibition({ reload, result }) {
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
 
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
+    const [tournamentResult, setTournamentResult] = useState();
     const [exhibitionType, setExhibitionType] = useState(0);
     const [exhibitionTeam, setExhibitionTeam] = useState([]);
     const [listExhibitionType, setListExhibitionType] = useState([]);
-    // const [tournamentStatus, setTournamentStatus] = useState(-1);
+    const [tournamentStatus, setTournamentStatus] = useState();
 
     const handleChangeExhibitionType = (event) => {
         console.log(event.target.value);
+        if (result && result.length > 0) {
+            const _result = result.find((subResult) =>
+                subResult.data.find((d) => d.exhibitionType.id == event.target.value),
+            ).data[0].listResult;
+            setTournamentResult(_result);
+            console.log('result', _result);
+        }
         setExhibitionType(event.target.value);
         let exType;
         if (event.target.value === 0) {
@@ -34,10 +45,17 @@ function TournamentExhibition({ tournamentStatus, reload }) {
         try {
             const response = await adminTournament.getListExhibitionType(tournamentId);
             console.log(response);
+            setTournamentStatus(response.data[0].status);
             setListExhibitionType(response.data);
             setExhibitionType(response.data[0].id);
+            console.log(response.data[0].id, result);
+            const _result = result.find((subResult) =>
+                subResult.data.find((d) => d.exhibitionType.id == response.data[0].id),
+            ).data[0].listResult;
+            setTournamentResult(_result);
+            console.log('result', _result);
+            console.log(response.data[0].id, nowDate);
             getExhibitionResult(response.data[0].id, nowDate);
-            // setTournamentStatus(response.code);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -54,7 +72,8 @@ function TournamentExhibition({ tournamentStatus, reload }) {
 
     const getExhibitionResult = async (exhibitionType, date) => {
         try {
-            const response = await adminTournament.getExhibitionResult({ exhibitionType, date });
+            const response = await adminTournament.getExhibitionResult({ date, exhibitionType });
+            console.log(response.data);
             setExhibitionTeam(response.data);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
@@ -122,9 +141,37 @@ function TournamentExhibition({ tournamentStatus, reload }) {
                     </Select>
                 </FormControl>
             </Box>
+            {tournamentResult != null && (
+                <Paper elevation={3} sx={{ m: 2, p: 2 }}>
+                    <Typography variant="h6">Kết quả bảng đấu</Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Tooltip title="Huy chương vàng">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Gold />
+
+                                <Typography variant="body1">{tournamentResult[0].teamName}</Typography>
+                            </Box>
+                        </Tooltip>
+                        <Tooltip title="Huy chương bạc">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Sliver />
+
+                                <Typography variant="body1">{tournamentResult[1].teamName}</Typography>
+                            </Box>
+                        </Tooltip>
+                        <Tooltip title="Huy chương đồng">
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <Brone />
+
+                                <Typography variant="body1">{tournamentResult[2].teamName}</Typography>
+                            </Box>
+                        </Tooltip>
+                    </Box>
+                </Paper>
+            )}
             {exhibitionTeam && exhibitionTeam.length > 0 ? (
                 <div>
-                    {tournamentStatus == 2 ? (
+                    {/* {tournamentStatus == 2 ? (
                         exhibitionTeam[0].area ? (
                             ''
                         ) : (
@@ -134,7 +181,7 @@ function TournamentExhibition({ tournamentStatus, reload }) {
                         )
                     ) : (
                         ''
-                    )}
+                    )} */}
                     <TableMatch
                         matches={exhibitionTeam}
                         status={tournamentStatus}

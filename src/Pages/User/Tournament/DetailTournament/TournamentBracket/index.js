@@ -1,16 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-    Box,
-    Button,
-    Tab,
-    Tabs,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Typography,
-} from '@mui/material';
+import { Box, Button, Tab, Tabs } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 
@@ -42,7 +31,7 @@ function TabPanel(props) {
     );
 }
 
-function TournamentBacket({ tournament, tournamentStatus }) {
+function TournamentBracket({ tournament, competitive, exhibition }) {
     let isDisplay = false;
     if (tournament.competitiveTypes.length > 0 || tournament.exhibitionTypes.length > 0) {
         const competitiveStatus = tournament.competitiveTypes.map((competitive) => competitive.status);
@@ -54,34 +43,12 @@ function TournamentBacket({ tournament, tournamentStatus }) {
     }
     console.log(isDisplay);
     const { tournamentId } = useParams();
-    const { enqueueSnackbar } = useSnackbar();
     const [value, setValue] = useState(0);
-    const [open, setOpen] = useState(false);
     const [tournamentResult, setTournamentResult] = useState();
     const [isRender, setIsRender] = useState(false);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
-    };
-
-    // const gettournamentresult = async () => {
-    //     try {
-    //         const response = await adminTournament.getTournamentResult(tournamentId);
-    //         console.log('result', response.data);
-    //         setTournamentResult([]);
-    //     } catch (error) {
-    //         console.warn('Failed to get tournament result', error);
-    //     }
-    // };
-
-    const spawnTimeAndArea = async () => {
-        try {
-            const response = await adminTournament.spawnTimeAndArea(tournamentId);
-            enqueueSnackbar(response.message, { variant: 'success' });
-            setIsRender(true);
-        } catch (error) {
-            console.warn('Failed to spawn time and area');
-        }
     };
 
     useEffect(() => {
@@ -97,46 +64,16 @@ function TournamentBacket({ tournament, tournamentStatus }) {
         getTournamentResult();
     }, [tournamentId]);
 
-    const handleDialogConfirmMatch = () => {
-        setOpen(true);
-    };
-    const handleCancel = () => {
-        setOpen(false);
-    };
-    const handleOk = () => {
-        spawnTimeAndArea();
-        handleCancel();
-    };
-
     console.log(tournamentResult);
 
     return (
         <Box>
-            <Dialog maxWidth="xs" open={open}>
-                <DialogTitle>Xác nhận</DialogTitle>
-                <DialogContent dividers>
-                    <DialogContentText>
-                        Bạn có chắc chắn muốn cập nhật thời gian cho toàn bộ thể thức thi đấu?
-                    </DialogContentText>
-                    <Typography variant="caption">
-                        Sau khi xác nhận sẽ không thể thêm đội hoặc tuyển thủ vào thi đấu được nữa!
-                    </Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button autoFocus onClick={handleCancel}>
-                        Hủy bỏ
-                    </Button>
-                    <Button onClick={handleOk}>Đồng ý</Button>
-                </DialogActions>
-            </Dialog>
             {tournamentResult && (
                 <Box sx={{ width: '100%' }}>
                     <Box
                         sx={{
                             borderBottom: 1,
                             borderColor: 'divider',
-                            display: 'flex',
-                            justifyContent: 'space-between',
                         }}
                     >
                         <Tabs
@@ -149,26 +86,18 @@ function TournamentBacket({ tournament, tournamentStatus }) {
                             <Tab label="Đối kháng" {...a11yProps(0)} />
                             <Tab label="Biểu diễn" {...a11yProps(1)} />
                         </Tabs>
-                        <Button
-                            variant="outlined"
-                            onClick={handleDialogConfirmMatch}
-                            sx={{ mb: 2, float: 'right' }}
-                            disabled={isDisplay}
-                        >
-                            Cập nhật thời gian thi đấu cho giải đấu
-                        </Button>
                     </Box>
 
                     <TabPanel value={value} index={0}>
                         <TournamentCompetitive
-                            tournamentStatus={tournamentStatus}
+                            competitive={competitive}
                             reload={isRender}
                             result={tournamentResult.listCompetitiveResult}
                         />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <TournamentExhibition
-                            tournamentStatus={tournamentStatus}
+                            exhibition={exhibition}
                             reload={isRender}
                             result={tournamentResult.listExhibitionResult}
                         />
@@ -179,4 +108,4 @@ function TournamentBacket({ tournament, tournamentStatus }) {
     );
 }
 
-export default TournamentBacket;
+export default TournamentBracket;
