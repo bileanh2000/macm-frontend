@@ -167,8 +167,8 @@ function QRScanner({ activityData, activityType }) {
     };
     return (
         <Fragment>
-            {activityData.id}
-            {activityType}
+            {/* {activityData.id}
+            {activityType} */}
             <Dialog
                 open={!isSessionTime}
                 onClose={handleReset}
