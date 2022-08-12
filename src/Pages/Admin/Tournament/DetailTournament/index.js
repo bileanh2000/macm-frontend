@@ -75,9 +75,15 @@ function DetailTournament() {
     const [openDialog, setOpenDialog] = useState(false);
     const [value, setValue] = useState(0);
     const [isRender, setIsRender] = useState(true);
+    const [valueTab, SetValueTabs] = useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
+    };
+
+    const handleChangeTab = (newValue, tab) => {
+        setValue(newValue);
+        SetValueTabs(tab);
     };
     let navigate = useNavigate();
 
@@ -238,6 +244,7 @@ function DetailTournament() {
                                 index={0}
                                 startTime={scheduleList[0].date}
                                 isUpdate={isUpdate}
+                                onChangeTab={handleChangeTab}
                             />
                             <TabPanel value={value} index={1}>
                                 <TournamentSchedule isUpdate={isUpdate} />
@@ -256,7 +263,11 @@ function DetailTournament() {
                                 />
                             </TabPanel>
                             <TabPanel value={value} index={5}>
-                                <TournamentBacket tournament={tournament} tournamentStatus={tournament.status} />
+                                <TournamentBacket
+                                    tournament={tournament}
+                                    tournamentStatus={tournament.status}
+                                    valueTab={valueTab}
+                                />
                             </TabPanel>
                         </Container>
                     </Paper>

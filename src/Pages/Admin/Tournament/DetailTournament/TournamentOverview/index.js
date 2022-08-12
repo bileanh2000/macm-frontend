@@ -16,7 +16,7 @@ import { tableCellClasses } from '@mui/material/TableCell';
 import { Edit } from '@mui/icons-material';
 import UpdateTournamentOverview from './UpdateTournamentOverview';
 
-function TournamentOverview({ tournament, onUpdateTournament, value, index, startTime, isUpdate }) {
+function TournamentOverview({ tournament, onUpdateTournament, value, index, startTime, isUpdate, onChangeTab }) {
     const [openEditDialog, setOpenEditDialog] = useState(false);
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -104,7 +104,12 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                                                 </TableHead>
                                                 <TableBody>
                                                     {tournament.competitiveTypes.map((data) => (
-                                                        <StyledTableRow key={data.id}>
+                                                        <StyledTableRow
+                                                            key={data.id}
+                                                            onClick={(e) => {
+                                                                onChangeTab && onChangeTab(5, 0);
+                                                            }}
+                                                        >
                                                             <StyledTableCell align="center">
                                                                 {data.gender ? 'Nam' : 'Nữ'}
                                                             </StyledTableCell>
@@ -138,7 +143,12 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                                                 </TableHead>
                                                 <TableBody>
                                                     {tournament.exhibitionTypes.map((data) => (
-                                                        <StyledTableRow key={data.id}>
+                                                        <StyledTableRow
+                                                            key={data.id}
+                                                            onClick={(e) => {
+                                                                onChangeTab && onChangeTab(5, 1);
+                                                            }}
+                                                        >
                                                             <StyledTableCell align="center">
                                                                 {data.name}
                                                             </StyledTableCell>
