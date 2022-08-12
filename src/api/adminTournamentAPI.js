@@ -10,7 +10,7 @@ const adminTournament = {
 
     deleteTournament: (tournamentId) => {
         const url = `tournament/headclub/delete/${tournamentId}`;
-        return axiosClient.delete(url);
+        return axiosClient.put(url);
     },
 
     updateTournament: (params, tournamentId) => {
@@ -24,6 +24,11 @@ const adminTournament = {
     },
     getTournamentById: (params) => {
         const url = `tournament/headclub/tournament/${params}`;
+        return axiosClient.get(url);
+    },
+
+    getTournamentResult: (tournamentId) => {
+        const url = `tournament/gettournamentresult/${tournamentId}`;
         return axiosClient.get(url);
     },
 
@@ -304,7 +309,10 @@ const adminTournament = {
         const url = `/exhibition/headclub/registerexhibitionteam/${exhibitionTypeId}`;
         return axiosClient.post(url, params.listStudentId, { params: { name: params.teamName } });
     },
-
+    listUserNotJoinExhibition: (exhibitionTypeId) => {
+        const url = `/exhibition/headclub/listusernotjoinexhibition/${exhibitionTypeId}`;
+        return axiosClient.get(url);
+    },
     // spawnTimeAndAreaEx: (tournamentId) => {
     //     const url = `/exhibition/headclub/spawntimeandarea/${tournamentId}`;
     //     return axiosClient.post(url);
