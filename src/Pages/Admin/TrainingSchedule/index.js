@@ -1,4 +1,4 @@
-import { Box, Button, MenuItem, TextField, Typography } from '@mui/material';
+import { Box, Button, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
 import { createRef, Fragment, useEffect, useRef } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -11,12 +11,25 @@ import trainingSchedule from 'src/api/trainingScheduleApi';
 import interactionPlugin from '@fullcalendar/interaction';
 import moment from 'moment';
 import SquareIcon from '@mui/icons-material/Square';
+import styled from '@emotion/styled';
 
 import semesterApi from 'src/api/semesterApi';
 import { CollectionsBookmarkOutlined } from '@material-ui/icons';
 
 const cx = classNames.bind(styles);
 
+export const CustomTrainingSchedule = styled.div`
+    .fc-day-future {
+        transition: 0.2s;
+    }
+    .fc-day-future:hover:hover {
+        background-color: #57a6f4 !important;
+    }
+    background-color: #fff;
+    padding: 12px;
+    height: 80vh;
+    width: 70%;
+`;
 function TrainingSchedule() {
     const nowDate = new Date();
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
@@ -104,12 +117,13 @@ function TrainingSchedule() {
         const container = {};
         container['id'] = item.id;
         container['date'] = item.date;
-        container['title'] = item.title + ' - ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+        container['title'] = item.title;
+        container['time'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
         container['type'] = item.type;
 
         // container['backgroundColor'] = '#5ba8f5';
-        container['backgroundColor'] = item.type === 0 ? '#5ba8f5' : item.type === 1 ? '#37ff9f' : '#F58171';
+        container['backgroundColor'] = item.type === 0 ? '#9fccf9' : item.type === 1 ? '#d9d9d9' : '#d9d9d9';
 
         return container;
     });
@@ -119,25 +133,26 @@ function TrainingSchedule() {
     };
     let navigate = useNavigate();
     const navigateToUpdate = (params, date) => {
-        console.log(date, nowDate);
+        // console.log(date, nowDate);
         const filterEventClicked = commonList.filter((item) => item.date === moment(date).format('YYYY-MM-DD'));
-        console.log(filterEventClicked);
-        if (filterEventClicked[0] && filterEventClicked[0].type !== 0 && filterEventClicked[0].type !== 1) {
+        console.log('filter event clicked', filterEventClicked);
+        if (filterEventClicked[0].type !== 0) {
+            console.log('ko phai lich tap');
             return;
         }
         if (
-            date.getMonth() === nowDate.getMonth() &&
-            date.getFullYear() === nowDate.getFullYear() &&
-            date.getDate() === nowDate.getDate()
+            // date.getMonth() === nowDate.getMonth() &&
+            // date.getFullYear() === nowDate.getFullYear() &&
+            // date.getDate() === nowDate.getDate()
+            new Date(date) < new Date()
         ) {
-            console.log('dung ngay roi');
+            console.log('lịch tập quá khứ');
             navigate(
                 { pathname: '../admin/attendance' },
                 { state: { date: moment(date).format('DD/MM/YYYY'), id: params } },
             );
         } else {
-            console.log('sai ngay roi');
-            console.log(date);
+            console.log('lich tap tuong lai, update');
 
             let path = `${moment(date).format('YYYY-MM-DD')}/edit`;
             navigate(path);
@@ -158,6 +173,39 @@ function TrainingSchedule() {
         } else {
             return;
         }
+    };
+    const renderEventContent = (eventInfo) => {
+        console.log(eventInfo);
+
+        return (
+            <Tooltip
+                title={
+                    eventInfo.event.extendedProps.type === 0
+                        ? eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time
+                        : 'Không thể tạo lịch tập (trùng hoạt động khác)'
+                }
+                placement="top"
+            >
+                {eventInfo.event.extendedProps.type === 0 ? (
+                    <Box>
+                        <Box sx={{ ml: 0.5 }}>
+                            <div className={cx('event-title')}>
+                                {eventInfo.event.title} <br />
+                                {eventInfo.event.extendedProps.time}
+                            </div>
+                        </Box>
+                    </Box>
+                ) : (
+                    <Box>
+                        <Box sx={{ ml: 0.5 }}>
+                            <div className={cx('event-title')} style={{ opacity: 0 }}>
+                                {eventInfo.event.extendedProps.time}
+                            </div>
+                        </Box>
+                    </Box>
+                )}
+            </Tooltip>
+        );
     };
 
     return (
@@ -204,26 +252,29 @@ function TrainingSchedule() {
                     ))}
                 </TextField>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                    {/* <Typography>Bấm vào ngày trống trong tương lai để tạo lịch tập</Typography>
+                    <Typography>Bấm vào lịch tập cũ để xem trạng thái điểm danh</Typography> */}
+                    {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
                         <SquareIcon sx={{ color: '#BBBBBB', mr: 0.5 }} />
                         <span>Lịch trong quá khứ</span>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                        <SquareIcon sx={{ color: '#5BA8F5', mr: 0.5 }} />
+                    </Box> */}
+                    {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                        <SquareIcon sx={{ color: '#9fccf9', mr: 0.5 }} />
                         <span>Tập luyện</span>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                        <SquareIcon sx={{ color: '#37ff9f', mr: 0.5 }} />
+                    </Box> */}
+                    {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                        <SquareIcon sx={{ color: '#80ffc1', mr: 0.5 }} />
                         <span>Sự kiện</span>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                        <SquareIcon sx={{ color: '#F58171', mr: 0.5 }} />
+                        <SquareIcon sx={{ color: '#f8aaa0', mr: 0.5 }} />
                         <span>Giải đấu</span>
-                    </Box>
+                    </Box> */}
                 </Box>
             </Box>
             <div className={cx('schedule-container')}>
-                <div className={cx('schedule-content')}>
+                <CustomTrainingSchedule>
+                    {/* <div className={cx('schedule-content')}> */}
                     {semester && (
                         <FullCalendar
                             // initialDate={new Date('2022-10-01')}
@@ -233,6 +284,7 @@ function TrainingSchedule() {
                             height="100%"
                             plugins={[dayGridPlugin, interactionPlugin]}
                             initialView="dayGridMonth"
+                            eventContent={renderEventContent}
                             // events={[
                             //     {
                             //         id: 1,
@@ -277,7 +329,8 @@ function TrainingSchedule() {
                             // eventDrop={(e) => console.log(e)}
                         />
                     )}
-                </div>
+                    {/* </div> */}
+                </CustomTrainingSchedule>
             </div>
         </Fragment>
     );
