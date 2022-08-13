@@ -24,13 +24,13 @@ import Sliver from 'src/Components/Common/Material/Sliver';
 import Trophy from 'src/Components/Common/Material/Trophy';
 import Brone from 'src/Components/Common/Material/Brone';
 
-function TournamentCompetitive({ reload, result }) {
-    console.log(result);
+function TournamentCompetitive({ reload, result, type }) {
+    console.log(result, type);
     let { tournamentId } = useParams();
     const [tournamentResult, setTournamentResult] = useState();
     const [tournamentStatus, setTournamentStatus] = useState(0);
     const { enqueueSnackbar } = useSnackbar();
-    const [competitiveId, setCompetitiveId] = useState(0);
+    const [competitiveId, setCompetitiveId] = useState(type);
     const [listWeightRange, setListWeightRange] = useState([]);
     const [listPlayer, setListPlayer] = useState([]);
     const [rounds, setRounds] = useState();
@@ -154,7 +154,7 @@ function TournamentCompetitive({ reload, result }) {
                 const response = await adminTournament.getAllCompetitiveType(tournamentId);
                 if (response.data.length > 0) {
                     setListWeightRange(response.data[0]);
-                    setCompetitiveId(response.data[0][0].id);
+                    type == 0 && setCompetitiveId(response.data[0][0].id);
                     console.log(response.data[0][0].id, result);
                     const _result = result.find((subResult) =>
                         subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id),

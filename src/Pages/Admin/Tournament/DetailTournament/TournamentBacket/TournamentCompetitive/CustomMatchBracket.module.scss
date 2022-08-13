@@ -264,9 +264,10 @@ h2 {
     margin-bottom: 0.5em;
     justify-content: space-between;
 }
-// .tournament-bracket__match:focus {
-//     border-color: #2196f3;
-// }
+.tournament-bracket__match:hover {
+    background-color: #57a6f4;
+    cursor: pointer;
+}
 .tournament-bracket__match::before,
 .tournament-bracket__match::after {
     transition: all 0.2s linear;

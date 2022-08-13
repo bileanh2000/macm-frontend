@@ -51,11 +51,11 @@ function Attendance() {
                         </Typography>
                         <Divider />
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, mt: 2 }}>
-                            <Button variant="outlined">
+                            {/* <Button variant="outlined">
                                 <Link to={`./report`} style={{ color: 'black' }}>
                                     Thống kê thành viên tham gia buổi tập
                                 </Link>
-                            </Button>
+                            </Button> */}
                             <Box>
                                 <Button variant="outlined" sx={{ color: 'black', mr: 2 }}>
                                     <Link
