@@ -35,6 +35,7 @@ import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
 import moment from 'moment';
 import TournamentBracket from './TournamentBracket';
+import NoValuePage from 'src/Components/NoValuePage';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -84,6 +85,7 @@ function DetailTournament() {
     const [isJoinCompetitive, setIsJoinCompetitive] = useState([]);
     const [isJoinExhibition, setIsJoinExhibition] = useState([]);
     const [isJoinAdmin, setIsJoinAdmin] = useState();
+    const [message, setMessage] = useState('');
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -161,6 +163,7 @@ function DetailTournament() {
             const response = await adminTournamentAPI.getTournamentById(tournamentId);
             console.log(response.data);
             setTournament(response.data[0]);
+            setMessage(response.message);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
@@ -247,6 +250,10 @@ function DetailTournament() {
             }
         }
     };
+
+    if (message === 'Giải đấu này đã hủy') {
+        return <NoValuePage message="Giải đấu này không tồn tại hoặc đã bị hủy" />;
+    }
 
     return (
         <Box sx={{ m: 1, p: 1 }}>

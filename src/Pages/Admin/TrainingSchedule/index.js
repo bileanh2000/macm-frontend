@@ -15,15 +15,46 @@ import styled from '@emotion/styled';
 
 import semesterApi from 'src/api/semesterApi';
 import { CollectionsBookmarkOutlined } from '@material-ui/icons';
+import AddSession from './addSession';
+import EditSession from './editSession';
+import AddSchedule from './addSchedule';
 
 const cx = classNames.bind(styles);
 
 export const CustomTrainingSchedule = styled.div`
     .fc-day-future {
         transition: 0.2s;
+        cursor: ;
     }
-    .fc-day-future:hover:hover {
-        background-color: #57a6f4 !important;
+    .fc-day-past {
+        transition: 0.2s;
+        cursor: default;
+    }
+    .fc-event {
+        cursor: pointer;
+    }
+    .fc-day-future:hover:after {
+        content: 'Tạo buổi tập';
+        position: absolute;
+        margin-top: -8vh;
+        margin-left: 6px;
+        font-weight: bold;
+        font-size: 0.8rem;
+        // bottom: 50%;
+        // left: 50%;
+    }
+    .fc-day-future:hover {
+        background-color: #d0e6fb !important;
+    }
+    .fc-day-today a {
+        background-color: white;
+        // color: red !important;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        margin: 2px;
+        // text-align: center;
+        font-weight: bold;
     }
     background-color: #fff;
     padding: 12px;
@@ -35,11 +66,17 @@ function TrainingSchedule() {
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
     const [scheduleList, setScheduleList] = useState([]);
     const [scheduleId, setScheduleId] = useState();
-    const [semester, setSemester] = useState(2);
+    const [semester, setSemester] = useState(1);
     const [semesterList, setSemesterList] = useState([]);
-    const [currentSemester, setCurrentSemester] = useState([]);
     const [startDateOfSemester, setStartDateOfSemester] = useState();
     const [commonList, setCommonList] = useState([]);
+    const [selectedDate, setSelectedDate] = useState();
+    const [isOpenAddSessionDialog, setIsOpenAddSessionDialog] = useState(false);
+    const [isOpenAddScheduleDialog, setIsOpenAddScheduleDialog] = useState(false);
+    const [isOpenEditSessionDialog, setIsOpenEditSessionDialog] = useState(false);
+    const [isUpdate, setIsUpdate] = useState(false);
+    const [isDisabled, setIsDisabled] = useState(false);
+
     const calendarComponentRef = useRef(null);
 
     const getMonthInCurrentTableView = (startDate) => {
@@ -49,6 +86,7 @@ function TrainingSchedule() {
         const currentYear = temp.getFullYear();
         setMonthAndYear({ month: currentMonth, year: currentYear });
     };
+
     const fetchCommonScheduleBySemester = async () => {
         try {
             const response = await trainingSchedule.commonSchedule();
@@ -102,16 +140,21 @@ function TrainingSchedule() {
     };
 
     useEffect(() => {
-        fetchCommonScheduleBySemester();
+        // fetchCommonScheduleBySemester();
         fetchTrainingSchedule();
         getStartDateBySemesterId(semester);
         startDateOfSemester && goToSemester(startDateOfSemester);
         console.log(startDateOfSemester);
+        // setIsUpdate(false);
     }, [semester, startDateOfSemester]);
     useEffect(() => {
         fetchSemester();
         // getCurrentSemester();
     }, []);
+    useEffect(() => {
+        fetchCommonScheduleBySemester();
+        setIsUpdate(false);
+    }, [isUpdate]);
 
     const scheduleData = commonList.map((item) => {
         const container = {};
@@ -153,36 +196,44 @@ function TrainingSchedule() {
             );
         } else {
             console.log('lich tap tuong lai, update');
-
-            let path = `${moment(date).format('YYYY-MM-DD')}/edit`;
-            navigate(path);
+            setSelectedDate(date);
+            setIsOpenEditSessionDialog(true);
         }
     };
     const navigateToCreate = (date) => {
         console.log(date);
         const existSession = commonList.filter((item) => item.date === date).length; //length = 0 (false) is not exist
         // const scheduleDateList = scheduleList.
-
         if (new Date(date) < nowDate) {
             return;
         }
-
         if (!existSession) {
-            navigate(`addsession/${date}`);
-            console.log(date);
+            setIsDisabled(true);
+            setSelectedDate(date);
+            setIsOpenAddSessionDialog(true);
+            // navigate(`addsession/${date}`);
+            // console.log(date);
         } else {
             return;
         }
     };
     const renderEventContent = (eventInfo) => {
-        console.log(eventInfo);
+        // console.log(eventInfo.event.start);
+        let eventDate = new Date(eventInfo.event.start);
+        let current = new Date();
 
         return (
             <Tooltip
                 title={
+                    // eventInfo.event.extendedProps.type === 0
+                    //     ? eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time
+                    //     : 'Không thể tạo lịch tập (trùng hoạt động khác)'
+                    // eventDate < current ? 'Xem thông tin điểm danh' : 'Cập nhật thời gian'?eventInfo.event.extendedProps.type === 0?'Không thể tạo lịch tập (trùng hoạt động khác)':''
                     eventInfo.event.extendedProps.type === 0
-                        ? eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time
-                        : 'Không thể tạo lịch tập (trùng hoạt động khác)'
+                        ? eventDate < current
+                            ? 'Xem thông tin điểm danh'
+                            : 'Cập nhật thời gian'
+                        : `Không thể tạo lịch tập (trùng với ${eventInfo.event.title})`
                 }
                 placement="top"
             >
@@ -199,8 +250,11 @@ function TrainingSchedule() {
                     <Box>
                         <Box sx={{ ml: 0.5 }}>
                             <div className={cx('event-title')} style={{ opacity: 0 }}>
-                                {eventInfo.event.title} <br />
-                                {eventInfo.event.extendedProps.time}
+                                {/* {eventInfo.event.title} <br />
+                                {eventInfo.event.extendedProps.time} */}
+                                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Rem cumque voluptatum nihil
+                                magni sint cum veritatis voluptas consequuntur delectus, facere magnam quisquam
+                                architecto illum officiis ratione, nobis est nesciunt autem!
                             </div>
                         </Box>
                     </Box>
@@ -211,6 +265,51 @@ function TrainingSchedule() {
 
     return (
         <Fragment>
+            {isOpenAddSessionDialog && (
+                <AddSession
+                    title="Tạo buổi tập"
+                    isOpen={isOpenAddSessionDialog}
+                    handleClose={() => {
+                        setIsOpenAddSessionDialog(false);
+                        setSelectedDate(null);
+                    }}
+                    date={selectedDate}
+                    isDisabled={isDisabled}
+                    onSucess={(isUpdate) => {
+                        setIsUpdate(isUpdate);
+                    }}
+                />
+            )}
+            {isOpenEditSessionDialog && (
+                <EditSession
+                    title="Cập nhật thời gian buổi tập"
+                    isOpen={isOpenEditSessionDialog}
+                    handleClose={() => {
+                        setIsOpenEditSessionDialog(false);
+                        setSelectedDate(null);
+                    }}
+                    date={selectedDate}
+                    onSucess={(isUpdate) => {
+                        setIsUpdate(isUpdate);
+                    }}
+                />
+            )}
+            {isOpenAddScheduleDialog && (
+                <AddSchedule
+                    title="Thêm lịch tập"
+                    isOpen={isOpenAddScheduleDialog}
+                    handleClose={() => {
+                        // setIsOpenEditSessionDialog(false);
+                        // setSelectedDate(null);
+                        setIsOpenAddScheduleDialog(false);
+                    }}
+                    date={selectedDate}
+                    onSucess={(isUpdate) => {
+                        setIsUpdate(isUpdate);
+                    }}
+                />
+            )}
+
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 700, marginBottom: 2 }}>
                     Theo dõi lịch tập
@@ -219,8 +318,12 @@ function TrainingSchedule() {
                     {/* <Box sx={{ mt: 8, ml: 2 }}>
                     </Box> */}
                     <Button
-                        component={Link}
-                        to="/admin/trainingschedules/addsession"
+                        // component={Link}
+                        // to="/admin/trainingschedules/addsession"
+                        onClick={() => {
+                            setIsOpenAddSessionDialog(true);
+                            setIsDisabled(false);
+                        }}
                         startIcon={<AddCircleIcon />}
                         variant="outlined"
                         sx={{ mr: 1 }}
@@ -228,8 +331,9 @@ function TrainingSchedule() {
                         Thêm buổi tập
                     </Button>
                     <Button
-                        component={Link}
-                        to="/admin/trainingschedules/add"
+                        // component={Link}
+                        // to="/admin/trainingschedules/add"
+                        onClick={() => setIsOpenAddScheduleDialog(true)}
                         startIcon={<AddCircleIcon />}
                         variant="outlined"
                     >
@@ -278,7 +382,7 @@ function TrainingSchedule() {
                     {/* <div className={cx('schedule-content')}> */}
                     {semester && (
                         <FullCalendar
-                            // initialDate={new Date('2022-10-01')}
+                            initialDate={new Date()}
                             // {...(semester!==2?(initialDate: '2022-10-01'):{})}
                             // initialDate={semester !== 2 ? new Date('2022-10-01') : new Date()}
                             locale="vie"
@@ -325,6 +429,7 @@ function TrainingSchedule() {
                                 //     type: 'success',
                                 // });
                             }}
+
                             // selectable
                             // select={handleEventAdd}
                             // eventDrop={(e) => console.log(e)}

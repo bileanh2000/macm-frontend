@@ -74,7 +74,7 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
             if (!value.match(/[A-Z]{2}\d{6}\b/)) {
                 return createError({
                     path,
-                    message: 'Vui lòng nhập đúng định dạng',
+                    message: `Vui lòng nhập đúng định dạng 'ex: HA14000'`,
                 });
             }
 

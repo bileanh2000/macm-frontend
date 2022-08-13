@@ -1,4 +1,15 @@
-import { Box, ButtonGroup, Button, Typography, TextField, Grid, Snackbar, Alert } from '@mui/material';
+import {
+    Box,
+    ButtonGroup,
+    Button,
+    Typography,
+    TextField,
+    Grid,
+    Snackbar,
+    Alert,
+    IconButton,
+    Tooltip,
+} from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -13,8 +24,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
 import eventApi from 'src/api/eventApi';
 import { useSnackbar } from 'notistack';
+import { Title } from '@mui/icons-material';
 
-function UpdateSchedule() {
+function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const currentDate = new Date();
     const { scheduleId } = useParams();
@@ -28,18 +40,15 @@ function UpdateSchedule() {
     const [dateValue, setDateValue] = useState();
 
     const schema = Yup.object().shape({
-        date: Yup.string()
-            .nullable()
-            .matches(/(\d{4})-(\d{2})-(\d{2})/, 'Vui lòng nhập đúng định dạng ngày tháng YYYY-MM-DD'),
-        // endDate: Yup.string().nullable().required('Điền đi'),
-        startTime: Yup.string()
-            .nullable()
-            .required('Không để để trống trường này')
-            .matches(/(\d{2}):(\d{2}):(\d{2})/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
-        finishTime: Yup.string()
-            .nullable()
-            .required('Không để để trống trường này')
-            .matches(/(\d{2}):(\d{2}):(\d{2})/, 'Vui lòng nhập đúng định dạng thời gian HH:mm:ss'),
+        // date: Yup.string().nullable().required('Vui lòng không để trống trường này'),
+        startTime: Yup.date().nullable().required('Vui lòng không để trống trường này'),
+        finishTime: Yup.date()
+            // .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
+            .typeError('Vui lòng không để trống trường này')
+            .test('deadline_test', 'Thời gian kết thúc không được sớm hơn thời gian bắt đầu', function (value) {
+                const { startTime } = this.parent;
+                return value.getTime() > startTime.getTime();
+            }),
     });
 
     const fetchSchedule = async (date) => {
@@ -51,28 +60,28 @@ function UpdateSchedule() {
         }
     };
     useEffect(() => {
-        window.scrollTo(0, 0);
-
-        fetchSchedule(moment(scheduleId).format('DD/MM/YYYY'));
-    }, [scheduleId]);
+        fetchSchedule(moment(date).format('DD/MM/yyyy'));
+    }, [date]);
 
     const handleClickOpen = () => {
         setOpen(true);
     };
 
-    const handleClose = () => {
+    const handleCloseConfirmDialog = () => {
         setOpen(false);
     };
 
     const handleConfirmDialog = async () => {
         setOpen(false);
-        await trainingSchedule.deleteSession(moment(scheduleId).format('DD/MM/YYYY')).then((res) => {
+        await trainingSchedule.deleteSession(moment(date).format('DD/MM/YYYY')).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
             console.log('3', res.message);
             enqueueSnackbar(res.message, { variant: 'success' });
         });
-        setTimeout(navigate(-1), 50000);
+        onSucess && onSucess(true);
+        handleCloseConfirmDialog();
+        handleClose();
     };
     const {
         control,
@@ -81,25 +90,24 @@ function UpdateSchedule() {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(schema),
-        mode: 'onBlur',
+        mode: 'onChange',
         defaultValues: {},
     });
 
-    let navigate = useNavigate();
     const onSubmit = async (data) => {
-        data = {
-            id: parseInt(scheduleId, 10),
-            date: moment(dateValue).format('yyyy-MM-DD'),
-            startTime: data.startTime,
-            finishTime: data.finishTime,
+        const formatData = {
+            id: scheduleList[0].id,
+            date: moment(date).format('yyyy-MM-DD'),
+            startTime: moment(data.startTime).format('HH:mm'),
+            finishTime: moment(data.finishTime).format('HH:mm'),
         };
-        await trainingSchedule.updateSchedule(moment(scheduleId).format('DD/MM/YYYY'), data).then((res) => {
+        await trainingSchedule.updateSchedule(moment(date).format('DD/MM/YYYY'), formatData).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
             if (res.data.length != 0) {
                 enqueueSnackbar(res.message, { variant: 'success' });
-
-                navigate(`/admin/trainingschedules`);
+                onSucess && onSucess(true);
+                handleClose();
             } else {
                 console.log('huhu');
 
@@ -115,188 +123,166 @@ function UpdateSchedule() {
         <Box>
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={handleCloseConfirmDialog}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">{'Xác nhận xóa!'}</DialogTitle>
+                <DialogTitle id="alert-dialog-title">{'Xác nhận xóa ?'}</DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description">Bạn muốn xóa buổi tập này?</DialogContentText>
+                    <DialogContentText id="alert-dialog-description">
+                        Bạn muốn xóa buổi tập ngày {moment(date).format('DD/MM/yyyy')} ?
+                    </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Từ chối</Button>
+                    <Button onClick={handleCloseConfirmDialog}>Từ chối</Button>
                     <Button onClick={handleConfirmDialog} autoFocus>
                         Đồng ý
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h4" color="initial" sx={{ marginBottom: '16px', fontWeight: '700' }}>
-                    Cập nhật buổi tập
-                </Typography>
-                {selectedDate <= currentDate ? (
-                    ''
-                ) : (
-                    <Button variant="outlined" startIcon={<DeleteIcon />} color="error" onClick={handleClickOpen}>
-                        Xóa buổi tập
-                    </Button>
-                )}
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+            <Dialog
+                fullWidth
+                maxWidth="xs"
+                // keepMounted
+                open={!!isOpen}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle
+                    id="alert-dialog-title"
+                    sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                    {title}
+                    {/* <Tooltip title="Xóa lịch tập">
+                        <IconButton aria-label="delete" onClick={handleClickOpen}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Tooltip> */}
+                </DialogTitle>
+                <DialogContent>
+                    {/* <DialogContentText id="alert-dialog-description">{facilityId}</DialogContentText> */}
                     <Box
                         component="form"
                         noValidate
-                        onSubmit={handleSubmit(onSubmit)}
-                        className="signup-form"
-                        sx={{ width: '100%', mt: 5 }}
+                        autoComplete="off"
+                        sx={
+                            {
+                                // '& .MuiTextField-root': { mt: 0 },
+                            }
+                        }
                     >
-                        {scheduleList.map((item) => {
-                            return (
-                                <Grid container spacing={1} columns={12} key={item.id}>
-                                    <Grid item sm={4}>
-                                        <TextField
-                                            disabled
-                                            id="outlined-disabled"
-                                            label="Ngày tháng"
-                                            defaultValue={item.date}
-                                            fullWidth
-                                            {...register('date')}
-                                            error={errors.date ? true : false}
-                                            helperText={errors.date?.message}
-                                        />
-                                        {/* <Controller
-                                            required
-                                            name="startDate"
-                                            control={control}
-                                            defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <DatePicker
-                                                    label="Ngày bắt đầu"
-                                                    ampm={false}
-                                                    defaultValue={new Date()}
-                                                    inputFormat="yyyy-MM-dd"
-                                                    value={dateValue}
-                                                    onChange={(e) => {
-                                                        console.log(e);
-                                                        setDateValue(e);
-                                                    }}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        /> */}
-                                    </Grid>
-                                    <Grid item sm={4}>
-                                        <TextField
-                                            required
-                                            id="outlined-disabled"
-                                            label="Thời gian bắt đầu"
-                                            defaultValue={item.startTime}
-                                            fullWidth
-                                            {...register('startTime')}
-                                            error={errors.startTime ? true : false}
-                                            helperText={errors.startTime?.message}
-                                        />
-                                        {/* <Controller
-                                            name="startTime"
-                                            control={control}
-                                            defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <TimePicker
-                                                    label="Thời gian bắt đầu"
-                                                    ampm={false}
-                                                    value={moment(new Date(item.startTime)).format('hh:mm') || value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        /> */}
-                                    </Grid>
-                                    <Grid item sm={4}>
-                                        <TextField
-                                            required
-                                            id="outlined-disabled"
-                                            label="Thời gian kết thúc"
-                                            defaultValue={item.finishTime}
-                                            fullWidth
-                                            {...register('finishTime')}
-                                            error={errors.finishTime ? true : false}
-                                            helperText={errors.finishTime?.message}
-                                        />
-                                        {/* <Controller
-                                            required
-                                            name="endTime"
-                                            control={control}
-                                            defaultValue={null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <TimePicker
-                                                    label="Thời gian kết thúc"
-                                                    ampm={false}
-                                                    value={item.finishTime || value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        /> */}
-                                    </Grid>
-                                </Grid>
-                            );
-                        })}
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Button color="primary" variant="contained" type="submit" sx={{ mt: 3 }}>
-                                Xác nhận
-                            </Button>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                                <Box
+                                    component="form"
+                                    noValidate
+                                    // onSubmit={}
+                                    sx={{ width: '100%', mt: 5 }}
+                                >
+                                    {scheduleList.map((item) => {
+                                        return (
+                                            <Grid container spacing={1} columns={12} key={item.id}>
+                                                <Grid item sm={12}>
+                                                    <TextField
+                                                        disabled
+                                                        id="outlined-disabled"
+                                                        label="Ngày tháng"
+                                                        defaultValue={moment(item.date).format('DD/MM/yyyy')}
+                                                        fullWidth
+                                                        {...register('date')}
+                                                        error={errors.date ? true : false}
+                                                        helperText={errors.date?.message}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={12} sm={12}>
+                                                    <Controller
+                                                        required
+                                                        name="startTime"
+                                                        control={control}
+                                                        defaultValue={new Date(`2022-11-12T${item.startTime}`)}
+                                                        render={({
+                                                            field: { onChange, value },
+                                                            fieldState: { error, invalid },
+                                                        }) => (
+                                                            <TimePicker
+                                                                label="Thời gian bắt đầu"
+                                                                ampm={false}
+                                                                value={value}
+                                                                onChange={(value) => onChange(value)}
+                                                                renderInput={(params) => (
+                                                                    <TextField
+                                                                        {...params}
+                                                                        required
+                                                                        id="outlined-disabled"
+                                                                        error={invalid}
+                                                                        helperText={invalid ? error.message : null}
+                                                                        // id="startDate"
+                                                                        variant="outlined"
+                                                                        margin="dense"
+                                                                        fullWidth
+                                                                    />
+                                                                )}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={12} sm={12} sx={{ mb: 2 }}>
+                                                    <Controller
+                                                        required
+                                                        name="finishTime"
+                                                        control={control}
+                                                        defaultValue={new Date(`2022-11-12T${item.finishTime}`)}
+                                                        render={({
+                                                            field: { onChange, value },
+                                                            fieldState: { error, invalid },
+                                                        }) => (
+                                                            <TimePicker
+                                                                label="Thời gian kết thúc"
+                                                                ampm={false}
+                                                                value={value}
+                                                                onChange={(value) => onChange(value)}
+                                                                renderInput={(params) => (
+                                                                    <TextField
+                                                                        {...params}
+                                                                        required
+                                                                        id="outlined-disabled"
+                                                                        error={invalid}
+                                                                        helperText={invalid ? error.message : null}
+                                                                        // id="startDate"
+                                                                        variant="outlined"
+                                                                        margin="dense"
+                                                                        fullWidth
+                                                                    />
+                                                                )}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        );
+                                    })}
+                                </Box>
+                            </LocalizationProvider>
                         </Box>
                     </Box>
-                </LocalizationProvider>
-            </Box>
+                </DialogContent>
+                <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Button variant="contained" color="error" onClick={handleClickOpen}>
+                        Xóa buổi tập
+                    </Button>
+                    <Box>
+                        <Button onClick={handleClose} sx={{ mr: 1 }}>
+                            Hủy bỏ
+                        </Button>
+                        <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
+                            Xác nhận
+                        </Button>
+                    </Box>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
 
-export default UpdateSchedule;
+export default EditSession;
