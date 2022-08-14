@@ -42,13 +42,13 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
     moment().locale('vi');
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [open, setOpen] = useState(false);
-    const [startDate, setStartDate] = useState();
-    const [endDate, setEndDate] = useState(new Date());
     const [submitData, setSubmitData] = useState();
     const [previewData, setPreviewData] = useState();
     const [currentSemester, setCurrentSemester] = useState([]);
     const today = new Date();
     const tomorrow = today.setDate(today.getDate() + 1);
+    const [selectStartDate, setSelectStartDate] = useState();
+    const [selectEndDate, setSelectEndDate] = useState();
 
     let navigate = useNavigate();
 
@@ -76,16 +76,24 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
         currentSemester[0] && console.log(currentSemester[0].endDate);
     }, [currentSemester]);
     const schema = Yup.object().shape({
-        startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
+        startDate: Yup.date().nullable().required('Vui lòng không để trống trường này'),
         endDate: Yup.date()
-            .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được sớm hơn ngày bắt đầu`)
-            .typeError('Vui lòng không để trống trường này'),
-        startTime: Yup.date().typeError('Vui lòng không để trống trường này'),
+            // .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
+            .typeError('Vui lòng không để trống trường này')
+            .test('abc', 'Thời gian kết thúc không được sớm hơn thời gian bắt đầu', function (value) {
+                const { startDate } = this.parent;
+                return value.getTime() > startDate.getTime();
+            }),
+        startTime: Yup.date().nullable().required('Vui lòng không để trống trường này'),
         endTime: Yup.date()
-            .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
-            .typeError('Vui lòng không để trống trường này'),
+            // .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
+            .typeError('Vui lòng không để trống trường này')
+            .test('cde', 'Thời gian kết thúc không được sớm hơn thời gian bắt đầu', function (value) {
+                const { startTime } = this.parent;
+                return value.getTime() > startTime.getTime();
+            }),
         dayOfWeek: Yup.array()
-            .min(1)
+            .min(1, 'Vui lòng chọn ít nhất một ngày')
             // .of(Yup.string().required('Vui lòng chọn ít nhất một ngày'))
             .required('Vui lòng chọn ít nhất một ngày'),
     });
@@ -93,6 +101,8 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
     const {
         control,
         handleSubmit,
+        reset,
+        resetField,
         formState: { errors },
         invalid,
     } = useForm({
@@ -103,6 +113,10 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
         },
     });
     const dayOfWeek = [
+        {
+            label: 'Chủ nhật',
+            value: 'SUNDAY',
+        },
         {
             label: 'Thứ hai',
             value: 'MONDAY',
@@ -126,10 +140,6 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
         {
             label: 'Thứ bảy',
             value: 'SATURDAY',
-        },
-        {
-            label: 'Chủ nhật',
-            value: 'SUNDAY',
         },
     ];
     const [openSnackBar, setOpenSnackBar] = useState(false);
@@ -216,9 +226,36 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
 
             return container;
         });
+    const resetCheckbox = () => {
+        // reset({ dayOfWeek: [] });
+        resetField('dayOfWeek');
+    };
+    const getDaysOfWeekBetweenDates = (sDate = '2022-01-14', eDate = '2022-12-20') => {
+        const startDate = moment(sDate);
+        const endDate = moment(eDate);
 
+        endDate.add(1, 'day');
+
+        const daysOfWeek = [];
+
+        let i = 0;
+
+        while (i < 7 && startDate < endDate) {
+            daysOfWeek.push(startDate.day());
+            startDate.add(1, 'day');
+            i++;
+        }
+        console.log(daysOfWeek);
+        return daysOfWeek;
+    };
+
+    useEffect(() => {
+        resetCheckbox();
+        // getDaysOfWeekBetweenDates(selectStartDate, selectEndDate);
+    }, [selectStartDate, selectEndDate]);
     return (
         <Box>
+            {/* {JSON.stringify(getDaysOfWeekBetweenDates(selectStartDate, selectEndDate))} */}
             <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClosePreviewDialog}>
                 <DialogTitle>Xem trước lịch tập</DialogTitle>
                 <DialogContent sx={{ height: '590px' }}>
@@ -260,6 +297,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                     {title}
                 </DialogTitle>
                 <DialogContent>
+                    {/* <button onClick={() => resetCheckbox()}>Reset</button> */}
                     <Box
                         component="form"
                         noValidate
@@ -282,23 +320,25 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                         required
                                         name="startDate"
                                         control={control}
-                                        // defaultValue={tomorrow}
                                         defaultValue=""
-                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                        render={({ field: { onChange, value }, fieldState: { error } }) => (
                                             <DatePicker
+                                                label="Thời gian bắt đầu"
                                                 disablePast
-                                                label="Ngày bắt đầu"
-                                                inputFormat="dd/MM/yyyy"
-                                                disableFuture={false}
+                                                ampm={false}
                                                 value={value}
-                                                onChange={(value) => onChange(value)}
+                                                onChange={(value) => {
+                                                    onChange(value);
+                                                    console.log('startDate value', value);
+                                                    setSelectStartDate(value);
+                                                }}
                                                 renderInput={(params) => (
                                                     <TextField
                                                         {...params}
                                                         required
                                                         id="outlined-disabled"
-                                                        error={invalid}
-                                                        helperText={invalid ? error.message : null}
+                                                        error={!!error}
+                                                        helperText={error ? error.message : null}
                                                         // id="startDate"
                                                         variant="outlined"
                                                         margin="dense"
@@ -313,7 +353,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                     <Controller
                                         required
                                         name="endDate"
-                                        inputFormat="DD/MM/YYYY"
+                                        // inputFormat="DD/MM/YYYY"
                                         control={control}
                                         // defaultValue="2022-09-04"
                                         // defaultValue={currentSemester[0].endDate}
@@ -325,11 +365,11 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                                 // minDate={startDate}
                                                 disablePast
                                                 disableFuture={false}
-                                                inputFormat="dd/MM/yyyy"
+                                                // inputFormat="dd/MM/yyyy"
                                                 value={value}
                                                 onChange={(value) => {
-                                                    console.log(value);
                                                     onChange(value);
+                                                    setSelectEndDate(value);
                                                 }}
                                                 renderInput={(params) => (
                                                     <TextField
@@ -369,8 +409,6 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                                 ampm={false}
                                                 value={value}
                                                 onChange={(value) => {
-                                                    setStartDate(value);
-                                                    console.log(value);
                                                     onChange(value);
                                                 }}
                                                 renderInput={(params) => (
@@ -423,7 +461,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                         </LocalizationProvider>
                         <Box component="div" sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                             <Paper elevation={2} sx={{ padding: 2 }}>
-                                <FormControl component="div" error={invalid}>
+                                <FormControl component="div" error={errors.dayOfWeek ? true : false}>
                                     <FormLabel component="legend">Lặp lại</FormLabel>
                                     <FormGroup sx={{ flexDirection: 'row' }}>
                                         <Controller
@@ -431,7 +469,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                             control={control}
                                             render={({ field, fieldState: { error, invalid } }) => (
                                                 <>
-                                                    {dayOfWeek.map((item) => (
+                                                    {dayOfWeek.map((item, index) => (
                                                         <FormControlLabel
                                                             required={true}
                                                             key={item.value}
@@ -440,6 +478,12 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                                             control={
                                                                 <Checkbox
                                                                     required
+                                                                    disabled={
+                                                                        !getDaysOfWeekBetweenDates(
+                                                                            selectStartDate,
+                                                                            selectEndDate,
+                                                                        ).some((i) => i === index)
+                                                                    }
                                                                     value={item.value}
                                                                     checked={field.value.some(
                                                                         (existingValue) => existingValue === item.value,
@@ -471,7 +515,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                             )}
                                         />
                                     </FormGroup>
-                                    <FormHelperText>{errors.maxQuantityComitee ? true : false}</FormHelperText>
+                                    <FormHelperText>{errors.dayOfWeek?.message}</FormHelperText>
                                     {/* error={errors.maxQuantityComitee ? true : false}
                                 helperText={errors.maxQuantityComitee?.message} */}
                                 </FormControl>
