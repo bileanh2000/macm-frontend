@@ -28,17 +28,13 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import classNames from 'classnames/bind';
 import moment from 'moment';
 import { Link, useNavigate } from 'react-router-dom';
 
-import styles from './CreateTournament.module.scss';
 import FightingCompetition from './FightingCompetition';
 import PerformanceCompetition from './PerformanceCompetition';
 import PreviewData from './PreviewData';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
-
-const cx = classNames.bind(styles);
 
 function CreateTourament() {
     const [datasFightingCompetition, setDataFightingCompetition] = useState([]);
@@ -658,11 +654,9 @@ function CreateTourament() {
                             </Paper>
                         </Grid>
                         <Grid item xs={12}>
-                            <div className={cx('create-event-button')}>
-                                <Button variant="contained" onClick={handleSubmit(onSubmit)}>
-                                    Tạo giải đấu
-                                </Button>
-                            </div>
+                            <Button variant="contained" onClick={handleSubmit(onSubmit)}>
+                                Tạo giải đấu
+                            </Button>
                         </Grid>
                     </Grid>
                 </Box>

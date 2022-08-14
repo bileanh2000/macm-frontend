@@ -69,9 +69,9 @@ function CustomMatchBracket(params) {
     const [score2, setScore2] = useState(-1);
     const [isEdit, setEdit] = useState(false);
     const [areaName, setAreaId] = useState();
-    const [winner, setWinner] = useState(0);
+    const [winner, setWinner] = useState();
     const [value, setValue] = useState(1);
-    const [winnerTemp, setWinnerTemp] = useState(0);
+    const [winnerTemp, setWinnerTemp] = useState();
 
     const handleChangeTab = (event, newValue) => {
         setValue(newValue);
@@ -90,16 +90,18 @@ function CustomMatchBracket(params) {
             score1: Yup.number()
                 .required('Không được để trống trường này')
                 .typeError('Vui lòng nhập số')
-                .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+                .min(0, 'Vui lòng nhập giá trị lớn hơn hoặc bằng 0')
+                .max(10, 'Điếm số không được vượt quá 10'),
         }),
         ...(value === 1 && {
             score2: Yup.number()
                 .required('Không được để trống trường này')
                 .typeError('Vui lòng nhập số')
-                .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+                .min(0, 'Vui lòng nhập giá trị lớn hơn hoặc bằng 0')
+                .max(10, 'Điếm số không được vượt quá 10'),
         }),
-        ...(value === 0 && { date: Yup.string().nullable().required('Điền đi') }),
-        ...(value === 0 && { startTime: Yup.string().nullable().required('Điền đi') }),
+        ...(value === 0 && { date: Yup.string().nullable().required('Không được để trống trường này') }),
+        ...(value === 0 && { startTime: Yup.string().nullable().required('Không được để trống trường này') }),
     });
 
     const {
@@ -205,21 +207,31 @@ function CustomMatchBracket(params) {
         if (data == null) {
             return;
         }
-        setWinnerTemp(data.studentId);
+        setWinnerTemp(data);
         setWinner(data);
     };
 
     const handleClickResult = (e, data) => {
+        console.log('hihi');
         if (params.status < 2) {
             return;
         }
         if (data.firstPlayer == null || data.secondPlayer == null) {
             setMatch(data);
             setValue(0);
+            return;
         } else {
             setMatch(data);
             setValue(1);
         }
+
+        if (data.firstPlayer.point == null && data.secondPlayer.point == null) {
+            setMatch(data);
+            setValue(1);
+        } else {
+            return;
+        }
+
         if (!params.matches[params.matches.length - 1].area) {
             return;
         }
@@ -233,8 +245,8 @@ function CustomMatchBracket(params) {
             score1: '',
             score2: '',
         });
-        setWinnerTemp(0);
-        setWinner(0);
+        setWinnerTemp();
+        setWinner();
         handleCloseUpdateTime();
     };
     const updateResult = async (match) => {
@@ -307,13 +319,9 @@ function CustomMatchBracket(params) {
     const handleChange = (score, event) => {
         score == 1 ? setScore1(Number(event)) : setScore2(Number(event));
         if (score == 1) {
-            Number(event) > score2
-                ? setWinnerTemp(match.firstPlayer.studentId)
-                : setWinnerTemp(match.secondPlayer.studentId);
+            Number(event) > score2 ? setWinnerTemp(match.firstPlayer) : setWinnerTemp(match.secondPlayer);
         } else {
-            Number(event) > score1
-                ? setWinnerTemp(match.secondPlayer.studentId)
-                : setWinnerTemp(match.firstPlayer.studentId);
+            Number(event) > score1 ? setWinnerTemp(match.secondPlayer) : setWinnerTemp(match.firstPlayer);
         }
     };
 
@@ -327,11 +335,20 @@ function CustomMatchBracket(params) {
             >
                 {match && (
                     <>
+                        {winner && (
+                            <Typography variant="body1">
+                                Xác nhận{' '}
+                                <strong>
+                                    {winner.studentName} - {winner.studentId}
+                                </strong>{' '}
+                                là người chiến thắng. Vui lòng nhập tỉ số
+                            </Typography>
+                        )}
                         <TableContainer sx={{ maxHeight: 440 }}>
                             <Table stickyHeader aria-label="sticky table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell align="center">Tên cầu thủ</TableCell>
+                                        <TableCell align="center">Tên vận động viên</TableCell>
                                         <TableCell align="center">Điểm số</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -410,7 +427,7 @@ function CustomMatchBracket(params) {
                             </Table>
                         </TableContainer>
                         <Box>
-                            <FormControl>
+                            {/* <FormControl>
                                 <FormLabel id="demo-form-control-label-placement">Xác nhận người chiến thắng</FormLabel>
                                 <RadioGroup
                                     row
@@ -434,11 +451,13 @@ function CustomMatchBracket(params) {
                                         sx={{ ml: 1 }}
                                     />
                                 </RadioGroup>
-                            </FormControl>
-                            {winnerTemp !== winner.studentId && winner != 0 && (
+                            </FormControl> */}
+                            {winner && winnerTemp && winnerTemp.studentId !== winner.studentId && (
                                 <Typography variant="body1" sx={{ color: 'red' }}>
-                                    Người chiến thắng bạn chọn không trùng với kết quả, bạn có muốn tiếp tục lưu điểm
-                                    số?
+                                    <strong>
+                                        {winnerTemp.studentName} - {winnerTemp.studentId}
+                                    </strong>
+                                    là người chiến thắng. Bạn xác nhận có đúng không?
                                 </Typography>
                             )}
                         </Box>
@@ -484,7 +503,7 @@ function CustomMatchBracket(params) {
                                 render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                     <DatePicker
                                         disablePast
-                                        label="Ngày tháng"
+                                        label="Ngày thi đấu"
                                         inputFormat="dd/MM/yyyy"
                                         disableFuture={false}
                                         value={value}
@@ -514,8 +533,9 @@ function CustomMatchBracket(params) {
                                 defaultValue={match.time ? match.time : null}
                                 render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                     <TimePicker
-                                        label="Thời gian bắt đầu"
+                                        label="Thời gian thi đấu"
                                         ampm={false}
+                                        inputFormat="HH:mm"
                                         value={value}
                                         onChange={(value) => onChange(value)}
                                         renderInput={(params) => (
@@ -558,9 +578,11 @@ function CustomMatchBracket(params) {
                                     scrollButtons="auto"
                                     aria-label="basic tabs example"
                                 >
-                                    <Tab label="Thời gian và địa điểm" {...a11yProps(0)} />
+                                    {match && match.firstPlayer.point === null && match.secondPlayer.point === null && (
+                                        <Tab label="Thời gian và địa điểm" {...a11yProps(0)} value={0} />
+                                    )}
                                     {match && match.firstPlayer !== null && match.secondPlayer !== null && (
-                                        <Tab label="Điểm số" {...a11yProps(1)} />
+                                        <Tab label="Điểm số" {...a11yProps(1)} value={1} />
                                     )}
                                 </Tabs>
                             </Box>
@@ -659,7 +681,7 @@ function CustomMatchBracket(params) {
                                         >
                                             <Box
                                                 sx={{
-                                                    p: '1em',
+                                                    pr: '1em',
                                                     backgroundColor: '#0000000a',
                                                     width: '100%',
                                                     display: 'flex',
@@ -669,8 +691,8 @@ function CustomMatchBracket(params) {
                                                 }}
                                                 onClick={(e) => handleClickResult(e, match)}
                                             >
-                                                <Typography variant="caption" sx={{ m: 1 }}>
-                                                    Cặp: {match.matchNo}
+                                                <Typography variant="caption" sx={{ m: 1, width: '3em' }}>
+                                                    Cặp:{match.matchNo}
                                                 </Typography>
                                                 <Box
                                                     sx={{
@@ -682,13 +704,25 @@ function CustomMatchBracket(params) {
                                                     </div>
 
                                                     <Tooltip
-                                                        title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
+                                                        title={
+                                                            params.status < 2
+                                                                ? `${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`
+                                                                : match.firstPlayer?.point
+                                                                ? `${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`
+                                                                : `Xác nhận ${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId} là người chiến thắng`
+                                                        }
                                                         disableHoverListener={isEdit || match.firstPlayer === null}
                                                     >
                                                         <div
                                                             className={cx(
                                                                 'tournament-bracket__match',
                                                                 isEdit ? 'draggable' : '',
+                                                                match.firstPlayer?.point && match.secondPlayer?.point
+                                                                    ? match.firstPlayer?.point >
+                                                                      match.secondPlayer?.point
+                                                                        ? 'winner'
+                                                                        : 'loser'
+                                                                    : '',
                                                             )}
                                                             draggable={isEdit}
                                                             onDragOver={(e) => onDragOver(e)}
@@ -722,13 +756,25 @@ function CustomMatchBracket(params) {
                                                         </div>
                                                     </Tooltip>
                                                     <Tooltip
-                                                        title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
+                                                        title={
+                                                            params.status < 2
+                                                                ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`
+                                                                : match.secondPlayer?.point
+                                                                ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`
+                                                                : `Xác nhận ${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId} là người chiến thắng`
+                                                        }
                                                         disableHoverListener={isEdit || match.secondPlayer === null}
                                                     >
                                                         <div
                                                             className={cx(
                                                                 'tournament-bracket__match',
                                                                 isEdit ? 'draggable' : '',
+                                                                match.firstPlayer?.point && match.secondPlayer?.point
+                                                                    ? match.secondPlayer?.point >
+                                                                      match.firstPlayer?.point
+                                                                        ? 'winner'
+                                                                        : 'loser'
+                                                                    : '',
                                                             )}
                                                             draggable={isEdit}
                                                             onDragOver={(e) => onDragOver(e)}
@@ -777,7 +823,7 @@ function CustomMatchBracket(params) {
                                         <li className={cx('tournament-bracket__item')} key={match.id}>
                                             <Box
                                                 sx={{
-                                                    p: '1em',
+                                                    pr: '1em',
                                                     backgroundColor: '#0000000a',
                                                     width: '100%',
                                                     display: 'flex',
@@ -787,8 +833,8 @@ function CustomMatchBracket(params) {
                                                 }}
                                                 onClick={(e) => handleClickResult(e, match)}
                                             >
-                                                <Typography variant="caption" sx={{ m: 1 }}>
-                                                    Cặp: {match.matchNo}
+                                                <Typography variant="caption" sx={{ m: 1, width: '3em' }}>
+                                                    Cặp:{match.matchNo}
                                                 </Typography>
                                                 <Box
                                                     sx={{
@@ -799,11 +845,25 @@ function CustomMatchBracket(params) {
                                                         <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
                                                     </div>
                                                     <Tooltip
-                                                        title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
+                                                        title={
+                                                            params.status < 2
+                                                                ? `${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`
+                                                                : match.firstPlayer?.point
+                                                                ? `${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`
+                                                                : `Xác nhận ${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId} là người chiến thắng`
+                                                        }
                                                         disableHoverListener={match.firstPlayer === null}
                                                     >
                                                         <div
-                                                            className={cx('tournament-bracket__match')}
+                                                            className={cx(
+                                                                'tournament-bracket__match',
+                                                                match.firstPlayer?.point && match.secondPlayer?.point
+                                                                    ? match.firstPlayer?.point >
+                                                                      match.secondPlayer?.point
+                                                                        ? 'winner'
+                                                                        : 'loser'
+                                                                    : '',
+                                                            )}
                                                             onClick={(e) => handleClickWinner(e, match.firstPlayer)}
                                                         >
                                                             <Box sx={{ m: '0.5em' }} className={cx('name')}>
@@ -815,11 +875,25 @@ function CustomMatchBracket(params) {
                                                         </div>
                                                     </Tooltip>
                                                     <Tooltip
-                                                        title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
+                                                        title={
+                                                            params.status < 2
+                                                                ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`
+                                                                : match.secondPlayer?.point
+                                                                ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`
+                                                                : `Xác nhận ${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId} là người chiến thắng`
+                                                        }
                                                         disableHoverListener={match.secondPlayer === null}
                                                     >
                                                         <div
-                                                            className={cx('tournament-bracket__match')}
+                                                            className={cx(
+                                                                'tournament-bracket__match',
+                                                                match.firstPlayer?.point && match.secondPlayer?.point
+                                                                    ? match.secondPlayer?.point >
+                                                                      match.firstPlayer?.point
+                                                                        ? 'winner'
+                                                                        : 'loser'
+                                                                    : '',
+                                                            )}
                                                             onClick={(e) => handleClickWinner(e, match.secondPlayer)}
                                                         >
                                                             <Box sx={{ m: '0.5em' }} className={cx('name')}>

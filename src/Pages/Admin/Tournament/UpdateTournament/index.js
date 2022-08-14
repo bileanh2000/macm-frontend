@@ -28,13 +28,10 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import moment from 'moment';
 
-import styles from '../CreateTournament/CreateTournament.module.scss';
 import UpdatePerformanceCompetition from './UpdatePerformanceCompetition';
 import adminTournament from 'src/api/adminTournamentAPI';
 import UpdateFightingCompetition from './UpdateFightingCompetition';
 import PreviewData from './PreviewData';
-
-const cx = classNames.bind(styles);
 
 function UpdateTournament() {
     const nowDate = new Date();
@@ -545,11 +542,9 @@ function UpdateTournament() {
                                             )}
                                         </Grid>
                                     </Grid>
-                                    <div className={cx('create-event-button')}>
-                                        <Button variant="contained" onClick={handleSubmit(onUpdateTournament)}>
-                                            Cập nhật thông tin
-                                        </Button>
-                                    </div>
+                                    <Button variant="contained" onClick={handleSubmit(onUpdateTournament)}>
+                                        Cập nhật thông tin
+                                    </Button>
                                 </Grid>
                                 <Grid item xs={5} sx={{ minHeight: '755px' }}>
                                     <FullCalendar

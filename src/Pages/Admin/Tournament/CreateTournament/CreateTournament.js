@@ -36,7 +36,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
 import moment from 'moment';
 import { useSnackbar } from 'notistack';
-import { Add, Delete } from '@mui/icons-material';
+import { Add, Delete, Edit } from '@mui/icons-material';
 import { useRef } from 'react';
 
 import PreviewSchedule from './PreviewSchedule';
@@ -54,6 +54,8 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
     const [skipped, setSkipped] = useState(new Set());
     const [isChecked, setIsChecked] = useState(false);
     const [datas, setDatas] = useState([]);
+    const [datasTemp, setDatasTemp] = useState([]);
+    const [roleEdit, setRoleEdit] = useState();
     const [startDate, setStartDate] = useState('');
     const [startTime, setStartTime] = useState('');
     const [previewSchedule, setPreviewSchedule] = useState([]);
@@ -266,17 +268,34 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
         // });
         setDatas((prevRows) => prevRows.filter((item) => item.id !== id));
     };
+
+    const handleEdit = (data) => {
+        setDatasTemp((prevRows) => prevRows.filter((item) => item.id !== data.id));
+        const dataEdit = datas.filter((item) => item.id === data.id);
+        setRoleEdit(dataEdit);
+        setIsChecked(!isChecked);
+    };
+
     const handleAddEventRoles = (data) => {
         console.log(data);
-        if (datas.findIndex((d) => d.name.includes(data.roleName)) >= 0) {
+
+        if (
+            datas.findIndex((d) => d.name.includes(data.roleName)) >= 0 &&
+            datas.findIndex((d) => d.maxQuantity == data.maxQuantity) >= 0
+        ) {
             setError('roleName', {
                 message: 'Vai trò này đã tồn tại, vui lòng chọn vai trò khác',
             });
             return;
         }
 
-        const newData = [...datas, { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity }];
-        setDatas(newData);
+        if (datas.findIndex((d) => d.name.includes(data.roleName)) >= 0) {
+            const newData = [...datasTemp, { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity }];
+            setDatas(newData);
+        } else {
+            const newData = [...datas, { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity }];
+            setDatas(newData);
+        }
 
         /**
          * Reset field keep error (isValid)
@@ -284,12 +303,12 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
 
         resetField('roleName', { keepError: true });
         resetField('maxQuantity', { keepError: true });
-
+        setRoleEdit();
         setIsChecked(!isChecked);
     };
     const handleCancel = () => {
         setIsChecked(!isChecked);
-
+        setRoleEdit();
         resetField('roleName', { keepError: true });
         resetField('maxQuantity', { keepError: true });
     };
@@ -688,6 +707,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                         <TableCell align="center">Tên vai trò</TableCell>
                                                         <TableCell align="center">Số lượng</TableCell>
                                                         <TableCell align="center"></TableCell>
+                                                        <TableCell align="center"></TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
@@ -695,6 +715,17 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                         <TableRow key={data.id}>
                                                             <TableCell align="center">{data.name}</TableCell>
                                                             <TableCell align="center">{data.maxQuantity}</TableCell>
+                                                            <TableCell>
+                                                                <IconButton
+                                                                    aria-label="edit"
+                                                                    onClick={() => {
+                                                                        // handleOpenDialog();
+                                                                        handleEdit(data);
+                                                                    }}
+                                                                >
+                                                                    <Edit />
+                                                                </IconButton>
+                                                            </TableCell>
                                                             <TableCell>
                                                                 <IconButton
                                                                     aria-label="delete"
@@ -714,10 +745,11 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                     )}
                                     <Paper elevation={3}>
                                         <Collapse in={isChecked}>
-                                            <Grid container spacing={2} sx={{ p: 2 }}>
-                                                <Grid item xs={12} container spacing={2}>
-                                                    <Grid item xs={6}>
-                                                        {roles.length > 0 ? (
+                                            {!roleEdit ? (
+                                                <Grid container spacing={2} sx={{ p: 2 }}>
+                                                    <Grid item xs={12} container spacing={2}>
+                                                        <Grid item xs={6}>
+                                                            {/* {roles.length > 0 ? (
                                                             <Autocomplete
                                                                 id="free-solo-demo"
                                                                 freeSolo
@@ -736,44 +768,98 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                                     />
                                                                 )}
                                                             />
-                                                        ) : (
+                                                        ) : ( */}
                                                             <TextField
                                                                 id="outlined-basic"
                                                                 label="Tên vai trò"
                                                                 variant="outlined"
                                                                 fullWidth
+                                                                defaultValue="khong co"
                                                                 {...register('roleName')}
                                                                 error={errors.roleName ? true : false}
                                                                 helperText={errors.roleName?.message}
                                                             />
-                                                        )}
+                                                            {/* )} */}
+                                                        </Grid>
+                                                        <Grid item xs={6}>
+                                                            <TextField
+                                                                label="Số lượng"
+                                                                type="number"
+                                                                id="outlined-basic"
+                                                                variant="outlined"
+                                                                fullWidth
+                                                                {...register('maxQuantity')}
+                                                                error={errors.maxQuantity ? true : false}
+                                                                helperText={errors.maxQuantity?.message}
+                                                            />
+                                                        </Grid>
                                                     </Grid>
-                                                    <Grid item xs={6}>
-                                                        <TextField
-                                                            label="Số lượng"
-                                                            type="number"
-                                                            id="outlined-basic"
-                                                            variant="outlined"
-                                                            fullWidth
-                                                            {...register('maxQuantity')}
-                                                            error={errors.maxQuantity ? true : false}
-                                                            helperText={errors.maxQuantity?.message}
-                                                        />
+                                                    <Grid item xs={12}>
+                                                        <Button
+                                                            variant="contained"
+                                                            onClick={handleSubmit(handleAddEventRoles)}
+                                                            sx={{ mr: 1 }}
+                                                        >
+                                                            Thêm
+                                                        </Button>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="error"
+                                                            onClick={handleCancel}
+                                                        >
+                                                            Hủy
+                                                        </Button>
+                                                    </Grid>{' '}
+                                                </Grid>
+                                            ) : (
+                                                <Grid container spacing={2} sx={{ p: 2 }}>
+                                                    <Grid item xs={12} container spacing={2}>
+                                                        <Grid item xs={6}>
+                                                            <TextField
+                                                                id="outlined-basic"
+                                                                label="Tên vai trò"
+                                                                variant="outlined"
+                                                                fullWidth
+                                                                defaultValue="co"
+                                                                // defaultValue={roleEdit.name}
+                                                                {...register('roleName')}
+                                                                error={errors.roleName ? true : false}
+                                                                helperText={errors.roleName?.message}
+                                                            />
+                                                            {/* )} */}
+                                                        </Grid>
+                                                        <Grid item xs={6}>
+                                                            <TextField
+                                                                label="Số lượng"
+                                                                type="number"
+                                                                id="outlined-basic"
+                                                                variant="outlined"
+                                                                fullWidth
+                                                                defaultValue={roleEdit.maxQuantity}
+                                                                {...register('maxQuantity')}
+                                                                error={errors.maxQuantity ? true : false}
+                                                                helperText={errors.maxQuantity?.message}
+                                                            />
+                                                        </Grid>
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        <Button
+                                                            variant="contained"
+                                                            onClick={handleSubmit(handleAddEventRoles)}
+                                                            sx={{ mr: 1 }}
+                                                        >
+                                                            Thêm
+                                                        </Button>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="error"
+                                                            onClick={handleCancel}
+                                                        >
+                                                            Hủy
+                                                        </Button>
                                                     </Grid>
                                                 </Grid>
-                                                <Grid item xs={12}>
-                                                    <Button
-                                                        variant="contained"
-                                                        onClick={handleSubmit(handleAddEventRoles)}
-                                                        sx={{ mr: 1 }}
-                                                    >
-                                                        Thêm
-                                                    </Button>
-                                                    <Button variant="contained" color="error" onClick={handleCancel}>
-                                                        Hủy
-                                                    </Button>
-                                                </Grid>
-                                            </Grid>
+                                            )}
                                         </Collapse>
                                     </Paper>
                                     <Collapse in={!isChecked}>

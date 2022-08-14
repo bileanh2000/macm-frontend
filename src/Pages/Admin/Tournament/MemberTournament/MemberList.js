@@ -92,6 +92,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
     };
 
     const deleteUser = (competitivePlayerId) => {
+        console.log(competitivePlayerId);
         setCompetitivePlayerId(competitivePlayerId);
         setOpenDelete(true);
     };
@@ -99,13 +100,14 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
         setOpenDelete(false);
     };
     const handleConfirmDelete = () => {
-        deleteCompetitivePlayer(competitivePlayerId);
+        deleteCompetitivePlayer(competitivePlayerId.id);
         // const newData = data.filter((player) => player.id != competitivePlayerId);
         onChange && onChange();
         handleCloseDelete();
     };
 
     const updateWeight = (competitivePlayerId) => {
+        console.log(competitivePlayerId);
         setCompetitivePlayerId(competitivePlayerId);
         setOpenUpdate(true);
     };
@@ -142,7 +144,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
     };
 
     const onSubmit = (value) => {
-        updateWeightForCompetitivePlayer(competitivePlayerId, value.weight);
+        updateWeightForCompetitivePlayer(competitivePlayerId.id, value.weight);
         // const newData = data.map((player) =>
         //     player.id === competitivePlayerId ? { ...player, weight: value.weight } : player,
         // );
@@ -205,7 +207,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                         <GridActionsCellItem
                             icon={<Edit />}
                             label="Edit weight"
-                            onClick={() => updateWeight(params.id)}
+                            onClick={() => updateWeight(params.row)}
                             // showInMenu
                             disabled={isUpdate || tournamentStatus > 2}
                         />
@@ -220,7 +222,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                         <GridActionsCellItem
                             icon={<Delete />}
                             label="Delete"
-                            onClick={() => deleteUser(params.id)}
+                            onClick={() => deleteUser(params.row)}
                             disabled={isUpdate || tournamentStatus > 2}
                         />
                     </Tooltip>,
@@ -334,7 +336,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
         setError,
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     function Row(props) {
@@ -510,64 +512,79 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     </Table>
                 </TableContainer>
             )}
-            <Dialog
-                // fullWidth
-                // maxWidth="md"
-                open={openDelete}
-                onClose={handleCloseDelete}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    Xác nhận
-                </DialogTitle>
-                <DialogContent>Bạn có chắc chắn muốn xóa vận động viên này</DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDelete}>Hủy</Button>
-                    <Button onClick={handleConfirmDelete} autoFocus>
-                        Đồng ý
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog
-                // fullWidth
-                // maxWidth="md"
-                open={openUpdate}
-                onClose={handleCloseUpdate}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    Chỉnh sửa cân nặng
-                </DialogTitle>
-                <DialogContent>
-                    <Box
-                        component="form"
-                        noValidate
-                        autoComplete="off"
-                        sx={{
-                            '& .MuiTextField-root': { mb: 2, mt: 2 },
-                        }}
-                    >
-                        <TextField
-                            type="number"
-                            id="outlined-basic"
-                            label="Vui lòng nhập hạng cân vận động viên"
-                            variant="outlined"
-                            fullWidth
-                            {...register('weight')}
-                            error={errors.weight ? true : false}
-                            helperText={errors.weight?.message}
-                        />
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseUpdate}>Hủy</Button>
-                    <Button onClick={handleSubmit(onSubmit)} autoFocus>
-                        Xác nhận
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {competitivePlayerId && (
+                <Dialog
+                    // fullWidth
+                    // maxWidth="md"
+                    open={openDelete}
+                    onClose={handleCloseDelete}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
+                    <DialogContent>
+                        Bạn có chắc chắn muốn xóa vận động viên{' '}
+                        <strong>
+                            {competitivePlayerId.studentName} - {competitivePlayerId.studentId}
+                        </strong>{' '}
+                        ra khỏi thể thức thi đấu này không
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="outlined" onClick={handleCloseDelete}>
+                            Hủy
+                        </Button>
+                        <Button variant="contained" onClick={handleConfirmDelete} autoFocus>
+                            Đồng ý
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+            {competitivePlayerId && (
+                <Dialog
+                    // fullWidth
+                    // maxWidth="md"
+                    open={openUpdate}
+                    onClose={handleCloseUpdate}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">
+                        Chỉnh sửa cân nặng cho vận động viên
+                        <strong>
+                            {competitivePlayerId.studentName} - {competitivePlayerId.studentId}
+                        </strong>
+                    </DialogTitle>
+                    <DialogContent>
+                        <Box
+                            component="form"
+                            noValidate
+                            autoComplete="off"
+                            sx={{
+                                '& .MuiTextField-root': { mb: 2, mt: 2 },
+                            }}
+                        >
+                            <TextField
+                                type="number"
+                                id="outlined-basic"
+                                label="Vui lòng nhập hạng cân vận động viên"
+                                variant="outlined"
+                                fullWidth
+                                {...register('weight')}
+                                error={errors.weight ? true : false}
+                                helperText={errors.weight?.message}
+                            />
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="outlined" onClick={handleCloseUpdate}>
+                            Hủy
+                        </Button>
+                        <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
+                            Xác nhận
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
             {exhibitionTeam && (
                 <UpdateExhibitionTeam
                     title="Đăng kí tham gia biểu diễn"

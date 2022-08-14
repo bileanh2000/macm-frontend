@@ -3,15 +3,11 @@ import { Typography } from '@mui/material';
 import { Fragment, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import classNames from 'classnames/bind';
 import { useNavigate, useParams } from 'react-router-dom';
 import interactionPlugin from '@fullcalendar/interaction';
 import moment from 'moment';
 
-import styles from './TournamentSchedule.module.scss';
 import adminTournament from 'src/api/adminTournamentAPI';
-
-const cx = classNames.bind(styles);
 
 function TournamentSchedule() {
     const { tournamentId } = useParams();
@@ -68,8 +64,8 @@ function TournamentSchedule() {
                 Chỉnh sửa lịch sự kiện
             </Typography>
 
-            <div className={cx('schedule-container')}>
-                <div className={cx('schedule-content')}>
+            <div>
+                <div>
                     <FullCalendar
                         locale="vie"
                         height="60%"
