@@ -231,48 +231,46 @@ function DetailTournament() {
                                     <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />
                                     <Tab label="Chi phí" {...a11yProps(2)} value={2} />
                                     <Tab label="Danh sách ban tổ chức" {...a11yProps(3)} value={3} />
-                                    <Tab label="Danh sách người chơi" {...a11yProps(4)} value={4} />
+                                    <Tab label="Danh sách vận động viên" {...a11yProps(4)} value={4} />
                                     <Tab label="Bảng đấu" {...a11yProps(5)} value={5} />
                                 </Tabs>
                             </Box>
                         </Container>
                     </Paper>
                     <Paper elevation={3} sx={{ mt: 1 }}>
-                        <Container maxWidth="lg">
-                            <TournamentOverview
+                        <TournamentOverview
+                            tournament={tournament}
+                            onUpdateTournament={handleUpdateTournament}
+                            value={value}
+                            index={0}
+                            startTime={scheduleList[0].date}
+                            isUpdate={isUpdate}
+                            onChangeTab={handleChangeTab}
+                        />
+                        <TabPanel value={value} index={1}>
+                            <TournamentSchedule isUpdate={isUpdate} />
+                        </TabPanel>
+                        <TabPanel value={value} index={2}>
+                            <TournamentFee tournament={tournament} tournamentStatus={tournament.status} />
+                        </TabPanel>
+                        <TabPanel value={value} index={3}>
+                            <AdminTournament isUpdate={isUpdate} user={user} />
+                        </TabPanel>
+                        <TabPanel value={value} index={4}>
+                            <MemberTournament
                                 tournament={tournament}
-                                onUpdateTournament={handleUpdateTournament}
-                                value={value}
-                                index={0}
-                                startTime={scheduleList[0].date}
+                                tournamentStatus={tournament.status}
                                 isUpdate={isUpdate}
-                                onChangeTab={handleChangeTab}
                             />
-                            <TabPanel value={value} index={1}>
-                                <TournamentSchedule isUpdate={isUpdate} />
-                            </TabPanel>
-                            <TabPanel value={value} index={2}>
-                                <TournamentFee tournament={tournament} tournamentStatus={tournament.status} />
-                            </TabPanel>
-                            <TabPanel value={value} index={3}>
-                                <AdminTournament isUpdate={isUpdate} user={user} />
-                            </TabPanel>
-                            <TabPanel value={value} index={4}>
-                                <MemberTournament
-                                    tournament={tournament}
-                                    tournamentStatus={tournament.status}
-                                    isUpdate={isUpdate}
-                                />
-                            </TabPanel>
-                            <TabPanel value={value} index={5}>
-                                <TournamentBacket
-                                    tournament={tournament}
-                                    tournamentStatus={tournament.status}
-                                    valueTab={valueTab}
-                                    type={type}
-                                />
-                            </TabPanel>
-                        </Container>
+                        </TabPanel>
+                        <TabPanel value={value} index={5}>
+                            <TournamentBacket
+                                tournament={tournament}
+                                tournamentStatus={tournament.status}
+                                valueTab={valueTab}
+                                type={type}
+                            />
+                        </TabPanel>
                     </Paper>
                 </Fragment>
             )}

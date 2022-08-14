@@ -174,14 +174,14 @@ function MemberTournament({ tournament, isUpdate }) {
                                             >
                                                 Thêm người chơi thi đấu đối kháng
                                             </Button>
-                                            <Button
+                                            {/* <Button
                                                 variant="outlined"
                                                 sx={{ mr: 2 }}
                                                 onClick={() => handleCreateMatches()}
                                                 disabled={!isCreate}
                                             >
                                                 Tạo bảng thi đấu
-                                            </Button>
+                                            </Button> */}
                                         </Box>
                                     )}
                                     <FormControl size="small">
@@ -212,7 +212,7 @@ function MemberTournament({ tournament, isUpdate }) {
                             )
                         ) : tournament.exhibitionTypes.length > 0 ? (
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                                {!isUpdate && (
+                                {!isUpdate && tournamentStatus < 2 && (
                                     <Box
                                         sx={{
                                             display: 'flex',
@@ -258,41 +258,6 @@ function MemberTournament({ tournament, isUpdate }) {
                                 <Typography variant="h5">Không tổ chức thi đấu biểu diễn</Typography>
                             </Box>
                         )}
-                        <RegisterPlayer
-                            title="Đăng kí tham gia thi đấu"
-                            isOpen={openDialog}
-                            competitiveId={weightRange}
-                            handleClose={() => {
-                                setOpenDialog(false);
-                            }}
-                            onSuccess={(newItem) => {
-                                // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
-                                //     return;
-                                // }
-                                setCompetitivePlayer([...newItem, ...competitivePlayer]);
-                                setOpenDialog(false);
-                            }}
-                            onChangeData={() => {
-                                console.log('change compe');
-                                return setIsRenderCompe(true);
-                            }}
-                        />
-                        <RegisterExhibition
-                            title="Đăng kí tham gia biểu diễn"
-                            isOpen={openDialogExhibition}
-                            exhibitionId={exhibitionType}
-                            handleClose={() => {
-                                setOpenDialogExhibition(false);
-                            }}
-                            onSuccess={() => {
-                                // fetchExhibitionTeam(tournamentId, exhibitionType);
-                                setOpenDialogExhibition(false);
-                            }}
-                            onChangeData={() => {
-                                console.log('change exhi');
-                                return setIsRender(true);
-                            }}
-                        />
                     </Box>
                     {type == 1 && tournament.competitiveTypes.length > 0 && competitivePlayer && (
                         <MemberList
@@ -302,6 +267,9 @@ function MemberTournament({ tournament, isUpdate }) {
                                 console.log('change compe');
                                 return setIsRenderCompe(true);
                             }}
+                            isUpdate={isUpdate}
+                            tournamentStatus={tournamentStatus}
+                            listExhibitionType={listExhibitionType}
                         />
                     )}
                     {type == 2 && tournament.exhibitionTypes.length > 0 > 0 && exhibitionTeam && (
@@ -312,8 +280,46 @@ function MemberTournament({ tournament, isUpdate }) {
                                 console.log('change exhi');
                                 return setIsRender(true);
                             }}
+                            isUpdate={isUpdate}
+                            tournamentStatus={tournamentStatus}
+                            listExhibitionType={listExhibitionType}
                         />
                     )}
+                    <RegisterPlayer
+                        title="Đăng kí tham gia thi đấu"
+                        isOpen={openDialog}
+                        competitiveId={weightRange}
+                        handleClose={() => {
+                            setOpenDialog(false);
+                        }}
+                        onSuccess={(newItem) => {
+                            // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
+                            //     return;
+                            // }
+                            setCompetitivePlayer([...newItem, ...competitivePlayer]);
+                            setOpenDialog(false);
+                        }}
+                        onChangeData={() => {
+                            console.log('change compe');
+                            return setIsRenderCompe(true);
+                        }}
+                    />
+                    <RegisterExhibition
+                        title="Đăng kí tham gia biểu diễn"
+                        isOpen={openDialogExhibition}
+                        exhibitionId={exhibitionType}
+                        handleClose={() => {
+                            setOpenDialogExhibition(false);
+                        }}
+                        onSuccess={() => {
+                            // fetchExhibitionTeam(tournamentId, exhibitionType);
+                            setOpenDialogExhibition(false);
+                        }}
+                        onChangeData={() => {
+                            console.log('change exhi');
+                            return setIsRender(true);
+                        }}
+                    />
                 </Box>
             )}
         </Fragment>

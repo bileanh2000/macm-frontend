@@ -42,8 +42,27 @@ function TournamentFeeReport({ tournament, tournamentStatus, value, index }) {
     };
 
     useEffect(() => {
+        const getReportPayment = async (tournamentId, typeId) => {
+            try {
+                if (typeId == 1) {
+                    const response = await adminTournamentAPI.getAllTournamentOrganizingCommitteePaymentStatusReport(
+                        tournamentId,
+                    );
+                    tournament.feeOrganizingCommiteePay == 0 ? setPaymentStatus(false) : setPaymentStatus(true);
+                    setMembershipReport(response.data);
+                    console.log('report 1', response.data);
+                } else {
+                    const response = await adminTournamentAPI.getAllTournamentPlayerPaymentStatusReport(tournamentId);
+                    tournament.feePlayerPay == 0 ? setPaymentStatus(false) : setPaymentStatus(true);
+                    setMembershipReport(response.data);
+                    console.log('report 2', response.data);
+                }
+            } catch (error) {
+                console.log('khong lay duoc roi dm');
+            }
+        };
         getReportPayment(tournamentId, type);
-    }, [tournamentId, type]);
+    }, [tournamentId, type, tournament.feeOrganizingCommiteePay, tournament.feePlayerPay]);
 
     const columns = [
         { field: 'date', type: 'date', headerName: 'Ngày chỉnh sửa', flex: 0.1 },

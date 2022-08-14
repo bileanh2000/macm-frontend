@@ -47,7 +47,7 @@ function AdminTournament({ isUpdate, user }) {
     return (
         <Fragment>
             <Box sx={{ width: '100%' }}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                {/* <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs
                         value={value}
                         onChange={handleChange}
@@ -56,15 +56,15 @@ function AdminTournament({ isUpdate, user }) {
                         aria-label="basic tabs example"
                     >
                         <Tab label="Danh sách ban tổ chức" {...a11yProps(0)} />
-                        <Tab label="Cập nhật vai trò" {...a11yProps(1)} />
-                        {/* <Tab label="Xét duyệt yêu cầu tham gia" {...a11yProps(2)} /> */}
+                        {/* <Tab label="Cập nhật vai trò" {...a11yProps(1)} /> 
+                        {/* <Tab label="Xét duyệt yêu cầu tham gia" {...a11yProps(2)} /> 
                     </Tabs>
                     {/* {!isUpdate && (
                         <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialogExhibition(true)}>
                             Thêm người chơi thi đấu biểu diễn
                         </Button>
-                    )} */}
-                </Box>
+                    )} 
+                </Box> */}
                 <AdminList
                     adminList={adminList}
                     isUpdate={isUpdate}
@@ -83,13 +83,13 @@ function AdminTournament({ isUpdate, user }) {
                     tournamentId={tournamentId}
                     onChange={() => SetIsRender(true)}
                 />
-                <UpdateAdminTournament
+                {/* <UpdateAdminTournament
                     value={value}
                     active={active}
                     total={total}
                     index={1}
                     onChange={() => SetIsRender(true)}
-                />
+                /> */}
                 {/* <AddAdminTourament value={value} active={active} total={total} index={2} /> */}
             </Box>
         </Fragment>

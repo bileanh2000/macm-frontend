@@ -34,19 +34,25 @@ function TournamentFee({ tournament, tournamentStatus }) {
                         <Tab label="Lịch sử đóng tiền" {...a11yProps(2)} />
                     </Tabs>
                 </Box>
-                <OverviewFee value={value} index={0} tournament={tournament} tournamentStatus={tournamentStatus} />
-                <TournamentPayment
-                    value={value}
-                    index={1}
-                    tournament={tournament}
-                    tournamentStatus={tournamentStatus}
-                />
-                <TournamentFeeReport
-                    value={value}
-                    index={2}
-                    tournament={tournament}
-                    tournamentStatus={tournamentStatus}
-                />
+                {value == 0 && (
+                    <OverviewFee value={value} index={0} tournament={tournament} tournamentStatus={tournamentStatus} />
+                )}
+                {value == 1 && (
+                    <TournamentPayment
+                        value={value}
+                        index={1}
+                        tournament={tournament}
+                        tournamentStatus={tournamentStatus}
+                    />
+                )}
+                {value == 2 && (
+                    <TournamentFeeReport
+                        value={value}
+                        index={2}
+                        tournament={tournament}
+                        tournamentStatus={tournamentStatus}
+                    />
+                )}
             </Box>
         </Fragment>
     );

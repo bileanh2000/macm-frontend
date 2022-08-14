@@ -230,106 +230,6 @@ function TableMatch(params) {
                     </div>
                 )}
             </Dialog>
-            {/* <Dialog fullWidth maxWidth="md" open={openUpdateTime}>
-                {match && (
-                    <div>
-                        <DialogTitle>Thay đổi thời gian và địa điểm thi đấu</DialogTitle>
-                        <DialogContent>
-                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                                <Grid container spacing={3} columns={12}>
-                                    {/* <Grid item xs={12} sm={4}>
-                                        <FormControl size="medium">
-                                            <Typography variant="caption">Sân thi đấu</Typography>
-                                            <Select
-                                                id="demo-simple-select"
-                                                value={areaName}
-                                                displayEmpty
-                                                onChange={handleChangeAreaName}
-                                            >
-                                                {params.areaList.map((area) => (
-                                                    <MenuItem value={area.name} key={area.id}>
-                                                        {area.name}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <Controller
-                                            required
-                                            name="date"
-                                            control={control}
-                                            defaultValue={match.time ? match.time : null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <DatePicker
-                                                    disablePast
-                                                    label="Ngày tháng"
-                                                    inputFormat="dd/MM/yyyy"
-                                                    disableFuture={false}
-                                                    value={value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <Controller
-                                            required
-                                            name="startTime"
-                                            control={control}
-                                            defaultValue={match.time ? match.time : null}
-                                            render={({
-                                                field: { onChange, value },
-                                                fieldState: { error, invalid },
-                                            }) => (
-                                                <TimePicker
-                                                    label="Thời gian bắt đầu"
-                                                    ampm={false}
-                                                    value={value}
-                                                    onChange={(value) => onChange(value)}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            required
-                                                            id="outlined-disabled"
-                                                            error={invalid}
-                                                            helperText={invalid ? error.message : null}
-                                                            // id="startDate"
-                                                            variant="outlined"
-                                                            margin="dense"
-                                                            fullWidth
-                                                        />
-                                                    )}
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                </Grid>
-                            </LocalizationProvider>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleCloseUpdateTime}>Quay lại</Button>
-                            <Button onClick={handleSubmit(handleUpdateTime)}>Đồng ý</Button>
-                        </DialogActions>
-                    </div>
-                )}
-            </Dialog> */}
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="caption table">
                     <caption>Địa điểm thi đấu: {params.matches[0].area.name}</caption>
@@ -347,25 +247,6 @@ function TableMatch(params) {
                     <TableBody>
                         {params.matches.map((row, index) => (
                             <Row key={row.id} row={row} status={params.status} index={index} />
-                            // <TableRow key={row.id}>
-                            //     <TableCell component="th" scope="row">
-                            //         {index + 1}
-                            //     </TableCell>
-                            //     <TableCell align="left">{row.team.teamName}</TableCell>
-                            //     <TableCell align="left">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
-                            //     <TableCell align="left">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
-                            //     {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
-                            //     {params.status === 3 && (
-                            //         <TableCell align="left">
-                            //             <Chip
-                            //                 icon={<SportsScore />}
-                            //                 label={row.score == null ? 'Cập nhật điểm số' : 'Đã cập nhật'}
-                            //                 clickable={row.score == null ? true : false}
-                            //                 onClick={() => handleClickResult(row)}
-                            //             />
-                            //         </TableCell>
-                            //     )}
-                            // </TableRow>
                         ))}
                     </TableBody>
                 </Table>

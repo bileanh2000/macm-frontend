@@ -124,7 +124,7 @@ function Sidebar() {
                 component={Link}
                 to="/admin/trainingschedules"
                 selected={selectedIndex === 3}
-                onClick={(event) => handleListItemClick(event, 4)}
+                onClick={(event) => handleListItemClick(event, 3)}
             >
                 <ListItemIcon>
                     <CalendarMonthIcon />
@@ -159,7 +159,7 @@ function Sidebar() {
                             date: null,
                         }}
                         selected={selectedIndex === 4}
-                        onClick={(event) => handleListItemClick(event, 1)}
+                        onClick={(event) => handleListItemClick(event, 4)}
                     >
                         <ListItemIcon>
                             <PeopleAltRoundedIcon />
@@ -172,7 +172,7 @@ function Sidebar() {
                         component={Link}
                         to="/admin/editattendance"
                         selected={selectedIndex === 5}
-                        onClick={(event) => handleListItemClick(event, 2)}
+                        onClick={(event) => handleListItemClick(event, 5)}
                     >
                         <ListItemIcon>
                             <PsychologyIcon />
@@ -211,7 +211,7 @@ function Sidebar() {
                         component={Link}
                         to="/admin/membership"
                         selected={selectedIndex === 7}
-                        onClick={(event) => handleListItemClick(event, 1)}
+                        onClick={(event) => handleListItemClick(event, 7)}
                     >
                         <ListItemIcon>
                             <PriceCheck />
@@ -224,7 +224,7 @@ function Sidebar() {
                         component={Link}
                         to="/admin/fund"
                         selected={selectedIndex === 8}
-                        onClick={(event) => handleListItemClick(event, 2)}
+                        onClick={(event) => handleListItemClick(event, 8)}
                     >
                         <ListItemIcon>
                             <Savings />
@@ -240,7 +240,7 @@ function Sidebar() {
                 component={Link}
                 to="/admin/rules"
                 selected={selectedIndex === 9}
-                onClick={(event) => handleListItemClick(event, 8)}
+                onClick={(event) => handleListItemClick(event, 9)}
             >
                 <ListItemIcon>
                     <RuleIcon />
@@ -254,7 +254,7 @@ function Sidebar() {
                 component={Link}
                 to="/admin/tournament"
                 selected={selectedIndex === 10}
-                onClick={(event) => handleListItemClick(event, 9)}
+                onClick={(event) => handleListItemClick(event, 10)}
             >
                 <ListItemIcon>
                     <EmojiEventsIcon />
