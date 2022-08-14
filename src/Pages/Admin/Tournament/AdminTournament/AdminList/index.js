@@ -3,8 +3,17 @@ import { Box } from '@mui/system';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { styled } from '@mui/material/styles';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Tooltip,
+    Typography,
+} from '@mui/material';
+import { Add, Delete, Edit } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 
 import RegisterAdmin from './RegisterAdmin';
@@ -18,25 +27,55 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
     const [open, setOpen] = useState(false);
     const [roleInTournament, setRoleInTournament] = useState([]);
     const [openDelete, setOpenDelete] = useState(false);
-    const [tournamentAdminId, setTournamentAdminId] = useState(0);
-
+    const [tournamentAdminId, setTournamentAdminId] = useState();
+    const [openDialog, setOpenDialog] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
     useEffect(() => {
         setData(adminList);
     }, [adminList]);
+
+    const handleRowEditCommit = React.useCallback(
+        (params) => {
+            const id = params.id;
+            const key = params.field;
+            const value = params.value;
+            console.log(id, key, value, params);
+            const newRole = roleInTournament.find((role) => role.name == value);
+            console.log(newRole);
+            console.log(data);
+            const newAdminList = data.map((member) =>
+                member.id === id ? { ...member, roleTournamentDto: newRole } : member,
+            );
+            setData(newAdminList);
+            setIsEdit(true);
+        },
+        [data, roleInTournament],
+    );
+
+    const handleUpdate = () => {
+        console.log('submit', data);
+        adminTournament.updateTournamentOrganizingCommitteeRole(data).then((res) => {
+            console.log(res);
+            console.log(res.data);
+            enqueueSnackbar(res.message, { variant: 'success' });
+            onChange && onChange();
+        });
+        setOpenDialog(false);
+        setIsEdit(false);
+        // navigate(-1);
+    };
 
     const handleOpenDialog = () => {
         setOpen(true);
     };
 
-    const getRoleInTournament = async () => {
-        try {
-            const response = await userTournamentAPI.getAllOrginizingCommitteeRole(tournamentId);
-            console.log(response);
-            setRoleInTournament(response.data);
-        } catch (error) {
-            console.log('Khong the lay duoc role', error);
-        }
+    const handleCloseDialogSave = () => {
+        setOpenDialog(false);
     };
+    const handleOpenDialogSave = () => {
+        setOpenDialog(true);
+    };
+
     const deleteTournamentOrganizingCommittee = async (tournamentAdminId) => {
         try {
             const response = await adminTournament.deleteTournamentOrganizingCommittee(tournamentAdminId);
@@ -50,24 +89,70 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
     };
 
     useEffect(() => {
+        const getRoleInTournament = async () => {
+            try {
+                const response = await userTournamentAPI.getAllOrginizingCommitteeRole(tournamentId);
+                console.log(response);
+                setRoleInTournament(response.data);
+            } catch (error) {
+                console.log('Khong the lay duoc role', error);
+            }
+        };
         getRoleInTournament();
-    }, []);
+    }, [tournamentId]);
 
     const columns = [
-        { field: 'studentName', headerName: 'Tên', flex: 0.8 },
+        { field: 'studentName', headerName: 'Tên', flex: 0.6 },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
             width: 150,
-            flex: 0.6,
+            flex: 0.3,
         },
-        { field: 'role', headerName: 'Vai trò trong sự kiện', width: 150, flex: 1 },
+        {
+            field: 'role',
+            headerName: `Vai trò trong giải đấu`,
+            width: 150,
+            flex: 0.6,
+            editable: !isUpdate,
+            type: 'singleSelect',
+            valueOptions: roleInTournament.map((role) => {
+                return { label: role.name, value: role.name };
+            }),
+            renderCell: (params) => (
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>{params.value}</span>
+                    <Tooltip title={!isUpdate ? 'DoubleClick để chỉnh sửa vai trò' : 'Hết thời hạn cập nhật vai trò'}>
+                        <span>
+                            <GridActionsCellItem icon={<Edit />} label="Edit" sx={{ ml: 2 }} />
+                        </span>
+                    </Tooltip>
+                </Box>
+            ),
+            cellClassName: (params) => {
+                if (params.value == null) {
+                    return '';
+                }
+
+                return clsx('role-edit');
+            },
+        },
         {
             field: 'actions',
             type: 'actions',
             width: 80,
             getActions: (params) => [
-                <GridActionsCellItem icon={<Delete />} label="Delete" onClick={() => deleteUser(params.id)} />,
+                <Tooltip title={!isUpdate ? 'Xóa khỏi ban tổ chức' : 'Hết thời hạn xóa'}>
+                    {/* <span> */}
+                    <GridActionsCellItem
+                        icon={<Delete />}
+                        label="Delete"
+                        onClick={(e) => (!isUpdate ? deleteUser(params.row) : e.stopPropagation())}
+                        disabled={isUpdate}
+                        // touchRippleRef
+                    />
+                    {/* </span> */}
+                </Tooltip>,
             ],
         },
     ];
@@ -94,7 +179,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
         setOpenDelete(false);
     };
     const handleConfirmDelete = () => {
-        deleteTournamentOrganizingCommittee(tournamentAdminId);
+        deleteTournamentOrganizingCommittee(tournamentAdminId.id);
         handleCloseDelete();
     };
 
@@ -109,8 +194,11 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 >
                     <GridToolbarQuickFilter />
                 </Box>
+
                 <Box>
-                    Số lượng thành viên trong ban tổ chức: {active}/{total}
+                    <Typography variant="button" color="initial" sx={{ marginLeft: 'auto', marginRight: '1rem' }}>
+                        Tổng thành viên Ban tổ chức: {total} người
+                    </Typography>
                     {!isUpdate && roleInTournament.length > 0 && (
                         <Button
                             startIcon={<Add />}
@@ -119,7 +207,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                             sx={{ mr: 2, ml: 2 }}
                             onClick={() => handleOpenDialog(true)}
                         >
-                            Thêm người vào ban tổ chức
+                            Thêm người thành viên
                         </Button>
                     )}
                 </Box>
@@ -193,6 +281,21 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 height: '70vh',
                 width: '100%',
                 mt: '1rem',
+                display: 'flex',
+                flexDirection: 'column',
+                // '& .role-edit::after': {
+                //     // backgroundColor: 'red !important',
+                //     content: "'\\270E'",
+                //     // color: 'red',
+                //     fontSize: '1.2rem',
+                // },
+                '& .role-edit:hover': {
+                    // backgroundColor: '#655151 !important',
+                    border: '1px dashed #655151',
+                    // content: "'\\270E'",
+                    // // color: 'red',
+                    // fontSize: '1.2rem',
+                },
                 '& .status-rows': {
                     justifyContent: 'center !important',
                     minHeight: '0px !important',
@@ -216,25 +319,13 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 },
             }}
         >
-            <Dialog
-                fullWidth
-                maxWidth="md"
-                open={openDelete}
-                onClose={handleCloseDelete}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    Xác nhận
-                </DialogTitle>
-                <DialogContent>Bạn có chắc chắn muốn xóa người này ra khỏi ban tổ chức</DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDelete}>Hủy</Button>
-                    <Button onClick={handleConfirmDelete} autoFocus>
-                        Đồng ý
+            {isEdit && (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button variant="contained" onClick={handleOpenDialogSave} sx={{ m: 1 }} disabled={!isEdit}>
+                        Lưu lại
                     </Button>
-                </DialogActions>
-            </Dialog>
+                </Box>
+            )}
             <DataGrid
                 // loading={data.length === 0}
                 disableSelectionOnClick={true}
@@ -247,7 +338,35 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                     Toolbar: CustomToolbar,
                     NoRowsOverlay: CustomNoRowsOverlay,
                 }}
+                onCellEditCommit={handleRowEditCommit}
             />
+
+            {tournamentAdminId && (
+                <Dialog
+                    // fullWidth
+                    // maxWidth="md"
+                    open={openDelete}
+                    onClose={handleCloseDelete}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        Xác nhận
+                    </DialogTitle>
+                    <DialogContent>
+                        Bạn có chắc chắn muốn xóa <strong>{tournamentAdminId.studentName}</strong> ra khỏi ban tổ chức
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="outlined" onClick={handleCloseDelete}>
+                            Hủy
+                        </Button>
+                        <Button variant="contained" onClick={handleConfirmDelete} autoFocus>
+                            Đồng ý
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+
             {roleInTournament.length > 0 && (
                 <RegisterAdmin
                     title="Đăng kí tham gia ban tổ chức"
@@ -268,6 +387,26 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                     onChange={onChange}
                 />
             )}
+
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialogSave}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">Bạn có muốn lưu các thay đổi ?</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" onClick={handleCloseDialogSave}>
+                        Hủy bỏ
+                    </Button>
+                    <Button variant="contained" onClick={handleUpdate} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }

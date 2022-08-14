@@ -41,14 +41,14 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
     }, 0);
 
     const handleCloseConfirm = () => {
-        setIdMember(-1);
+        setIdMember();
         setOpenConfirm(false);
     };
 
     const handleOpenConfirm = () => {
-        updateUserPayment(idMember);
+        updateUserPayment(idMember.id);
         const newUserList = userPaymentStatus.map((user) => {
-            return user.id === idMember ? { ...user, paymentStatus: !user.paymentStatus } : user;
+            return user.id === idMember.id ? { ...user, paymentStatus: !user.paymentStatus } : user;
         });
         console.log(newUserList);
         setUserPaymentStatus(newUserList);
@@ -101,12 +101,12 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
     }, [tournamentId, type]);
 
     const columns = [
-        { field: 'id', headerName: 'ID', flex: 0.5, hide: true },
-        { field: 'userName', headerName: 'Tên', flex: 0.8 },
-        { field: 'userStudentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
+        { field: 'userName', headerName: 'Tên', width: 150, flex: 0.8 },
+        { field: 'userStudentId', headerName: 'Mã sinh viên', width: 150, flex: 0.5 },
         {
             field: 'paymentStatus',
             headerName: 'Trạng thái',
+            width: 150,
             flex: 0.5,
             cellClassName: (params) => {
                 if (params.value == null) {
@@ -132,7 +132,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                         <GridActionsCellItem
                             icon={<RadioButtonChecked />}
                             label="Đã đóng"
-                            onClick={() => toggleStatus(params.row.id, type)}
+                            onClick={() => toggleStatus(params.row, type)}
                             color="primary"
                             aria-details="Đã đóng"
                         />,
@@ -142,7 +142,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                     <GridActionsCellItem
                         icon={<RadioButtonUnchecked />}
                         label="Đã đóng"
-                        onClick={() => toggleStatus(params.row.id, type)}
+                        onClick={() => toggleStatus(params.row, type)}
                     />,
                 ];
             },
@@ -160,7 +160,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                         <GridActionsCellItem
                             icon={<RadioButtonUnchecked />}
                             label="Chưa đóng"
-                            onClick={() => toggleStatus(params.row.id, type)}
+                            onClick={() => toggleStatus(params.row, type)}
                         />,
                     ];
                 }
@@ -168,7 +168,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                     <GridActionsCellItem
                         icon={<RadioButtonChecked />}
                         label="Chưa đóng"
-                        onClick={() => toggleStatus(params.row.id, type)}
+                        onClick={() => toggleStatus(params.row, type)}
                         color="primary"
                     />,
                 ];
@@ -201,6 +201,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
 
     const toggleStatus = (id, type) => {
         setIdMember(id);
+        console.log(id);
         setOpenConfirm(true);
     };
 
@@ -275,25 +276,29 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                     </Typography>
                 </Grid> */}
 
-            <Dialog
-                fullWidth
-                maxWidth="md"
-                open={openConfirm}
-                onClose={handleCloseConfirm}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    Xác nhận
-                </DialogTitle>
-                <DialogContent>Bạn có chắc chắn muốn cập nhật trạng thái đóng tiền</DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseConfirm}>Hủy</Button>
-                    <Button onClick={handleOpenConfirm} autoFocus>
-                        Đồng ý
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {idMember && (
+                <Dialog
+                    open={openConfirm}
+                    onClose={handleCloseConfirm}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        Xác nhận
+                    </DialogTitle>
+                    <DialogContent>
+                        Bạn có chắc chắn muốn cập nhật trạng thái đóng tiền cho <strong>{idMember.userName}</strong>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="outlined" onClick={handleCloseConfirm}>
+                            Hủy
+                        </Button>
+                        <Button variant="contained" onClick={handleOpenConfirm} autoFocus>
+                            Đồng ý
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
 
             {paymentStatus ? (
                 <Box

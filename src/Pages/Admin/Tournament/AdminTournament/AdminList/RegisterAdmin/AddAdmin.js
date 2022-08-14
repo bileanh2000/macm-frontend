@@ -48,7 +48,7 @@ function AddAdmin(props) {
                         )}
                         style={{ width: 500 }}
                         renderInput={(params) => (
-                            <TextField {...params} label="Thành viên" placeholder="Thêm thành viên" />
+                            <TextField {...params} label="Danh sách thành viên" placeholder="Thêm thành viên" />
                         )}
                     />
                 </Grid>

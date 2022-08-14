@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import {
+    Box,
     Button,
     Grid,
     Paper,
@@ -45,15 +46,16 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
     }));
 
     return (
-        <div
+        <Box
             role="tabpanel"
             hidden={value !== index}
             id={`simple-tabpanel-${index}`}
             aria-labelledby={`simple-tab-${index}`}
+            sx={{ p: 1 }}
         >
             {tournament && (
                 <Fragment>
-                    <Grid container columns={12} sx={{ mt: 2, ml: 0 }} spacing={2}>
+                    <Grid container columns={12} sx={{ width: '100% ', m: 0 }} spacing={2}>
                         <Grid item xs={7}>
                             <Typography variant="body1" sx={{ p: 2, m: 1 }}>
                                 <strong>Nội dung: </strong>
@@ -175,7 +177,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                     </Grid>
                 </Fragment>
             )}
-        </div>
+        </Box>
     );
 }
 export default TournamentOverview;

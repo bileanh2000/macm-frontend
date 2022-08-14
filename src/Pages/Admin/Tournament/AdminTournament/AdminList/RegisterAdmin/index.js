@@ -18,6 +18,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    Tooltip,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -25,15 +26,16 @@ import { useSnackbar } from 'notistack';
 import AddAdmin from './AddAdmin';
 import adminTournament from 'src/api/adminTournamentAPI';
 import userTournamentAPI from 'src/api/userTournamentAPI';
-import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
+import { Edit } from '@mui/icons-material';
 
 function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [admin, setAdmin] = useState([]);
     const [allMember, setAllMember] = useState();
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(5);
     // const [roleInTournament, setRoleInTournament] = useState([]);
 
     const AddPlayerHandler = (data) => {
@@ -105,23 +107,6 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
         [admin, roles],
     );
 
-    const getAllMember = async (tournamentId) => {
-        try {
-            const response = await adminTournament.getAllUserNotJoinTournament(tournamentId);
-            console.log(response.data);
-            if (response.data.length > 0) {
-                const newAllMemberWithRole = response.data.map((data) => {
-                    return { roleId: roles[0].id, user: data };
-                });
-                setAllMember(newAllMemberWithRole);
-            } else {
-                setAllMember([]);
-            }
-        } catch (error) {
-            console.log('khong the lay data');
-        }
-    };
-
     const columns = [
         { field: 'studentName', headerName: 'Tên', flex: 0.8 },
         {
@@ -140,6 +125,16 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
             valueOptions: roles.map((role) => {
                 return { label: role.name, value: role.name };
             }),
+            renderCell: (params) => (
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>{params.value}</span>
+                    <Tooltip title="DoubleClick để chỉnh sửa vai trò">
+                        <span>
+                            <GridActionsCellItem icon={<Edit />} label="Edit" sx={{ ml: 2 }} />
+                        </span>
+                    </Tooltip>
+                </Box>
+            ),
             cellClassName: (params) => {
                 if (params.value == null) {
                     return '';
@@ -162,8 +157,24 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
         });
 
     useEffect(() => {
+        const getAllMember = async (tournamentId) => {
+            try {
+                const response = await adminTournament.getAllUserNotJoinTournament(tournamentId);
+                console.log(response.data);
+                if (response.data.length > 0) {
+                    const newAllMemberWithRole = response.data.map((data) => {
+                        return { roleId: roles[0].id, user: data };
+                    });
+                    setAllMember(newAllMemberWithRole);
+                } else {
+                    setAllMember([]);
+                }
+            } catch (error) {
+                console.log('khong the lay data');
+            }
+        };
         getAllMember(tournamentId);
-    }, []);
+    }, [tournamentId, roles]);
 
     const CustomToolbar = () => {
         return (
@@ -265,18 +276,12 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
 
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
-                        <Paper elevation={3} sx={{ width: '100%' }}>
+                        <Paper elevation={3} sx={{ width: '100%', minHeight: 400 }}>
                             {admin.length > 0 && (
                                 <Box
                                     sx={{
                                         height: '60vh',
                                         width: '100%',
-                                        '& .role-edit::after': {
-                                            // backgroundColor: 'red !important',
-                                            content: "'\\270E'",
-                                            // color: 'red',
-                                            fontSize: '1.2rem',
-                                        },
                                         '& .role-edit:hover': {
                                             // backgroundColor: '#655151 !important',
                                             border: '1px dashed #655151',
@@ -293,7 +298,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
                                         columns={columns}
                                         pageSize={pageSize}
                                         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                                        rowsPerPageOptions={[10, 20, 30]}
+                                        rowsPerPageOptions={[5, 10, 20]}
                                         components={{
                                             Toolbar: CustomToolbar,
                                             NoRowsOverlay: CustomNoRowsOverlay,
@@ -307,8 +312,10 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
                 </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
-                <Button onClick={handleRegister} autoFocus>
+                <Button variant="outlined" onClick={handleCloseDialog}>
+                    Hủy bỏ
+                </Button>
+                <Button variant="contained" onClick={handleRegister} autoFocus disabled={admin.length === 0}>
                     Đồng ý
                 </Button>
             </DialogActions>

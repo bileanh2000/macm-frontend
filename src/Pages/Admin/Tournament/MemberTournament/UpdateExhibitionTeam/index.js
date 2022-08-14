@@ -34,15 +34,16 @@ import { Delete } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhibitionId }) {
-    let { tournamentId } = useParams();
+function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, exhibitionTeam }) {
+    console.log(exhibitionTeam);
+    // let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
-    const [exhibitionType, setExhibitionType] = useState(exhibitionId);
-    const [numberMale, setNumberMale] = useState();
-    const [numberFemale, setNumberFemale] = useState();
-    const [listExhibitionType, setListExhibitionType] = useState([]);
-    const [dataMale, setDataMale] = useState([]);
-    const [dataFemale, setDateFemale] = useState([]);
+    // const [exhibitionType, setExhibitionType] = useState(exhibitionId);
+    const [numberMale, setNumberMale] = useState(exhibitionTeam.numberMale);
+    const [numberFemale, setNumberFemale] = useState(exhibitionTeam.numberFemale);
+    // const [listExhibitionType, setListExhibitionType] = useState([]);
+    const [dataMale, setDataMale] = useState(exhibitionTeam.dataMale);
+    const [dataFemale, setDateFemale] = useState(exhibitionTeam.dataFemale);
     const [isRender, setIsRender] = useState(true);
     const [allMember, setAllMember] = useState([]);
 
@@ -70,20 +71,6 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
         mode: 'onBlur',
     });
 
-    const handleChangeExhibitionType = (event) => {
-        console.log(event.target.value);
-        setExhibitionType(event.target.value);
-        let exType;
-        if (event.target.value === 0) {
-            exType = { exhibitionType: 0 };
-        } else {
-            exType = listExhibitionType.find((type) => type.id === event.target.value);
-            setNumberMale(exType.numberMale);
-            setNumberFemale(exType.numberFemale);
-        }
-        setDataMale([]);
-        setDateFemale([]);
-    };
     const getAllMember = async (exhibitionType) => {
         try {
             const response = await adminTournament.listUserNotJoinExhibition(exhibitionType);
@@ -93,17 +80,17 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
         }
     };
 
-    const fetchExhibitionType = async (tournamentId) => {
-        try {
-            const response = await adminTournament.getAllExhibitionType(tournamentId);
-            setListExhibitionType(response.data);
-            // setExhibitionType(response.data[0].id);
-            setNumberMale(response.data[0].numberMale);
-            setNumberFemale(response.data[0].numberFemale);
-        } catch (error) {
-            console.log('Failed to fetch user list: ', error);
-        }
-    };
+    // const fetchExhibitionType = async (tournamentId) => {
+    //     try {
+    //         const response = await adminTournament.getAllExhibitionType(tournamentId);
+    //         setListExhibitionType(response.data);
+    //         // setExhibitionType(response.data[0].id);
+    //         setNumberMale(response.data[0].numberMale);
+    //         setNumberFemale(response.data[0].numberFemale);
+    //     } catch (error) {
+    //         console.log('Failed to fetch user list: ', error);
+    //     }
+    // };
 
     const registerTeam = async (exhibitionType, params) => {
         try {
@@ -131,8 +118,8 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
         const teamMember = [...dataMale, ...dataFemale];
         const listStudentId = teamMember.map((student) => student.studentId);
 
-        const params = { listStudentId, teamName: data.teamName, exhibitionTypeId: exhibitionType };
-        registerTeam(exhibitionType, params);
+        const params = { listStudentId, teamName: data.teamName, exhibitionTypeId: exhibitionTeam.exhibitionTypeId };
+        registerTeam(exhibitionTeam.exhibitionTypeId, params);
         onSuccess && onSuccess();
         handleCloseDialog();
     };
@@ -155,17 +142,9 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
     };
 
     useEffect(() => {
-        fetchExhibitionType(tournamentId);
-    }, [tournamentId]);
-
-    useEffect(() => {
-        isRender && getAllMember(exhibitionType);
+        isRender && getAllMember(exhibitionTeam.exhibitionTypeId);
         setIsRender(false);
-    }, [exhibitionType, isRender, allMember]);
-
-    useEffect(() => {
-        setExhibitionType(exhibitionId);
-    }, [exhibitionId]);
+    }, [exhibitionTeam.exhibitionTypeId, isRender, allMember]);
 
     return (
         <Fragment>
@@ -178,34 +157,8 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">Đăng kí tham gia giải đấu</DialogTitle>
+                    <DialogTitle id="alert-dialog-title">Chỉnh sửa thông tin đội thi đấu</DialogTitle>
                     <DialogContent>
-                        <Box sx={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', m: 2 }}>
-                            <Box
-                                sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}
-                            >
-                                <FormControl size="small">
-                                    <Typography variant="caption">Thể thức thi đấu</Typography>
-                                    <Select
-                                        id="demo-simple-select"
-                                        value={exhibitionType}
-                                        displayEmpty
-                                        onChange={handleChangeExhibitionType}
-                                    >
-                                        {listExhibitionType &&
-                                            listExhibitionType.map((type) => (
-                                                <MenuItem value={type.id} key={type.id}>
-                                                    {type.name}
-                                                </MenuItem>
-                                            ))}
-                                    </Select>
-                                </FormControl>
-                            </Box>
-                            <Typography variant="body1" color={'orange'}>
-                                Vui lòng thêm đủ số lượng thành viên để đăng kí
-                            </Typography>
-                        </Box>
-
                         <Box>
                             <TextField
                                 fullWidth
@@ -213,6 +166,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
                                 label="Tên đội"
                                 variant="outlined"
                                 {...register('teamName')}
+                                defaultValue={exhibitionTeam.teamName}
                                 // onChange={checkValidWeight}
                                 error={errors.teamName ? true : false}
                                 helperText={errors.teamName?.message}
@@ -222,7 +176,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
                                 <Grid item xs={12} md={6}>
                                     <Box>
                                         <Typography sx={{ m: 1 }}>
-                                            <strong>Số lượng nam: </strong> yêu cầu {numberMale} thành viên
+                                            <strong>Số lượng nam: </strong> {numberMale}
                                         </Typography>
                                         {dataMale.length < numberMale && (
                                             <AddMember
@@ -276,7 +230,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
                                 <Grid item xs={12} md={6}>
                                     <Box>
                                         <Typography sx={{ m: 1 }}>
-                                            <strong>Số lượng nữ: </strong> yêu cầu {numberFemale} thành viên
+                                            <strong>Số lượng nữ: </strong> {numberFemale}
                                         </Typography>
                                         {dataFemale.length < numberFemale && (
                                             <AddMember
@@ -331,15 +285,8 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
                         </Box>
                     </DialogContent>
                     <DialogActions>
-                        <Button variant="outlined" onClick={handleCloseDialog}>
-                            Hủy bỏ
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick={handleSubmit(handleRegister)}
-                            autoFocus
-                            disabled={dataMale.length < numberMale || dataFemale.length < numberFemale}
-                        >
+                        <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
+                        <Button onClick={handleSubmit(handleRegister)} autoFocus>
                             Đồng ý
                         </Button>
                     </DialogActions>
@@ -351,4 +298,4 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
     );
 }
 
-export default RegisterExhibition;
+export default UpdateExhibitionTeam;

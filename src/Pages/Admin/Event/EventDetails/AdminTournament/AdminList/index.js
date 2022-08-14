@@ -1,28 +1,125 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Box } from '@mui/system';
-import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { styled } from '@mui/material/styles';
-import { Button, Typography } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import {
+    Button,
+    Typography,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Tooltip,
+} from '@mui/material';
+import { Add, Edit } from '@mui/icons-material';
 
 import RegisterAdmin from './RegisterAdmin';
 // import userTournamentAPI from 'src/api/userTournamentAPI';
 import eventApi from 'src/api/eventApi';
+import { useParams } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 function AdminList({ adminList, value, index, active, total, isUpdate, user, Success }) {
-    const [data, setData] = useState(adminList);
+    // const [data, setData] = useState(adminList);
     const [pageSize, setPageSize] = useState(10);
     const [open, setOpen] = useState(false);
-    const [roleInTournament, setRoleInTournament] = useState([]);
+    const [roleList, setRoleList] = useState([]);
+    const [userList, setUserList] = useState([]);
+    const [isEdit, setIsEdit] = useState(false);
+    let { id } = useParams();
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const [openDialog, setOpenDialog] = useState(false);
 
-    useEffect(() => {
-        setData(adminList);
-    }, [adminList]);
-
-    const handleOpenDialog = () => {
-        setOpen(true);
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
     };
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
+    };
+
+    const fetchUserInEvent = async (params) => {
+        try {
+            const response = await eventApi.getListMemberToUpdate(params);
+            console.log(response);
+            setUserList(response.data);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
+
+    const fetchRoleInEvent = async (params) => {
+        try {
+            const response = await eventApi.getAllOrganizingCommitteeRoleByEventId(params);
+            console.log(response);
+            setRoleList(response.data);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
+    const roles = roleList.map((role) => {
+        return { roleId: role.id, roleName: role.name };
+    });
+    const formatRoles = [{ id: 0, roleId: 1, roleName: 'Thành viên tham gia' }, ...roles];
+    // const roles = [
+    //     { roleId: 1, roleName: 'Thành viên tham gia' },
+    //     { roleId: 2, roleName: 'Thành viên ban truyền thông' },
+    //     { roleId: 3, roleName: 'Thành viên ban văn hóa' },
+    //     { roleId: 4, roleName: 'Thành viên ban hậu cần' },
+    // ];
+    useEffect(() => {
+        fetchUserInEvent(id);
+        fetchRoleInEvent(id);
+        // console.log('role', formatRoles);
+    }, [index, id, value]);
+
+    const handleRowEditCommit = React.useCallback(
+        (params) => {
+            const id = params.id;
+            const key = params.field;
+            const value = params.value;
+            console.log(id, key, value, params);
+            console.log(roles);
+
+            const newRole = formatRoles && formatRoles.find((role) => role.roleName === value);
+            console.log('new role', newRole);
+            console.log(userList);
+            const newMemberList =
+                userList &&
+                userList.map((member) =>
+                    member.id == id
+                        ? { ...member, roleEventDto: { id: newRole.roleId, name: newRole.roleName } }
+                        : member,
+                );
+            setUserList(newMemberList);
+            setIsEdit(true);
+        },
+        [userList],
+    );
+
+    const handleUpdate = () => {
+        console.log('submit', userList);
+        eventApi.updateMemberRole(userList).then((res) => {
+            console.log(res);
+            console.log(res.data);
+            enqueueSnackbar(res.message, { variant: 'success' });
+            setIsEdit(false);
+            handleCloseDialog();
+            // navigate(-1);
+            // if (res.message === 'Cập nhật chức vụ cho thành viên trong sự kiện thành công') {
+
+            // }
+        });
+    };
+
+    // useEffect(() => {
+    //     setData(adminList);
+    // }, [adminList]);
+
+    // const handleOpenDialog = () => {
+    //     setOpen(true);
+    // };
 
     // const getRoleInTournament = async () => {
     //     try {
@@ -48,12 +145,37 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             flex: 0.6,
         },
         { field: 'roleInClub', headerName: 'Vai trò trong CLB', width: 150, flex: 1 },
-        { field: 'role', headerName: 'Vai trò trong sự kiện', width: 150, flex: 1 },
+        {
+            field: 'role',
+            headerName: `Vai trò trong sự kiện`,
+            flex: 1,
+            editable: true,
+            type: 'singleSelect',
+            valueOptions: formatRoles.map((role) => role.roleName),
+            // valueOptions: roleValueOptions,
+            renderCell: (params) => (
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>{params.value}</span>
+                    <Tooltip title="DoubleClick để chỉnh sửa vai trò">
+                        <span>
+                            <GridActionsCellItem icon={<Edit />} label="Edit" sx={{ ml: 2 }} />
+                        </span>
+                    </Tooltip>
+                </Box>
+            ),
+            cellClassName: (params) => {
+                if (params.value == null) {
+                    return '';
+                }
+
+                return clsx('role-edit');
+            },
+        },
     ];
 
     const rowsUser =
-        data &&
-        data.map((item, index) => {
+        userList &&
+        userList.map((item, index) => {
             const container = {};
             container['id'] = item.id;
             container['studentName'] = item.userName;
@@ -151,6 +273,15 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 height: '70vh',
                 width: '100%',
                 mt: '1rem',
+                display: 'flex',
+                flexDirection: 'column',
+                '& .role-edit:hover': {
+                    // backgroundColor: '#655151 !important',
+                    border: '1px dashed #655151',
+                    // content: "'\\270E'",
+                    // // color: 'red',
+                    // fontSize: '1.2rem',
+                },
                 '& .status-rows': {
                     justifyContent: 'center !important',
                     minHeight: '0px !important',
@@ -174,6 +305,31 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 },
             }}
         >
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">Bạn có muốn lưu các thay đổi ?</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>Từ chối</Button>
+                    <Button onClick={handleUpdate} autoFocus>
+                        Đồng ý
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {isEdit && (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button variant="contained" onClick={handleOpenDialog} sx={{ m: 1 }}>
+                        Lưu lại
+                    </Button>
+                </Box>
+            )}
             <DataGrid
                 // loading={data.length === 0}
                 disableSelectionOnClick={true}
@@ -186,6 +342,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                     Toolbar: CustomToolbar,
                     NoRowsOverlay: CustomNoRowsOverlay,
                 }}
+                onCellEditCommit={handleRowEditCommit}
             />
         </Box>
     );
