@@ -142,10 +142,12 @@ class App extends Component {
                             path="/"
                             // render={(props) => <Login authenticated={this.state.authenticated} {...props} />}
                             element={
-                                this.state.authenticated ? (
-                                    <Navigate to="/home" />
-                                ) : (
+                                !this.state.authenticated ? (
                                     <Login authenticated={this.state.authenticated} />
+                                ) : this.isAdmin() ? (
+                                    <Navigate to="/admin" />
+                                ) : (
+                                    <Navigate to="/home" />
                                 )
                             }
                             // element={<Login />}
@@ -215,7 +217,14 @@ class App extends Component {
                               })
                             : null}
                     </Routes>
-                    {/* {console.log(this.isAdmin())} */}
+                    {/* {this.isAdmin() ? <Navigate to="/admin" /> : <Navigate to="/home" />} */}
+                    {/* {!localStorage.getItem(ACCESS_TOKEN) ? (
+                        <Navigate to="/" />
+                    ) : this.isAdmin() ? (
+                        <Navigate to="/admin" />
+                    ) : (
+                        <Navigate to="/home" />
+                    )} */}
                     {/* {alert(JSON.parse(localStorage.getItem('currentUser')).role.id)} */}
                     {/* {window.location.pathname.startsWith('/admin') ? <Navigate to="/forbidden" /> : ''} */}
 

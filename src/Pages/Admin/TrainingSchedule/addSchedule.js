@@ -49,6 +49,12 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
     const tomorrow = today.setDate(today.getDate() + 1);
     const [selectStartDate, setSelectStartDate] = useState();
     const [selectEndDate, setSelectEndDate] = useState();
+    const [previewStatistical, setPreviewStatistical] = useState({
+        existedSession: 0,
+        totalSession: 0,
+        coincideEvent: 0,
+        coincideTournament: 0,
+    });
 
     let navigate = useNavigate();
 
@@ -186,6 +192,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                 // setSnackBarStatus(true);
                 // snackBarStatus = true;
                 // dynamicAlert(snackBarStatus, res.message);
+                setPreviewStatistical({ totalSession: res.data.length });
                 setPreviewData(res.data);
                 setOpen(true);
             } else {
@@ -220,9 +227,9 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
             const container = {};
             container['id'] = index;
             container['date'] = item.date;
-            container['title'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+            container['title'] = item.title + ' ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
             container['display'] = 'background';
-            container['backgroundColor'] = '#5ba8f5';
+            container['backgroundColor'] = item.existed === false ? '#9fccf9' : '#ffb3b4';
 
             return container;
         });
@@ -259,6 +266,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
             <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClosePreviewDialog}>
                 <DialogTitle>Xem trước lịch tập</DialogTitle>
                 <DialogContent sx={{ height: '590px' }}>
+                    <Typography>Tổng số buổi tập: {previewStatistical.totalSession}</Typography>
                     <FullCalendar
                         locale="vie"
                         height="100%"

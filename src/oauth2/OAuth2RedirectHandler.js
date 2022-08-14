@@ -59,7 +59,7 @@ function OAuth2RedirectHandler() {
         return (
             <Navigate
                 to={{
-                    pathname: '/home',
+                    pathname: '/',
                     // state: { from: this.props.location },
                 }}
             />

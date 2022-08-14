@@ -400,14 +400,16 @@ function MemberAndCollaborator() {
 
     return (
         <Fragment>
-            <AddMemberDialog
-                title="Thêm thành viên"
-                isOpen={isOpenAddMember}
-                handleClose={() => setIsOpenAddMember(false)}
-                onSucess={(newUser) => {
-                    setUserList([newUser, ...userList]);
-                }}
-            />
+            {isOpenAddMember && (
+                <AddMemberDialog
+                    title="Thêm thành viên"
+                    isOpen={isOpenAddMember}
+                    handleClose={() => setIsOpenAddMember(false)}
+                    onSucess={(newUser) => {
+                        setUserList([newUser, ...userList]);
+                    }}
+                />
+            )}
             {isOpenViewMember && (
                 <ViewDetailMemberDialog
                     // title="Thông tin thành viên"

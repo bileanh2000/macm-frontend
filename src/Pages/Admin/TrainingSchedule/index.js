@@ -411,8 +411,6 @@ function TrainingSchedule() {
                                 right: 'prev next today',
                                 // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
                             }}
-                            // editable={true}
-                            // selectable={true}
                             datesSet={(dateInfo) => {
                                 getMonthInCurrentTableView(dateInfo.start);
                             }}
@@ -429,10 +427,21 @@ function TrainingSchedule() {
                                 //     type: 'success',
                                 // });
                             }}
-
                             // selectable
                             // select={handleEventAdd}
                             // eventDrop={(e) => console.log(e)}
+                            // selectable={true}
+                            // editable={true}
+                            // droppable={true}
+                            // eventDrop={function (eventBj, date) {
+                            //     console.log('eventDrop function');
+                            // }}
+                            // drop={(date, jsEvent, ui, resourceId) => {
+                            //     console.log('drop function');
+                            // }}
+                            // select={(start, end, allDay) => {
+                            //     this.handleSelect(start, end, allDay);
+                            // }}
                         />
                     )}
                     {/* </div> */}

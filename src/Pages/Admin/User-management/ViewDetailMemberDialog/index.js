@@ -424,35 +424,50 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                                 />
                             </Box>
                             <Box>
-                                <TextField
-                                    required
-                                    select
-                                    fullWidth
-                                    defaultValue={selectedStudent.roleId}
-                                    label="Chức vụ"
-                                    {...register('roleId')}
-                                    error={errors.roleId ? true : false}
-                                    helperText={errors.roleId?.message}
-                                    sx={{ width: '-webkit-fill-available' }}
-                                    {...(!isEditable ? { disabled: true } : {})}
-                                >
-                                    <MenuItem value={1}>Chủ nhiệm</MenuItem>
-                                    <MenuItem value={2}>Phó chủ nhiệm</MenuItem>
-                                    <MenuItem value={3}>Thủ quỹ</MenuItem>
-                                    <MenuItem value={4}>Trưởng ban văn hóa</MenuItem>
-                                    <MenuItem value={5}>Phó ban văn hóa</MenuItem>
-                                    <MenuItem value={6}>Trưởng ban truyền thông</MenuItem>
-                                    <MenuItem value={7}>Phó ban truyền thông</MenuItem>
-                                    <MenuItem value={8}>Trưởng ban chuyên môn</MenuItem>
-                                    <MenuItem value={9}>Phó ban chuyên môn</MenuItem>
-
-                                    <MenuItem value={10}>Thành viên Ban truyền thông</MenuItem>
-                                    <MenuItem value={11}>Thành viên Ban văn hóa</MenuItem>
-                                    <MenuItem value={12}>Thành viên Ban chuyên môn</MenuItem>
-                                    <MenuItem value={13}>CTV Ban truyền thông</MenuItem>
-                                    <MenuItem value={14}>CTV Ban văn hóa</MenuItem>
-                                    <MenuItem value={15}>CTV Ban chuyên môn</MenuItem>
-                                </TextField>
+                                {adminRole ? (
+                                    <TextField
+                                        required
+                                        select
+                                        fullWidth
+                                        defaultValue={selectedStudent.roleId}
+                                        label="Chức vụ"
+                                        {...register('roleId')}
+                                        error={errors.roleId ? true : false}
+                                        helperText={errors.roleId?.message}
+                                        sx={{ width: '-webkit-fill-available' }}
+                                        {...(!isEditable ? { disabled: true } : {})}
+                                    >
+                                        <MenuItem value={1}>Chủ nhiệm</MenuItem>
+                                        <MenuItem value={2}>Phó chủ nhiệm</MenuItem>
+                                        <MenuItem value={3}>Thủ quỹ</MenuItem>
+                                        <MenuItem value={4}>Trưởng ban văn hóa</MenuItem>
+                                        <MenuItem value={5}>Phó ban văn hóa</MenuItem>
+                                        <MenuItem value={6}>Trưởng ban truyền thông</MenuItem>
+                                        <MenuItem value={7}>Phó ban truyền thông</MenuItem>
+                                        <MenuItem value={8}>Trưởng ban chuyên môn</MenuItem>
+                                        <MenuItem value={9}>Phó ban chuyên môn</MenuItem>
+                                    </TextField>
+                                ) : (
+                                    <TextField
+                                        required
+                                        select
+                                        fullWidth
+                                        defaultValue={selectedStudent.roleId}
+                                        label="Chức vụ"
+                                        {...register('roleId')}
+                                        error={errors.roleId ? true : false}
+                                        helperText={errors.roleId?.message}
+                                        sx={{ width: '-webkit-fill-available' }}
+                                        {...(!isEditable ? { disabled: true } : {})}
+                                    >
+                                        <MenuItem value={10}>Thành viên Ban truyền thông</MenuItem>
+                                        <MenuItem value={11}>Thành viên Ban văn hóa</MenuItem>
+                                        <MenuItem value={12}>Thành viên Ban chuyên môn</MenuItem>
+                                        <MenuItem value={13}>CTV Ban truyền thông</MenuItem>
+                                        <MenuItem value={14}>CTV Ban văn hóa</MenuItem>
+                                        <MenuItem value={15}>CTV Ban chuyên môn</MenuItem>
+                                    </TextField>
+                                )}
                             </Box>
                         </Box>
                     </Box>

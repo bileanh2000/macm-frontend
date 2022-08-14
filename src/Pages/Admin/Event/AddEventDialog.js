@@ -116,7 +116,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                   roleName: Yup.string()
                       .nullable()
                       .required('Không được để trống trường này')
-                      .test('len', 'Không hợp lệ', (val) => val.length > 1)
+                      .test('len', 'Độ dài không cho phép', (val) => val.length > 1)
                       .matches(
                           /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹẾỀếề ]+$/,
                           'Không hợp lệ: vui lòng nhập chữ',

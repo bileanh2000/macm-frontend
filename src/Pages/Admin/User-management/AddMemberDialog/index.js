@@ -71,7 +71,7 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
                 return createError({ path, message: 'Không được để trống trường này' });
             }
 
-            if (!value.match(/[A-Z]{2}\d{6}\b/)) {
+            if (!value.match(/^[A-Z]{2}\d{6}\b/)) {
                 return createError({
                     path,
                     message: `Vui lòng nhập đúng định dạng 'ex: HA14000'`,
@@ -115,7 +115,7 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
                 return createError({ path, message: 'Không được để trống trường này' });
             }
 
-            if (!value.match(/(84|0[3|5|7|8|9])+([0-9]{8})\b/)) {
+            if (!value.match(/^[^\s]*(84|0[3|5|7|8|9])+([0-9]{8})\b/)) {
                 return createError({
                     path,
                     message: 'Vui lòng nhập đúng số điện thoại',
@@ -129,17 +129,25 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
     Yup.addMethod(Yup.mixed, 'uniqueEmail', uniqueEmail);
     Yup.addMethod(Yup.mixed, 'uniquePhone', uniquePhone);
     const validationSchema = Yup.object().shape({
-        name: Yup.string().required('Không được để trống trường này'),
+        name: Yup.string()
+            .nullable()
+            .required('Không được để trống trường này')
+            .test('len', 'Độ dài không cho phép', (val) => val.length > 5)
+            .matches(
+                /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹẾỀếề ]+$/,
+                'Không hợp lệ: vui lòng nhập chữ',
+            ),
         studentId: Yup.mixed().uniqueStudentId(),
         dateOfBirth: Yup.string().nullable().required('Không được để trống trường này'),
         email: Yup.mixed().uniqueEmail(),
         gender: Yup.string().required('Không được để trống trường này'),
         phone: Yup.mixed().uniquePhone(),
         roleId: Yup.string().required('Không được để trống trường này'),
-        generation: Yup.number()
+        generation: Yup.string()
             .required('Không được để trống trường này')
-            .min(0, 'Vui lòng nhập lớn hơn 0')
-            .typeError('Không được để trống trường này'),
+            .min(1, 'Vui lòng nhập lớn hơn 0')
+            .typeError('Không được để trống trường này')
+            .matches(/^[0-9]*$/, 'Vui lòng chỉ nhập số nguyên'),
     });
 
     const {
@@ -151,7 +159,7 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
         formState: { errors, isSubmitSuccessful },
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const onSubmit = async (data) => {
