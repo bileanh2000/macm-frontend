@@ -49,7 +49,7 @@ function ReportAttendance() {
     const header = dateList && [
         ...[
             { field: 'userStudentId', headerName: 'Mã sinh viên' },
-            { field: 'userName', headerName: 'Tên', width: 200 },
+            { field: 'userName1', headerName: 'Tên', width: 200 },
         ],
         ...dateList,
     ];

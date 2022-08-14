@@ -168,9 +168,9 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
     const deleteDate = (id) => {
         console.log(id);
         // delete previewData[id];
-        // previewData.splice(id, 1);
-        // setPreviewData(previewData);
-        // console.log(previewData);
+        previewData.splice(id, 1);
+        setPreviewData(previewData);
+        console.log(previewData);
     };
     const onSubmit = (data) => {
         // setSubmitData(moment(new Date(data.startDate)).format('yyyy-MM-DD'));
@@ -266,7 +266,9 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
             <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClosePreviewDialog}>
                 <DialogTitle>Xem trước lịch tập</DialogTitle>
                 <DialogContent sx={{ height: '590px' }}>
-                    <Typography>Tổng số buổi tập: {previewStatistical.totalSession}</Typography>
+                    <Typography>
+                        <strong>Tổng số buổi tập có thể tạo:</strong> {previewStatistical.totalSession}
+                    </Typography>
                     <FullCalendar
                         locale="vie"
                         height="100%"

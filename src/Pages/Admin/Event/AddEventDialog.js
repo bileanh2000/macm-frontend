@@ -55,7 +55,17 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     const [totalClubFunds, setTotalClubFunds] = useState(20000);
     const [previewSchedule, setPreviewSchedule] = useState([]);
     const [previewEvent, setPreviewEvent] = useState([]);
+    //-------
+    const [existedDate, setExistedDate] = useState([]);
+    const [submitOption, setSubmitOption] = useState(0);
+    const [isOpenPreviewDialog, setIsOpenPreviewDialog] = useState(false);
+    const [isEditableSchedule, setIsEditableSchedule] = useState(false);
+    const [isUpdate, setIsUpdate] = useState(false);
+    const [preview, setPreview] = useState([]);
 
+    const handleChange = (event) => {
+        setSubmitOption(event.target.value);
+    };
     const getClubFund = async () => {
         try {
             const response = await adminFunAPi.getClubFund();
@@ -965,9 +975,23 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                     <Button onClick={handleClose} autoFocus>
                         Xác nhận
                     </Button> */}
-                    <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
-                        Quay lại
-                    </Button>
+                    {activeStep === 0 ? (
+                        <Button
+                            color="error"
+                            onClick={() => {
+                                handleClose();
+                                reset();
+                            }}
+                            sx={{ mr: 1 }}
+                        >
+                            Hủy bỏ
+                        </Button>
+                    ) : (
+                        <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
+                            Quay lại
+                        </Button>
+                    )}
+
                     {/* <Box>
                         {isStepOptional(activeStep) && (
                             <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
