@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { Divider, Typography } from '@mui/material';
 import moment from 'moment';
 
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
+
+import { IfAllGranted, IfAuthorized, IfAnyGranted } from 'react-authorization';
+import ForbiddenPage from 'src/Pages/ForbiddenPage';
 
 function ReportMembership() {
     const [pageSize, setPageSize] = useState(10);
@@ -98,51 +101,57 @@ function ReportMembership() {
         );
     }
     return (
-        <Box sx={{ m: 1, p: 1 }}>
-            {semester && (
-                <Box>
-                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
-                        Lịch sử thay đổi chi phí câu lạc bộ
-                    </Typography>
-                    <Divider sx={{ mb: 2 }} />
-                    <Typography variant="h6">Học kì: {semester.name}</Typography>
-                </Box>
-            )}
-            <Box
-                sx={{
-                    height: '70vh',
-                    '& .status-rows.active .MuiDataGrid-cellContent': {
-                        backgroundColor: '#56f000',
-                        color: '#fff',
-                        fontWeight: '600',
-                        textAlign: 'center',
-                        padding: 1,
-                        borderRadius: 5,
-                    },
-                    '& .status-rows.deactive .MuiDataGrid-cellContent': {
-                        backgroundColor: '#ff3838',
-                        color: '#fff',
-                        fontWeight: '600',
-                        textAlign: 'center',
-                        padding: 1,
-                        borderRadius: 5,
-                    },
-                }}
-            >
-                <DataGrid
-                    loading={!membershipReport.length}
-                    disableSelectionOnClick={true}
-                    rows={rowsUser}
-                    columns={columns}
-                    pageSize={pageSize}
-                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                    rowsPerPageOptions={[10, 20, 30]}
-                    components={{
-                        Toolbar: CustomToolbar,
+        <IfAnyGranted
+            expected={['ROLE_Treasurer', 'ROLE_HeadClub']}
+            actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
+            unauthorized={<Navigate to="/forbidden" />}
+        >
+            <Box sx={{ m: 1, p: 1 }}>
+                {semester && (
+                    <Box>
+                        <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+                            Lịch sử thay đổi chi phí câu lạc bộ
+                        </Typography>
+                        <Divider sx={{ mb: 2 }} />
+                        <Typography variant="h6">Học kì: {semester.name}</Typography>
+                    </Box>
+                )}
+                <Box
+                    sx={{
+                        height: '70vh',
+                        '& .status-rows.active .MuiDataGrid-cellContent': {
+                            backgroundColor: '#56f000',
+                            color: '#fff',
+                            fontWeight: '600',
+                            textAlign: 'center',
+                            padding: 1,
+                            borderRadius: 5,
+                        },
+                        '& .status-rows.deactive .MuiDataGrid-cellContent': {
+                            backgroundColor: '#ff3838',
+                            color: '#fff',
+                            fontWeight: '600',
+                            textAlign: 'center',
+                            padding: 1,
+                            borderRadius: 5,
+                        },
                     }}
-                />
+                >
+                    <DataGrid
+                        loading={!membershipReport.length}
+                        disableSelectionOnClick={true}
+                        rows={rowsUser}
+                        columns={columns}
+                        pageSize={pageSize}
+                        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                        rowsPerPageOptions={[10, 20, 30]}
+                        components={{
+                            Toolbar: CustomToolbar,
+                        }}
+                    />
+                </Box>
             </Box>
-        </Box>
+        </IfAnyGranted>
     );
 }
 

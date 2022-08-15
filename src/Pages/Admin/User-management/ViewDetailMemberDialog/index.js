@@ -244,12 +244,13 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                 </DialogTitle>
                 <DialogContent>
                     {/* <DialogContentText id="alert-dialog-description">{children}</DialogContentText> */}
+
                     <Box
                         component="form"
                         noValidate
                         autoComplete="off"
                         sx={{
-                            mt: 8,
+                            mt: 5,
                             '& .MuiTextField-root': { mb: 2 },
                             '& .MuiBox-root': { width: '100%', ml: 1, mr: 2 },
                         }}
@@ -264,9 +265,9 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                             <Box>
                                 <Typography sx={{ fontSize: '1.2rem' }}>Thông tin cá nhân</Typography>
                             </Box>
-                            <Box>
+                            {/* <Box>
                                 <Typography sx={{ fontSize: '1.2rem' }}>Thông tin liên hệ</Typography>
-                            </Box>
+                            </Box> */}
                         </Box>
                         <Box
                             sx={{
@@ -290,26 +291,6 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                             <Box>
                                 <TextField
                                     required
-                                    fullWidth
-                                    id="outlined-disabled"
-                                    label="Email"
-                                    {...register('email')}
-                                    error={errors.email ? true : false}
-                                    helperText={errors.email?.message}
-                                    defaultValue={selectedStudent.email}
-                                    {...(!isEditable ? { disabled: true } : {})}
-                                />
-                            </Box>
-                        </Box>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                            }}
-                        >
-                            <Box>
-                                <TextField
-                                    required
                                     id="outlined-disabled"
                                     label="Mã sinh viên"
                                     fullWidth
@@ -317,19 +298,6 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                                     error={errors.studentId ? true : false}
                                     helperText={errors.studentId?.message}
                                     defaultValue={selectedStudent.studentId}
-                                    {...(!isEditable ? { disabled: true } : {})}
-                                />
-                            </Box>
-                            <Box>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="outlined-disabled"
-                                    label="Số điện thoại"
-                                    {...register('phone')}
-                                    error={errors.phone ? true : false}
-                                    helperText={errors.phone?.message}
-                                    defaultValue={selectedStudent.phone}
                                     {...(!isEditable ? { disabled: true } : {})}
                                 />
                             </Box>
@@ -380,13 +348,19 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                             </Box>
                             <Box>
                                 <TextField
+                                    required
+                                    select
                                     fullWidth
-                                    id="outlined-disabled"
-                                    label="Địa chỉ hiện tại"
-                                    {...register('currentAddress')}
-                                    defaultValue={selectedStudent.currentAddress}
+                                    label="Giới tính"
+                                    {...register('gender')}
+                                    error={errors.gender ? true : false}
+                                    helperText={errors.gender?.message}
+                                    defaultValue={selectedStudent.gender === 'Nam' ? true : false}
                                     {...(!isEditable ? { disabled: true } : {})}
-                                />
+                                >
+                                    <MenuItem value={true}>Nam</MenuItem>
+                                    <MenuItem value={false}>Nữ</MenuItem>
+                                </TextField>
                             </Box>
                         </Box>
                         <Box
@@ -398,28 +372,14 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                             <Box>
                                 <TextField
                                     required
-                                    select
-                                    fullWidth
-                                    defaultValue={selectedStudent.gender === 'Nam' ? true : false}
-                                    label="Giới tính"
-                                    {...register('gender')}
-                                    error={errors.gender ? true : false}
-                                    helperText={errors.gender?.message}
-                                    {...(!isEditable ? { disabled: true } : {})}
-                                >
-                                    <MenuItem value={true}>Nam</MenuItem>
-                                    <MenuItem value={false}>Nữ</MenuItem>
-                                </TextField>
-                                <TextField
-                                    required
                                     type="number"
-                                    defaultValue={selectedStudent.generation}
                                     id="outlined-disabled"
                                     label="Gen"
                                     fullWidth
                                     {...register('generation')}
                                     error={errors.generation ? true : false}
                                     helperText={errors.generation?.message}
+                                    defaultValue={selectedStudent.generation}
                                     {...(!isEditable ? { disabled: true } : {})}
                                 />
                             </Box>
@@ -468,6 +428,72 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                                         <MenuItem value={15}>CTV Ban chuyên môn</MenuItem>
                                     </TextField>
                                 )}
+                            </Box>
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                mb: 1,
+                            }}
+                        >
+                            <Box>
+                                <Typography sx={{ fontSize: '1.2rem' }}>Thông tin liên hệ</Typography>
+                            </Box>
+                            {/* <Box>
+                                <Typography sx={{ fontSize: '1.2rem' }}>Thông tin liên hệ</Typography>
+                            </Box> */}
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                            }}
+                        >
+                            <Box>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="outlined-disabled"
+                                    label="Số điện thoại"
+                                    {...register('phone')}
+                                    error={errors.phone ? true : false}
+                                    helperText={errors.phone?.message}
+                                    defaultValue={selectedStudent.phone}
+                                    {...(!isEditable ? { disabled: true } : {})}
+                                />
+                            </Box>
+                            <Box>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="outlined-disabled"
+                                    label="Email"
+                                    {...register('email')}
+                                    error={errors.email ? true : false}
+                                    helperText={errors.email?.message}
+                                    defaultValue={selectedStudent.email}
+                                    {...(!isEditable ? { disabled: true } : {})}
+                                />
+                            </Box>
+                        </Box>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'flex-start',
+                            }}
+                        >
+                            <Box>
+                                <TextField
+                                    fullWidth
+                                    id="outlined-disabled"
+                                    label="Địa chỉ hiện tại"
+                                    {...register('currentAddress')}
+                                    defaultValue={selectedStudent.currentAddress}
+                                    {...(!isEditable ? { disabled: true } : {})}
+                                />
                             </Box>
                         </Box>
                     </Box>

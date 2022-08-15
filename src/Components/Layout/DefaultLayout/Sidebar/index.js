@@ -32,6 +32,7 @@ import { PriceCheck, Savings } from '@mui/icons-material';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 
 function Sidebar() {
+    const ROLE = JSON.parse(localStorage.getItem('currentUser')).role.name;
     const [selectedIndex, setSelectedIndex] = React.useState(1);
     const [open, setOpen] = React.useState(false);
     const [openFee, setOpenFee] = React.useState(false);
@@ -106,19 +107,6 @@ function Sidebar() {
                     </ListItem>
                 </List>
             </Collapse>
-            {/* <Divider />
-            <ListItem
-                button
-                component={Link}
-                to="/admin/facility"
-                selected={selectedIndex === 3}
-                onClick={(event) => handleListItemClick(event, 3)}
-            >
-                <ListItemIcon>
-                    <InventoryIcon />
-                </ListItemIcon>
-                <ListItemText primary="Quản Lý Cơ Sở Vật Chất" />
-            </ListItem> */}
             <Divider />
             <ListItem
                 button
@@ -133,14 +121,6 @@ function Sidebar() {
                 <ListItemText primary="Quản Lý Lịch Tập" />
             </ListItem>
             <Divider />
-
-            {/* <ListItem
-                button
-                component={Link}
-                to="/admin/attendance"
-                selected={selectedIndex === 5}
-                onClick={(event) => handleListItemClick(event, 5)}
-            ></ListItem> */}
             <ListItem button onClick={handleClickAttendance}>
                 <ListItemIcon>
                     <HowToRegIcon />
@@ -210,45 +190,49 @@ function Sidebar() {
                 <ListItemText primary="Trang Liên Hệ" />
             </ListItem>
             <Divider />
-            <ListItem button onClick={handleClickFee}>
-                <ListItemIcon>
-                    <PaidIcon />
-                </ListItemIcon>
-                <ListItemText primary="Quản Lý Chi Phí CLB" />
-                {openFee ? <ExpandLess /> : <ExpandMore />}
-            </ListItem>
-            <Collapse in={openFee} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                    <ListItem
-                        button
-                        sx={{ pl: 4 }}
-                        component={Link}
-                        to="/admin/membership"
-                        selected={selectedIndex === 8}
-                        onClick={(event) => handleListItemClick(event, 8)}
-                    >
+            {ROLE === 'ROLE_Treasurer' || ROLE === 'ROLE_HeadClub' ? (
+                <>
+                    <ListItem button onClick={handleClickFee}>
                         <ListItemIcon>
-                            <PriceCheck />
+                            <PaidIcon />
                         </ListItemIcon>
-                        <ListItemText primary="Phí duy trì CLB" />
+                        <ListItemText primary="Quản Lý Chi Phí CLB" />
+                        {openFee ? <ExpandLess /> : <ExpandMore />}
                     </ListItem>
-                    <ListItem
-                        button
-                        sx={{ pl: 4 }}
-                        component={Link}
-                        to="/admin/fund"
-                        selected={selectedIndex === 9}
-                        onClick={(event) => handleListItemClick(event, 9)}
-                    >
-                        <ListItemIcon>
-                            <Savings />
-                        </ListItemIcon>
-                        <ListItemText primary="Quỹ câu lạc bộ" />
-                    </ListItem>
-                </List>
-            </Collapse>
+                    <Collapse in={openFee} timeout="auto" unmountOnExit>
+                        <List component="div" disablePadding>
+                            <ListItem
+                                button
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                to="/admin/membership"
+                                selected={selectedIndex === 8}
+                                onClick={(event) => handleListItemClick(event, 8)}
+                            >
+                                <ListItemIcon>
+                                    <PriceCheck />
+                                </ListItemIcon>
+                                <ListItemText primary="Phí duy trì CLB" />
+                            </ListItem>
+                            <ListItem
+                                button
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                to="/admin/fund"
+                                selected={selectedIndex === 9}
+                                onClick={(event) => handleListItemClick(event, 9)}
+                            >
+                                <ListItemIcon>
+                                    <Savings />
+                                </ListItemIcon>
+                                <ListItemText primary="Quỹ câu lạc bộ" />
+                            </ListItem>
+                        </List>
+                    </Collapse>
 
-            <Divider />
+                    <Divider />
+                </>
+            ) : null}
             <ListItem
                 button
                 component={Link}
