@@ -26,7 +26,7 @@ function QRCode({ title, params, isOpen, handleClose }) {
     return (
         <Dialog
             fullWidth
-            maxWidth="md"
+            maxWidth="xs"
             open={!!isOpen}
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
@@ -37,8 +37,8 @@ function QRCode({ title, params, isOpen, handleClose }) {
             </DialogTitle>
             <DialogContent>
                 <Grid container direction="row" justifyContent="center" alignItems="center">
-                    <Grid item xs={6} textAlign="center">
-                        <img src={params.QRUrl} alt="" />
+                    <Grid item xs={12} textAlign="center">
+                        <img src={params.QRUrl} alt="qrcode" />
                         <Typography variant="body1">
                             {params.userDetail[0].name} - {params.userDetail[0].studentId}
                         </Typography>
@@ -46,7 +46,7 @@ function QRCode({ title, params, isOpen, handleClose }) {
                 </Grid>
             </DialogContent>
             <DialogActions>
-                <Button variant="contained" color="success" onClick={() => download(params.QRUrl)}>
+                <Button variant="contained" onClick={() => download(params.QRUrl)}>
                     <DownloadIcon />
                     Tải xuống
                 </Button>
