@@ -427,6 +427,9 @@ function DefaultLayout({ children, onLogout }) {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
+                                <Box sx={{ p: 1.5, mb: 0.8, borderBottom: '1px solid #dddd', textAlign: 'center' }}>
+                                    <Typography sx={{ fontWeight: 500 }}>Xin chào, {user.name}</Typography>
+                                </Box>
                                 <MenuItem
                                     component={Link}
                                     to={`/profile/${user.studentId}`}
