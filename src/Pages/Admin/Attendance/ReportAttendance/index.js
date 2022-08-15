@@ -6,11 +6,13 @@ import semesterApi from 'src/api/semesterApi';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 import clsx from 'clsx';
 import moment from 'moment';
+import LoadingProgress from 'src/Components/LoadingProgress';
 
 function ReportAttendance() {
     const [semester, setSemester] = useState('Summer2022');
     const [semesterList, setSemesterList] = useState([]);
     const [attendanceList, setAttendanceList] = useState([]);
+    const [columns, setColumns] = useState([]);
     const [pageSize, setPageSize] = useState(10);
 
     const handleChange = (event) => {
@@ -22,6 +24,7 @@ function ReportAttendance() {
             const response = await semesterApi.getTop3Semester();
             console.log('Thanh cong roi, semester: ', response);
             setSemesterList(response.data);
+            console.log(response);
         } catch (error) {
             console.log('That bai roi huhu, semester: ', error);
         }
@@ -32,79 +35,66 @@ function ReportAttendance() {
             const response = await adminAttendanceAPI.getAttendanceTrainingStatistic(semester);
             console.log('fetchAttendanceReportBySemester: ', response);
             setAttendanceList(response.data);
+            let header = Object.keys(response.data[0]);
+            let columns = header.map((i) => {
+                return {
+                    field: i,
+                    headerName:
+                        i === 'studentId'
+                            ? 'Mã sinh viên'
+                            : i === 'name'
+                            ? 'Tên'
+                            : i === 'percentAbsent'
+                            ? 'Phần trăm nghỉ'
+                            : i === 'totalSession'
+                            ? 'Tổng số buổi'
+                            : i === 'totalAbsent'
+                            ? 'Tổng số buổi nghỉ'
+                            : moment(i).format('DD/MM'),
+                    cellClassName: (params) => {
+                        if (params.value == null) {
+                            return '';
+                        }
+
+                        return clsx('status-rows', {
+                            _absent: params.value === 'X',
+                            _attended: params.value === 'V',
+                            _notyet: params.value === '-',
+                        });
+                    },
+
+                    ...(i === 'name'
+                        ? { width: 200 }
+                        : i === 'studentId'
+                        ? { width: 100 }
+                        : i === 'percentAbsent'
+                        ? { width: 100 }
+                        : i === 'totalSession'
+                        ? { width: 100 }
+                        : i === 'totalAbsent'
+                        ? { width: 100 }
+                        : i === 'id'
+                        ? { hide: true }
+                        : { flex: 1 }),
+                };
+            });
+            const results = columns.filter((element) => {
+                if (Object.keys(element).length !== 0) {
+                    return true;
+                }
+
+                return false;
+            });
+            setColumns(results);
         } catch (error) {
             console.log('failed when fetchAttendanceReportBySemester: ', error);
         }
     };
 
-    // const header = c.map(i=>i.attendanceTrainingsDto)[0].map(i=>i.date)
-    const dateList =
-        attendanceList[0] &&
-        attendanceList
-            .map((i) => i.attendanceTrainingsDto)[0]
-            .map((i, index) => {
-                return { field: index, headerName: moment(i.date).format('DD/MM') };
-            });
-
-    const header = dateList && [
-        ...[
-            { field: 'userStudentId', headerName: 'Mã sinh viên' },
-            { field: 'userName1', headerName: 'Tên', width: 200 },
-        ],
-        ...dateList,
-    ];
     useEffect(() => {
         fetchSemester();
         fetchAttendanceReportBySemester(semester);
     }, [semester]);
-
-    // const columns = [
-    //     { field: 'studentName', headerName: 'Tên sinh viên', flex: 0.5 },
-    //     { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.3 },
-    //     { field: 'roleName', headerName: 'Vai trò trong CLB', width: 150, flex: 0.6 },
-
-    //     {
-    //         field: 'totalAbsent',
-    //         headerName: 'Số buổi nghỉ',
-    //         width: 150,
-    //         flex: 0.6,
-    //         cellClassName: (params) => {
-    //             if (params.value == null) {
-    //                 return '';
-    //             }
-    //             return clsx('status-rows', {
-    //                 deactive: true,
-    //             });
-    //         },
-    //     },
-    //     {
-    //         field: 'percentAbsent',
-    //         headerName: 'Phần trăm số buổi nghỉ',
-    //         width: 150,
-    //         flex: 0.4,
-    //         cellClassName: (params) => {
-    //             if (params.value == null) {
-    //                 return '';
-    //             }
-    //             return clsx('status-rows-active');
-    //         },
-    //     },
-    // ];
-
-    // const columns = header.map((i) => {
-    //     return i;
-    // });
-
-    const rowsAttendance = attendanceList.map((item, index) => {
-        const container = {};
-        container['id'] = index + 1;
-        container['userName'] = item.userName;
-        container['userStudentId'] = item.userStudentId;
-        container['roleName'] = item.roleName;
-        container['percentAbsent'] = item.percentAbsent + '%';
-        container['totalAbsent'] = item.totalAbsent;
-        return container;
-    });
 
     function CustomToolbar() {
         return (
@@ -117,10 +107,32 @@ function ReportAttendance() {
                 >
                     <GridToolbarQuickFilter />
                 </Box>
+                <Box sx={{ display: 'flex' }}>
+                    <Box sx={{ ml: 1 }}>
+                        <span>
+                            <strong style={{ color: 'green' }}>V</strong>:
+                        </span>
+                        <span> Có mặt </span>
+                    </Box>
+                    <Box sx={{ ml: 1 }}>
+                        <span>
+                            <strong style={{ color: 'red' }}>X</strong>:
+                        </span>
+                        <span> Vắng mặt</span>
+                    </Box>
+                    <Box sx={{ ml: 1 }}>
+                        <span>
+                            <strong style={{ color: 'blue' }}>╺</strong>:
+                        </span>
+                        <span> Chưa điểm danh</span>
+                    </Box>
+                </Box>
             </GridToolbarContainer>
         );
     }
-
+    if (!attendanceList[0]) {
+        return <LoadingProgress />;
+    }
     return (
         <div>
             <Grid container spacing={4}>
@@ -156,12 +168,24 @@ function ReportAttendance() {
                     '& .status-rows': {
                         // justifyContent: 'center !important',
                     },
-                    '& .status-rows-active': {
-                        justifyContent: 'center !important',
-                    },
-                    '& .status-rows.deactive': {
+                    // '& .status-rows-active': {
+                    //     justifyContent: 'center !important',
+                    // },
+                    '& .status-rows._absent': {
                         // backgroundColor: '#ff3838',
-                        color: '#ff3838',
+                        color: 'red',
+                        fontWeight: '600',
+                        textAlign: 'center',
+                    },
+                    '& .status-rows._attended': {
+                        // backgroundColor: '#ff3838',
+                        color: 'green',
+                        fontWeight: '600',
+                        textAlign: 'center',
+                    },
+                    '& .status-rows._notyet': {
+                        // backgroundColor: '#ff3838',
+                        color: 'blue',
                         fontWeight: '600',
                         textAlign: 'center',
                     },
@@ -171,13 +195,17 @@ function ReportAttendance() {
                     <DataGrid
                         loading={!attendanceList.length}
                         disableSelectionOnClick={true}
-                        rows={rowsAttendance}
-                        columns={header}
+                        rows={attendanceList}
+                        columns={columns}
                         pageSize={pageSize}
                         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                         rowsPerPageOptions={[10, 20, 30]}
                         components={{
                             Toolbar: CustomToolbar,
+                        }}
+                        // initialState={{ pinnedColumns: { left: ['name'] } }}
+                        initialState={{
+                            pinnedColumns: { left: ['name'] },
                         }}
                     />
                 ) : (
