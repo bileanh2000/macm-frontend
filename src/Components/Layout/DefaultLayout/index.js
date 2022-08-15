@@ -429,7 +429,7 @@ function DefaultLayout({ children, onLogout }) {
                             >
                                 <MenuItem
                                     component={Link}
-                                    to={`/${user.studentId}`}
+                                    to={`/profile/${user.studentId}`}
                                     // sx={{ height: '64px' }}
                                     onClick={handleCloseUserMenu}
                                 >

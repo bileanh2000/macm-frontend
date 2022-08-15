@@ -369,6 +369,7 @@ function UserDetailEdit() {
                             </Typography>
                             <FormControl fullWidth>
                                 <TextField
+                                    disabled
                                     required
                                     id="outlined-disabled"
                                     label="Email"
@@ -395,9 +396,7 @@ function UserDetailEdit() {
                                 />
 
                                 <TextField
-                                    InputProps={{
-                                        readOnly: true,
-                                    }}
+                                    disabled
                                     defaultValue={item.role.name}
                                     // value={item.role.id}
                                     label="Chức vụ"
