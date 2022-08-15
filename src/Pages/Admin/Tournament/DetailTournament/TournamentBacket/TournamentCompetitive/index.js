@@ -187,10 +187,12 @@ function TournamentCompetitive({ reload, result, type }) {
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button autoFocus onClick={handleCancel}>
+                    <Button variant="outline" autoFocus onClick={handleCancel}>
                         Hủy bỏ
                     </Button>
-                    <Button onClick={handleOk}>Đồng ý</Button>
+                    <Button variant="contained" onClick={handleOk}>
+                        Đồng ý
+                    </Button>
                 </DialogActions>
             </Dialog>
             {/* <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>

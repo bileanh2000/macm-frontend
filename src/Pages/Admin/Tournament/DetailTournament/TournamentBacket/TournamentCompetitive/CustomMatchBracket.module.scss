@@ -86,6 +86,14 @@ html {
     cursor: grab !important;
 }
 
+.winner {
+    border: 0.1em solid #37d437 !important;
+    border-right: 0.5em solid #37d437 !important;
+}
+.loser {
+    opacity: 0.5;
+}
+
 .hidden {
     visibility: hidden;
 }
@@ -178,6 +186,7 @@ html {
         padding: 0.2rem 1rem;
         width: 100%;
         padding-left: 0;
+        min-height: 11em;
     }
     .tournament-bracket__item:nth-child(odd),
     .tournament-bracket__item:nth-child(even) {
@@ -242,6 +251,7 @@ html {
     .tournament-bracket__item {
         padding: 0.5em 1.5em;
         padding-left: 0;
+        min-height: 11em;
     }
     .tournament-bracket__item::after {
         width: 1.5em;

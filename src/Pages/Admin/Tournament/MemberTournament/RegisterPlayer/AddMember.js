@@ -106,7 +106,9 @@ function AddMember(props) {
                 return [{ studentId: 'Chọn tất cả', name: 'All', value: 'select-all' }, ...filtered];
             }}
             style={{ width: '80%' }}
-            renderInput={(params) => <TextField {...params} label="Thành viên" placeholder="Thêm thành viên" />}
+            renderInput={(params) => (
+                <TextField {...params} label="Danh sách vận động viên" placeholder="Thêm vận động  viên" />
+            )}
         />
     );
 }

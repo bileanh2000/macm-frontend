@@ -157,7 +157,7 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
                                                 fieldState: { error, invalid },
                                             }) => (
                                                 <DatePicker
-                                                    label="Hạn đăng kí cho người chơi"
+                                                    label="Hạn đăng kí cho vận động viên"
                                                     inputFormat="dd/MM/yyyy"
                                                     disablePast
                                                     ampm={false}
@@ -262,8 +262,14 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
                         </Box>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose}>Hủy</Button>
-                        <Button variant="contained" onClick={handleSubmit(onUpdateTournament)}>
+                        <Button variant="outlined" onClick={handleClose}>
+                            Hủy
+                        </Button>
+                        <Button
+                            variant="contained"
+                            onClick={handleSubmit(onUpdateTournament)}
+                            disabled={datasFightingCompetition.length === 0 && datasPerformanceCompetition.length === 0}
+                        >
                             Cập nhật thông tin
                         </Button>
                     </DialogActions>
