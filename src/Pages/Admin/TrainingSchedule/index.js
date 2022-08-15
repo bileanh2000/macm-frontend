@@ -52,9 +52,18 @@ export const CustomTrainingSchedule = styled.div`
         border-radius: 50%;
         width: 30px;
         height: 30px;
-        margin: 2px;
+        margin: 7px;
+
         // text-align: center;
         font-weight: bold;
+    }
+    .fc-daygrid-day-number {
+        margin: 7px;
+    }
+    .fc td,
+    .fc th {
+        // border-style: none !important;
+        border: 1.25px solid #c4cfd9 !important;
     }
     background-color: #fff;
     padding: 12px;
@@ -166,7 +175,7 @@ function TrainingSchedule() {
         container['type'] = item.type;
 
         // container['backgroundColor'] = '#5ba8f5';
-        container['backgroundColor'] = item.type === 0 ? '#9fccf9' : item.type === 1 ? '#d9d9d9' : '#d9d9d9';
+        container['backgroundColor'] = item.type === 0 ? '#9fccf9' : item.type === 1 ? '#edf2fc' : '#edf2fc';
 
         return container;
     });
@@ -239,16 +248,27 @@ function TrainingSchedule() {
             >
                 {eventInfo.event.extendedProps.type === 0 ? (
                     <Box>
-                        <Box sx={{ ml: 0.5 }}>
+                        <Box sx={{ ml: '10px' }}>
                             <div className={cx('event-title')}>
-                                {eventInfo.event.title} <br />
-                                {eventInfo.event.extendedProps.time}
+                                {eventDate === current ? (
+                                    <>
+                                        <strong>
+                                            {eventInfo.event.title} <br />
+                                            {eventInfo.event.extendedProps.time}
+                                        </strong>
+                                    </>
+                                ) : (
+                                    <>
+                                        {eventInfo.event.title} <br />
+                                        {eventInfo.event.extendedProps.time}
+                                    </>
+                                )}
                             </div>
                         </Box>
                     </Box>
                 ) : (
                     <Box>
-                        <Box sx={{ ml: 0.5 }}>
+                        <Box sx={{ ml: '10px' }}>
                             <div className={cx('event-title')} style={{ opacity: 0 }}>
                                 {/* {eventInfo.event.title} <br />
                                 {eventInfo.event.extendedProps.time} */}

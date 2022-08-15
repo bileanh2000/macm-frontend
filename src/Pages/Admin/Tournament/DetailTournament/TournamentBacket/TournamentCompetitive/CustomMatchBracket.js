@@ -41,6 +41,7 @@ import { DatePicker, LocalizationProvider, TimePicker } from '@mui/x-date-picker
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
 import { useSnackbar } from 'notistack';
+import UpdateTimeAndArea from './UpdateTimeAndArea';
 
 const cx = classNames.bind(styles);
 
@@ -100,8 +101,8 @@ function CustomMatchBracket(params) {
                 .min(0, 'Vui lòng nhập giá trị lớn hơn hoặc bằng 0')
                 .max(10, 'Điếm số không được vượt quá 10'),
         }),
-        ...(value === 0 && { date: Yup.string().nullable().required('Không được để trống trường này') }),
-        ...(value === 0 && { startTime: Yup.string().nullable().required('Không được để trống trường này') }),
+        // ...(value === 0 && { date: Yup.string().nullable().required('Không được để trống trường này') }),
+        // ...(value === 0 && { startTime: Yup.string().nullable().required('Không được để trống trường này') }),
     });
 
     const {
@@ -198,7 +199,6 @@ function CustomMatchBracket(params) {
 
     const handleUpdateMatches = () => {
         var merged = [].concat.apply([], __matches);
-        console.log(merged);
         updateListMatchesPlayer(merged);
         setEdit(false);
     };
@@ -212,24 +212,22 @@ function CustomMatchBracket(params) {
     };
 
     const handleClickResult = (e, data) => {
-        console.log('hihi');
         if (params.status < 2) {
             return;
         }
         if (data.firstPlayer == null || data.secondPlayer == null) {
             setMatch(data);
             setValue(0);
-            return;
+            // return;
         } else {
-            setMatch(data);
-            setValue(1);
-        }
-
-        if (data.firstPlayer.point == null && data.secondPlayer.point == null) {
-            setMatch(data);
-            setValue(1);
-        } else {
-            return;
+            // setMatch(data);
+            // setValue(1);
+            if (data.firstPlayer.point == null && data.secondPlayer.point == null) {
+                setMatch(data);
+                // setValue(1);
+            } else {
+                return;
+            }
         }
 
         if (!params.matches[params.matches.length - 1].area) {
@@ -241,10 +239,11 @@ function CustomMatchBracket(params) {
 
     const handleClose = () => {
         setOpen(false);
-        reset({
-            score1: '',
-            score2: '',
-        });
+        // reset({
+        //     score1: '',
+        //     score2: '',
+        // });
+        setMatch();
         setWinnerTemp();
         setWinner();
         handleCloseUpdateTime();
@@ -278,22 +277,13 @@ function CustomMatchBracket(params) {
     };
 
     const handleUpdateTime = (data) => {
-        console.log('time');
-        const date = moment(data.date).format('YYYY-MM-DD');
-        const time = moment(data.startTime).format('hh:mm:ss');
-        const dateTime = date + 'T' + time;
-        const areaId = params.areaList.filter((area) => area.name == areaName)[0];
-        const request = { time: dateTime, area: areaId };
-
-        match.time = dateTime;
-        updateTimeAndPlace(match.id, request);
+        updateTimeAndPlace(match.id, data);
         var merged = [].concat.apply([], __matches);
         params.onUpdateResult(merged);
         handleClose();
     };
 
     const handleUpdate = (data) => {
-        console.log('result');
         if (data.score1 == data.score2) {
             setError('score1', {
                 message: 'Điểm 2 người chơi không được bằng nhau',
@@ -304,15 +294,11 @@ function CustomMatchBracket(params) {
         } else {
             match.firstPlayer.point = data.score1;
             match.secondPlayer.point = data.score2;
-            setMatch(match);
+            // setMatch(match);
             updateResult(match);
             var merged = [].concat.apply([], __matches);
             params.onUpdateResult(merged);
-            setOpen(false);
-            reset({
-                score1: '',
-                score2: '',
-            });
+            handleClose();
         }
     };
 
@@ -333,7 +319,7 @@ function CustomMatchBracket(params) {
                 id={`simple-tabpanel-${index}`}
                 aria-labelledby={`simple-tab-${index}`}
             >
-                {match && (
+                {match && match.firstPlayer && match.secondPlayer ? (
                     <>
                         {winner && (
                             <Typography variant="body1">
@@ -460,8 +446,18 @@ function CustomMatchBracket(params) {
                                     là người chiến thắng. Bạn xác nhận có đúng không?
                                 </Typography>
                             )}
+                            <Box sx={{ float: 'right' }}>
+                                <Button variant="outlined" onClick={handleClose} sx={{ mr: 2 }}>
+                                    Hủy bỏ
+                                </Button>
+                                <Button variant="contained" onClick={handleSubmit(handleUpdate)}>
+                                    Đồng ý
+                                </Button>
+                            </Box>
                         </Box>
                     </>
+                ) : (
+                    <Typography variant="body1">Trận đấu chưa đủ vận động viên để có thể xác nhận điểm số</Typography>
                 )}
             </Box>
         );
@@ -475,88 +471,15 @@ function CustomMatchBracket(params) {
                 id={`simple-tabpanel-${index}`}
                 aria-labelledby={`simple-tab-${index}`}
             >
-                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                    <Grid container spacing={3} columns={12} sx={{ mt: 2, alignItems: 'flex-end' }}>
-                        <Grid item xs={12} sm={4}>
-                            <FormControl size="medium">
-                                <Typography variant="caption">Sân thi đấu</Typography>
-                                <Select
-                                    id="demo-simple-select"
-                                    value={areaName}
-                                    displayEmpty
-                                    onChange={handleChangeAreaName}
-                                >
-                                    {params.areaList.map((area) => (
-                                        <MenuItem value={area.name} key={area.id}>
-                                            {area.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <Controller
-                                required
-                                name="date"
-                                control={control}
-                                defaultValue={match.time ? match.time : null}
-                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                    <DatePicker
-                                        disablePast
-                                        label="Ngày thi đấu"
-                                        inputFormat="dd/MM/yyyy"
-                                        disableFuture={false}
-                                        value={value}
-                                        onChange={(value) => onChange(value)}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                required
-                                                id="outlined-disabled"
-                                                error={invalid}
-                                                helperText={invalid ? error.message : null}
-                                                // id="startDate"
-                                                variant="outlined"
-                                                margin="dense"
-                                                fullWidth
-                                            />
-                                        )}
-                                    />
-                                )}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <Controller
-                                required
-                                name="startTime"
-                                control={control}
-                                defaultValue={match.time ? match.time : null}
-                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                    <TimePicker
-                                        label="Thời gian thi đấu"
-                                        ampm={false}
-                                        inputFormat="HH:mm"
-                                        value={value}
-                                        onChange={(value) => onChange(value)}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                required
-                                                id="outlined-disabled"
-                                                error={invalid}
-                                                helperText={invalid ? error.message : null}
-                                                // id="startDate"
-                                                variant="outlined"
-                                                margin="dense"
-                                                fullWidth
-                                            />
-                                        )}
-                                    />
-                                )}
-                            />
-                        </Grid>
-                    </Grid>
-                </LocalizationProvider>
+                {match && (
+                    <UpdateTimeAndArea
+                        match={match}
+                        areaList={params.areaList}
+                        name={areaName}
+                        onClose={handleClose}
+                        onUpdate={handleUpdateTime}
+                    />
+                )}
             </Box>
         );
     };
@@ -578,28 +501,34 @@ function CustomMatchBracket(params) {
                                     scrollButtons="auto"
                                     aria-label="basic tabs example"
                                 >
-                                    {match && match.firstPlayer.point === null && match.secondPlayer.point === null && (
-                                        <Tab label="Thời gian và địa điểm" {...a11yProps(0)} value={0} />
-                                    )}
-                                    {match && match.firstPlayer !== null && match.secondPlayer !== null && (
-                                        <Tab label="Điểm số" {...a11yProps(1)} value={1} />
-                                    )}
+                                    {!(
+                                        match &&
+                                        match.firstPlayer &&
+                                        match.secondPlayer &&
+                                        match.firstPlayer.point !== null &&
+                                        match.secondPlayer.point !== null
+                                    ) && <Tab label="Thời gian và địa điểm" {...a11yProps(0)} value={0} />}
+                                    {/* {match && match.firstPlayer.point !== null && match.secondPlayer.point !== null && ( */}
+                                    <Tab
+                                        label="Điểm số"
+                                        {...a11yProps(1)}
+                                        value={1}
+                                        disabled={!(match && match.firstPlayer && match.secondPlayer)}
+                                    />
                                 </Tabs>
                             </Box>
                             <UpdateTime value={value} index={0} />
-                            {match && match.firstPlayer !== null && match.secondPlayer !== null && (
-                                <UpdateScore value={value} index={1} />
-                            )}
+                            <UpdateScore value={value} index={1} />
                         </Box>
                     </DialogContent>
-                    <DialogActions>
+                    {/* <DialogActions>
                         <Button onClick={handleClose}>Hủy bỏ</Button>
                         {value == 1 ? (
                             <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
                         ) : (
                             <Button onClick={handleSubmit(handleUpdateTime)}>Đồng ý</Button>
                         )}
-                    </DialogActions>
+                    </DialogActions> */}
                 </div>
             </Dialog>
             {params.status === 3 && <Typography variant="caption">*Chọn vào 1 cặp trận để cập nhật tỉ số</Typography>}
@@ -812,7 +741,7 @@ function CustomMatchBracket(params) {
                                                         <small>
                                                             {match.time
                                                                 ? 'Thời gian: ' +
-                                                                  moment(match.time).format('hh:mm - DD/MM')
+                                                                  moment(match.time).format('HH:mm - DD/MM')
                                                                 : ''}
                                                         </small>
                                                     </div>
@@ -908,7 +837,7 @@ function CustomMatchBracket(params) {
                                                         <small>
                                                             {match.time
                                                                 ? 'Thời gian: ' +
-                                                                  moment(match.time).format('hh:mm - DD/MM')
+                                                                  moment(match.time).format('HH:mm - DD/MM')
                                                                 : ''}
                                                         </small>
                                                     </div>

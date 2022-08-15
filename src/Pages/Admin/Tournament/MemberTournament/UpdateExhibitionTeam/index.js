@@ -74,6 +74,7 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
     const getAllMember = async (exhibitionType) => {
         try {
             const response = await adminTournament.listUserNotJoinExhibition(exhibitionType);
+            console.log(response.data);
             setAllMember(response.data);
         } catch (error) {
             console.log('khong the lay data');
@@ -92,9 +93,9 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
     //     }
     // };
 
-    const registerTeam = async (exhibitionType, params) => {
+    const updateTeam = async (exhibitionTeamId, params) => {
         try {
-            const response = await adminTournament.registerTeam(exhibitionType, params);
+            const response = await adminTournament.updateExhibitionTeam(exhibitionTeamId, params);
             let variant = response.message.includes('thành công') ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
             setIsRender(true);
@@ -116,10 +117,10 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
 
     const handleRegister = (data) => {
         const teamMember = [...dataMale, ...dataFemale];
-        const listStudentId = teamMember.map((student) => student.studentId);
-
-        const params = { listStudentId, teamName: data.teamName, exhibitionTypeId: exhibitionTeam.exhibitionTypeId };
-        registerTeam(exhibitionTeam.exhibitionTypeId, params);
+        // const listStudentId = teamMember.map((student) => student.studentId);
+        console.log(teamMember);
+        // const params = { listStudentId, teamName: data.teamName, exhibitionTypeId: exhibitionTeam.exhibitionTypeId };
+        updateTeam(exhibitionTeam.exhibitionTypeId, teamMember);
         onSuccess && onSuccess();
         handleCloseDialog();
     };
@@ -159,7 +160,12 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
                 >
                     <DialogTitle id="alert-dialog-title">Chỉnh sửa thông tin đội thi đấu</DialogTitle>
                     <DialogContent>
-                        <Box>
+                        {(dataFemale.length !== numberFemale || dataMale.length !== numberMale) && (
+                            <Typography variant="body1" color={'orange'}>
+                                Vui lòng thêm đủ số lượng thành viên để đăng kí
+                            </Typography>
+                        )}
+                        <Box sx={{ mt: 2 }}>
                             <TextField
                                 fullWidth
                                 id="outlined-basic"
@@ -176,7 +182,7 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
                                 <Grid item xs={12} md={6}>
                                     <Box>
                                         <Typography sx={{ m: 1 }}>
-                                            <strong>Số lượng nam: </strong> {numberMale}
+                                            <strong>Số lượng nam: </strong> yêu cầu {numberMale} thành viên
                                         </Typography>
                                         {dataMale.length < numberMale && (
                                             <AddMember
@@ -230,7 +236,7 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
                                 <Grid item xs={12} md={6}>
                                     <Box>
                                         <Typography sx={{ m: 1 }}>
-                                            <strong>Số lượng nữ: </strong> {numberFemale}
+                                            <strong>Số lượng nữ: </strong> yêu cầu {numberFemale} thành viên
                                         </Typography>
                                         {dataFemale.length < numberFemale && (
                                             <AddMember
@@ -286,7 +292,11 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
-                        <Button onClick={handleSubmit(handleRegister)} autoFocus>
+                        <Button
+                            onClick={handleSubmit(handleRegister)}
+                            autoFocus
+                            disabled={dataFemale.length !== numberFemale || dataMale.length !== numberMale}
+                        >
                             Đồng ý
                         </Button>
                     </DialogActions>

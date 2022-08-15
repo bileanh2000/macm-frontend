@@ -512,7 +512,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     </Table>
                 </TableContainer>
             )}
-            {competitivePlayerId && (
+            {competitivePlayerId > 0 && (
                 <Dialog
                     // fullWidth
                     // maxWidth="md"
@@ -539,7 +539,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     </DialogActions>
                 </Dialog>
             )}
-            {competitivePlayerId && (
+            {competitivePlayerId > 0 && (
                 <Dialog
                     // fullWidth
                     // maxWidth="md"

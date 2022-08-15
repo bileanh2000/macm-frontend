@@ -8,11 +8,14 @@ import {
     DialogContent,
     DialogTitle,
     Fab,
+    FormControl,
     FormControlLabel,
     Grid,
     IconButton,
     InputAdornment,
     Paper,
+    Radio,
+    RadioGroup,
     Step,
     StepLabel,
     Stepper,
@@ -42,6 +45,8 @@ import eventApi from 'src/api/eventApi';
 import PreviewSchedule from './PreviewSchedule';
 import adminFunAPi from 'src/api/adminFunAPi';
 import { useNavigate } from 'react-router-dom';
+import PreviewCommonSchedule from '../Tournament/CreateTournament/Schedule/Schedule';
+import EditableSchedule from '../Tournament/CreateTournament/Schedule/EditableSchedule';
 
 const steps = ['Thông tin sự kiện', 'Thêm vai trò BTC', 'Thêm chi phí', 'Thêm lịch', 'Xem trước'];
 const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
@@ -55,7 +60,19 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     const [totalClubFunds, setTotalClubFunds] = useState(20000);
     const [previewSchedule, setPreviewSchedule] = useState([]);
     const [previewEvent, setPreviewEvent] = useState([]);
+    //-------
+    const [existedDate, setExistedDate] = useState([]);
+    const [submitOption, setSubmitOption] = useState(0);
+    const [isOpenPreviewDialog, setIsOpenPreviewDialog] = useState(false);
+    const [isEditableSchedule, setIsEditableSchedule] = useState(false);
+    const [isUpdate, setIsUpdate] = useState(false);
+    const [preview, setPreview] = useState([]);
+    const [disabled, setDisabled] = useState(false);
+    const [isOverride, setIsOverride] = useState(-1);
 
+    const handleChange = (event) => {
+        setSubmitOption(event.target.value);
+    };
     const getClubFund = async () => {
         try {
             const response = await adminFunAPi.getClubFund();
@@ -65,7 +82,39 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
             console.log('failed at getClubFund', error);
         }
     };
+
+    const checkOverride = (TournamentSchedule) => {
+        const arrayCheck = TournamentSchedule.map((item) => {
+            if (item.title.toString() === 'Trùng với Lịch tập') {
+                return 2;
+            } else if (item.title.toString().includes('Trùng với')) {
+                return 1;
+            } else {
+                return -1;
+            }
+        });
+        console.log('arrayCheck', arrayCheck);
+        if (arrayCheck.find((item) => item === 1)) {
+            console.log('check', 1);
+            setDisabled(true);
+            setIsOverride(1);
+        } else {
+            if (arrayCheck.find((item) => item === 2)) {
+                console.log('check', 2);
+                setDisabled(true);
+                setIsOverride(2);
+                // isStepFailed(4);
+            } else {
+                console.log('check', -1);
+                setDisabled(false);
+                setIsOverride(-1);
+            }
+        }
+    };
     let navigate = useNavigate();
+    const isStepFailed = (step) => {
+        return step === 3;
+    };
     const isStepOptional = (step) => {
         return step === 2 || step === 1;
     };
@@ -264,13 +313,34 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
             startDate: moment(new Date(data.startDate)).format('DD/MM/yyyy'),
             finishDate: moment(new Date(data.finishDate)).format('DD/MM/yyyy'),
         };
-        eventApi.createPreviewEvent(formatData).then((response) => {
+        setPreview(formatData);
+
+        console.log('format Data', formatData);
+    };
+
+    useEffect(() => {
+        eventApi.createPreviewEvent(preview).then((response) => {
+            if (response.data.length != 0) {
+                console.log(response.data);
+                setPreviewSchedule(response.data);
+                // setPreviewTournament(res.data);
+                checkOverride(response.data);
+                let existedDate = response.data.filter((i) => i.existed);
+                setExistedDate(existedDate);
+                if (activeStep < 4) {
+                    handleNext();
+                }
+            } else {
+                console.log('huhu');
+                // setError('startDate', {
+                //     message: response.message,
+                // });
+            }
             console.log('fetch preview schedule data', response);
             setPreviewSchedule(response.data);
+            setIsUpdate(false);
         });
-        console.log('format Data', formatData);
-        handleNext();
-    };
+    }, [preview, isUpdate]);
     /**
      * Create Event
      */
@@ -354,6 +424,23 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
 
     return (
         <Fragment>
+            <PreviewCommonSchedule isOpen={isOpenPreviewDialog} handleClose={() => setIsOpenPreviewDialog(false)} />
+
+            {isEditableSchedule && (
+                <EditableSchedule
+                    isOpen={isEditableSchedule}
+                    handleClose={() => {
+                        setIsEditableSchedule(false);
+                        // handleSubmit(handlePreviewSchedule);
+                        // handlePreviewSchedule();
+                        // handleSubmit(handlePreviewSchedule);
+
+                        setIsUpdate(true);
+                    }}
+                    initialDate={eventSchedule[0] && new Date(eventSchedule[0].date)}
+                    description={existedDate}
+                />
+            )}
             <Dialog
                 fullWidth
                 maxWidth="md"
@@ -382,6 +469,17 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                 }
                                 if (isStepSkipped(index)) {
                                     stepProps.completed = false;
+                                }
+                                if (isOverride !== -1) {
+                                    if (isStepFailed(index)) {
+                                        labelProps.optional = (
+                                            <Typography variant="caption" color="error">
+                                                Bị trùng
+                                            </Typography>
+                                        );
+
+                                        labelProps.error = true;
+                                    }
                                 }
                                 return (
                                     <Step key={label} {...stepProps}>
@@ -550,6 +648,50 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                         </Box>
                                     </Grid>
                                 </Grid>
+                                {isOverride === 3 || isOverride === 2 ? (
+                                    <>
+                                        <Typography color="error">
+                                            <strong>
+                                                Ngày{' '}
+                                                {existedDate.map((i) => moment(i.date).format('DD/MM/yyyy') + ', ')}
+                                                đang trùng với lịch tập, vui lòng lựa chọn:
+                                            </strong>
+                                        </Typography>
+                                        <FormControl>
+                                            {/* <FormLabel id="demo-controlled-radio-buttons-group">Gender</FormLabel> */}
+                                            <RadioGroup
+                                                aria-labelledby="demo-controlled-radio-buttons-group"
+                                                name="controlled-radio-buttons-group"
+                                                value={submitOption}
+                                                onChange={handleChange}
+                                            >
+                                                <FormControlLabel value={0} control={<Radio />} label="Bỏ lịch tập" />
+                                                <FormControlLabel
+                                                    value={1}
+                                                    control={<Radio onClick={() => setIsEditableSchedule(true)} />}
+                                                    label="Thay đổi lịch tập"
+                                                />
+                                                <FormControlLabel
+                                                    value={2}
+                                                    control={<Radio onClick={handleBack} />}
+                                                    label="Chỉnh sửa thời gian giải đấu"
+                                                />
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </>
+                                ) : isOverride === 1 ? (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Typography color="error">
+                                            <strong>
+                                                Không thể tạo Sự kiện (lịch bị trùng với Sự kiện hoặc giải đấu khác) vui
+                                                lòng chọn lại ngày !
+                                            </strong>
+                                        </Typography>
+                                        <Button onClick={handleBack}>Chọn lại ngày</Button>
+                                    </Box>
+                                ) : (
+                                    ''
+                                )}
                                 <Box sx={{ height: '50vh', ml: 0 }}>
                                     <PreviewSchedule
                                         dataPreview={eventSchedule}
@@ -803,6 +945,10 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                             </>
                         ) : activeStep === 3 ? (
                             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                                <Button sx={{ mb: 1 }} onClick={() => setIsOpenPreviewDialog(true)}>
+                                    Xem lịch chung
+                                </Button>
+
                                 <Grid container spacing={2}>
                                     <Grid item xs={6}>
                                         <Controller
@@ -965,9 +1111,23 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                     <Button onClick={handleClose} autoFocus>
                         Xác nhận
                     </Button> */}
-                    <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
-                        Quay lại
-                    </Button>
+                    {activeStep === 0 ? (
+                        <Button
+                            color="error"
+                            onClick={() => {
+                                handleClose();
+                                reset();
+                            }}
+                            sx={{ mr: 1 }}
+                        >
+                            Hủy bỏ
+                        </Button>
+                    ) : (
+                        <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
+                            Quay lại
+                        </Button>
+                    )}
+
                     {/* <Box>
                         {isStepOptional(activeStep) && (
                             <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>

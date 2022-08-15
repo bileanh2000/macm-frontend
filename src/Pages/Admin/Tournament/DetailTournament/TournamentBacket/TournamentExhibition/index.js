@@ -21,6 +21,8 @@ function TournamentExhibition({ reload, result, type }) {
     const [exhibitionTeam, setExhibitionTeam] = useState([]);
     const [listExhibitionType, setListExhibitionType] = useState([]);
     const [tournamentStatus, setTournamentStatus] = useState();
+    const [areaList, setAreaList] = useState();
+    const [isRender, setIsRender] = useState(true);
 
     const handleChangeExhibitionType = (event) => {
         console.log(event.target.value);
@@ -43,29 +45,6 @@ function TournamentExhibition({ reload, result, type }) {
         getExhibitionResult(exType.id, nowDate);
     };
 
-    const fetchExhibitionType = async (tournamentId) => {
-        try {
-            const response = await adminTournament.getListExhibitionType(tournamentId);
-            console.log(response);
-            setTournamentStatus(response.data[0].status);
-            setListExhibitionType(response.data);
-            type == 0 && setExhibitionType(response.data[0].id);
-            console.log(response.data[0].id, result);
-            const _result = result.find((subResult) =>
-                subResult.data.length > 0
-                    ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
-                    : null,
-            );
-
-            setTournamentResult(_result ? _result.data[0].listResult : null);
-            console.log('result', _result);
-            console.log(response.data[0].id, nowDate);
-            getExhibitionResult(response.data[0].id, nowDate);
-        } catch (error) {
-            console.log('Failed to fetch user list: ', error);
-        }
-    };
-
     // const fetchExhibitionTeam = async (exhibitionType) => {
     //     try {
     //         const response = await adminTournament.getTeamByType(exhibitionType);
@@ -85,6 +64,15 @@ function TournamentExhibition({ reload, result, type }) {
         }
     };
 
+    const getAllArea = async () => {
+        try {
+            const response = await adminTournament.getAllArea();
+            setAreaList(response.data);
+        } catch (error) {
+            console.log('Khong the lay danh sach san dau');
+        }
+    };
+
     const spawnTimeAndArea = async () => {
         try {
             const response = await adminTournament.spawnTimeAndAreaEx(tournamentId);
@@ -96,9 +84,33 @@ function TournamentExhibition({ reload, result, type }) {
     };
 
     useEffect(() => {
-        fetchExhibitionType(tournamentId);
+        const fetchExhibitionType = async (tournamentId) => {
+            try {
+                const response = await adminTournament.getListExhibitionType(tournamentId);
+                console.log(response);
+                setTournamentStatus(response.data[0].status);
+                setListExhibitionType(response.data);
+                type == 0 && setExhibitionType(response.data[0].id);
+                console.log(response.data[0].id, result);
+                const _result = result.find((subResult) =>
+                    subResult.data.length > 0
+                        ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
+                        : null,
+                );
+
+                setTournamentResult(_result ? _result.data[0].listResult : null);
+                console.log('result', _result);
+                console.log(response.data[0].id, nowDate);
+                getExhibitionResult(response.data[0].id, nowDate);
+                setIsRender(false);
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
+        isRender && fetchExhibitionType(tournamentId);
         getExhibitionResult(exhibitionType, nowDate);
-    }, []);
+        getAllArea();
+    }, [tournamentId, exhibitionType, nowDate, isRender, result, type]);
 
     const handleDialogCreate = () => {
         if (exhibitionType == 0) {
@@ -115,8 +127,8 @@ function TournamentExhibition({ reload, result, type }) {
         //spawnTimeAndArea();
     };
 
-    const UpdateResultHandler = (newMatches) => {
-        setExhibitionTeam(newMatches);
+    const UpdateResultHandler = () => {
+        setIsRender(true);
         // getExhibitionResult(exhibitionType, nowDate);
     };
 
@@ -180,7 +192,7 @@ function TournamentExhibition({ reload, result, type }) {
                     </Box>
                 </Paper>
             )}
-            {exhibitionTeam && exhibitionTeam.length > 0 ? (
+            {exhibitionTeam && exhibitionTeam.length > 0 && areaList ? (
                 <div>
                     {/* {tournamentStatus == 2 ? (
                         exhibitionTeam[0].area ? (
@@ -196,6 +208,7 @@ function TournamentExhibition({ reload, result, type }) {
                     <TableMatch
                         matches={exhibitionTeam}
                         status={tournamentStatus}
+                        areaList={areaList}
                         onUpdateResult={UpdateResultHandler}
                     />
                 </div>

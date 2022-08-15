@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -14,6 +14,7 @@ import {
     Grid,
     Paper,
     TextField,
+    Tooltip,
     Typography,
 } from '@mui/material';
 import { Box } from '@mui/system';
@@ -23,11 +24,70 @@ import { useSnackbar } from 'notistack';
 import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
+import moment from 'moment';
+import classNames from 'classnames/bind';
 
 import adminTournament from 'src/api/adminTournamentAPI';
-import moment from 'moment';
+import styles from 'src/Pages/Admin/TrainingSchedule/TrainingSchedule.module.scss';
+import styled from '@emotion/styled';
+import trainingScheduleApi from 'src/api/trainingScheduleApi';
+import AddSession from './addSession';
+import EditSession from './editSession';
+
+const cx = classNames.bind(styles);
+
+export const CustomTrainingSchedule = styled.div`
+    .fc-day-future {
+        transition: 0.2s;
+        cursor: ;
+    }
+    .fc-day-past {
+        transition: 0.2s;
+        cursor: default;
+    }
+    .fc-event {
+        cursor: pointer;
+    }
+    .fc-day-future:hover:after {
+        content: 'Tạo lịch cho giải đấu';
+        position: absolute;
+        margin-top: -8vh;
+        margin-left: 6px;
+        font-weight: bold;
+        font-size: 0.8rem;
+        // bottom: 50%;
+        // left: 50%;
+    }
+    .fc-day-future:hover {
+        background-color: #d0e6fb !important;
+    }
+    .fc-day-today a {
+        background-color: white;
+        // color: red !important;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        margin: 7px;
+
+        // text-align: center;
+        font-weight: bold;
+    }
+    .fc-daygrid-day-number {
+        margin: 7px;
+    }
+    .fc td,
+    .fc th {
+        // border-style: none !important;
+        border: 1.25px solid #c4cfd9 !important;
+    }
+    background-color: #fff;
+    padding: 12px;
+    height: 80vh;
+    width: 70%;
+`;
 
 function TournamentSchedule({ isUpdate }) {
+    const calendarComponentRef = useRef(null);
     const nowDate = new Date();
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
@@ -35,12 +95,36 @@ function TournamentSchedule({ isUpdate }) {
     const [scheduleUpdate, setScheduleUpdate] = useState({});
     const [open, setOpen] = useState(false);
     const [isEdit, setEdit] = useState(false);
+    const [update, setUpdate] = useState(false);
+    const [commonList, setCommonList] = useState([]);
+    const [isOpenAddSessionDialog, setIsOpenAddSessionDialog] = useState(false);
+    const [isOpenEditSessionDialog, setIsOpenEditSessionDialog] = useState(false);
+    const [isDisabled, setIsDisabled] = useState(false);
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
+
+    const goToSemester = (date) => {
+        let calApi = calendarComponentRef.current.getApi();
+        calApi.gotoDate(date);
+    };
 
     const fetchTournamentSchedule = async (params) => {
         try {
             const response = await adminTournament.getTournamentSchedule(params);
-            setScheduleList(response.data);
+            console.log(response.data);
+            const newSchedule = response.data.map((schedule) => {
+                return { id: schedule.id, title: schedule.tournament.name, type: 3, ...schedule };
+            });
+            setScheduleList(newSchedule);
+        } catch (error) {
+            console.log('That bai roi huhu ', error);
+        }
+    };
+
+    const fetchCommonScheduleBySemester = async () => {
+        try {
+            const response = await trainingScheduleApi.commonSchedule();
+            console.log('Thanh cong roi: ', response);
+            setCommonList(response.data);
         } catch (error) {
             console.log('That bai roi huhu ', error);
         }
@@ -51,16 +135,35 @@ function TournamentSchedule({ isUpdate }) {
         window.scrollTo({ behavior: 'smooth', top: '0px' });
     }, [tournamentId]);
 
-    const scheduleData = scheduleList.map((item) => {
-        const container = {};
-        container['id'] = item.id;
-        container['date'] = item.date;
-        container['title'] =
-            item.tournament.name + ' - ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
-        container['display'] = 'background';
-        container['backgroundColor'] = '#5ba8f5';
-        return container;
-    });
+    useEffect(() => {
+        fetchCommonScheduleBySemester();
+        setUpdate(false);
+    }, [update]);
+
+    const totalSchedule =
+        commonList.length > 0 &&
+        scheduleList.length > 0 &&
+        commonList.map((common) =>
+            scheduleList.find((tourament) => tourament.date == common.date)
+                ? scheduleList.find((tourament) => tourament.date == common.date)
+                : common,
+        );
+    console.log(totalSchedule);
+
+    const scheduleData =
+        totalSchedule &&
+        totalSchedule.map((item) => {
+            const container = {};
+            container['id'] = item.id;
+            container['date'] = item.date;
+            container['title'] = item.title;
+            container['time'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+            container['display'] = 'background';
+            // container['backgroundColor'] = '#5ba8f5';
+            container['type'] = item.type;
+            container['backgroundColor'] = item.type === 3 ? '#9fccf9' : item.type === 1 ? '#edf2fc' : '#edf2fc';
+            return container;
+        });
 
     const getMonthInCurrentTableView = (startDate) => {
         if (!isEdit) {
@@ -83,7 +186,7 @@ function TournamentSchedule({ isUpdate }) {
     const handleDelete = (id) => {
         adminTournament.deleteTournamentSession(id).then((res) => {
             if (res.data.length != 0) {
-                const newScheduleList = scheduleList.filter((date) => date.id !== id);
+                const newScheduleList = totalSchedule.filter((date) => date.id !== id);
                 setScheduleList(newScheduleList);
                 let variant = 'success';
                 enqueueSnackbar(res.message, { variant });
@@ -106,7 +209,7 @@ function TournamentSchedule({ isUpdate }) {
         if (scheduleUpdate.params) {
             adminTournament.updateTournamentSession(scheduleUpdate.params.id, newData).then((res) => {
                 if (res.data.length != 0) {
-                    const newScheduleList = scheduleList.map((date) =>
+                    const newScheduleList = totalSchedule.map((date) =>
                         date.id === scheduleUpdate.params.id
                             ? { ...date, finishTime: newData.finishTime, startTime: newData.startTime }
                             : date,
@@ -125,7 +228,7 @@ function TournamentSchedule({ isUpdate }) {
         } else {
             adminTournament.createTournamentSession(tournamentId, newData).then((res) => {
                 if (res.data.length != 0) {
-                    const newScheduleList = [...scheduleList, res.data[0]];
+                    const newScheduleList = [...totalSchedule, res.data[0]];
                     setScheduleList(newScheduleList);
                     let variant = 'success';
                     enqueueSnackbar(res.message, { variant });
@@ -148,32 +251,39 @@ function TournamentSchedule({ isUpdate }) {
         });
     };
 
-    const navigateToUpdate = (params, date, day) => {
-        if (!isEdit) {
+    const navigateToUpdate = (params, date) => {
+        if (isUpdate) {
             return;
         }
-        if (
-            date.getMonth() === nowDate.getMonth() &&
-            date.getFullYear() === nowDate.getFullYear() &&
-            date.getDate() === nowDate.getDate()
-        ) {
+        console.log(params);
+        const filterEventClicked = totalSchedule.filter((item) => item.date === moment(date).format('YYYY-MM-DD'));
+        console.log('filter event clicked', filterEventClicked);
+        if (filterEventClicked[0].type !== 3) {
+            console.log('ko phai lich tap');
+            return;
+        }
+        console.log(date);
+        if (new Date(date) === new Date()) {
             return;
         } else {
-            const data = scheduleList.filter((date) => date.id == params);
-            setScheduleUpdate({ date: day, params: data[0] });
-            setOpen(true);
+            const data = scheduleList.filter((item) => item.date == moment(date).format('YYYY-MM-DD'));
+            console.log(scheduleList, data);
+            setScheduleUpdate(data);
+            setIsOpenEditSessionDialog(true);
         }
     };
 
-    const navigateToCreate = (day, date) => {
-        if (!isEdit) {
+    const navigateToCreate = (date) => {
+        if (isUpdate) {
             return;
         }
-        if (date > nowDate) {
-            const existSession = scheduleList.filter((item) => item.date === day).length; //length = 0 (false) is not exist
+        console.log(date);
+        if (new Date(date) > nowDate) {
+            const existSession = totalSchedule.filter((item) => item.date === date).length; //length = 0 (false) is not exist
             if (!existSession) {
-                setScheduleUpdate({ date: day, params: null });
-                setOpen(true);
+                setIsDisabled(true);
+                setScheduleUpdate(date);
+                setIsOpenAddSessionDialog(true);
             } else {
                 return;
             }
@@ -191,9 +301,67 @@ function TournamentSchedule({ isUpdate }) {
         mode: 'onBlur',
     });
 
+    const renderEventContent = (eventInfo) => {
+        let eventDate = new Date(eventInfo.event.start);
+        let current = new Date();
+
+        return (
+            <Tooltip
+                title={
+                    // eventInfo.event.extendedProps.type === 0
+                    //     ? eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time
+                    //     : 'Không thể tạo lịch tập (trùng hoạt động khác)'
+                    // eventDate < current ? 'Xem thông tin điểm danh' : 'Cập nhật thời gian'?eventInfo.event.extendedProps.type === 0?'Không thể tạo lịch tập (trùng hoạt động khác)':''
+                    !isUpdate
+                        ? eventInfo.event.extendedProps.type === 3
+                            ? eventDate < current
+                                ? ''
+                                : 'Cập nhật thời gian'
+                            : `Không thể tạo lịch tập (trùng với ${eventInfo.event.title})`
+                        : 'Quá thời gian cập nhật'
+                }
+                placement="top"
+            >
+                {eventInfo.event.extendedProps.type === 3 ? (
+                    <Box>
+                        <Box sx={{ ml: '10px' }}>
+                            <div className={cx('event-title')}>
+                                {eventDate === current ? (
+                                    <>
+                                        <strong>
+                                            {eventInfo.event.title} <br />
+                                            {eventInfo.event.extendedProps.time}
+                                        </strong>
+                                    </>
+                                ) : (
+                                    <>
+                                        {eventInfo.event.title} <br />
+                                        {eventInfo.event.extendedProps.time}
+                                    </>
+                                )}
+                            </div>
+                        </Box>
+                    </Box>
+                ) : (
+                    <Box>
+                        <Box sx={{ ml: '10px' }}>
+                            <div className={cx('event-title')} style={{ opacity: 0 }}>
+                                {/* {eventInfo.event.title} <br />
+                                {eventInfo.event.extendedProps.time} */}
+                                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Rem cumque voluptatum nihil
+                                magni sint cum veritatis voluptas consequuntur delectus, facere magnam quisquam
+                                architecto illum officiis ratione, nobis est nesciunt autem!
+                            </div>
+                        </Box>
+                    </Box>
+                )}
+            </Tooltip>
+        );
+    };
+
     return (
-        <Box sx={{ mt: 1, mb: 2, height: '35rem', display: 'flex', flexDirection: 'column' }}>
-            {!isUpdate && (
+        <Box sx={{ mt: 1, mb: 2, display: 'flex', flexDirection: 'column' }}>
+            {/* {!isUpdate && (
                 <Box component="div" sx={{ mb: 2 }}>
                     <Button
                         variant="outlined"
@@ -208,149 +376,79 @@ function TournamentSchedule({ isUpdate }) {
                         {isEdit ? '*Để chỉnh sửa, vui lòng chọn 1 ngày trên lịch' : ''}
                     </Typography>
                 </Box>
-            )}
+            )} */}
 
-            {scheduleUpdate && (
-                <Dialog fullWidth maxWidth="lg" open={open}>
-                    <DialogTitle>
-                        <Grid container spacing={1} columns={12}>
-                            <Grid item sm={6}>
-                                {scheduleUpdate.params ? 'Cập nhật' : 'Thêm mới'}
-                            </Grid>
-                            <Grid item sm={6}>
-                                {scheduleUpdate.params && (
-                                    <Button
-                                        variant="outlined"
-                                        startIcon={<Delete />}
-                                        color="error"
-                                        onClick={() => handleDelete(scheduleUpdate.params.id)}
-                                        sx={{ float: 'right' }}
-                                    >
-                                        Xóa lịch
-                                    </Button>
-                                )}
-                            </Grid>
-                        </Grid>
-                    </DialogTitle>
-                    <DialogContent sx={{ height: '500px', paddingTop: '20px !important' }}>
-                        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                            <Grid container spacing={1} columns={12}>
-                                <Grid item sm={4}>
-                                    <TextField
-                                        disabled
-                                        id="outlined-disabled"
-                                        label="Ngày tháng"
-                                        defaultValue={scheduleUpdate.date}
-                                        fullWidth
-                                        {...register('date')}
-                                        //error={errors.date ? true : false}
-                                        //helperText={errors.date?.message}
-                                    />
-                                </Grid>
-                                <Grid item sm={4}>
-                                    <Controller
-                                        required
-                                        name="startTime"
-                                        inputFormat="HH:mm:ss"
-                                        control={control}
-                                        defaultValue={
-                                            scheduleUpdate.params ? '2022-08-17T' + scheduleUpdate.params.startTime : ''
-                                        }
-                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                            <TimePicker
-                                                label="Thời gian bắt đầu"
-                                                ampm={false}
-                                                inputFormat="HH:mm:ss"
-                                                value={value}
-                                                onChange={(value) => onChange(value)}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        required
-                                                        id="outlined-disabled"
-                                                        error={invalid}
-                                                        helperText={invalid ? error.message : null}
-                                                        // id="startDate"
-                                                        variant="outlined"
-                                                        margin="dense"
-                                                        fullWidth
-                                                    />
-                                                )}
-                                            />
-                                        )}
-                                    />
-                                </Grid>
-                                <Grid item sm={4}>
-                                    <Controller
-                                        required
-                                        name="finishTime"
-                                        inputFormat="HH:mm:ss"
-                                        defaultValue={
-                                            scheduleUpdate.params
-                                                ? '2022-08-17T' + scheduleUpdate.params.finishTime
-                                                : ''
-                                        }
-                                        control={control}
-                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                            <TimePicker
-                                                label="Thời gian kết thúc"
-                                                ampm={false}
-                                                inputFormat="HH:mm:ss"
-                                                value={value}
-                                                onChange={(value) => onChange(value)}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        required
-                                                        id="outlined-disabled"
-                                                        error={invalid}
-                                                        helperText={invalid ? error.message : null}
-                                                        // id="startDate"
-                                                        variant="outlined"
-                                                        margin="dense"
-                                                        fullWidth
-                                                    />
-                                                )}
-                                            />
-                                        )}
-                                    />
-                                </Grid>
-                            </Grid>
-                        </LocalizationProvider>
-                    </DialogContent>
-
-                    <DialogActions>
-                        <Button onClick={handleClose}>Quay lại</Button>
-                        <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
-                    </DialogActions>
-                </Dialog>
-            )}
-            {scheduleList[0] && (
-                <FullCalendar
-                    // initialDate={new Date('2022-09-01')}
-                    initialDate={scheduleData[0] && new Date(scheduleData[0].date)}
-                    locale="vie"
-                    height="100%"
-                    plugins={[dayGridPlugin, interactionPlugin]}
-                    defaultView="dayGridMonth"
-                    events={scheduleData}
-                    weekends={true}
-                    headerToolbar={{
-                        left: 'title',
-                        center: 'dayGridMonth,dayGridWeek',
-                        right: 'prev next',
-                        // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+            {isOpenAddSessionDialog && (
+                <AddSession
+                    title="Tạo buổi tập"
+                    isOpen={isOpenAddSessionDialog}
+                    handleClose={() => {
+                        setIsOpenAddSessionDialog(false);
+                        setScheduleUpdate(null);
                     }}
-                    datesSet={(dateInfo) => {
-                        getMonthInCurrentTableView(dateInfo.start);
-                    }}
-                    eventClick={(args) => {
-                        navigateToUpdate(args.event.id, args.event.start, args.event.startStr);
-                    }}
-                    dateClick={function (arg) {
-                        navigateToCreate(arg.dateStr, arg.date);
+                    date={scheduleUpdate}
+                    isDisabled={isDisabled}
+                    onSucess={(isUpdate) => {
+                        setUpdate(isUpdate);
                     }}
                 />
+            )}
+            {isOpenEditSessionDialog && (
+                <EditSession
+                    title="Cập nhật thời gian buổi tập"
+                    isOpen={isOpenEditSessionDialog}
+                    handleClose={() => {
+                        setIsOpenEditSessionDialog(false);
+                        setScheduleUpdate(null);
+                    }}
+                    date={scheduleUpdate}
+                    onSucess={(isUpdate) => {
+                        setUpdate(isUpdate);
+                    }}
+                />
+            )}
+            {scheduleList[0] && (
+                <div className={cx('schedule-container')}>
+                    {scheduleList[0] && (
+                        <CustomTrainingSchedule>
+                            <FullCalendar
+                                initialDate={scheduleList[0] && new Date(scheduleList[0].date)}
+                                // {...(semester!==2?(initialDate: '2022-10-01'):{})}
+                                // initialDate={semester !== 2 ? new Date('2022-10-01') : new Date()}
+                                locale="vie"
+                                height="100%"
+                                plugins={[dayGridPlugin, interactionPlugin]}
+                                initialView="dayGridMonth"
+                                eventContent={renderEventContent}
+                                events={scheduleData}
+                                ref={calendarComponentRef}
+                                weekends={true}
+                                headerToolbar={{
+                                    left: 'title',
+                                    center: 'dayGridMonth,dayGridWeek',
+                                    right: 'prev next today',
+                                    // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                                }}
+                                datesSet={(dateInfo) => {
+                                    getMonthInCurrentTableView(dateInfo.start);
+                                }}
+                                eventClick={(args) => {
+                                    navigateToUpdate(args.event, args.event.start);
+                                    // console.log(args);
+                                }}
+                                dateClick={function (arg) {
+                                    // console.log(arg.dateStr);
+                                    navigateToCreate(arg.dateStr);
+                                    // swal({
+                                    //     title: 'Date',
+                                    //     text: arg.dateStr,
+                                    //     type: 'success',
+                                    // });
+                                }}
+                            />
+                        </CustomTrainingSchedule>
+                    )}
+                </div>
             )}
         </Box>
     );

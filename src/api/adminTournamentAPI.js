@@ -280,7 +280,12 @@ const adminTournament = {
         return axiosClient.get(url);
     },
     updateTimeAndPlaceMatch: (matchId, params) => {
-        const url = `/competitive/headclub/updatetimeandplacematch/${matchId}`;
+        const url = `/tournament/headclub/updatetimeandplacematch/${matchId}`;
+        return axiosClient.put(url, params);
+    },
+
+    updateTimeAndPlaceTeam: (teamId, params) => {
+        const url = `/tournament/headclub/updatetimeandplacematch/${teamId}`;
         return axiosClient.put(url, params);
     },
 
