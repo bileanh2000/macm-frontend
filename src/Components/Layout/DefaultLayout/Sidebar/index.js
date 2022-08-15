@@ -29,6 +29,7 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import FeedIcon from '@mui/icons-material/Feed';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import { PriceCheck, Savings } from '@mui/icons-material';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 function Sidebar() {
     const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -179,6 +180,19 @@ function Sidebar() {
                         </ListItemIcon>
                         <ListItemText primary="Chỉnh sửa điểm danh" />
                     </ListItem>
+                    <ListItem
+                        button
+                        sx={{ pl: 4 }}
+                        component={Link}
+                        to="/admin/attendance/report"
+                        selected={selectedIndex === 6}
+                        onClick={(event) => handleListItemClick(event, 6)}
+                    >
+                        <ListItemIcon>
+                            <AssessmentIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Báo cáo điểm danh" />
+                    </ListItem>
                 </List>
             </Collapse>
 
@@ -187,8 +201,8 @@ function Sidebar() {
                 button
                 component={Link}
                 to="/admin/contact"
-                selected={selectedIndex === 6}
-                onClick={(event) => handleListItemClick(event, 6)}
+                selected={selectedIndex === 7}
+                onClick={(event) => handleListItemClick(event, 7)}
             >
                 <ListItemIcon>
                     <ContactPageIcon />
@@ -210,8 +224,8 @@ function Sidebar() {
                         sx={{ pl: 4 }}
                         component={Link}
                         to="/admin/membership"
-                        selected={selectedIndex === 7}
-                        onClick={(event) => handleListItemClick(event, 7)}
+                        selected={selectedIndex === 8}
+                        onClick={(event) => handleListItemClick(event, 8)}
                     >
                         <ListItemIcon>
                             <PriceCheck />
@@ -223,8 +237,8 @@ function Sidebar() {
                         sx={{ pl: 4 }}
                         component={Link}
                         to="/admin/fund"
-                        selected={selectedIndex === 8}
-                        onClick={(event) => handleListItemClick(event, 8)}
+                        selected={selectedIndex === 9}
+                        onClick={(event) => handleListItemClick(event, 9)}
                     >
                         <ListItemIcon>
                             <Savings />
@@ -239,8 +253,8 @@ function Sidebar() {
                 button
                 component={Link}
                 to="/admin/rules"
-                selected={selectedIndex === 9}
-                onClick={(event) => handleListItemClick(event, 9)}
+                selected={selectedIndex === 10}
+                onClick={(event) => handleListItemClick(event, 10)}
             >
                 <ListItemIcon>
                     <RuleIcon />
@@ -253,8 +267,8 @@ function Sidebar() {
                 button
                 component={Link}
                 to="/admin/tournament"
-                selected={selectedIndex === 10}
-                onClick={(event) => handleListItemClick(event, 10)}
+                selected={selectedIndex === 11}
+                onClick={(event) => handleListItemClick(event, 11)}
             >
                 <ListItemIcon>
                     <EmojiEventsIcon />
@@ -279,8 +293,8 @@ function Sidebar() {
                 button
                 component={Link}
                 to="/admin/events"
-                selected={selectedIndex === 11}
-                onClick={(event) => handleListItemClick(event, 11)}
+                selected={selectedIndex === 12}
+                onClick={(event) => handleListItemClick(event, 12)}
             >
                 <ListItemIcon>
                     <CelebrationIcon />
