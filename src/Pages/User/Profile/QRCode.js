@@ -39,7 +39,7 @@ function QRCode({ title, params, isOpen, handleClose }) {
                 <Grid container direction="row" justifyContent="center" alignItems="center">
                     <Grid item xs={12} textAlign="center">
                         <img src={params.QRUrl} alt="qrcode" />
-                        <Typography variant="body1">
+                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
                             {params.userDetail[0].name} - {params.userDetail[0].studentId}
                         </Typography>
                     </Grid>
