@@ -51,6 +51,8 @@ function Event() {
     const [commonList, setCommonList] = useState([]);
     const [startDateOfSemester, setStartDateOfSemester] = useState();
     const calendarComponentRef = useRef(null);
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+
     let navigate = useNavigate();
     const handleChange = (event) => {
         setSemester(event.target.value);
@@ -172,18 +174,20 @@ function Event() {
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                     Danh sách sự kiện
                 </Typography>
-                <Button
-                    variant="outlined"
-                    sx={{ maxHeight: '50px', minHeight: '50px' }}
-                    // component={Link}
-                    // to={'/admin/events/add'}
-                    onClick={() => {
-                        setOpenDialog(true);
-                    }}
-                    startIcon={<AddCircleIcon />}
-                >
-                    Thêm sự kiện mới
-                </Button>
+                {user.role.name !== 'ROLE_Treasurer' ? (
+                    <Button
+                        variant="outlined"
+                        sx={{ maxHeight: '50px', minHeight: '50px' }}
+                        // component={Link}
+                        // to={'/admin/events/add'}
+                        onClick={() => {
+                            setOpenDialog(true);
+                        }}
+                        startIcon={<AddCircleIcon />}
+                    >
+                        Thêm sự kiện mới
+                    </Button>
+                ) : null}
             </Box>
             <Box sx={{ mb: 2 }}>
                 <TextField

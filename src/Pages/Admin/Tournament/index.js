@@ -29,6 +29,8 @@ import trainingScheduleApi from 'src/api/trainingScheduleApi';
 import CreateTournament from './CreateTournament/CreateTournament';
 
 function Tournament() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+
     const [tournaments, setTournaments] = useState();
     const [semester, setSemester] = useState('Summer2022');
     const [semesterList, setSemesterList] = useState([]);
@@ -193,19 +195,20 @@ function Tournament() {
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
                     Danh sách giải đấu
                 </Typography>
-
-                <Button
-                    variant="outlined"
-                    sx={{ maxHeight: '50px', minHeight: '50px' }}
-                    // component={Link}
-                    // to={'./create'}
-                    startIcon={<AddCircle />}
-                    onClick={() => {
-                        setOpenDialogCreate(true);
-                    }}
-                >
-                    Tạo giải đấu
-                </Button>
+                {user.role.name !== 'ROLE_Treasurer' ? (
+                    <Button
+                        variant="outlined"
+                        sx={{ maxHeight: '50px', minHeight: '50px' }}
+                        // component={Link}
+                        // to={'./create'}
+                        startIcon={<AddCircle />}
+                        onClick={() => {
+                            setOpenDialogCreate(true);
+                        }}
+                    >
+                        Tạo giải đấu
+                    </Button>
+                ) : null}
             </Box>
             <Divider />
             <Box sx={{ m: 2 }}>

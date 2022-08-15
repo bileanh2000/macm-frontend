@@ -170,7 +170,11 @@ function DetailTournament() {
     const handleUpdateTournament = (data) => {
         setTournament(data);
     };
-
+    useEffect(() => {
+        if (user.role.name === 'ROLE_Treasurer') {
+            setValue(2);
+        }
+    }, []);
     return (
         <Box sx={{ m: 1, p: 1, height: '80vh' }}>
             <Dialog
@@ -226,14 +230,32 @@ function DetailTournament() {
                             </Box>
                             <Divider />
                             <Box>
-                                <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
-                                    <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
-                                    <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />
-                                    <Tab label="Chi phí" {...a11yProps(2)} value={2} />
-                                    <Tab label="Danh sách ban tổ chức" {...a11yProps(3)} value={3} />
-                                    <Tab label="Danh sách vận động viên" {...a11yProps(4)} value={4} />
-                                    <Tab label="Bảng đấu" {...a11yProps(5)} value={5} />
-                                </Tabs>
+                                {user.role.name === 'ROLE_Treasurer' ? (
+                                    <Tabs
+                                        value={value}
+                                        onChange={handleChange}
+                                        variant="scrollable"
+                                        scrollButtons="auto"
+                                    >
+                                        <Tab label="Chi phí" {...a11yProps(2)} value={2} />
+                                        <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
+                                        <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />
+                                    </Tabs>
+                                ) : (
+                                    <Tabs
+                                        value={value}
+                                        onChange={handleChange}
+                                        variant="scrollable"
+                                        scrollButtons="auto"
+                                    >
+                                        <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
+                                        <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />
+                                        <Tab label="Chi phí" {...a11yProps(2)} value={2} />
+                                        <Tab label="Danh sách ban tổ chức" {...a11yProps(3)} value={3} />
+                                        <Tab label="Danh sách vận động viên" {...a11yProps(4)} value={4} />
+                                        <Tab label="Bảng đấu" {...a11yProps(5)} value={5} />
+                                    </Tabs>
+                                )}
                             </Box>
                         </Container>
                     </Paper>

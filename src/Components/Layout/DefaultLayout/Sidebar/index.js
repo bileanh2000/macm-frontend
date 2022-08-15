@@ -108,24 +108,11 @@ function Sidebar() {
                 </List>
             </Collapse>
             <Divider />
-            <ListItem
-                button
-                component={Link}
-                to="/admin/trainingschedules"
-                selected={selectedIndex === 3}
-                onClick={(event) => handleListItemClick(event, 3)}
-            >
-                <ListItemIcon>
-                    <CalendarMonthIcon />
-                </ListItemIcon>
-                <ListItemText primary="Quản Lý Lịch Tập" />
-            </ListItem>
-            <Divider />
             <ListItem button onClick={handleClickAttendance}>
                 <ListItemIcon>
                     <HowToRegIcon />
                 </ListItemIcon>
-                <ListItemText primary="Quản Lý Điểm danh" />
+                <ListItemText primary="Quản Lý Điểm Danh" />
                 {openAttendance ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
             <Collapse in={openAttendance} timeout="auto" unmountOnExit>
@@ -147,19 +134,24 @@ function Sidebar() {
                         </ListItemIcon>
                         <ListItemText primary="Điểm danh hôm nay" />
                     </ListItem>
-                    <ListItem
-                        button
-                        sx={{ pl: 4 }}
-                        component={Link}
-                        to="/admin/editattendance"
-                        selected={selectedIndex === 5}
-                        onClick={(event) => handleListItemClick(event, 5)}
-                    >
-                        <ListItemIcon>
-                            <PsychologyIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Chỉnh sửa điểm danh" />
-                    </ListItem>
+                    {ROLE === 'ROLE_HeadClub' ||
+                    ROLE === 'ROLE_ViceHeadClub' ||
+                    ROLE === 'ROLE_HeadTechnique' ||
+                    ROLE === 'ROLE_ViceHeadTechnique' ? (
+                        <ListItem
+                            button
+                            sx={{ pl: 4 }}
+                            component={Link}
+                            to="/admin/editattendance"
+                            selected={selectedIndex === 5}
+                            onClick={(event) => handleListItemClick(event, 5)}
+                        >
+                            <ListItemIcon>
+                                <PsychologyIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Chỉnh sửa điểm danh" />
+                        </ListItem>
+                    ) : null}
                     <ListItem
                         button
                         sx={{ pl: 4 }}
@@ -176,20 +168,53 @@ function Sidebar() {
                 </List>
             </Collapse>
 
-            <Divider />
-            <ListItem
-                button
-                component={Link}
-                to="/admin/contact"
-                selected={selectedIndex === 7}
-                onClick={(event) => handleListItemClick(event, 7)}
-            >
-                <ListItemIcon>
-                    <ContactPageIcon />
-                </ListItemIcon>
-                <ListItemText primary="Trang Liên Hệ" />
-            </ListItem>
-            <Divider />
+            {ROLE !== 'ROLE_Treasurer' ? (
+                <>
+                    <Divider />
+
+                    <ListItem
+                        button
+                        component={Link}
+                        to="/admin/trainingschedules"
+                        selected={selectedIndex === 3}
+                        onClick={(event) => handleListItemClick(event, 3)}
+                    >
+                        <ListItemIcon>
+                            <CalendarMonthIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Quản Lý Lịch Tập" />
+                    </ListItem>
+                    <Divider />
+                    <Divider />
+                    <ListItem
+                        button
+                        component={Link}
+                        to="/admin/tournament"
+                        selected={selectedIndex === 11}
+                        onClick={(event) => handleListItemClick(event, 11)}
+                    >
+                        <ListItemIcon>
+                            <EmojiEventsIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Quản Lý Giải Đấu" />
+                    </ListItem>
+                    <Divider />
+                    <ListItem
+                        button
+                        component={Link}
+                        to="/admin/events"
+                        selected={selectedIndex === 12}
+                        onClick={(event) => handleListItemClick(event, 12)}
+                    >
+                        <ListItemIcon>
+                            <CelebrationIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Quản Lý Sự Kiện" />
+                    </ListItem>
+
+                    <Divider />
+                </>
+            ) : null}
             {ROLE === 'ROLE_Treasurer' || ROLE === 'ROLE_HeadClub' ? (
                 <>
                     <ListItem button onClick={handleClickFee}>
@@ -227,6 +252,36 @@ function Sidebar() {
                                 </ListItemIcon>
                                 <ListItemText primary="Quỹ câu lạc bộ" />
                             </ListItem>
+                            {ROLE === 'ROLE_Treasurer' ? (
+                                <>
+                                    <ListItem
+                                        button
+                                        sx={{ pl: 4 }}
+                                        component={Link}
+                                        to="/admin/tournament"
+                                        selected={selectedIndex === 11}
+                                        onClick={(event) => handleListItemClick(event, 11)}
+                                    >
+                                        <ListItemIcon>
+                                            <EmojiEventsIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Chi Phí Giải Đấu" />
+                                    </ListItem>
+                                    <ListItem
+                                        button
+                                        sx={{ pl: 4 }}
+                                        component={Link}
+                                        to="/admin/events"
+                                        selected={selectedIndex === 12}
+                                        onClick={(event) => handleListItemClick(event, 12)}
+                                    >
+                                        <ListItemIcon>
+                                            <CelebrationIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Chi Phí Sự Kiện" />
+                                    </ListItem>
+                                </>
+                            ) : null}
                         </List>
                     </Collapse>
 
@@ -246,44 +301,17 @@ function Sidebar() {
                 <ListItemText primary="Danh Sách Nội Quy CLB" />
             </ListItem>
             <Divider />
-
             <ListItem
                 button
                 component={Link}
-                to="/admin/tournament"
-                selected={selectedIndex === 11}
-                onClick={(event) => handleListItemClick(event, 11)}
+                to="/admin/contact"
+                selected={selectedIndex === 7}
+                onClick={(event) => handleListItemClick(event, 7)}
             >
                 <ListItemIcon>
-                    <EmojiEventsIcon />
+                    <ContactPageIcon />
                 </ListItemIcon>
-                <ListItemText primary="Quản Lý Giải Đấu" />
-            </ListItem>
-            {/* <Divider />
-            <ListItem
-                button
-                component={Link}
-                to="/admin/news"
-                selected={selectedIndex === 10}
-                onClick={(event) => handleListItemClick(event, 10)}
-            >
-                <ListItemIcon>
-                    <FeedIcon />
-                </ListItemIcon>
-                <ListItemText primary="Quản Lý Tin Tức" />
-            </ListItem> */}
-            <Divider />
-            <ListItem
-                button
-                component={Link}
-                to="/admin/events"
-                selected={selectedIndex === 12}
-                onClick={(event) => handleListItemClick(event, 12)}
-            >
-                <ListItemIcon>
-                    <CelebrationIcon />
-                </ListItemIcon>
-                <ListItemText primary="Quản Lý Sự Kiện" />
+                <ListItemText primary="Trang Liên Hệ" />
             </ListItem>
             <Divider />
         </List>

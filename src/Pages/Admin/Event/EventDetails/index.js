@@ -45,6 +45,7 @@ import UpdateTournamentOverview from './EventOverview/UpdateEventOverview';
 import { useSnackbar } from 'notistack';
 import EventFee from './EventFee';
 import EventAttendance from './EventAttendance';
+import useEnhancedEffect from '@mui/material/utils/useEnhancedEffect';
 // import AdminTournament from '../AdminTournament';
 // import MemberTournament from '../MemberTournament';
 
@@ -172,6 +173,11 @@ function EventDetails() {
         setTournament(data);
     };
 
+    useEffect(() => {
+        if (user.role.name === 'ROLE_Treasurer') {
+            setValue(4);
+        }
+    }, []);
     return (
         <Box sx={{ m: 1, p: 1, height: '80vh' }}>
             {tournament && scheduleList[0] && (
@@ -265,14 +271,32 @@ function EventDetails() {
                             </Box>
                             <Divider />
                             <Box>
-                                <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
-                                    <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
-                                    <Tab label="Lịch sự kiện" {...a11yProps(1)} value={1} />
-                                    <Tab label="Danh sách thành viên BTC" {...a11yProps(2)} value={2} />
-                                    <Tab label="Danh sách thành viên tham gia" {...a11yProps(3)} value={3} />
-                                    <Tab label="Chi phí" {...a11yProps(4)} value={4} />
-                                    <Tab label="Trạng thái điểm danh" {...a11yProps(5)} value={5} />
-                                </Tabs>
+                                {user.role.name === 'ROLE_Treasurer' ? (
+                                    <Tabs
+                                        value={value}
+                                        onChange={handleChange}
+                                        variant="scrollable"
+                                        scrollButtons="auto"
+                                    >
+                                        <Tab label="Chi phí" {...a11yProps(4)} value={4} />
+                                        <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
+                                        <Tab label="Lịch sự kiện" {...a11yProps(1)} value={1} />
+                                    </Tabs>
+                                ) : (
+                                    <Tabs
+                                        value={value}
+                                        onChange={handleChange}
+                                        variant="scrollable"
+                                        scrollButtons="auto"
+                                    >
+                                        <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
+                                        <Tab label="Lịch sự kiện" {...a11yProps(1)} value={1} />
+                                        <Tab label="Danh sách thành viên BTC" {...a11yProps(2)} value={2} />
+                                        <Tab label="Danh sách thành viên tham gia" {...a11yProps(3)} value={3} />
+                                        <Tab label="Chi phí" {...a11yProps(4)} value={4} />
+                                        <Tab label="Trạng thái điểm danh" {...a11yProps(5)} value={5} />
+                                    </Tabs>
+                                )}
                             </Box>
                         </Container>
                     </Paper>
