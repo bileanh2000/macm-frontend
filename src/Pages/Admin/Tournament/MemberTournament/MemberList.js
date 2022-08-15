@@ -366,7 +366,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     {/* <TableCell align="left">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell> */}
                     <TableCell align="left">{row.exhibitionTypeName}</TableCell>
                     {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
-                    {status >= 2 && (
+                    {status <= 2 && (
                         <TableCell align="left">
                             <Tooltip title="Chỉnh sửa thông tin đội tham gia">
                                 <Chip

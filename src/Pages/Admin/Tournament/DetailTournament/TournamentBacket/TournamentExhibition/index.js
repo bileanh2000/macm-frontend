@@ -158,7 +158,7 @@ function TournamentExhibition({ reload, result, type }) {
                     </Select>
                 </FormControl>
             </Box>
-            {tournamentResult != null && (
+            {tournamentResult && tournamentResult.length > 0 && (
                 <Paper elevation={3} sx={{ m: 2, p: 2 }}>
                     <Typography variant="h6">Kết quả bảng đấu</Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
