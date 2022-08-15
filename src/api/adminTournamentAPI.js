@@ -158,7 +158,7 @@ const adminTournament = {
     },
 
     getAllCompetitiveType: (tournamentId) => {
-        const url = `/tournament/treasurer/getallcompetitivetype/${tournamentId}`;
+        const url = `/competitive/treasurer/getallcompetitivetype/${tournamentId}`;
         return axiosClient.get(url);
     },
 

@@ -90,7 +90,7 @@ function MemberTournament({ tournament, isUpdate }) {
     const fetchCompetitivePlayer = async (weightRange) => {
         try {
             const response = await adminTournamentAPI.getListPlayerBracket(weightRange);
-            console.log(response.data);
+            console.log('fetchCompetitivePlayer', response.data);
             if (response.data.length > 0) {
                 setCompetitivePlayer(response.data[0].listPlayers);
                 setIsCreate(response.data[0].changed);
@@ -144,6 +144,7 @@ function MemberTournament({ tournament, isUpdate }) {
         setIsRender(false);
     }, [tournamentId, exhibitionType, exhibitionTeam, isRender]);
 
+    console.log(!isUpdate, tournamentStatus);
     return (
         <Fragment>
             {competitivePlayer && exhibitionTeam && (
