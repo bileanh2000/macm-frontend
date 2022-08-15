@@ -42,6 +42,7 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
     const [listEmail, setListEmailId] = useState([]);
     const [listPhone, setListPhone] = useState([]);
     const [isEditable, setIsEditable] = useState(editable);
+    const user = JSON.parse(localStorage.getItem('currentUser'));
 
     useEffect(() => {
         const fetchUserList = async () => {
@@ -224,23 +225,25 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                             border: '4px solid #fff',
                         }}
                     />
-                    <Tooltip title="Chỉnh sửa" placement="left-start">
-                        <IconButton
-                            aria-label="edit"
-                            // size=""
-                            sx={{
-                                position: 'absolute',
-                                top: '115px',
-                                right: '5px',
-                                // transform: 'translateX(-50%)',
-                            }}
-                            onClick={() => {
-                                setIsEditable(true);
-                            }}
-                        >
-                            <EditRoundedIcon fontSize="inherit" />
-                        </IconButton>
-                    </Tooltip>
+                    {user.role.name === 'ROLE_HeadClub' || user.role.name === 'ROLE_ViceHeadClub' ? (
+                        <Tooltip title="Chỉnh sửa" placement="left-start">
+                            <IconButton
+                                aria-label="edit"
+                                // size=""
+                                sx={{
+                                    position: 'absolute',
+                                    top: '115px',
+                                    right: '5px',
+                                    // transform: 'translateX(-50%)',
+                                }}
+                                onClick={() => {
+                                    setIsEditable(true);
+                                }}
+                            >
+                                <EditRoundedIcon fontSize="inherit" />
+                            </IconButton>
+                        </Tooltip>
+                    ) : null}
                 </DialogTitle>
                 <DialogContent>
                     {/* <DialogContentText id="alert-dialog-description">{children}</DialogContentText> */}
@@ -420,6 +423,15 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                                         sx={{ width: '-webkit-fill-available' }}
                                         {...(!isEditable ? { disabled: true } : {})}
                                     >
+                                        <MenuItem value={1}>Chủ nhiệm</MenuItem>
+                                        <MenuItem value={2}>Phó chủ nhiệm</MenuItem>
+                                        <MenuItem value={3}>Thủ quỹ</MenuItem>
+                                        <MenuItem value={4}>Trưởng ban văn hóa</MenuItem>
+                                        <MenuItem value={5}>Phó ban văn hóa</MenuItem>
+                                        <MenuItem value={6}>Trưởng ban truyền thông</MenuItem>
+                                        <MenuItem value={7}>Phó ban truyền thông</MenuItem>
+                                        <MenuItem value={8}>Trưởng ban chuyên môn</MenuItem>
+                                        <MenuItem value={9}>Phó ban chuyên môn</MenuItem>
                                         <MenuItem value={10}>Thành viên Ban truyền thông</MenuItem>
                                         <MenuItem value={11}>Thành viên Ban văn hóa</MenuItem>
                                         <MenuItem value={12}>Thành viên Ban chuyên môn</MenuItem>

@@ -57,6 +57,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
 import AddMemberDialog from '../AddMemberDialog';
 import ViewDetailMemberDialog from '../ViewDetailMemberDialog';
+import { createMuiTheme } from '@material-ui/core/styles';
 
 function MemberAndCollaborator() {
     const token = localStorage[`accessToken`];
@@ -77,6 +78,12 @@ function MemberAndCollaborator() {
     const [isOpenAddMember, setIsOpenAddMember] = useState(false);
     const [isOpenViewMember, setIsOpenViewMember] = useState(false);
     const [isEditDialog, setIsEditDialog] = useState(false);
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const styles = (theme) => ({
+        disabledButton: {
+            backgroundColor: theme.palette.primary || 'red',
+        },
+    });
 
     const toggleFilter = () => {
         setChecked((prev) => !prev);
@@ -177,7 +184,6 @@ function MemberAndCollaborator() {
                 return (
                     <Button
                         sx={{
-                            // borderRadius: '5px',
                             ...(cellValues.row.active === 'Active'
                                 ? {
                                       backgroundColor: '#00AD31',
@@ -212,6 +218,8 @@ function MemberAndCollaborator() {
                         // onClick={(event) => {
                         //     toggleStatus(cellValues.row.studentId);
                         // }}
+                        disabled={user.role.name !== 'ROLE_HeadClub' && user.role.name !== 'ROLE_ViceHeadClub'}
+                        // classes={{ disabled: classes.disabledButton }}
                     >
                         {cellValues.row.active}
                     </Button>
@@ -220,7 +228,10 @@ function MemberAndCollaborator() {
         },
         {
             hideable: !editable,
-            hide: editable,
+            ...(user.role.name === 'ROLE_HeadClub' || user.role.name === 'ROLE_ViceHeadClub'
+                ? { hide: editable }
+                : { hide: true }),
+
             field: 'actions',
             type: 'actions',
             flex: 0.5,
@@ -674,22 +685,27 @@ function MemberAndCollaborator() {
                     </TextField>
                 </Box>
                 <Box>
-                    <Button
-                        variant="outlined"
-                        sx={{ marginRight: 2 }}
-                        startIcon={<AddCircleIcon />}
-                        onClick={() => setIsOpenAddMember(true)}
-                    >
-                        Thêm thành viên
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        sx={{ marginRight: 2 }}
-                        startIcon={<UploadFileIcon />}
-                        onClick={handleClickOpen}
-                    >
-                        Thêm danh sách thành viên
-                    </Button>
+                    {user.role.name === 'ROLE_HeadClub' || user.role.name === 'ROLE_ViceHeadClub' ? (
+                        <>
+                            <Button
+                                variant="outlined"
+                                sx={{ marginRight: 2 }}
+                                startIcon={<AddCircleIcon />}
+                                onClick={() => setIsOpenAddMember(true)}
+                            >
+                                Thêm thành viên
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                sx={{ marginRight: 2 }}
+                                startIcon={<UploadFileIcon />}
+                                onClick={handleClickOpen}
+                            >
+                                Thêm danh sách thành viên
+                            </Button>
+                        </>
+                    ) : null}
+
                     <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} onClick={exportExcel}>
                         Xuất Excel {selectedRows.length > 0 ? `đã chọn (${selectedRows.length})` : `toàn bộ danh sách`}
                     </Button>
@@ -720,6 +736,7 @@ function MemberAndCollaborator() {
                         Toolbar: CustomToolbar,
                         Footer: CustomFooter,
                     }}
+                    disableSelectionOnClick={true}
                     onSelectionModelChange={(ids) => {
                         setSelectionModel(ids);
                         const selectedIDs = new Set(ids);

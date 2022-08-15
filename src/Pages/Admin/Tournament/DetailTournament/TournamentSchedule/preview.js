@@ -48,19 +48,6 @@ export const CustomTrainingSchedule = styled.div`
     .fc-event {
         cursor: pointer;
     }
-    .fc-day-future:hover:after {
-        content: 'Tạo lịch cho giải đấu';
-        position: absolute;
-        margin-top: -8vh;
-        margin-left: 6px;
-        font-weight: bold;
-        font-size: 0.8rem;
-        // bottom: 50%;
-        // left: 50%;
-    }
-    .fc-day-future:hover {
-        background-color: #d0e6fb !important;
-    }
     .fc-day-today a {
         background-color: white;
         // color: red !important;
@@ -86,7 +73,7 @@ export const CustomTrainingSchedule = styled.div`
     width: 70%;
 `;
 
-function TournamentSchedule({ isUpdate }) {
+function Preview({ isUpdate }) {
     const calendarComponentRef = useRef(null);
     const nowDate = new Date();
     let { tournamentId } = useParams();
@@ -307,22 +294,7 @@ function TournamentSchedule({ isUpdate }) {
         let current = new Date();
 
         return (
-            <Tooltip
-                title={
-                    // eventInfo.event.extendedProps.type === 0
-                    //     ? eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time
-                    //     : 'Không thể tạo lịch tập (trùng hoạt động khác)'
-                    // eventDate < current ? 'Xem thông tin điểm danh' : 'Cập nhật thời gian'?eventInfo.event.extendedProps.type === 0?'Không thể tạo lịch tập (trùng hoạt động khác)':''
-                    !isUpdate
-                        ? eventInfo.event.extendedProps.type === 3
-                            ? eventDate < current
-                                ? ''
-                                : 'Cập nhật thời gian'
-                            : `Không thể tạo lịch tập (trùng với ${eventInfo.event.title})`
-                        : 'Quá thời gian cập nhật'
-                }
-                placement="top"
-            >
+            <Tooltip title={eventInfo.event.title + ' - ' + eventInfo.event.extendedProps.time} placement="top">
                 {eventInfo.event.extendedProps.type === 3 ? (
                     <Box>
                         <Box sx={{ ml: '10px' }}>
@@ -433,19 +405,6 @@ function TournamentSchedule({ isUpdate }) {
                                 datesSet={(dateInfo) => {
                                     getMonthInCurrentTableView(dateInfo.start);
                                 }}
-                                eventClick={(args) => {
-                                    navigateToUpdate(args.event, args.event.start);
-                                    // console.log(args);
-                                }}
-                                dateClick={function (arg) {
-                                    // console.log(arg.dateStr);
-                                    navigateToCreate(arg.dateStr);
-                                    // swal({
-                                    //     title: 'Date',
-                                    //     text: arg.dateStr,
-                                    //     type: 'success',
-                                    // });
-                                }}
                             />
                         </CustomTrainingSchedule>
                     )}
@@ -455,4 +414,4 @@ function TournamentSchedule({ isUpdate }) {
     );
 }
 
-export default TournamentSchedule;
+export default Preview;

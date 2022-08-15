@@ -254,7 +254,9 @@ function EventDetails() {
                                         </Typography>
                                     </Box>
                                 </Box>
-                                {new Date(scheduleData[0].date) > new Date() ? (
+
+                                {new Date(scheduleData[0].date) < new Date() ||
+                                user.role.name === 'ROLE_Treasurer' ? null : (
                                     <Box>
                                         <Tooltip title="Chỉnh sửa">
                                             <IconButton aria-label="edit" onClick={() => setOpenEditDialog(true)}>
@@ -267,7 +269,7 @@ function EventDetails() {
                                             </IconButton>
                                         </Tooltip>
                                     </Box>
-                                ) : null}
+                                )}
                             </Box>
                             <Divider />
                             <Box>

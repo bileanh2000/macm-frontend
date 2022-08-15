@@ -184,20 +184,24 @@ function Sidebar() {
                         </ListItemIcon>
                         <ListItemText primary="Quản Lý Lịch Tập" />
                     </ListItem>
-                    <Divider />
-                    <Divider />
-                    <ListItem
-                        button
-                        component={Link}
-                        to="/admin/tournament"
-                        selected={selectedIndex === 11}
-                        onClick={(event) => handleListItemClick(event, 11)}
-                    >
-                        <ListItemIcon>
-                            <EmojiEventsIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Quản Lý Giải Đấu" />
-                    </ListItem>
+                    {ROLE === 'ROLE_HeadClub' || ROLE === 'ROLE_HeadTechnique' || ROLE === 'ROLE_ViceHeadTechnique' ? (
+                        <>
+                            <Divider />
+                            <ListItem
+                                button
+                                component={Link}
+                                to="/admin/tournament"
+                                selected={selectedIndex === 11}
+                                onClick={(event) => handleListItemClick(event, 11)}
+                            >
+                                <ListItemIcon>
+                                    <EmojiEventsIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Quản Lý Giải Đấu" />
+                            </ListItem>
+                        </>
+                    ) : null}
+
                     <Divider />
                     <ListItem
                         button
@@ -288,32 +292,47 @@ function Sidebar() {
                     <Divider />
                 </>
             ) : null}
-            <ListItem
-                button
-                component={Link}
-                to="/admin/rules"
-                selected={selectedIndex === 10}
-                onClick={(event) => handleListItemClick(event, 10)}
-            >
-                <ListItemIcon>
-                    <RuleIcon />
-                </ListItemIcon>
-                <ListItemText primary="Danh Sách Nội Quy CLB" />
-            </ListItem>
-            <Divider />
-            <ListItem
-                button
-                component={Link}
-                to="/admin/contact"
-                selected={selectedIndex === 7}
-                onClick={(event) => handleListItemClick(event, 7)}
-            >
-                <ListItemIcon>
-                    <ContactPageIcon />
-                </ListItemIcon>
-                <ListItemText primary="Trang Liên Hệ" />
-            </ListItem>
-            <Divider />
+
+            {ROLE === 'ROLE_HeadClub' ||
+            ROLE === 'ROLE_ViceHeadClub' ||
+            ROLE === 'ROLE_HeadCulture' ||
+            ROLE === 'ROLE_ViceHeadCulture' ? (
+                <>
+                    <ListItem
+                        button
+                        component={Link}
+                        to="/admin/rules"
+                        selected={selectedIndex === 10}
+                        onClick={(event) => handleListItemClick(event, 10)}
+                    >
+                        <ListItemIcon>
+                            <RuleIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Danh Sách Nội Quy CLB" />
+                    </ListItem>
+                    <Divider />
+                </>
+            ) : null}
+            {ROLE === 'ROLE_HeadClub' ||
+            ROLE === 'ROLE_ViceHeadClub' ||
+            ROLE === 'ROLE_HeadCommunication' ||
+            ROLE === 'ROLE_ViceHeadCommunication' ? (
+                <>
+                    <ListItem
+                        button
+                        component={Link}
+                        to="/admin/contact"
+                        selected={selectedIndex === 7}
+                        onClick={(event) => handleListItemClick(event, 7)}
+                    >
+                        <ListItemIcon>
+                            <ContactPageIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Trang Liên Hệ" />
+                    </ListItem>
+                    <Divider />
+                </>
+            ) : null}
         </List>
 
         // <React.Fragment>

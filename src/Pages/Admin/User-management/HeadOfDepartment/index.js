@@ -38,6 +38,7 @@ function HeadOfDepartment() {
     const [isOpenAddMember, setIsOpenAddMember] = useState(false);
     const [isOpenViewMember, setIsOpenViewMember] = useState(false);
     const [isEditDialog, setIsEditDialog] = useState(false);
+    const user = JSON.parse(localStorage.getItem('currentUser'));
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -92,7 +93,10 @@ function HeadOfDepartment() {
         { field: 'role', headerName: 'Vai trò', flex: 1 },
         {
             hideable: !editable,
-            hide: editable,
+            ...(user.role.name === 'ROLE_HeadClub' || user.role.name === 'ROLE_ViceHeadClub'
+                ? { hide: editable }
+                : { hide: true }),
+
             field: 'actions',
             type: 'actions',
             flex: 1,
