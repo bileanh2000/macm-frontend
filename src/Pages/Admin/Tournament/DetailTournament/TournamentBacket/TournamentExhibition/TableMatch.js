@@ -26,10 +26,11 @@ import * as Yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import NumberFormat from 'react-number-format';
-import { KeyboardArrowDown, KeyboardArrowUp, SportsScore } from '@mui/icons-material';
+import { KeyboardArrowDown, KeyboardArrowUp, SportsScore, Update } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 
 import adminTournament from 'src/api/adminTournamentAPI';
+import UpdateTimeAndArea from './UpdateTimeAndArea';
 
 function TableMatch(params) {
     console.log(params.matches);
@@ -37,6 +38,8 @@ function TableMatch(params) {
     const [match, setMatch] = useState();
     const [open, setOpen] = useState(false);
     const { enqueueSnackbar } = useSnackbar();
+    const [openUpdate, setOpenUpdate] = useState(false);
+    const [areaName, setAreaId] = useState();
 
     useEffect(() => {
         setMatches(params.matches);
@@ -47,9 +50,22 @@ function TableMatch(params) {
             const res = await adminTournament.updateExhibitionResult(exhibitionTeamId, score);
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
+            params.onUpdateResult && params.onUpdateResult();
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar('Không thể cập nhật điểm số', { variant });
+        }
+    };
+
+    const updateTimeAndPlace = async (matchId, match) => {
+        try {
+            const res = await adminTournament.updateTimeAndPlaceTeam(matchId, match);
+            let variant = 'success';
+            enqueueSnackbar(res.message, { variant });
+            params.onUpdateResult && params.onUpdateResult();
+        } catch (error) {
+            let variant = 'error';
+            enqueueSnackbar('khong the cap nhat thoi gian', { variant });
         }
     };
 
@@ -76,8 +92,15 @@ function TableMatch(params) {
         setOpen(true);
     };
 
+    const handleClickUpdate = (data) => {
+        setMatch(data);
+        setAreaId(data.area.name);
+        setOpenUpdate(true);
+    };
+
     const handleClose = () => {
         setOpen(false);
+        setOpenUpdate(false);
         reset({
             score: 0,
         });
@@ -90,7 +113,15 @@ function TableMatch(params) {
             return m.team.id == match.team.id ? { ...m, score: data.score } : m;
         });
         setMatches(newMatches);
-        params.onUpdateResult(newMatches);
+        // params.onUpdateResult();
+        handleClose();
+    };
+
+    const handleUpdateTime = (data) => {
+        console.log(data, match.team.id);
+        updateTimeAndPlace(match.team.id, data);
+        // var merged = [].concat.apply([], __matches);
+        // params.onUpdateResult(merged);
         handleClose();
     };
 
@@ -100,7 +131,7 @@ function TableMatch(params) {
 
         return (
             <React.Fragment>
-                <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                <TableRow>
                     <TableCell>
                         <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
                             {open ? (
@@ -118,9 +149,19 @@ function TableMatch(params) {
                         {index + 1}
                     </TableCell>
                     <TableCell align="left">{row.team.teamName}</TableCell>
-                    <TableCell align="left">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
+                    <TableCell align="left">{moment(row.time).format('HH:mm  -  DD/MM')}</TableCell>
                     <TableCell align="left">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
                     {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
+                    {status >= 2 && (
+                        <TableCell align="left">
+                            <Chip
+                                icon={<Update />}
+                                label={row.score == null ? 'Cập nhật thời gian thi đấu' : 'Đã quá thời gian cập nhật'}
+                                clickable={row.score == null ? true : false}
+                                onClick={() => handleClickUpdate(row)}
+                            />
+                        </TableCell>
+                    )}
                     {status >= 2 && (
                         <TableCell align="left">
                             <Chip
@@ -224,12 +265,38 @@ function TableMatch(params) {
                             </TableContainer>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={handleClose}>Quay lại</Button>
-                            <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
+                            <Button variant="outlined" onClick={handleClose}>
+                                Hủy bỏ
+                            </Button>
+                            <Button variant="contained" onClick={handleSubmit(handleUpdate)}>
+                                Đồng ý
+                            </Button>
                         </DialogActions>
                     </div>
                 )}
             </Dialog>
+
+            <Dialog fullWidth maxWidth="lg" open={openUpdate}>
+                {match && (
+                    <div>
+                        <DialogTitle>Cập nhật thời gian thi đấu</DialogTitle>
+                        <DialogContent>
+                            <UpdateTimeAndArea
+                                match={match}
+                                areaList={params.areaList}
+                                name={areaName}
+                                onClose={handleClose}
+                                onUpdate={handleUpdateTime}
+                            />
+                        </DialogContent>
+                        {/* <DialogActions>
+                            <Button onClick={handleClose}>Quay lại</Button>
+                            <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
+                        </DialogActions> */}
+                    </div>
+                )}
+            </Dialog>
+
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="caption table">
                     <caption>Địa điểm thi đấu: {params.matches[0].area.name}</caption>
@@ -241,6 +308,7 @@ function TableMatch(params) {
                             <TableCell align="left">Thời gian thi đấu</TableCell>
                             <TableCell align="left">Điểm số</TableCell>
                             {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
+                            {params.status === 3 && <TableCell align="left"></TableCell>}
                             {params.status === 3 && <TableCell align="left"></TableCell>}
                         </TableRow>
                     </TableHead>

@@ -158,7 +158,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
-            <DialogTitle id="alert-dialog-title">Thêm thành viên vào giải đấu</DialogTitle>
+            <DialogTitle id="alert-dialog-title">Thêm vận động viên viên vào thi đấu đối kháng</DialogTitle>
             <DialogContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', m: 2 }}>
                     {allMember && (

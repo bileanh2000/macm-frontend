@@ -59,8 +59,11 @@ function Tournament() {
     const getAllSuggestionRole = async () => {
         try {
             const response = await adminTournamentAPI.getAllSuggestionRole();
-            console.log(response);
-            setSuggestionRole(response.data);
+            const roles = response.data.map((role) => {
+                return { ...role, maxQuantity: 5 };
+            });
+            console.log('suggestion role: ', roles);
+            setSuggestionRole(roles);
         } catch (error) {
             console.warn('Failed to get all suggestion role', error);
         }
@@ -183,14 +186,16 @@ function Tournament() {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <CreateTournament
-                title="Tạo giải đấu"
-                roles={suggestionRole}
-                isOpen={openDialogCreate}
-                handleClose={() => {
-                    setOpenDialogCreate(false);
-                }}
-            />
+            {suggestionRole && (
+                <CreateTournament
+                    title="Tạo giải đấu"
+                    roles={suggestionRole}
+                    isOpen={openDialogCreate}
+                    handleClose={() => {
+                        setOpenDialogCreate(false);
+                    }}
+                />
+            )}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
                     Danh sách giải đấu
