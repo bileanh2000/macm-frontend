@@ -94,6 +94,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
             .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
             .required('Vui lòng không để trống trường này')
             .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy'),
+
         endDate: Yup.date()
             .min(min, 'Vui lòng không nhập ngày trong quá khứ')
             .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
@@ -354,9 +355,10 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                         render={({ field: { onChange, value }, fieldState: { error } }) => (
                                             <DatePicker
                                                 label="Ngày bắt đầu"
-                                                disablePast
+
                                                 // disablePast
                                                 minDate={addDays(new Date(), 1)}
+
                                                 ampm={false}
                                                 value={value}
                                                 onChange={(value) => {
