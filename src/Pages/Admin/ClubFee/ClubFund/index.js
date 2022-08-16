@@ -245,40 +245,6 @@ function ClubFund() {
     }
 
     return (
-        <Box sx={{ m: 1, p: 1 }}>
-            <Dialog fullWidth open={open} onClose={handleClose}>
-                <DialogTitle>
-                    {type === 1 ? 'Thêm tiền vào quỹ câu lạc bộ' : 'Rút tiền khỏi quỹ câu lạc bộ'}
-                </DialogTitle>
-                <DialogContent sx={{ paddingTop: '20px !important' }}>
-                    <Grid container spacing={1} columns={12}>
-                        <Grid item sm={6} xs={12}>
-                            <Controller
-                                name="amount"
-                                variant="outlined"
-                                defaultValue=""
-                                control={control}
-                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                    <NumberFormat
-                                        name="amount"
-                                        customInput={TextField}
-                                        label="Số tiền"
-                                        thousandSeparator={true}
-                                        onValueChange={(v) => {
-                                            onChange(Number(v.value));
-                                        }}
-                                        variant="outlined"
-                                        defaultValue=""
-                                        value={value}
-                                        InputProps={{
-                                            endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
-                                        }}
-                                        error={invalid}
-                                        helperText={invalid ? error.message : null}
-                                        fullWidth
-                                    />
-                                )}
-                            />
         <IfAnyGranted
             expected={['ROLE_Treasurer', 'ROLE_HeadClub']}
             actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
@@ -386,36 +352,6 @@ function ClubFund() {
                         </Paper>
                     </Box>
 
-                <Box
-                    sx={{
-                        height: '70vh',
-                        width: '100%',
-                        '& .status-rows': {},
-                        '& .status-rows.active': {
-                            color: '#56f000',
-                            fontWeight: '600',
-                            textAlign: 'center',
-                        },
-                        '& .status-rows.deactive': {
-                            color: '#ff3838',
-                            fontWeight: '600',
-                        },
-                    }}
-                >
-                    <DataGrid
-                        // loading={!userList.length}
-                        disableSelectionOnClick={true}
-                        rows={rowsUser}
-                        getRowHeight={() => 'auto'}
-                        getEstimatedRowHeight={() => 200}
-                        columns={columns}
-                        pageSize={pageSize}
-                        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                        rowsPerPageOptions={[10, 20, 30]}
-                        components={{
-                            Toolbar: CustomToolbar,
-                            NoRowsOverlay: CustomNoRowsOverlay,
-                        }}
                     <Box
                         sx={{
                             height: '70vh',
@@ -444,6 +380,7 @@ function ClubFund() {
                             rowsPerPageOptions={[10, 20, 30]}
                             components={{
                                 Toolbar: CustomToolbar,
+                                NoRowsOverlay: CustomNoRowsOverlay,
                             }}
                             sx={{
                                 '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
@@ -451,6 +388,43 @@ function ClubFund() {
                                 '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' },
                             }}
                         />
+                        {/* <Box>
+                            sx=
+                            {{
+                                height: '70vh',
+                                width: '100%',
+                                '& .status-rows': {},
+                                '& .status-rows.active': {
+                                    color: '#56f000',
+                                    fontWeight: '600',
+                                    textAlign: 'center',
+                                },
+                                '& .status-rows.deactive': {
+                                    color: '#ff3838',
+                                    fontWeight: '600',
+                                },
+                            }}
+                            >
+                            <DataGrid
+                                // loading={!userList.length}
+                                disableSelectionOnClick={true}
+                                rows={rowsUser}
+                                getRowHeight={() => 'auto'}
+                                getEstimatedRowHeight={() => 200}
+                                columns={columns}
+                                pageSize={pageSize}
+                                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                                rowsPerPageOptions={[10, 20, 30]}
+                                components={{
+                                    Toolbar: CustomToolbar,
+                                }}
+                                sx={{
+                                    '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
+                                    '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
+                                    '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' },
+                                }}
+                            />
+                        </Box> */}
                     </Box>
                 </Container>
             </Box>
