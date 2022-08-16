@@ -56,6 +56,7 @@ function OAuth2RedirectHandler() {
     if (token) {
         localStorage.setItem(ACCESS_TOKEN, token);
         localStorage.setItem('toShowPopup', 'true');
+        localStorage.setItem('toShowRegister', 'true');
         return (
             <Navigate
                 to={{

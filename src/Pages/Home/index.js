@@ -22,11 +22,15 @@ import { IfAllGranted, IfAuthorized } from 'react-authorization';
 import ForbiddenPage from '../ForbiddenPage';
 import UpNext from '../Admin/Home/UpNext';
 import notificationApi from 'src/api/notificationApi';
+import semesterApi from 'src/api/semesterApi';
+import ActiveRegister from './ActiveRegister';
 
 function Index() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
+    const [isOpenActiveRegisterDialog, setIsOpenActiveRegisterDialog] = useState(false);
     const [paymentMessage, setPaymentMessage] = useState([]);
+    const [startDateOfCurrentSemester, setStartDateOfCurrentSemester] = useState([]);
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
     const roleId = JSON.parse(localStorage.getItem('currentUser')).role.id;
@@ -34,10 +38,23 @@ function Index() {
     const handleOpenNotificationDialog = () => {
         setOpenNotificationDialog(true);
     };
+    const handleOpenActiveRegisterDialog = () => {
+        setIsOpenActiveRegisterDialog(true);
+    };
     const handleCloseNotificationDialog = () => {
         // setAlreadyVisited(false);
         localStorage.removeItem('toShowPopup');
         setOpenNotificationDialog(false);
+    };
+
+    const getCurrentSemester = async () => {
+        try {
+            const response = await semesterApi.getCurrentSemester();
+            console.log('getCurrentSemester', response);
+            setStartDateOfCurrentSemester(response.data[0].startDate);
+        } catch (error) {
+            console.log('failed when getCurrentSemester', error);
+        }
     };
 
     const fetchPaymentNotification = async (studentId) => {
@@ -50,6 +67,7 @@ function Index() {
         }
     };
     useEffect(() => {
+        getCurrentSemester();
         console.log(getAllRole);
         if (
             roleId === 1 ||
@@ -64,17 +82,29 @@ function Index() {
         ) {
             setIsAdmin(true);
         }
-        // localStorage.setItem('alreadyVisited', 'true');
         fetchPaymentNotification(studentId);
 
         let visited = localStorage['toShowPopup'] !== 'true';
         if (!visited && paymentMessage !== 'Không có khoản nào phải đóng') {
             handleOpenNotificationDialog();
         }
+    }, [studentId, paymentMessage]);
+
+    useEffect(() => {
+        if (new Date(startDateOfCurrentSemester) - new Date() === 0) {
+            console.log('hien thong bao nao babe');
+            handleOpenActiveRegisterDialog();
+        } else {
+            console.log(`chwa den ngay ${new Date(startDateOfCurrentSemester)}`);
+        }
     }, []);
 
     return (
         <Fragment>
+            <ActiveRegister
+                isOpen={isOpenActiveRegisterDialog}
+                handleClose={() => setIsOpenActiveRegisterDialog(false)}
+            />
             <Dialog
                 open={openNotificationDialog}
                 onClose={handleCloseNotificationDialog}

@@ -690,10 +690,10 @@ function MemberAndCollaborator() {
                 <Box component="form" onSubmit={handleSubmit(onSubmit)}>
                     <DialogContent sx={{ display: 'flex', justifyContent: 'center' }}>
                         <Box>
-                            <Button variant="outlined" component="span" sx={{ mb: 1 }} onClick={exportExcel}>
+                            <Button variant="outlined" component="span" sx={{ mb: 1, mr: 2 }} onClick={exportExcel}>
                                 Tải File mẫu
                             </Button>
-                            {errorList.length === 0 ? (
+                            {errorList.length > 0 ? (
                                 <Button
                                     variant="outlined"
                                     color="error"

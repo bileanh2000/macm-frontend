@@ -10,13 +10,17 @@ import LoadingProgress from 'src/Components/LoadingProgress';
 
 function ReportAttendance() {
     const [semester, setSemester] = useState('Summer2022');
+    const [roleId, setRoleId] = useState(0);
     const [semesterList, setSemesterList] = useState([]);
     const [attendanceList, setAttendanceList] = useState([]);
     const [columns, setColumns] = useState([]);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(30);
 
     const handleChange = (event) => {
         setSemester(event.target.value);
+    };
+    const handleChangeRoleId = (event) => {
+        setRoleId(event.target.value);
     };
 
     const fetchSemester = async () => {
@@ -30,9 +34,9 @@ function ReportAttendance() {
         }
     };
 
-    const fetchAttendanceReportBySemester = async (semester) => {
+    const fetchAttendanceReportBySemester = async (semester, id) => {
         try {
-            const response = await adminAttendanceAPI.getAttendanceTrainingStatistic(semester);
+            const response = await adminAttendanceAPI.getAttendanceTrainingStatistic(semester, id);
             console.log('fetchAttendanceReportBySemester: ', response);
             setAttendanceList(response.data);
             let header = Object.keys(response.data[0]);
@@ -50,6 +54,8 @@ function ReportAttendance() {
                             ? 'Tổng số buổi'
                             : i === 'totalAbsent'
                             ? 'Tổng số buổi nghỉ'
+                            : i === 'roleName'
+                            ? 'Vai trò'
                             : moment(i).format('DD/MM'),
                     cellClassName: (params) => {
                         if (params.value == null) {
@@ -75,6 +81,8 @@ function ReportAttendance() {
                         ? { width: 100 }
                         : i === 'id'
                         ? { hide: true }
+                        : i === 'roleName'
+                        ? { width: 200 }
                         : { flex: 1 }),
                 };
             });
@@ -93,8 +101,8 @@ function ReportAttendance() {
 
     useEffect(() => {
         fetchSemester();
-        fetchAttendanceReportBySemester(semester);
-    }, [semester]);
+        fetchAttendanceReportBySemester(semester, roleId);
+    }, [semester, roleId]);
 
     function CustomToolbar() {
         return (
@@ -144,6 +152,7 @@ function ReportAttendance() {
                 <Grid item xs={8}>
                     <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                         <TextField
+                            sx={{ mr: 1 }}
                             id="outlined-select-currency"
                             select
                             size="small"
@@ -156,6 +165,24 @@ function ReportAttendance() {
                                     {option.name}
                                 </MenuItem>
                             ))}
+                        </TextField>
+                        <TextField
+                            id="outlined-select-currency"
+                            select
+                            size="small"
+                            label="Chọn vai trò"
+                            value={roleId}
+                            onChange={handleChangeRoleId}
+                        >
+                            <MenuItem value={0}>Tất cả</MenuItem>
+                            <MenuItem value={-1}>Thành viên</MenuItem>
+                            <MenuItem value={-2}>Cộng tác viên</MenuItem>
+                            <MenuItem value={10}>Thành viên ban truyền thông</MenuItem>
+                            <MenuItem value={11}>Thành viên ban văn hóa</MenuItem>
+                            <MenuItem value={12}>Thành viên ban chuyên môn</MenuItem>
+                            <MenuItem value={13}>CTV ban truyền thông</MenuItem>
+                            <MenuItem value={14}>CTV ban văn hóa</MenuItem>
+                            <MenuItem value={15}>CTV ban chuyên môn</MenuItem>
                         </TextField>
                     </Typography>
                 </Grid>
@@ -199,7 +226,7 @@ function ReportAttendance() {
                         columns={columns}
                         pageSize={pageSize}
                         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                        rowsPerPageOptions={[10, 20, 30]}
+                        rowsPerPageOptions={[30, 50, 70]}
                         components={{
                             Toolbar: CustomToolbar,
                         }}
