@@ -316,6 +316,9 @@ function MemberAndCollaborator() {
                     setErrorList(res.data.data);
                 } else {
                     enqueueSnackbar(res.data.message, { variant: 'success' });
+                    setIsUpdate(true);
+                    setErrorList([]);
+                    handleClose();
                 }
                 // if (res.data.length !== 0) {
                 //     // enqueueSnackbar(res.data.message, { variant: 'success' });
@@ -393,7 +396,7 @@ function MemberAndCollaborator() {
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'MACM - Danh sách thành viên.xlsx'); //or any other extension
+            link.setAttribute('download', 'MACM - Danh sách thành viên thêm lỗi.xlsx'); //or any other extension
             document.body.appendChild(link);
             link.click();
         });
@@ -686,20 +689,22 @@ function MemberAndCollaborator() {
                 <DialogTitle>Tải lên file Excel</DialogTitle>
                 <Box component="form" onSubmit={handleSubmit(onSubmit)}>
                     <DialogContent sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Button variant="outlined" component="span" sx={{ mr: 1 }} onClick={exportExcel}>
-                            Tải File mẫu
-                        </Button>
-                        {errorList.length > 0 ? (
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                component="span"
-                                sx={{ mr: 1 }}
-                                onClick={exportErrorList}
-                            >
-                                Tải danh sách người bị lỗi
+                        <Box>
+                            <Button variant="outlined" component="span" sx={{ mb: 1 }} onClick={exportExcel}>
+                                Tải File mẫu
                             </Button>
-                        ) : null}
+                            {errorList.length === 0 ? (
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    component="span"
+                                    sx={{ mr: 1 }}
+                                    onClick={exportErrorList}
+                                >
+                                    Tải danh sách người bị lỗi
+                                </Button>
+                            ) : null}
+                        </Box>
 
                         <input type="file" accept=".xlsx" {...register('file')} />
                     </DialogContent>

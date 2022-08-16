@@ -27,9 +27,9 @@ function Index() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
     const [paymentMessage, setPaymentMessage] = useState([]);
+    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
     const roleId = JSON.parse(localStorage.getItem('currentUser')).role.id;
-    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
     const handleOpenNotificationDialog = () => {
         setOpenNotificationDialog(true);
@@ -39,6 +39,7 @@ function Index() {
         localStorage.removeItem('toShowPopup');
         setOpenNotificationDialog(false);
     };
+
     const fetchPaymentNotification = async (studentId) => {
         try {
             const response = await notificationApi.checkPaymentStatus(studentId);
@@ -48,7 +49,6 @@ function Index() {
             console.log('failed when fetchPaymentNotification', error);
         }
     };
-
     useEffect(() => {
         console.log(getAllRole);
         if (
@@ -68,7 +68,7 @@ function Index() {
         fetchPaymentNotification(studentId);
 
         let visited = localStorage['toShowPopup'] !== 'true';
-        if (!visited || paymentMessage === 'Không có khoản nào phải đóng') {
+        if (!visited && paymentMessage !== 'Không có khoản nào phải đóng') {
             handleOpenNotificationDialog();
         }
     }, []);

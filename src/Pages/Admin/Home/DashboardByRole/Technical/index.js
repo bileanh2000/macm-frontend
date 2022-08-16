@@ -19,6 +19,9 @@ import LoadingProgress from 'src/Components/LoadingProgress';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import PercentIcon from '@mui/icons-material/Percent';
 import trainingScheduleApi from 'src/api/trainingScheduleApi';
+import notificationApi from 'src/api/notificationApi';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import PaymentNotification from 'src/Pages/Home/PaymentNotification';
 
 export const CustomPersentStatus = ({ persent }) => {
     let bgColor = '#ccf5e7';
@@ -55,29 +58,21 @@ function TechnicalDashboard() {
     const [balanceInLastMonth, setBalanceInLastMonth] = useState([]);
     const [currentSemester, setCurrentSemester] = useState(1);
     const [totalTrainingSchedule, setTotalTrainingSchedule] = useState(1);
+    const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
+    const [paymentMessage, setPaymentMessage] = useState([]);
+    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
     const currentMonth = new Date().getMonth() + 1;
 
-    const fetchFeeInCurrentSemester = async () => {
+    const fetchPaymentNotification = async (studentId) => {
         try {
-            const semester = await semesterApi.getCurrentSemester();
-
-            console.log('Current Semester', semester.data);
-            setCurrentSemester(semester.data[0].id);
-            const fee = await dashboardApi.getFeeReportBySemester(semester.data[0].name);
-            console.log('fee in currentmonth', fee.data);
-            let fillerFeeByCurrentMonth = fee.data.filter((semester) => semester.month === currentMonth);
-            let fillerFeeByLastMonth = fee.data.filter((semester) => semester.month === currentMonth - 1);
-            setBalanceInCurrentMonth(fillerFeeByCurrentMonth);
-            setBalanceInLastMonth(fillerFeeByLastMonth);
-            console.log('fillerFeeByCurrentMonth', fillerFeeByCurrentMonth);
-            console.log('fillerFeeByLastMonth', fillerFeeByLastMonth);
-            setFeeReport(fee.data);
+            const response = await notificationApi.checkPaymentStatus(studentId);
+            console.log('fetchPaymentNotification', response);
+            setPaymentMessage(response.message);
         } catch (error) {
-            console.log('Failed when fetch Current Semester', error);
+            console.log('failed when fetchPaymentNotification', error);
         }
     };
-
     const fetchMemberReport = async () => {
         try {
             const response = await dashboardApi.getUserStatus();
@@ -103,15 +98,27 @@ function TechnicalDashboard() {
             console.log('Failed when fetch fetchTrainingSchedule', error);
         }
     };
+    const handleOpenNotificationDialog = () => {
+        setOpenNotificationDialog(true);
+    };
+    const handleCloseNotificationDialog = () => {
+        // setAlreadyVisited(false);
+        localStorage.removeItem('toShowPopup');
+        setOpenNotificationDialog(false);
+    };
     useEffect(() => {
-        fetchFeeInCurrentSemester();
         fetchMemberReport();
         getPersentMemberSinceLastSemester();
         fetchTrainingSchedule(currentSemester);
+        fetchPaymentNotification(studentId);
     }, [currentSemester]);
-    // useEffect(() => {
-    //     console.log(balanceInCurrentMonth);
-    // }, [balanceInCurrentMonth]);
+
+    useEffect(() => {
+        let visited = localStorage['toShowPopup'] !== 'true';
+        if (!visited && paymentMessage !== 'Không có khoản nào phải đóng') {
+            handleOpenNotificationDialog();
+        }
+    }, [paymentMessage]);
 
     const getPersentMemberSinceLastSemester = () => {
         let memberPersent =
@@ -130,6 +137,24 @@ function TechnicalDashboard() {
 
     return (
         <Fragment>
+            <Dialog
+                open={openNotificationDialog}
+                onClose={handleCloseNotificationDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
+                <DialogContent>
+                    {/* <DialogContentText id="alert-dialog-description"></DialogContentText> */}
+                    <PaymentNotification />
+                </DialogContent>
+                <DialogActions>
+                    {/* <Button onClick={handleCloseNotificationDialog}>Disagree</Button> */}
+                    <Button onClick={handleCloseNotificationDialog} autoFocus>
+                        Thoát
+                    </Button>
+                </DialogActions>
+            </Dialog>
             {memberReport[0] ? (
                 <Fragment>
                     <Typography variant="h4" color="initial" sx={{ fontWeight: 500, mb: 2 }}>
