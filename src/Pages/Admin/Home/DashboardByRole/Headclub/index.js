@@ -18,6 +18,7 @@ import semesterApi from 'src/api/semesterApi';
 import LoadingProgress from 'src/Components/LoadingProgress';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import PaymentNotification from 'src/Pages/Home/PaymentNotification';
+import notificationApi from 'src/api/notificationApi';
 
 export const CustomPersentStatus = ({ persent }) => {
     let bgColor = '#ccf5e7';
@@ -54,6 +55,8 @@ function HeadClubDashboard() {
     const [balanceInLastMonth, setBalanceInLastMonth] = useState([]);
     const [currentSemester, setCurrentSemester] = useState([]);
     const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
+    const [paymentMessage, setPaymentMessage] = useState([]);
+    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
     const currentMonth = new Date().getMonth() + 1;
 
@@ -75,7 +78,15 @@ function HeadClubDashboard() {
             console.log('Failed when fetch Current Semester', error);
         }
     };
-
+    const fetchPaymentNotification = async (studentId) => {
+        try {
+            const response = await notificationApi.checkPaymentStatus(studentId);
+            console.log('fetchPaymentNotification', response);
+            setPaymentMessage(response.message);
+        } catch (error) {
+            console.log('failed when fetchPaymentNotification', error);
+        }
+    };
     const fetchMemberReport = async () => {
         try {
             const response = await dashboardApi.getUserStatus();
@@ -100,12 +111,13 @@ function HeadClubDashboard() {
         fetchFeeInCurrentSemester();
         fetchMemberReport();
         getPersentMemberSinceLastSemester();
+        fetchPaymentNotification(studentId);
         let visited = localStorage['toShowPopup'] !== 'true';
 
-        if (!visited) {
+        if (!visited && paymentMessage !== 'Không có khoản nào phải đóng') {
             handleOpenNotificationDialog();
         }
-    }, []);
+    }, [studentId]);
     // useEffect(() => {
     //     console.log(balanceInCurrentMonth);
     // }, [balanceInCurrentMonth]);

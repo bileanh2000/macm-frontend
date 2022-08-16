@@ -18,9 +18,11 @@ import semesterApi from 'src/api/semesterApi';
 import LoadingProgress from 'src/Components/LoadingProgress';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CelebrationIcon from '@mui/icons-material/Celebration';
-import { MenuItem, TextField } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from '@mui/material';
 import SquareIcon from '@mui/icons-material/Square';
 import CommonSchedule from './CommonSchedule';
+import PaymentNotification from 'src/Pages/Home/PaymentNotification';
+import notificationApi from 'src/api/notificationApi';
 export const CustomPersentStatus = ({ persent }) => {
     let bgColor = '#ccf5e7';
     let color = '#0bce89';
@@ -57,7 +59,21 @@ function CultureDashboard() {
     const [semester, setSemester] = useState('Summer2022');
     const currentMonth = new Date().getMonth() + 1;
     const [startDateOfSemester, setStartDateOfSemester] = useState();
+    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
+    //--------------------------------
+    const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
+    const [paymentMessage, setPaymentMessage] = useState([]);
+
+    const fetchPaymentNotification = async (studentId) => {
+        try {
+            const response = await notificationApi.checkPaymentStatus(studentId);
+            console.log('fetchPaymentNotification', response);
+            setPaymentMessage(response.message);
+        } catch (error) {
+            console.log('failed when fetchPaymentNotification', error);
+        }
+    };
     const handleChange = (event) => {
         setSemester(event.target.value);
     };
@@ -86,6 +102,12 @@ function CultureDashboard() {
     };
     useEffect(() => {
         fetchTop3Semester();
+        fetchPaymentNotification(studentId);
+
+        let visited = localStorage['toShowPopup'] !== 'true';
+        if (!visited && paymentMessage !== 'Không có khoản nào phải đóng') {
+            handleOpenNotificationDialog();
+        }
     }, []);
     useEffect(() => {
         getStartDateBySemester(semester);
@@ -105,8 +127,34 @@ function CultureDashboard() {
         border: '1px solid red',
     };
 
+    const handleOpenNotificationDialog = () => {
+        setOpenNotificationDialog(true);
+    };
+    const handleCloseNotificationDialog = () => {
+        // setAlreadyVisited(false);
+        localStorage.removeItem('toShowPopup');
+        setOpenNotificationDialog(false);
+    };
     return (
         <Fragment>
+            <Dialog
+                open={openNotificationDialog}
+                onClose={handleCloseNotificationDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
+                <DialogContent>
+                    {/* <DialogContentText id="alert-dialog-description"></DialogContentText> */}
+                    <PaymentNotification />
+                </DialogContent>
+                <DialogActions>
+                    {/* <Button onClick={handleCloseNotificationDialog}>Disagree</Button> */}
+                    <Button onClick={handleCloseNotificationDialog} autoFocus>
+                        Thoát
+                    </Button>
+                </DialogActions>
+            </Dialog>
             {activityReport[0] ? (
                 <Fragment>
                     <Typography variant="h4" color="initial" sx={{ fontWeight: 500, mb: 2 }}>

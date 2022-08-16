@@ -58,6 +58,7 @@ import { vi } from 'date-fns/locale';
 import AddMemberDialog from '../AddMemberDialog';
 import ViewDetailMemberDialog from '../ViewDetailMemberDialog';
 import { createMuiTheme } from '@material-ui/core/styles';
+import { useSnackbar } from 'notistack';
 
 function MemberAndCollaborator() {
     const token = localStorage[`accessToken`];
@@ -74,10 +75,14 @@ function MemberAndCollaborator() {
     const [selectedRows, setSelectedRows] = useState([]);
     const [emailList, setEmailList] = useState([]);
     const [selectedStudent, setSelectedStudent] = useState([]);
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     const [isOpenAddMember, setIsOpenAddMember] = useState(false);
     const [isOpenViewMember, setIsOpenViewMember] = useState(false);
     const [isEditDialog, setIsEditDialog] = useState(false);
+    const [isUpdate, setIsUpdate] = useState(false);
+    const [errorList, setErrorList] = useState([]);
+
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const styles = (theme) => ({
         disabledButton: {
@@ -125,7 +130,8 @@ function MemberAndCollaborator() {
     useEffect(() => {
         // fetchUserList();
         fetchUserListBySemester(semester);
-    }, [semester]);
+        setIsUpdate(false);
+    }, [semester, isUpdate]);
 
     useEffect(() => {
         let emails = selectedRows.map((item) => item.email);
@@ -176,7 +182,7 @@ function MemberAndCollaborator() {
         { field: 'month', headerName: 'Tháng sinh', flex: 0.5, hide: true, hideable: false },
         { field: 'generation', headerName: 'Gen', flex: 0.5 },
         { field: 'studentId', headerName: 'Mã sinh viên', flex: 0.6 },
-        { field: 'role', headerName: 'Vai trò', flex: 1.2 },
+        { field: 'roleName', headerName: 'Vai trò', flex: 1.2 },
         {
             field: 'active',
             headerName: 'Trạng thái',
@@ -254,7 +260,7 @@ function MemberAndCollaborator() {
         container['generation'] = item.generation;
         container['month'] = new Date(item.dateOfBirth).getMonth() + 1;
         container['studentId'] = item.studentId;
-        container['role'] = item.roleName;
+        container['roleName'] = item.roleName;
         container['active'] = item.active ? 'Active' : 'Deactive';
         container['phone'] = item.phone;
         container['image'] = item.image;
@@ -304,19 +310,26 @@ function MemberAndCollaborator() {
                 },
             })
             .then((res) => {
-                console.log(res);
-                if (res.data.length != 0) {
-                    setOpenSnackBar(true);
-                    // setSnackBarStatus(true);
-                    snackBarStatus = true;
-                    dynamicAlert(snackBarStatus, res.data.message);
+                console.log(res.data.message);
+                if (res.data.data.length) {
+                    enqueueSnackbar(res.data.message, { variant: 'warning' });
+                    setErrorList(res.data.data);
                 } else {
-                    console.log('huhu');
-                    setOpenSnackBar(true);
-                    // setSnackBarStatus(false);
-                    snackBarStatus = false;
-                    dynamicAlert(snackBarStatus, res.data.message);
+                    enqueueSnackbar(res.data.message, { variant: 'success' });
+                    setIsUpdate(true);
+                    setErrorList([]);
+                    handleClose();
                 }
+                // if (res.data.length !== 0) {
+                //     // enqueueSnackbar(res.data.message, { variant: 'success' });
+                //     setErrorList(res.data.data);
+                // } else {
+                //     console.log('huhu');
+                //     setOpenSnackBar(true);
+                //     // setSnackBarStatus(false);
+                //     snackBarStatus = false;
+                //     dynamicAlert(snackBarStatus, res.data.message);
+                // }
             })
             .catch((error) => {
                 console.log(error);
@@ -348,7 +361,6 @@ function MemberAndCollaborator() {
     };
 
     const exportExcel = () => {
-        console.log('exportExcel');
         axios({
             url: 'https://capstone-project-macm.herokuapp.com/api/admin/hr/users/export', //your url
             method: 'POST',
@@ -364,6 +376,27 @@ function MemberAndCollaborator() {
             const link = document.createElement('a');
             link.href = url;
             link.setAttribute('download', 'MACM - Danh sách thành viên.xlsx'); //or any other extension
+            document.body.appendChild(link);
+            link.click();
+        });
+    };
+
+    const exportErrorList = () => {
+        axios({
+            url: 'https://capstone-project-macm.herokuapp.com/api/admin/hr/users/exporterror', //your url
+            method: 'POST',
+
+            data: errorList,
+
+            responseType: 'blob', // important
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }).then((response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'MACM - Danh sách thành viên thêm lỗi.xlsx'); //or any other extension
             document.body.appendChild(link);
             link.click();
         });
@@ -440,7 +473,7 @@ function MemberAndCollaborator() {
                                         dateOfBirth: updatedUser.dateOfBirth,
                                         generation: updatedUser.generation,
                                         studentId: updatedUser.studentId,
-                                        role: updatedUser.roleName,
+                                        roleName: updatedUser.roleName,
                                         phone: updatedUser.phone,
                                         currentAddress: updatedUser.currentAddress,
                                         roleId: updatedUser.roleId,
@@ -449,6 +482,7 @@ function MemberAndCollaborator() {
                                 return user;
                             });
                         });
+                        setIsUpdate(true);
                     }}
                 />
             )}
@@ -651,13 +685,27 @@ function MemberAndCollaborator() {
                     {customAlert.message}
                 </Alert>
             </Snackbar>
-            <Dialog open={openUploadFile} onClose={handleClose} fullWidth maxWidth="xs">
+            <Dialog open={openUploadFile} onClose={handleClose} fullWidth maxWidth="sm">
                 <DialogTitle>Tải lên file Excel</DialogTitle>
                 <Box component="form" onSubmit={handleSubmit(onSubmit)}>
                     <DialogContent sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Button variant="outlined" component="span" sx={{ mr: 1 }} onClick={exportExcel}>
-                            Tải File mẫu
-                        </Button>
+                        <Box>
+                            <Button variant="outlined" component="span" sx={{ mb: 1 }} onClick={exportExcel}>
+                                Tải File mẫu
+                            </Button>
+                            {errorList.length === 0 ? (
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    component="span"
+                                    sx={{ mr: 1 }}
+                                    onClick={exportErrorList}
+                                >
+                                    Tải danh sách người bị lỗi
+                                </Button>
+                            ) : null}
+                        </Box>
+
                         <input type="file" accept=".xlsx" {...register('file')} />
                     </DialogContent>
                     <DialogActions>
