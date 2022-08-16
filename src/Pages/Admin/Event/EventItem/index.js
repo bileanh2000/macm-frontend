@@ -23,7 +23,7 @@ import { Fragment, useCallback, useState } from 'react';
 import { useSnackbar } from 'notistack';
 import eventApi from 'src/api/eventApi';
 
-function EventItem({ data, onSuccess, user }) {
+function EventItem({ data, onSuccess }) {
     const [eventOnclick, SetEventOnclick] = useState({ name: '', id: '' });
     const [openDialog, setOpenDialog] = useState(false);
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();

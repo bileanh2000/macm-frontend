@@ -351,6 +351,7 @@ function ClubFund() {
                             </CardActionArea>
                         </Paper>
                     </Box>
+
                     <Box
                         sx={{
                             height: '70vh',
@@ -379,6 +380,7 @@ function ClubFund() {
                             rowsPerPageOptions={[10, 20, 30]}
                             components={{
                                 Toolbar: CustomToolbar,
+                                NoRowsOverlay: CustomNoRowsOverlay,
                             }}
                             sx={{
                                 '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
@@ -386,6 +388,43 @@ function ClubFund() {
                                 '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' },
                             }}
                         />
+                        {/* <Box>
+                            sx=
+                            {{
+                                height: '70vh',
+                                width: '100%',
+                                '& .status-rows': {},
+                                '& .status-rows.active': {
+                                    color: '#56f000',
+                                    fontWeight: '600',
+                                    textAlign: 'center',
+                                },
+                                '& .status-rows.deactive': {
+                                    color: '#ff3838',
+                                    fontWeight: '600',
+                                },
+                            }}
+                            >
+                            <DataGrid
+                                // loading={!userList.length}
+                                disableSelectionOnClick={true}
+                                rows={rowsUser}
+                                getRowHeight={() => 'auto'}
+                                getEstimatedRowHeight={() => 200}
+                                columns={columns}
+                                pageSize={pageSize}
+                                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                                rowsPerPageOptions={[10, 20, 30]}
+                                components={{
+                                    Toolbar: CustomToolbar,
+                                }}
+                                sx={{
+                                    '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
+                                    '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
+                                    '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' },
+                                }}
+                            />
+                        </Box> */}
                     </Box>
                 </Container>
             </Box>

@@ -101,11 +101,8 @@ function TournamentSchedule({ isUpdate }) {
     const [isOpenEditSessionDialog, setIsOpenEditSessionDialog] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
-
     const [isRender, setIsRender] = useState(true);
-
     const user = JSON.parse(localStorage.getItem('currentUser'));
-
 
     const goToSemester = (date) => {
         let calApi = calendarComponentRef.current.getApi();

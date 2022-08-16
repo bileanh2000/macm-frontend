@@ -19,7 +19,7 @@ import { useSnackbar } from 'notistack';
 
 import adminTournament from 'src/api/adminTournamentAPI';
 
-function TournamentItem({ data, onSuccess, user }) {
+function TournamentItem({ data, onSuccess }) {
     let navigator = useNavigate();
     const [tournamentOnclick, SetTournamentOnclick] = useState({ name: '', id: '' });
     const [openDialog, setOpenDialog] = useState(false);

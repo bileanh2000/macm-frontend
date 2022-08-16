@@ -53,6 +53,7 @@ function Event() {
     const [startDateOfSemester, setStartDateOfSemester] = useState();
     const calendarComponentRef = useRef(null);
     const user = JSON.parse(localStorage.getItem('currentUser'));
+
     let navigate = useNavigate();
     const handleChange = (event) => {
         setSemester(event.target.value);

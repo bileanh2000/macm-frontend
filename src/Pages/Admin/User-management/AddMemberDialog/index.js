@@ -129,7 +129,6 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
     Yup.addMethod(Yup.mixed, 'uniqueEmail', uniqueEmail);
     Yup.addMethod(Yup.mixed, 'uniquePhone', uniquePhone);
     const validationSchema = Yup.object().shape({
-
         name: Yup.string()
             .strict(false)
             .trim('Không để trống')

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { ModeEditOutline, DeleteForeverOutlined, AddCircle } from '@mui/icons-material';
 import {
@@ -20,13 +19,14 @@ import {
     Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 
 import adminRuleAPI from 'src/api/adminRuleAPI';
 import CreateRule from './CreateRule/CreateRule';
 import EditRule from './EditRule/EditRule';
-import { IfAnyGranted } from 'react-authorization';
 
+import ListRule from '../Rules/ViewRule/ListRule';
+import { IfAnyGranted } from 'react-authorization';
 
 function Rules() {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -98,106 +98,106 @@ function Rules() {
     };
 
     return (
-
-       
         <IfAnyGranted
             expected={['ROLE_ViceHeadClub', 'ROLE_HeadClub', 'ROLE_HeadCulture', 'ROLE_ViceHeadCulture']}
             actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
             unauthorized={<Navigate to="/forbidden" />}
         >
-             <Box sx={{ m: 1, p: 1 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
-                    Danh sách nội quy
-                </Typography>
-                <Button
-                    variant="outlined"
-                    sx={{ maxHeight: '50px', minHeight: '50px' }}
-                    // component={Link}
-                    // to={'./create'}
-                    onClick={() => setCreateDialogOpen(true)}
-                    startIcon={<AddCircle />}
-                >
-                    Tạo nội quy mới
-                </Button>
-            </Box>
-            <Divider />
-            <Box sx={{ m: 2 }}>
-                <Box>
-                    <Dialog
-                        fullWidth
-                        maxWidth="md"
-                        open={openConfirm}
-                        onClose={handleCloseConfirm}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
+            <Box sx={{ m: 1, p: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+                        Danh sách nội quy
+                    </Typography>
+                    <Button
+                        variant="outlined"
+                        sx={{ maxHeight: '50px', minHeight: '50px' }}
+                        // component={Link}
+                        // to={'./create'}
+                        onClick={() => setCreateDialogOpen(true)}
+                        startIcon={<AddCircle />}
                     >
-                        <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                            Xác nhận
-                        </DialogTitle>
-                        <DialogContent>Bạn có chắc chắn muốn xóa nội quy này?</DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleCloseConfirm}>Hủy</Button>
-                            <Button onClick={handleOpenConfirm} autoFocus>
-                                Đồng ý
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
-                    {rules.map((row, index) => (
-                        <Paper elevation={1} key={index} sx={{ minHeight: 10, p: 2, m: 2 }}>
-                            <Grid container spacing={2} sx={{ m: 0, alignItems: 'center' }}>
-                                <Grid item xs={1}>
-                                    {(page - 1) * pageSize + index + 1}
-                                </Grid>
-                                <Grid item xs={9}>
-                                    {row.description}
-                                </Grid>
-                                <Grid item xs={1}>
-                                    <IconButton onClick={() => handleEdit(row)}>
-                                        <ModeEditOutline color="primary" />
-                                    </IconButton>
-                                </Grid>
-                                <Grid item xs={1} onClick={() => handleDelete(row.id)}>
-                                    <DeleteForeverOutlined color="primary" />
-                                </Grid>
-                            </Grid>
-                        </Paper>
-                    ))}
-                    {total > 1 && (
-                        <Stack spacing={2}>
-                            <Pagination count={total} page={page} onChange={handleChange} />
-                        </Stack>
-                    )}
+                        Tạo nội quy mới
+                    </Button>
                 </Box>
-                <CreateRule
-                    isOpen={createDialogOpen}
-                    handleClose={() => {
-                        // setIsOpenEditSessionDialog(false);
-                        // setSelectedDate(null);
-                        setCreateDialogOpen(false);
-                    }}
-                    onSucess={() => {
-                        setIsRender(true);
-                    }}
-                />
-                {rule && (
-                    <EditRule
-                        isOpen={editDialogOpen}
-                        rule={rule}
+                <Divider />
+                <Box sx={{ m: 2 }}>
+                    <Box>
+                        <Dialog
+                            fullWidth
+                            maxWidth="md"
+                            open={openConfirm}
+                            onClose={handleCloseConfirm}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle
+                                id="alert-dialog-title"
+                                sx={{ display: 'flex', justifyContent: 'space-between' }}
+                            >
+                                Xác nhận
+                            </DialogTitle>
+                            <DialogContent>Bạn có chắc chắn muốn xóa nội quy này?</DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleCloseConfirm}>Hủy</Button>
+                                <Button onClick={handleOpenConfirm} autoFocus>
+                                    Đồng ý
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                        {rules.map((row, index) => (
+                            <Paper elevation={1} key={index} sx={{ minHeight: 10, p: 2, m: 2 }}>
+                                <Grid container spacing={2} sx={{ m: 0, alignItems: 'center' }}>
+                                    <Grid item xs={1}>
+                                        {(page - 1) * pageSize + index + 1}
+                                    </Grid>
+                                    <Grid item xs={9}>
+                                        {row.description}
+                                    </Grid>
+                                    <Grid item xs={1}>
+                                        <IconButton onClick={() => handleEdit(row)}>
+                                            <ModeEditOutline color="primary" />
+                                        </IconButton>
+                                    </Grid>
+                                    <Grid item xs={1} onClick={() => handleDelete(row.id)}>
+                                        <DeleteForeverOutlined color="primary" />
+                                    </Grid>
+                                </Grid>
+                            </Paper>
+                        ))}
+                        {total > 1 && (
+                            <Stack spacing={2}>
+                                <Pagination count={total} page={page} onChange={handleChange} />
+                            </Stack>
+                        )}
+                    </Box>
+                    <CreateRule
+                        isOpen={createDialogOpen}
                         handleClose={() => {
                             // setIsOpenEditSessionDialog(false);
                             // setSelectedDate(null);
-                            setEditDialogOpen(false);
+                            setCreateDialogOpen(false);
                         }}
                         onSucess={() => {
                             setIsRender(true);
                         }}
                     />
-                )}
+                    {rule && (
+                        <EditRule
+                            isOpen={editDialogOpen}
+                            rule={rule}
+                            handleClose={() => {
+                                // setIsOpenEditSessionDialog(false);
+                                // setSelectedDate(null);
+                                setEditDialogOpen(false);
+                            }}
+                            onSucess={() => {
+                                setIsRender(true);
+                            }}
+                        />
+                    )}
+                </Box>
             </Box>
-        </Box>
         </IfAnyGranted>
-
     );
 }
 

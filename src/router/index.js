@@ -183,15 +183,11 @@ const userRouter = [
     { path: '/events', component: EventListPage, layout: HeaderOnly },
     { path: '/events/:id', component: UserEventDetails, layout: HeaderOnly },
     { path: '/home', component: Home, layout: HeaderOnly },
-
     { path: '/rule', component: Rule, layout: HeaderOnly },
-    //{ path: '/:userId', component: UserProfile, layout: HeaderOnly },
-    //{ path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
-
-    { path: '/rule', component: Rule, layout: HeaderOnly },
+    { path: '/:userId', component: UserProfile, layout: HeaderOnly },
+    { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
     { path: '/profile/:userId', component: UserProfile, layout: HeaderOnly },
     { path: '/profile/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
-
     { path: '/tournament', component: UserTournament, layout: HeaderOnly },
     { path: '/tournament/:tournamentId', component: UserTournamentDetail, layout: HeaderOnly },
     // 403 Page
