@@ -142,6 +142,11 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
+    editRoleTournament: (tournamentId, params) => {
+        const url = `/tournament/headclub/editroletournament/${tournamentId}`;
+        return axiosClient.put(url, params);
+    },
+
     deleteTournamentOrganizingCommittee: (tournamentOrganizingCommitteeId) => {
         const url = `/tournament/headclub/deletetournamentorganizingcommittee/${tournamentOrganizingCommitteeId}`;
         return axiosClient.delete(url);
