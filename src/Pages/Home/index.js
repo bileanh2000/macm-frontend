@@ -26,9 +26,10 @@ import notificationApi from 'src/api/notificationApi';
 function Index() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
-    const [paymentStatus, setPaymentStatus] = useState([]);
+    const [paymentMessage, setPaymentMessage] = useState([]);
 
     const roleId = JSON.parse(localStorage.getItem('currentUser')).role.id;
+    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
     const handleOpenNotificationDialog = () => {
         setOpenNotificationDialog(true);
@@ -42,7 +43,7 @@ function Index() {
         try {
             const response = await notificationApi.checkPaymentStatus(studentId);
             console.log('fetchPaymentNotification', response);
-            setPaymentStatus(response.data);
+            setPaymentMessage(response.message);
         } catch (error) {
             console.log('failed when fetchPaymentNotification', error);
         }
@@ -64,9 +65,10 @@ function Index() {
             setIsAdmin(true);
         }
         // localStorage.setItem('alreadyVisited', 'true');
-        let visited = localStorage['toShowPopup'] !== 'true';
+        fetchPaymentNotification(studentId);
 
-        if (!visited) {
+        let visited = localStorage['toShowPopup'] !== 'true';
+        if (!visited || paymentMessage === 'Không có khoản nào phải đóng') {
             handleOpenNotificationDialog();
         }
     }, []);

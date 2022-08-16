@@ -65,6 +65,20 @@ function CheckAttendanceDate() {
         fetchEventSessionByDate(currentDate);
         fetchTrainingSessionByDate(currentDate);
     }, [currentDate]);
+    useEffect(() => {
+        const now = new Date();
+        let setupTime = localStorage.getItem('setupTime');
+        if (setupTime == null) {
+            localStorage.setItem('setupTime', now);
+        } else {
+            if (now - new Date(setupTime) > 1 * 60 * 60 * 1000) {
+                localStorage.removeItem('attendanced');
+                localStorage.removeItem('setupTime');
+                localStorage.setItem('setupTime', now);
+            }
+        }
+        console.log('test', now - new Date(setupTime));
+    }, []);
     return (
         // <Box sx={{ display: 'flex', height: '100%', width: '100wh', alignItems: 'center', justifyContent: 'center' }}>
         <Fragment>

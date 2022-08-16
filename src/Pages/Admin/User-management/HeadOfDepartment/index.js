@@ -203,7 +203,7 @@ function HeadOfDepartment() {
                                         dateOfBirth: updatedUser.dateOfBirth,
                                         generation: updatedUser.generation,
                                         studentId: updatedUser.studentId,
-                                        role: updatedUser.roleName,
+                                        roleName: updatedUser.roleName,
                                         phone: updatedUser.phone,
                                         currentAddress: updatedUser.currentAddress,
                                         roleId: updatedUser.roleId,

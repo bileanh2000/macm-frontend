@@ -63,13 +63,14 @@ function QRScanner({ activityData, activityType }) {
         if (setupTime == null) {
             localStorage.setItem('setupTime', now);
         } else {
-            if (now - setupTime > LIMIT_TIME * 60 * 60 * 1000) {
+            if (now - new Date(setupTime) > LIMIT_TIME * 60 * 60 * 1000) {
                 localStorage.removeItem('attendanced');
                 localStorage.removeItem('setupTime');
                 localStorage.setItem('setupTime', now);
             }
         }
-    });
+        console.log('test', now - new Date(setupTime));
+    }, [now]);
 
     const reload = () => {
         window.location.reload();
