@@ -277,48 +277,40 @@ function CreateTournament({
                   //       .typeError('Vui lòng không để trống trường này')
                   //       .required('Vui lòng không để trống trường này'),
                   finishDate: Yup.date()
-                      .test('same_dates_test', 'Ngày bắt đầu và ngày kết thúc không được bằng nhau', function (value) {
-                          const { startDate } = this.parent;
-                          //   console.log(value, this.parent);
-                          return value.getDate() !== startDate.getDate();
-                      })
+                      //   .test('same_dates_test', 'Ngày bắt đầu và ngày kết thúc không được bằng nhau', function (value) {
+                      //       const { startDate } = this.parent;
+                      //       //   console.log(value, this.parent);
+                      //       return value.getDate() !== startDate.getDate();
+                      //   })
                       .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
                       .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
                       .required('Vui lòng không để trống trường này')
-                      .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy')
-                      .required('Vui lòng không để trống trường này'),
+                      .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy'),
+                  // .required('Vui lòng không để trống trường này'),
                   startTime: Yup.date()
                       .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm')
                       .required('Vui lòng không để trống trường này'),
-                  endTime: Yup.date()
+                  finishTime: Yup.date()
                       .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được bé hơn thời gian bắt đầu`)
                       .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm')
                       .required('Vui lòng không để trống trường này'),
+
                   datePlayerDeadline: Yup.date()
                       .min(min, 'Vui lòng không nhập ngày trong quá khứ')
                       .max(Yup.ref('startDate'), ({ max }) => `Deadline không được muộn hơn thời gian bắt đầu`)
                       .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy HH:mm')
                       .required('Vui lòng không để trống trường này'),
-                  ...(!skipped.has(1)
-                      ? {
-                            dateCommitteeDeadline: Yup.date()
-                                .max(
-                                    Yup.ref('startDate'),
-                                    ({ min }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`,
-                                )
-                                .min(min, 'Vui lòng không nhập ngày trong quá khứ')
-                                .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy HH:mm')
-                                .required('Vui lòng không để trống trường này')
-                                .test(
-                                    'same_dates_test',
-                                    'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu',
-                                    function (value) {
-                                        const { startDate } = this.parent;
-                                        return value.getDate() !== startDate.getDate();
-                                    },
-                                ),
-                        }
-                      : null),
+
+                  dateCommitteeDeadline: Yup.date()
+                      .max(Yup.ref('startDate'), ({ min }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`)
+                      .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+                      .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy HH:mm')
+                      .required('Vui lòng không để trống trường này')
+                      .test('same_dates_test', 'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu', function (value) {
+                          const { startDate } = this.parent;
+                          return value.getDate() !== startDate.getDate();
+                      }),
+
                   //   startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
                   //   finishDate: Yup.date()
                   //       .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được bé hơn ngày bắt đầu`)
