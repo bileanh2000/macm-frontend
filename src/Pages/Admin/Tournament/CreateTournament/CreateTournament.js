@@ -1445,23 +1445,25 @@ function CreateTournament({
                         )}
                         <Box>
                             {isStepOptional(activeStep) && (
-                                <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
+                                <Button variant="outlined" color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
                                     Bỏ qua
                                 </Button>
                             )}
                             {activeStep === steps.length - 1 ? (
                                 <Button
+                                    variant="contained"
                                     onClick={handleSubmit(handleCreateTournament)}
                                     disabled={submitOption != 0 && existedDate.length !== 0}
                                 >
                                     Tạo giải đấu
                                 </Button>
                             ) : activeStep === 1 ? (
-                                <Button onClick={handleNext} disabled={datas.length === 0}>
+                                <Button variant="contained" onClick={handleNext} disabled={datas.length === 0}>
                                     {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}
                                 </Button>
                             ) : activeStep === 2 ? (
                                 <Button
+                                    variant="contained"
                                     onClick={handleNext}
                                     disabled={
                                         datasFightingCompetition &&
@@ -1473,9 +1475,11 @@ function CreateTournament({
                                     {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}
                                 </Button>
                             ) : activeStep === 4 ? (
-                                <Button onClick={handleSubmit(handlePreviewSchedule)}>Xem trước</Button>
+                                <Button variant="contained" onClick={handleSubmit(handlePreviewSchedule)}>
+                                    Xem trước
+                                </Button>
                             ) : (
-                                <Button onClick={handleNext} disabled={!isValid}>
+                                <Button variant="contained" onClick={handleNext} disabled={!isValid}>
                                     Tiếp tục
                                 </Button>
                             )}

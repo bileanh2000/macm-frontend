@@ -252,7 +252,7 @@ function EditUserProfile() {
         const roleId = roleData.filter((item) => item.name === data.roleName);
         data = {
             ...data,
-            setId: userId,
+            studentId: userId,
             roleId: roleId[0].id,
             image: imageSrc,
         };

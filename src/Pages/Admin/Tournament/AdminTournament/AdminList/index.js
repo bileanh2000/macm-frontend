@@ -19,6 +19,7 @@ import { useSnackbar } from 'notistack';
 import RegisterAdmin from './RegisterAdmin';
 import userTournamentAPI from 'src/api/userTournamentAPI';
 import adminTournament from 'src/api/adminTournamentAPI';
+import UpdateRole from './UpdateRole';
 
 function AdminList({ adminList, value, index, active, total, isUpdate, user, Success, tournamentId, onChange }) {
     const { enqueueSnackbar } = useSnackbar();
@@ -29,7 +30,9 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
     const [openDelete, setOpenDelete] = useState(false);
     const [tournamentAdminId, setTournamentAdminId] = useState();
     const [openDialog, setOpenDialog] = useState(false);
+    const [openDialogEdit, setOpenDialogEdit] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
+    const [isRender, setIsRender] = useState(true);
     useEffect(() => {
         setData(adminList);
     }, [adminList]);
@@ -92,14 +95,15 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
         const getRoleInTournament = async () => {
             try {
                 const response = await userTournamentAPI.getAllOrginizingCommitteeRole(tournamentId);
-                console.log(response);
+                console.log('role', response);
                 setRoleInTournament(response.data);
+                setIsRender(false);
             } catch (error) {
                 console.log('Khong the lay duoc role', error);
             }
         };
-        getRoleInTournament();
-    }, [tournamentId]);
+        isRender && getRoleInTournament();
+    }, [tournamentId, roleInTournament, isRender]);
 
     const columns = [
         { field: 'studentName', headerName: 'Tên', flex: 0.6 },
@@ -319,13 +323,20 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 },
             }}
         >
-            {isEdit && (
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button variant="contained" onClick={handleOpenDialogSave} sx={{ m: 1 }} disabled={!isEdit}>
-                        Lưu lại
+            <Box sx={{ mb: 2, float: 'right' }}>
+                {!isUpdate && (
+                    <Button variant="outlined" sx={{ mr: 2 }} onClick={() => setOpenDialogEdit(true)}>
+                        Chỉnh sửa vai trò của giải đấu
                     </Button>
-                </Box>
-            )}
+                )}
+                {isEdit && (
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button variant="contained" onClick={handleOpenDialogSave} sx={{ m: 1 }} disabled={!isEdit}>
+                            Lưu lại
+                        </Button>
+                    </Box>
+                )}
+            </Box>
             <DataGrid
                 // loading={data.length === 0}
                 disableSelectionOnClick={true}
@@ -367,6 +378,30 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 </Dialog>
             )}
 
+            {roleInTournament.length > 0 && (
+                <UpdateRole
+                    title="Đăng kí tham gia ban tổ chức"
+                    isOpen={openDialogEdit}
+                    handleClose={() => {
+                        setOpenDialogEdit(false);
+                    }}
+                    tournamentId={tournamentId}
+                    user={user}
+                    roles={roleInTournament}
+                    onSuccess={() => {
+                        // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
+                        //     return;
+                        // }
+                        // setCompetitivePlayer([...newItem, ...competitivePlayer]);
+                        // Success && Success(newItem);
+                        setOpenDialogEdit(false);
+                    }}
+                    onChange={() => {
+                        onChange && onChange();
+                        setIsRender(true);
+                    }}
+                />
+            )}
             {roleInTournament.length > 0 && (
                 <RegisterAdmin
                     title="Đăng kí tham gia ban tổ chức"
