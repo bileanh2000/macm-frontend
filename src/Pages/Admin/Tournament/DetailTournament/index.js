@@ -24,7 +24,7 @@ import {
 import PropTypes from 'prop-types';
 import { Box } from '@mui/system';
 import { useCallback, useState, Fragment, useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import { Controller, useForm } from 'react-hook-form';
 import { Edit, EmojiEvents } from '@mui/icons-material';
@@ -36,6 +36,8 @@ import AdminTournament from '../AdminTournament';
 import MemberTournament from '../MemberTournament';
 import TournamentFee from './TournamentFee';
 import TournamentBacket from './TournamentBacket';
+import Preview from './TournamentSchedule/preview';
+import { IfAnyGranted } from 'react-authorization';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -180,118 +182,166 @@ function DetailTournament() {
     const handleUpdateTournament = (data) => {
         setTournament(data);
     };
-
+    useEffect(() => {
+        if (user.role.name === 'ROLE_Treasurer') {
+            setValue(2);
+        }
+    }, []);
     return (
-        <Box sx={{ m: 1, p: 1, height: '80vh' }}>
-            <Dialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa sự kiện này ?`}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Sự kiện sẽ được xóa khỏi hệ thống !
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
-                    <Button onClick={handleDelete(tournamentId)} autoFocus>
-                        Đồng ý
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            {tournament && scheduleData.length > 0 && (
-                <Fragment>
-                    <Paper elevation={3}>
-                        <Container maxWidth="lg">
-                            <Box sx={{ display: 'flex', pt: 1 }}>
-                                <Box>
-                                    <Box
-                                        sx={{
-                                            backgroundColor: '#F0F0F0',
-                                            padding: 0.8,
-                                            mr: 2,
-                                            borderRadius: '10px',
-                                            width: '4em',
-                                            height: '4em',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            flex: 1,
-                                        }}
-                                    >
-                                        <EmojiEvents fontSize="large" sx={{ color: '#0ACE70' }} />
+        <IfAnyGranted
+            expected={['ROLE_HeadTechnique', 'ROLE_HeadClub', 'ROLE_ViceHeadTechnique']}
+            actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
+            unauthorized={<Navigate to="/forbidden" />}
+        >
+            <Box sx={{ m: 1, p: 1, height: '80vh' }}>
+                <Dialog
+                    open={openDialog}
+                    onClose={handleCloseDialog}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa sự kiện này ?`}</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Sự kiện sẽ được xóa khỏi hệ thống !
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
+                        <Button onClick={handleDelete(tournamentId)} autoFocus>
+                            Đồng ý
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                {tournament && scheduleData.length > 0 && (
+                    <Fragment>
+                        <Paper elevation={3}>
+                            <Container maxWidth="lg">
+                                <Box sx={{ display: 'flex', pt: 1 }}>
+                                    <Box>
+                                        <Box
+                                            sx={{
+                                                backgroundColor: '#F0F0F0',
+                                                padding: 0.8,
+                                                mr: 2,
+                                                borderRadius: '10px',
+                                                width: '4em',
+                                                height: '4em',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                flex: 1,
+                                            }}
+                                        >
+                                            <EmojiEvents fontSize="large" sx={{ color: '#0ACE70' }} />
+                                        </Box>
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="h4" sx={{ fontSize: 'bold' }}>
+                                            {tournament.name}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ fontSize: 'bold' }}>
+                                            {scheduleData[0].date} - {scheduleData[scheduleData.length - 1].date}
+                                        </Typography>
                                     </Box>
                                 </Box>
+                                <Divider />
                                 <Box>
-                                    <Typography variant="h4" sx={{ fontSize: 'bold' }}>
-                                        {tournament.name}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ fontSize: 'bold' }}>
-                                        {scheduleData[0].date} - {scheduleData[scheduleData.length - 1].date}
-                                    </Typography>
+                                    {user.role.name === 'ROLE_Treasurer' ? (
+                                        <Tabs
+                                            value={value}
+                                            onChange={handleChange}
+                                            variant="scrollable"
+                                            scrollButtons="auto"
+                                        >
+                                            <Tab label="Chi phí" {...a11yProps(2)} value={2} />
+                                            <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
+                                            <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />
+                                        </Tabs>
+                                    ) : user.role.name === 'ROLE_HeadClub' ||
+                                      user.role.name === 'ROLE_HeadTechnique' ||
+                                      user.role.name === 'ROLE_ViceHeadTechnique' ? (
+                                        <Tabs
+                                            value={value}
+                                            onChange={handleChange}
+                                            variant="scrollable"
+                                            scrollButtons="auto"
+                                        >
+                                            <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
+                                            <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />
+                                            <Tab label="Chi phí" {...a11yProps(2)} value={2} />
+                                            <Tab label="Danh sách ban tổ chức" {...a11yProps(3)} value={3} />
+                                            <Tab label="Danh sách vận động viên" {...a11yProps(4)} value={4} />
+                                            <Tab label="Bảng đấu" {...a11yProps(5)} value={5} />
+                                        </Tabs>
+                                    ) : (
+                                        <Tabs
+                                            value={value}
+                                            onChange={handleChange}
+                                            variant="scrollable"
+                                            scrollButtons="auto"
+                                        >
+                                            <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
+                                            <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />
+                                            <Tab label="Chi phí" {...a11yProps(2)} value={2} />
+                                            <Tab label="Bảng đấu" {...a11yProps(5)} value={5} />
+                                        </Tabs>
+                                    )}
                                 </Box>
-                            </Box>
-                            <Divider />
-                            <Box>
-                                <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto">
-                                    <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
-                                    <Tab label="Lịch giải đấu" {...a11yProps(1)} value={1} />
-                                    <Tab label="Chi phí" {...a11yProps(2)} value={2} />
-                                    <Tab label="Danh sách ban tổ chức" {...a11yProps(3)} value={3} />
-                                    <Tab label="Danh sách vận động viên" {...a11yProps(4)} value={4} />
-                                    <Tab label="Bảng đấu" {...a11yProps(5)} value={5} />
-                                </Tabs>
-                            </Box>
-                        </Container>
-                    </Paper>
-                    <Paper elevation={3} sx={{ mt: 1 }}>
-                        <TournamentOverview
-                            tournament={tournament}
-                            onUpdateTournament={handleUpdateTournament}
-                            value={value}
-                            index={0}
-                            startTime={scheduleList[0].date}
-                            isUpdate={isUpdate}
-                            onChangeTab={handleChangeTab}
-                        />
-                        <TabPanel value={value} index={1}>
-                            <TournamentSchedule isUpdate={isUpdate} />
-                        </TabPanel>
-                        <TabPanel value={value} index={2}>
-                            <TournamentFee
+                            </Container>
+                        </Paper>
+                        <Paper elevation={3} sx={{ mt: 1 }}>
+                            <TournamentOverview
                                 tournament={tournament}
-                                tournamentStatus={tournament.status}
-                                isFinish={isFinish}
-                            />
-                        </TabPanel>
-                        <TabPanel value={value} index={3}>
-                            <AdminTournament isUpdate={isUpdate} user={user} />
-                        </TabPanel>
-                        <TabPanel value={value} index={4}>
-                            <MemberTournament
-                                tournament={tournament}
-                                tournamentStatus={tournament.status}
+                                onUpdateTournament={handleUpdateTournament}
+                                value={value}
+                                index={0}
+                                startTime={scheduleList[0].date}
                                 isUpdate={isUpdate}
+                                onChangeTab={handleChangeTab}
                             />
-                        </TabPanel>
-                        <TabPanel value={value} index={5}>
-                            <TournamentBacket
-                                tournament={tournament}
-                                tournamentStatus={tournament.status}
-                                valueTab={valueTab}
-                                type={type}
-                                endDate={
-                                    scheduleList.length > 0 && new Date(scheduleList[scheduleList.length - 1].date)
-                                }
-                            />
-                        </TabPanel>
-                    </Paper>
-                </Fragment>
-            )}
-        </Box>
+                            <TabPanel value={value} index={1}>
+                                {user.role.name === 'ROLE_HeadClub' ||
+                                user.role.name === 'ROLE_HeadTechnique' ||
+                                user.role.name === 'ROLE_ViceHeadTechnique' ? (
+                                    <TournamentSchedule isUpdate={isUpdate} />
+                                ) : (
+                                    <Preview />
+                                )}
+                            </TabPanel>
+                            <TabPanel value={value} index={2}>
+                                <TournamentFee
+                                    tournament={tournament}
+                                    tournamentStatus={tournament.status}
+                                    isFinish={isFinish}
+                                />
+                            </TabPanel>
+                            <TabPanel value={value} index={3}>
+                                <AdminTournament isUpdate={isUpdate} user={user} />
+                            </TabPanel>
+                            <TabPanel value={value} index={4}>
+                                <MemberTournament
+                                    tournament={tournament}
+                                    tournamentStatus={tournament.status}
+                                    isUpdate={isUpdate}
+                                />
+                            </TabPanel>
+                            <TabPanel value={value} index={5}>
+                                <TournamentBacket
+                                    tournament={tournament}
+                                    tournamentStatus={tournament.status}
+                                    valueTab={valueTab}
+                                    type={type}
+                                    endDate={
+                                        scheduleList.length > 0 && new Date(scheduleList[scheduleList.length - 1].date)
+                                    }
+                                />
+                            </TabPanel>
+                        </Paper>
+                    </Fragment>
+                )}
+            </Box>
+        </IfAnyGranted>
     );
 }
 

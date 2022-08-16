@@ -2,11 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
-import { useLocation } from 'react-router-dom';
+
+import { Navigate, useLocation } from 'react-router-dom';
 import { Divider, styled, Typography } from '@mui/material';
+
 import moment from 'moment';
 
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
+
+import { IfAllGranted, IfAuthorized, IfAnyGranted } from 'react-authorization';
+import ForbiddenPage from 'src/Pages/ForbiddenPage';
 
 function ReportMembership() {
     const [pageSize, setPageSize] = useState(10);
@@ -155,7 +160,12 @@ function ReportMembership() {
         );
     }
     return (
-        <Box sx={{ m: 1, p: 1 }}>
+        <IfAnyGranted
+            expected={['ROLE_Treasurer', 'ROLE_HeadClub']}
+            actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
+            unauthorized={<Navigate to="/forbidden" />}
+        >
+            <Box sx={{ m: 1, p: 1 }}>
             {semester && (
                 <Box>
                     <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
@@ -203,11 +213,11 @@ function ReportMembership() {
                     sx={{
                         '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
                         '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
-                        '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' },
-                    }}
-                />
+                        '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' },)}
+                    />
+                </Box>
             </Box>
-        </Box>
+        </IfAnyGranted>
     );
 }
 

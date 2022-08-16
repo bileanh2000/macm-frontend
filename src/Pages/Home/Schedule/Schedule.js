@@ -61,7 +61,7 @@ function Schedule() {
     };
     useEffect(() => {
         fetchCommonScheduleBySemester(type, studentId);
-    }, [type]);
+    }, [type, studentId]);
 
     const scheduleData = commonList.map((item) => {
         const container = {};

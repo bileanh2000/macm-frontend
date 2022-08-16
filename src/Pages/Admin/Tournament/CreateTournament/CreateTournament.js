@@ -86,7 +86,7 @@ function CreateTournament({
     const [datasFightingCompetition, setDataFightingCompetition] = useState(competitiveType);
     const [datasPerformanceCompetition, setDataPerformanceCompetition] = useState(exhibitionType);
     const [existedDate, setExistedDate] = useState([]);
-    const [submitOption, setSubmitOption] = useState(0);
+    const [submitOption, setSubmitOption] = useState(-1);
     const [isOpenPreviewDialog, setIsOpenPreviewDialog] = useState(false);
     const [isEditableSchedule, setIsEditableSchedule] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);

@@ -129,16 +129,25 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
     Yup.addMethod(Yup.mixed, 'uniqueEmail', uniqueEmail);
     Yup.addMethod(Yup.mixed, 'uniquePhone', uniquePhone);
     const validationSchema = Yup.object().shape({
-        name: Yup.string().trim()
+
+        name: Yup.string()
+            .strict(false)
+            .trim('Không để trống')
+            .min(2, 'Must be longer than 2 characters')
+            .max(20, 'Nice try, nobody has a first name that long')
+            .required('Required'),
+        // .nullable()
+        // .required('Không được để trống trường này')
+        // .test('len', 'Độ dài không cho phép', (val) => val.length > 5)
+        // .matches(
+        //     /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹẾỀếề ]+$/,
+        //     'Không hợp lệ: vui lòng nhập chữ',
+        // ),
+        studentId: Yup.mixed().uniqueStudentId(),
+        dateOfBirth: Yup.date()
             .nullable()
             .required('Không được để trống trường này')
-            .test('len', 'Độ dài không cho phép', (val) => val.length > 5)
-            .matches(
-                /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹẾỀếề ]+$/,
-                'Không hợp lệ: vui lòng nhập chữ',
-            ),
-        studentId: Yup.mixed().uniqueStudentId(),
-        dateOfBirth: Yup.string().nullable().required('Không được để trống trường này'),
+            .typeError('Vui lòng chọn đúng định dạng ngày'),
         email: Yup.mixed().uniqueEmail(),
         gender: Yup.string().required('Không được để trống trường này'),
         phone: Yup.mixed().uniquePhone(),
@@ -159,7 +168,7 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
         formState: { errors, isSubmitSuccessful },
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onChange',
+        mode: 'onBlur',
     });
 
     const onSubmit = async (data) => {
@@ -176,18 +185,18 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
             generation: data.generation,
             active: true,
         };
-        await userApi.createUser(dataFormat).then((res) => {
-            console.log('1', res);
-            console.log('2', res.data);
-            if (res.data.length != 0) {
-                enqueueSnackbar(res.message, { variant: 'success' });
-                onSucess && onSucess(res.data[0]);
-                handleClose();
-            } else {
-                console.log('huhu');
-                enqueueSnackbar(res.message, { variant: 'error' });
-            }
-        });
+        // await userApi.createUser(dataFormat).then((res) => {
+        //     console.log('1', res);
+        //     console.log('2', res.data);
+        //     if (res.data.length != 0) {
+        //         enqueueSnackbar(res.message, { variant: 'success' });
+        //         onSucess && onSucess(res.data[0]);
+        //         handleClose();
+        //     } else {
+        //         console.log('huhu');
+        //         enqueueSnackbar(res.message, { variant: 'error' });
+        //     }
+        // });
 
         console.log('form submit', data);
     };
@@ -238,9 +247,9 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
                             <Box>
                                 <Typography sx={{ fontSize: '1.2rem' }}>Thông tin cá nhân</Typography>
                             </Box>
-                            <Box>
+                            {/* <Box>
                                 <Typography sx={{ fontSize: '1.2rem' }}>Thông tin liên hệ</Typography>
-                            </Box>
+                            </Box> */}
                         </Box>
                         <Box
                             sx={{
@@ -262,41 +271,12 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
                             <Box>
                                 <TextField
                                     required
-                                    fullWidth
-                                    id="outlined-disabled"
-                                    label="Email"
-                                    {...register('email')}
-                                    error={errors.email ? true : false}
-                                    helperText={errors.email?.message}
-                                />
-                            </Box>
-                        </Box>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                            }}
-                        >
-                            <Box>
-                                <TextField
-                                    required
                                     id="outlined-disabled"
                                     label="Mã sinh viên"
                                     fullWidth
                                     {...register('studentId')}
                                     error={errors.studentId ? true : false}
                                     helperText={errors.studentId?.message}
-                                />
-                            </Box>
-                            <Box>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="outlined-disabled"
-                                    label="Số điện thoại"
-                                    {...register('phone')}
-                                    error={errors.phone ? true : false}
-                                    helperText={errors.phone?.message}
                                 />
                             </Box>
                         </Box>
@@ -340,21 +320,6 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
                             </Box>
                             <Box>
                                 <TextField
-                                    fullWidth
-                                    id="outlined-disabled"
-                                    label="Địa chỉ hiện tại"
-                                    {...register('currentAddress')}
-                                />
-                            </Box>
-                        </Box>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                            }}
-                        >
-                            <Box>
-                                <TextField
                                     required
                                     select
                                     fullWidth
@@ -367,6 +332,15 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
                                     <MenuItem value={true}>Nam</MenuItem>
                                     <MenuItem value={false}>Nữ</MenuItem>
                                 </TextField>
+                            </Box>
+                        </Box>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                            }}
+                        >
+                            <Box>
                                 <TextField
                                     required
                                     type="number"
@@ -397,6 +371,66 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
                                     <MenuItem value={14}>CTV Ban văn hóa</MenuItem>
                                     <MenuItem value={15}>CTV Ban chuyên môn</MenuItem>
                                 </TextField>
+                            </Box>
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                mb: 1,
+                            }}
+                        >
+                            <Box>
+                                <Typography sx={{ fontSize: '1.2rem' }}>Thông tin liên hệ</Typography>
+                            </Box>
+                            {/* <Box>
+                                <Typography sx={{ fontSize: '1.2rem' }}>Thông tin liên hệ</Typography>
+                            </Box> */}
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                            }}
+                        >
+                            <Box>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="outlined-disabled"
+                                    label="Số điện thoại"
+                                    {...register('phone')}
+                                    error={errors.phone ? true : false}
+                                    helperText={errors.phone?.message}
+                                />
+                            </Box>
+                            <Box>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="outlined-disabled"
+                                    label="Email"
+                                    {...register('email')}
+                                    error={errors.email ? true : false}
+                                    helperText={errors.email?.message}
+                                />
+                            </Box>
+                        </Box>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'flex-start',
+                            }}
+                        >
+                            <Box>
+                                <TextField
+                                    fullWidth
+                                    id="outlined-disabled"
+                                    label="Địa chỉ hiện tại"
+                                    {...register('currentAddress')}
+                                />
                             </Box>
                         </Box>
                     </Box>

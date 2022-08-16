@@ -94,6 +94,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
             .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
             .required('Vui lòng không để trống trường này')
             .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy'),
+
         endDate: Yup.date()
             .min(min, 'Vui lòng không nhập ngày trong quá khứ')
             .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
@@ -267,7 +268,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
             startDate.add(1, 'day');
             i++;
         }
-        console.log(daysOfWeek);
+        // console.log(daysOfWeek);
         return daysOfWeek;
     };
 
@@ -275,6 +276,11 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
         resetCheckbox();
         // getDaysOfWeekBetweenDates(selectStartDate, selectEndDate);
     }, [selectStartDate, selectEndDate]);
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+    }
     return (
         <Box>
             {/* {JSON.stringify(getDaysOfWeekBetweenDates(selectStartDate, selectEndDate))} */}
@@ -349,7 +355,10 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                         render={({ field: { onChange, value }, fieldState: { error } }) => (
                                             <DatePicker
                                                 label="Ngày bắt đầu"
-                                                disablePast
+
+                                                // disablePast
+                                                minDate={addDays(new Date(), 1)}
+
                                                 ampm={false}
                                                 value={value}
                                                 onChange={(value) => {
@@ -357,6 +366,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                                     console.log('startDate value', value);
                                                     setSelectStartDate(value);
                                                 }}
+                                                inputProps={{ readOnly: true }}
                                                 renderInput={(params) => (
                                                     <TextField
                                                         {...params}
@@ -388,7 +398,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                                 label="Ngày kết thúc"
                                                 // minDate={new Date('2022-06-29')}
                                                 // minDate={startDate}
-                                                disablePast
+                                                minDate={addDays(new Date(), 1)}
                                                 disableFuture={false}
                                                 // inputFormat="dd/MM/yyyy"
                                                 value={value}
@@ -396,6 +406,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                                     onChange(value);
                                                     setSelectEndDate(value);
                                                 }}
+                                                inputProps={{ readOnly: true }}
                                                 renderInput={(params) => (
                                                     <TextField
                                                         {...params}

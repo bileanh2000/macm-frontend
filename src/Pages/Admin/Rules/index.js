@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { ModeEditOutline, DeleteForeverOutlined, AddCircle } from '@mui/icons-material';
 import {
@@ -24,6 +25,8 @@ import { Link, useLocation } from 'react-router-dom';
 import adminRuleAPI from 'src/api/adminRuleAPI';
 import CreateRule from './CreateRule/CreateRule';
 import EditRule from './EditRule/EditRule';
+import { IfAnyGranted } from 'react-authorization';
+
 
 function Rules() {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -95,7 +98,14 @@ function Rules() {
     };
 
     return (
-        <Box sx={{ m: 1, p: 1 }}>
+
+       
+        <IfAnyGranted
+            expected={['ROLE_ViceHeadClub', 'ROLE_HeadClub', 'ROLE_HeadCulture', 'ROLE_ViceHeadCulture']}
+            actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
+            unauthorized={<Navigate to="/forbidden" />}
+        >
+             <Box sx={{ m: 1, p: 1 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
                     Danh sách nội quy
@@ -186,6 +196,8 @@ function Rules() {
                 )}
             </Box>
         </Box>
+        </IfAnyGranted>
+
     );
 }
 

@@ -19,6 +19,7 @@ function UpNext({ isAdmin }) {
         try {
             const response = await dashboardApi.getAllUpcomingActivities();
             setUpcomingActivity(response.data);
+            console.log('getAllUpcomingActivities', response);
         } catch (error) {
             console.log('failed at getAllUpcomingActivities:', error);
         }

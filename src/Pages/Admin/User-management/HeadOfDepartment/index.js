@@ -25,6 +25,7 @@ import { MenuItem, TextField } from '@mui/material';
 import moment from 'moment';
 import AddMemberDialog from '../AddMemberDialog';
 import ViewDetailMemberDialog from '../ViewDetailMemberDialog';
+import { useSnackbar } from 'notistack';
 
 function HeadOfDepartment() {
     let navigate = useNavigate();
@@ -38,6 +39,8 @@ function HeadOfDepartment() {
     const [isOpenAddMember, setIsOpenAddMember] = useState(false);
     const [isOpenViewMember, setIsOpenViewMember] = useState(false);
     const [isEditDialog, setIsEditDialog] = useState(false);
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -92,7 +95,10 @@ function HeadOfDepartment() {
         { field: 'role', headerName: 'Vai trò', flex: 1 },
         {
             hideable: !editable,
-            hide: editable,
+            ...(user.role.name === 'ROLE_HeadClub' || user.role.name === 'ROLE_ViceHeadClub'
+                ? { hide: editable }
+                : { hide: true }),
+
             field: 'actions',
             type: 'actions',
             flex: 1,
@@ -140,6 +146,7 @@ function HeadOfDepartment() {
                     setUserList((prevRows) => prevRows.filter((row) => row.studentId !== id));
                     console.log('1', res);
                     console.log('2', res.data);
+                    enqueueSnackbar(res.message, { variant: 'success' });
                 });
             });
         },

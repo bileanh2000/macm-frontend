@@ -1,0 +1,67 @@
+.ghost {
+    /* position: absolute; */
+    /* bottom: 50%; */
+    /* left: 50%; */
+}
+.ghost img {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: upndown 3s ease-in-out infinite;
+}
+
+.eyes {
+    position: absolute;
+    top: 30%;
+    transform: translateY(-50%);
+    width: 100%;
+    text-align: center;
+    animation: upndown 3s ease-in-out infinite;
+}
+.eye {
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    display: inline-block;
+    margin: 10px;
+    /* border-radius: 50%; */
+    position: relative;
+    overflow: hidden;
+}
+
+.ball {
+    width: 25px;
+    height: 25px;
+    background-color: rgb(51, 51, 51);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    /* border:15px solid #333 */
+}
+.error {
+    position: absolute;
+    top: 67%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #1a2f70;
+    /* text-shadow: 0px 5px 5px #999999; */
+}
+.error-code {
+    font-size: 6rem;
+}
+
+@keyframes upndown {
+    0% {
+        top: 33%;
+    }
+    50% {
+        top: 38%;
+    }
+    100% {
+        top: 33%;
+    }
+}

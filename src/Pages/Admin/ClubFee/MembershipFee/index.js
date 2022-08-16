@@ -22,7 +22,7 @@ import {
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import React, { Fragment, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -31,6 +31,9 @@ import { useSnackbar } from 'notistack';
 
 import adminClubFeeAPI from 'src/api/adminClubFeeAPI';
 import adminFunAPi from 'src/api/adminFunAPi';
+
+import { IfAllGranted, IfAuthorized, IfAnyGranted } from 'react-authorization';
+import ForbiddenPage from 'src/Pages/ForbiddenPage';
 
 function MembershipFee() {
     const { enqueueSnackbar } = useSnackbar();
@@ -371,174 +374,180 @@ function MembershipFee() {
     }
 
     return (
-        <Box sx={{ m: 1, p: 1 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
-                    Danh sách đóng tiền phí duy trì CLB
-                </Typography>
-                <Box>
-                    <Typography variant="h6" gutterBottom sx={{ marginBottom: 2 }}>
-                        <strong>Số dư câu lạc bộ hiện tại: </strong>
-                        {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+        <IfAnyGranted
+            expected={['ROLE_Treasurer', 'ROLE_HeadClub']}
+            actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
+            unauthorized={<Navigate to="/forbidden" />}
+        >
+            <Box sx={{ m: 1, p: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+                        Danh sách đóng tiền phí duy trì CLB
                     </Typography>
-                </Box>
-            </Box>
-            <Divider sx={{ mb: 2 }} />
-            <Grid container spacing={4}>
-                <Grid item xs={8}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        {semesterId > 0 && (
-                            <FormControl medium="true">
-                                <Select id="demo-simple-select" value={semesterId} onChange={handleChangeSemester}>
-                                    {semesterList.map((semester) => (
-                                        <MenuItem value={semester.id} key={semester.id}>
-                                            {semester.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        )}
-                        {cost && (
-                            <Box sx={{ display: 'flex', flexDirection: 'column', ml: 2 }}>
-                                <Typography variant="h6" sx={{ color: 'red' }}>
-                                    Số tiền mỗi người phải đóng:{' '}
-                                </Typography>
-                                <Typography variant="h6" sx={{ color: 'red' }}>
-                                    {cost.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-                                    {semesterId == currentSemester.id && semesterId && currentSemester.id > 0 && (
-                                        <Button startIcon={<Edit />} onClick={handleOpen}></Button>
-                                    )}
-                                </Typography>
-                            </Box>
-                        )}
+                    <Box>
+                        <Typography variant="h6" gutterBottom sx={{ marginBottom: 2 }}>
+                            <strong>Số dư câu lạc bộ hiện tại: </strong>
+                            {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                        </Typography>
                     </Box>
-                </Grid>
-                <Grid item xs={4}>
-                    {/* <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                </Box>
+                <Divider sx={{ mb: 2 }} />
+                <Grid container spacing={4}>
+                    <Grid item xs={8}>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            {semesterId > 0 && (
+                                <FormControl medium="true">
+                                    <Select id="demo-simple-select" value={semesterId} onChange={handleChangeSemester}>
+                                        {semesterList.map((semester) => (
+                                            <MenuItem value={semester.id} key={semester.id}>
+                                                {semester.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            )}
+                            {cost && (
+                                <Box sx={{ display: 'flex', flexDirection: 'column', ml: 2 }}>
+                                    <Typography variant="h6" sx={{ color: 'red' }}>
+                                        Số tiền mỗi người phải đóng:{' '}
+                                    </Typography>
+                                    <Typography variant="h6" sx={{ color: 'red' }}>
+                                        {cost.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                        {semesterId == currentSemester.id && semesterId && currentSemester.id > 0 && (
+                                            <Button startIcon={<Edit />} onClick={handleOpen}></Button>
+                                        )}
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Box>
+                    </Grid>
+                    <Grid item xs={4}>
+                        {/* <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                         Số dư câu lạc bộ hiện tại:{' '}
                         {funClub.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                     </Typography> */}
-                    <Typography variant="body1" sx={{ float: 'right' }}>
-                        Đã đóng: {payment}/{userList.length}
-                    </Typography>
+                        <Typography variant="body1" sx={{ float: 'right' }}>
+                            Đã đóng: {payment}/{userList.length}
+                        </Typography>
+                    </Grid>
                 </Grid>
-            </Grid>
 
-            <Dialog
-                fullWidth
-                maxWidth="md"
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    Chỉnh sửa tiền phí
-                </DialogTitle>
-                <DialogContent>
-                    <Box
-                        component="form"
-                        noValidate
-                        autoComplete="off"
-                        sx={{
-                            '& .MuiTextField-root': { mb: 2, mt: 2 },
-                        }}
-                    >
-                        <Controller
-                            name="cost"
-                            variant="outlined"
-                            defaultValue={cost}
-                            control={control}
-                            render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                <NumberFormat
-                                    name="cost"
-                                    customInput={TextField}
-                                    label="Nhập số tiền"
-                                    thousandSeparator={true}
-                                    variant="outlined"
-                                    value={value}
-                                    onValueChange={(v) => {
-                                        onChange(Number(v.value));
-                                    }}
-                                    InputProps={{
-                                        endAdornment: <InputAdornment position="end">VND</InputAdornment>,
-                                    }}
-                                    error={invalid}
-                                    helperText={invalid ? error.message : null}
-                                    fullWidth
-                                />
-                            )}
-                        />
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Hủy</Button>
-                    <Button onClick={handleSubmit(onSubmit)} autoFocus>
+                <Dialog
+                    fullWidth
+                    maxWidth="md"
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        Chỉnh sửa tiền phí
+                    </DialogTitle>
+                    <DialogContent>
+                        <Box
+                            component="form"
+                            noValidate
+                            autoComplete="off"
+                            sx={{
+                                '& .MuiTextField-root': { mb: 2, mt: 2 },
+                            }}
+                        >
+                            <Controller
+                                name="cost"
+                                variant="outlined"
+                                defaultValue={cost}
+                                control={control}
+                                render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                    <NumberFormat
+                                        name="cost"
+                                        customInput={TextField}
+                                        label="Nhập số tiền"
+                                        thousandSeparator={true}
+                                        variant="outlined"
+                                        value={value}
+                                        onValueChange={(v) => {
+                                            onChange(Number(v.value));
+                                        }}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="end">VND</InputAdornment>,
+                                        }}
+                                        error={invalid}
+                                        helperText={invalid ? error.message : null}
+                                        fullWidth
+                                    />
+                                )}
+                            />
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>Hủy</Button>
+                        <Button onClick={handleSubmit(onSubmit)} autoFocus>
+                            Xác nhận
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                <Dialog
+                    fullWidth
+                    maxWidth="md"
+                    open={openConfirm}
+                    onClose={handleCloseConfirm}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         Xác nhận
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                    </DialogTitle>
+                    <DialogContent>Bạn có chắc chắn muốn cập nhật trạng thái đóng tiền</DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseConfirm}>Hủy</Button>
+                        <Button onClick={handleOpenConfirm} autoFocus>
+                            Đồng ý
+                        </Button>
+                    </DialogActions>
+                </Dialog>
 
-            <Dialog
-                fullWidth
-                maxWidth="md"
-                open={openConfirm}
-                onClose={handleCloseConfirm}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    Xác nhận
-                </DialogTitle>
-                <DialogContent>Bạn có chắc chắn muốn cập nhật trạng thái đóng tiền</DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseConfirm}>Hủy</Button>
-                    <Button onClick={handleOpenConfirm} autoFocus>
-                        Đồng ý
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Box
-                sx={{
-                    height: '70vh',
-                    width: '100%',
-                    '& .status-rows': {
-                        justifyContent: 'center !important',
-                    },
-                    '& .status-rows.active .MuiDataGrid-cellContent': {
-                        backgroundColor: '#56f000',
-                        color: '#fff',
-                        fontWeight: '600',
-                        textAlign: 'center',
-                        padding: 1,
-                        borderRadius: 5,
-                    },
-                    '& .status-rows.deactive .MuiDataGrid-cellContent': {
-                        backgroundColor: '#ff3838',
-                        color: '#fff',
-                        fontWeight: '600',
-                        textAlign: 'center',
-                        padding: 1,
-                        borderRadius: 5,
-                    },
-                }}
-            >
-                <DataGrid
-                    // loading={!userList.length}
-                    disableSelectionOnClick={true}
-                    rows={rowsUser}
-                    columns={columns}
-                    pageSize={pageSize}
-                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                    rowsPerPageOptions={[10, 20, 30]}
-                    components={{
-                        Toolbar: CustomToolbar,
-                        NoRowsOverlay: CustomNoRowsOverlay,
+                <Box
+                    sx={{
+                        height: '70vh',
+                        width: '100%',
+                        '& .status-rows': {
+                            justifyContent: 'center !important',
+                        },
+                        '& .status-rows.active .MuiDataGrid-cellContent': {
+                            backgroundColor: '#56f000',
+                            color: '#fff',
+                            fontWeight: '600',
+                            textAlign: 'center',
+                            padding: 1,
+                            borderRadius: 5,
+                        },
+                        '& .status-rows.deactive .MuiDataGrid-cellContent': {
+                            backgroundColor: '#ff3838',
+                            color: '#fff',
+                            fontWeight: '600',
+                            textAlign: 'center',
+                            padding: 1,
+                            borderRadius: 5,
+                        },
                     }}
-                />
+                >
+                    <DataGrid
+                        // loading={!userList.length}
+                        disableSelectionOnClick={true}
+                        rows={rowsUser}
+                        columns={columns}
+                        pageSize={pageSize}
+                        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                        rowsPerPageOptions={[10, 20, 30]}
+                        components={{
+                            Toolbar: CustomToolbar,
+                            NoRowsOverlay: CustomNoRowsOverlay,
+                        }}
+                    />
+                </Box>
             </Box>
-        </Box>
+        </IfAnyGranted>
     );
 }
 

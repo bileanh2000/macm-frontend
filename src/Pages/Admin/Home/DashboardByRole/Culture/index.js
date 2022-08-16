@@ -18,6 +18,9 @@ import semesterApi from 'src/api/semesterApi';
 import LoadingProgress from 'src/Components/LoadingProgress';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CelebrationIcon from '@mui/icons-material/Celebration';
+import { MenuItem, TextField } from '@mui/material';
+import SquareIcon from '@mui/icons-material/Square';
+import CommonSchedule from './CommonSchedule';
 export const CustomPersentStatus = ({ persent }) => {
     let bgColor = '#ccf5e7';
     let color = '#0bce89';
@@ -48,59 +51,51 @@ export const CustomPersentStatus = ({ persent }) => {
 };
 function CultureDashboard() {
     const [memberReport, setMemberReport] = useState([]);
-    const [feeReport, setFeeReport] = useState([]);
-    const [balanceInCurrentMonth, setBalanceInCurrentMonth] = useState([]);
-    const [balanceInLastMonth, setBalanceInLastMonth] = useState([]);
     const [currentSemester, setCurrentSemester] = useState([]);
-
+    const [activityReport, setActivityReport] = useState([]);
+    const [semesterList, setSemesterList] = useState([]);
+    const [semester, setSemester] = useState('Summer2022');
     const currentMonth = new Date().getMonth() + 1;
+    const [startDateOfSemester, setStartDateOfSemester] = useState();
 
-    const fetchFeeInCurrentSemester = async () => {
-        try {
-            const semester = await semesterApi.getCurrentSemester();
-
-            console.log('Current Semester', semester.data);
-            const fee = await dashboardApi.getFeeReportBySemester(semester.data[0].name);
-            console.log('fee in currentmonth', fee.data);
-            let fillerFeeByCurrentMonth = fee.data.filter((semester) => semester.month === currentMonth);
-            let fillerFeeByLastMonth = fee.data.filter((semester) => semester.month === currentMonth - 1);
-            setBalanceInCurrentMonth(fillerFeeByCurrentMonth);
-            setBalanceInLastMonth(fillerFeeByLastMonth);
-            console.log('fillerFeeByCurrentMonth', fillerFeeByCurrentMonth);
-            console.log('fillerFeeByLastMonth', fillerFeeByLastMonth);
-            setFeeReport(fee.data);
-        } catch (error) {
-            console.log('Failed when fetch Current Semester', error);
-        }
+    const handleChange = (event) => {
+        setSemester(event.target.value);
     };
-
-    const fetchMemberReport = async () => {
+    const fetchTop3Semester = async () => {
         try {
-            const response = await dashboardApi.getUserStatus();
-            console.log('Member Report', response.data);
-            let reverseList = response.data.sort((a, b) => b.id - a.id);
-            // let filterByMonth = response.data.filter((item) => item.month === currentMonth);
-            // setBalanceInCurrentMonth(filterByMonth);
-            setMemberReport(reverseList);
+            const response = await semesterApi.getTop3Semester();
+            console.log('fetchTop3Semester', response.data);
+            setSemesterList(response.data);
         } catch (error) {
             console.log('Failed when fetch member report', error);
         }
     };
+
+    const fetchActivityReport = async (semester) => {
+        try {
+            const response = await dashboardApi.getActivityReport(semester);
+            console.log('fetchActivityReport', response);
+            setActivityReport(response.data);
+        } catch (error) {
+            console.log('failed when fetchActivityReport', error);
+        }
+    };
+    const getStartDateBySemester = (semester) => {
+        let startDateBySemester = semesterList && semesterList.filter((item) => item.name === semester);
+        startDateBySemester[0] && setStartDateOfSemester(startDateBySemester[0].startDate);
+    };
     useEffect(() => {
-        fetchFeeInCurrentSemester();
-        fetchMemberReport();
-        getPersentMemberSinceLastSemester();
+        fetchTop3Semester();
     }, []);
+    useEffect(() => {
+        getStartDateBySemester(semester);
+        fetchActivityReport(semester);
+        console.log(startDateOfSemester);
+    }, [semester, startDateOfSemester]);
     // useEffect(() => {
     //     console.log(balanceInCurrentMonth);
     // }, [balanceInCurrentMonth]);
 
-    const getPersentMemberSinceLastSemester = () => {
-        let memberPersent =
-            memberReport[0] &&
-            Math.floor((memberReport[0].totalNumberUserInSemester / memberReport[1].totalNumberUserInSemester) * 100);
-        console.log(memberPersent);
-    };
     const gridContainer = {
         display: 'grid',
         gridTemplateColumns: 'repeat(5, 1fr)',
@@ -112,57 +107,73 @@ function CultureDashboard() {
 
     return (
         <Fragment>
-            {memberReport[0] ? (
+            {activityReport[0] ? (
                 <Fragment>
                     <Typography variant="h4" color="initial" sx={{ fontWeight: 500, mb: 2 }}>
                         Tổng Quan
                     </Typography>
+
                     <Grid container spacing={2}>
-                        <Grid item xs={12} sm={12} md={3}>
-                            <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
+                        <Grid item md={9}>
+                            <Paper elevation={2}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                    <TextField
+                                        sx={{ margin: '16px 0px 0px 16px ' }}
+                                        size="small"
+                                        variant="outlined"
+                                        id="standard-select"
+                                        select
+                                        label="Chọn kỳ"
+                                        value={semester}
+                                        onChange={handleChange}
+                                    >
+                                        {semesterList &&
+                                            semesterList.map((semester) => (
+                                                <MenuItem key={semester.id} value={semester.name}>
+                                                    {semester.name}
+                                                </MenuItem>
+                                            ))}
+                                    </TextField>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                                            <SquareIcon sx={{ color: '#9fccf9', mr: 0.5 }} />
+                                            <span>Tập luyện</span>
+                                        </Box> */}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                                            <SquareIcon sx={{ color: '#80ffc1', mr: 0.5 }} />
+                                            <span>Sự kiện</span>
+                                        </Box>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                                            <SquareIcon sx={{ color: '#fce99c', mr: 0.5 }} />
+                                            <span>Giải đấu</span>
+                                        </Box>
+                                    </Box>
+                                </Box>
+                                <CommonSchedule goDate={startDateOfSemester} />
+                            </Paper>
+                        </Grid>
+                        <Grid item md={3}>
+                            <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                 <Box>
                                     <Typography variant="button" color="initial">
                                         Tổng số giải đấu
                                     </Typography>
-                                    <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                        2
-                                    </Typography>
 
-                                    {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {memberReport[1] === undefined ? (
-                                            <CustomPersentStatus persent={0} />
-                                        ) : (
-                                            <CustomPersentStatus
-                                                persent={
-                                                    memberReport[1] &&
-                                                    Math.floor(
-                                                        (memberReport[0].totalNumberUserInSemester /
-                                                            memberReport[1].totalNumberUserInSemester) *
-                                                            100 -
-                                                            100,
-                                                    )
-                                                }
-                                            />
-                                        )}
-                                        
-                                        <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
-                                            so với kỳ trước
-                                        </Typography>
-                                    </Box> */}
+                                    <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
+                                        {activityReport[0].totalTournament}
+                                    </Typography>
                                 </Box>
                                 <Avatar sx={{ bgcolor: '#f9d441', width: 48, height: 48 }}>
                                     <EmojiEventsIcon sx={{ fontSize: '2rem' }} />
                                 </Avatar>
                             </Paper>
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={3}>
-                            <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
+                            <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                 <Box>
                                     <Typography variant="button" color="initial">
                                         Tổng số sự kiện
                                     </Typography>
                                     <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                        4
+                                        {activityReport[0].totalEvent}
                                     </Typography>
 
                                     {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -191,15 +202,45 @@ function CultureDashboard() {
                                     <CelebrationIcon sx={{ fontSize: '2rem' }} />
                                 </Avatar>
                             </Paper>
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={3}>
-                            <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
+                            <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Box>
+                                    <Typography variant="button" color="initial">
+                                        Tỷ lệ tham gia giải đấu
+                                    </Typography>
+                                    <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
+                                        {activityReport[0].averageJoinEvent}%
+                                    </Typography>
+                                    {/* {balanceInLastMonth[0] && balanceInLastMonth[0].balance === 0 ? null : (
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <CustomPersentStatus
+                                                persent={
+                                                    balanceInLastMonth[0] &&
+                                                    balanceInCurrentMonth[0] &&
+                                                    Math.floor(
+                                                        (balanceInCurrentMonth[0].balance /
+                                                            balanceInLastMonth[0].balance) *
+                                                            100 -
+                                                            100,
+                                                    )
+                                                }
+                                            />
+                                            <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
+                                                so với tháng trước
+                                            </Typography>
+                                        </Box>
+                                    )} */}
+                                </Box>
+                                <Avatar sx={{ bgcolor: '#f9d441', width: 48, height: 48 }}>
+                                    <HowToRegRoundedIcon sx={{ fontSize: '2rem' }} />
+                                </Avatar>
+                            </Paper>
+                            <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                 <Box>
                                     <Typography variant="button" color="initial">
                                         Tỷ lệ tham gia sự kiện
                                     </Typography>
                                     <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                        14%
+                                        {activityReport[0].averageJoinTournament}%
                                     </Typography>
 
                                     {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -222,71 +263,24 @@ function CultureDashboard() {
                                         </Typography>
                                     </Box> */}
                                 </Box>
-                                <Avatar sx={{ bgcolor: '#35C0DE', width: 48, height: 48 }}>
-                                    <HowToRegRoundedIcon sx={{ fontSize: '2rem' }} />
-                                </Avatar>
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={3}>
-                            <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between' }}>
-                                <Box>
-                                    <Typography variant="button" color="initial">
-                                        Tỷ lệ tham gia giải đấu
-                                    </Typography>
-                                    <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                        17%
-                                    </Typography>
-                                    {/* {balanceInLastMonth[0] && balanceInLastMonth[0].balance === 0 ? null : (
-                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            <CustomPersentStatus
-                                                persent={
-                                                    balanceInLastMonth[0] &&
-                                                    balanceInCurrentMonth[0] &&
-                                                    Math.floor(
-                                                        (balanceInCurrentMonth[0].balance /
-                                                            balanceInLastMonth[0].balance) *
-                                                            100 -
-                                                            100,
-                                                    )
-                                                }
-                                            />
-                                            <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
-                                                so với tháng trước
-                                            </Typography>
-                                        </Box>
-                                    )} */}
-                                </Box>
                                 <Avatar sx={{ bgcolor: '#16ce8e', width: 48, height: 48 }}>
                                     <HowToRegRoundedIcon sx={{ fontSize: '2rem' }} />
                                 </Avatar>
                             </Paper>
                         </Grid>
+                        {/* <Grid item xs={12} sm={12} md={3}>
+                           
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={3}>
+                           
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={3}>
+                           
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={3}>
+                            
+                        </Grid> */}
                     </Grid>
-                    {/* <Grid container spacing={2} sx={{ mt: 0.5 }}>
-                        <Grid item xs={12} md={9} order={{ xs: 2, md: 1 }}>
-                            <Paper elevation={2} sx={{ padding: '16px' }}>
-                                <Attendance />
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12} md={3} order={{ xs: 1, md: 2 }}>
-                            <Paper elevation={2} sx={{ padding: '16px' }}>
-                                <UpNext isAdmin={true} />
-                            </Paper>
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={2} sx={{ mt: 0.5 }}>
-                        <Grid item xs={12} md={6}>
-                            <Paper elevation={2} sx={{ padding: '16px' }}>
-                                <MemberChart />
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <Paper elevation={2} sx={{ padding: '16px' }}>
-                                <FeeReport />
-                            </Paper>
-                        </Grid>
-                    </Grid>
-                    <Grid container spacing={2} sx={{ mt: 0.5 }}></Grid> */}
                 </Fragment>
             ) : (
                 <LoadingProgress />

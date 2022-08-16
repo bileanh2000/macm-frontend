@@ -24,6 +24,7 @@ function TournamentItem({ data, onSuccess, user }) {
     const [tournamentOnclick, SetTournamentOnclick] = useState({ name: '', id: '' });
     const [openDialog, setOpenDialog] = useState(false);
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const user = JSON.parse(localStorage.getItem('currentUser'));
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -150,19 +151,23 @@ function TournamentItem({ data, onSuccess, user }) {
                         <Box>
                             {data.status === 3 ? (
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Tooltip title="Xóa giải đấu">
-                                        <IconButton
-                                            aria-label="delete"
-                                            onClick={(event) => {
-                                                handleOpenDialog();
-                                                SetTournamentOnclick({ name: data.name, id: data.id });
-                                                event.preventDefault();
-                                                event.stopPropagation();
-                                            }}
-                                        >
-                                            <Delete />
-                                        </IconButton>
-                                    </Tooltip>
+                                    {user.role.name === 'ROLE_HeadClub' ||
+                                    user.role.name === 'ROLE_HeadTechnique' ||
+                                    user.role.name === 'ROLE_ViceHeadTechnique' ? (
+                                        <Tooltip title="Xóa giải đấu">
+                                            <IconButton
+                                                aria-label="delete"
+                                                onClick={(event) => {
+                                                    handleOpenDialog();
+                                                    SetTournamentOnclick({ name: data.name, id: data.id });
+                                                    event.preventDefault();
+                                                    event.stopPropagation();
+                                                }}
+                                            >
+                                                <Delete />
+                                            </IconButton>
+                                        </Tooltip>
+                                    ) : null}
 
                                     {/* <Tooltip title="Chỉnh sửa">
                                         <IconButton

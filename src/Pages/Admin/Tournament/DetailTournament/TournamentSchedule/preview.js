@@ -48,19 +48,6 @@ export const CustomTrainingSchedule = styled.div`
     .fc-event {
         cursor: pointer;
     }
-    .fc-day-future:hover:after {
-        content: 'Tạo lịch';
-        position: absolute;
-        margin-top: -8vh;
-        margin-left: 6px;
-        font-weight: bold;
-        font-size: 0.8rem;
-        // bottom: 50%;
-        // left: 50%;
-    }
-    .fc-day-future:hover {
-        background-color: #d0e6fb !important;
-    }
     .fc-day-today a {
         background-color: white;
         // color: red !important;
@@ -86,7 +73,7 @@ export const CustomTrainingSchedule = styled.div`
     width: 70%;
 `;
 
-function TournamentSchedule({ isUpdate }) {
+function Preview({ isUpdate }) {
     const calendarComponentRef = useRef(null);
     const nowDate = new Date();
     let { tournamentId } = useParams();
@@ -101,11 +88,7 @@ function TournamentSchedule({ isUpdate }) {
     const [isOpenEditSessionDialog, setIsOpenEditSessionDialog] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
-
-    const [isRender, setIsRender] = useState(true);
-
     const user = JSON.parse(localStorage.getItem('currentUser'));
-
 
     const goToSemester = (date) => {
         let calApi = calendarComponentRef.current.getApi();
@@ -145,12 +128,6 @@ function TournamentSchedule({ isUpdate }) {
         setUpdate(false);
     }, [update]);
 
-    useEffect(() => {
-        isRender && fetchTournamentSchedule();
-        isRender && fetchCommonScheduleBySemester();
-        setIsRender(false);
-    }, [scheduleList, commonList, isRender]);
-
     const totalSchedule =
         commonList.length > 0 &&
         scheduleList.length > 0 &&
@@ -159,6 +136,7 @@ function TournamentSchedule({ isUpdate }) {
                 ? scheduleList.find((tourament) => tourament.date == common.date)
                 : common,
         );
+    console.log(totalSchedule);
 
     const scheduleData =
         totalSchedule &&
@@ -316,22 +294,7 @@ function TournamentSchedule({ isUpdate }) {
         let current = new Date();
 
         return (
-            <Tooltip
-                title={
-                    // eventInfo.event.extendedProps.type === 0
-                    //     ? eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time
-                    //     : 'Không thể tạo lịch tập (trùng hoạt động khác)'
-                    // eventDate < current ? 'Xem thông tin điểm danh' : 'Cập nhật thời gian'?eventInfo.event.extendedProps.type === 0?'Không thể tạo lịch tập (trùng hoạt động khác)':''
-                    !isUpdate
-                        ? eventInfo.event.extendedProps.type === 3
-                            ? eventDate < current
-                                ? ''
-                                : 'Cập nhật thời gian'
-                            : `Không thể tạo lịch (trùng với ${eventInfo.event.title})`
-                        : 'Quá thời gian cập nhật'
-                }
-                placement="top"
-            >
+            <Tooltip title={eventInfo.event.title + ' - ' + eventInfo.event.extendedProps.time} placement="top">
                 {eventInfo.event.extendedProps.type === 3 ? (
                     <Box>
                         <Box sx={{ ml: '10px' }}>
@@ -390,7 +353,7 @@ function TournamentSchedule({ isUpdate }) {
 
             {isOpenAddSessionDialog && (
                 <AddSession
-                    title="Tạo lịch mới"
+                    title="Tạo buổi tập"
                     isOpen={isOpenAddSessionDialog}
                     handleClose={() => {
                         setIsOpenAddSessionDialog(false);
@@ -399,14 +362,13 @@ function TournamentSchedule({ isUpdate }) {
                     date={scheduleUpdate}
                     isDisabled={isDisabled}
                     onSucess={(isUpdate) => {
-                        setIsRender(true);
                         setUpdate(isUpdate);
                     }}
                 />
             )}
             {isOpenEditSessionDialog && (
                 <EditSession
-                    title="Cập nhật thời gian"
+                    title="Cập nhật thời gian buổi tập"
                     isOpen={isOpenEditSessionDialog}
                     handleClose={() => {
                         setIsOpenEditSessionDialog(false);
@@ -414,7 +376,6 @@ function TournamentSchedule({ isUpdate }) {
                     }}
                     date={scheduleUpdate}
                     onSucess={(isUpdate) => {
-                        setIsRender(true);
                         setUpdate(isUpdate);
                     }}
                 />
@@ -444,19 +405,6 @@ function TournamentSchedule({ isUpdate }) {
                                 datesSet={(dateInfo) => {
                                     getMonthInCurrentTableView(dateInfo.start);
                                 }}
-                                eventClick={(args) => {
-                                    navigateToUpdate(args.event, args.event.start);
-                                    // console.log(args);
-                                }}
-                                dateClick={function (arg) {
-                                    // console.log(arg.dateStr);
-                                    navigateToCreate(arg.dateStr);
-                                    // swal({
-                                    //     title: 'Date',
-                                    //     text: arg.dateStr,
-                                    //     type: 'success',
-                                    // });
-                                }}
                             />
                         </CustomTrainingSchedule>
                     )}
@@ -466,4 +414,4 @@ function TournamentSchedule({ isUpdate }) {
     );
 }
 
-export default TournamentSchedule;
+export default Preview;
