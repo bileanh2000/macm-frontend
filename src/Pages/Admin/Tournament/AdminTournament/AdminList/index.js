@@ -207,7 +207,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                             sx={{ mr: 2, ml: 2 }}
                             onClick={() => handleOpenDialog(true)}
                         >
-                            Thêm người thành viên
+                            Thêm thành viên
                         </Button>
                     )}
                 </Box>

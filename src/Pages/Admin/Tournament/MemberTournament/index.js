@@ -144,7 +144,6 @@ function MemberTournament({ tournament, isUpdate }) {
         setIsRender(false);
     }, [tournamentId, exhibitionType, exhibitionTeam, isRender]);
 
-    console.log(!isUpdate, tournamentStatus);
     return (
         <Fragment>
             {competitivePlayer && exhibitionTeam && (
@@ -296,6 +295,7 @@ function MemberTournament({ tournament, isUpdate }) {
                         handleClose={() => {
                             setOpenDialog(false);
                         }}
+                        genderCompetitive={listWeightRange.filter((weight) => weight.id === weightRange)[0].gender}
                         onSuccess={(newItem) => {
                             // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
                             //     return;

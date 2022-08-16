@@ -84,7 +84,7 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
         reset,
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
     return (
         <Fragment>
@@ -261,7 +261,13 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccess,
                             </Grid>
                         </Box>
                     </DialogContent>
+
                     <DialogActions>
+                        {datasFightingCompetition.length === 0 && datasPerformanceCompetition.length === 0 && (
+                            <Typography variant="body1" color={'orange'} sx={{ mr: 2 }}>
+                                Vui lòng thêm ít nhất một thể thức thi đấu
+                            </Typography>
+                        )}
                         <Button variant="outlined" onClick={handleClose}>
                             Hủy
                         </Button>

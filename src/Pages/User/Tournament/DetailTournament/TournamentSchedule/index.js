@@ -39,7 +39,7 @@ function TournamentSchedule() {
 
     return (
         <Box sx={{ mt: 2, mb: 2, p: 1, height: '30rem' }}>
-            {scheduleData && (
+            {scheduleList.length > 0 && (
                 <FullCalendar
                     // initialDate={new Date('2022-09-01')}
                     initialDate={scheduleData[0] && new Date(scheduleData[0].date)}

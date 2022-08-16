@@ -129,7 +129,7 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
     Yup.addMethod(Yup.mixed, 'uniqueEmail', uniqueEmail);
     Yup.addMethod(Yup.mixed, 'uniquePhone', uniquePhone);
     const validationSchema = Yup.object().shape({
-        name: Yup.string()
+        name: Yup.string().trim()
             .nullable()
             .required('Không được để trống trường này')
             .test('len', 'Độ dài không cho phép', (val) => val.length > 5)

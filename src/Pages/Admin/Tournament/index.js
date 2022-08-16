@@ -39,6 +39,8 @@ function Tournament() {
     const [openDialogCreate, setOpenDialogCreate] = useState(false);
     const [suggestionRole, setSuggestionRole] = useState([]);
     const [isRender, setIsRender] = useState(true);
+    const [suggestType, setSuggestType] = useState([]);
+    const user = JSON.parse(localStorage.getItem('currentUser'));
     let navigate = useNavigate();
 
     const handleChange = (event) => {
@@ -97,6 +99,17 @@ function Tournament() {
             console.log('That bai roi huhu ', error);
         }
     };
+
+    const getAllSuggestType = async () => {
+        try {
+            const response = await adminTournamentAPI.getAllSuggestType();
+            console.log('getAllSuggestType', response.data);
+            setSuggestType(response.data[0]);
+        } catch (error) {
+            console.warn('Failed to get all suggest type', error);
+        }
+    };
+
     const getAllTournamentSchedule = async () => {
         try {
             const response = await adminTournamentAPI.getAllTournamentSchedule();
@@ -141,6 +154,7 @@ function Tournament() {
     useEffect(() => {
         fetchSemester();
         getAllSuggestionRole();
+        getAllSuggestType();
         getAllTournamentSchedule();
     }, []);
 
@@ -184,14 +198,17 @@ function Tournament() {
                     </Button>
                 </DialogActions>
             </Dialog>
-            {suggestionRole && (
+            {suggestionRole && suggestType && (
                 <CreateTournament
                     title="Tạo giải đấu"
                     roles={suggestionRole}
+                    competitiveType={suggestType.competitiveTypeSamples}
+                    exhibitionType={suggestType.exhibitionTypeSamples}
                     isOpen={openDialogCreate}
                     handleClose={() => {
                         setOpenDialogCreate(false);
                     }}
+                    user={user}
                 />
             )}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -265,6 +282,7 @@ function Tournament() {
                                             <TournamentItem
                                                 key={tournament.id}
                                                 data={tournament}
+                                                user={user}
                                                 onSuccess={() => setIsRender(true)}
                                             />
                                         ))}

@@ -10,7 +10,7 @@ import Gold from 'src/Components/Common/Material/Gold';
 import Sliver from 'src/Components/Common/Material/Sliver';
 import Brone from 'src/Components/Common/Material/Brone';
 
-function TournamentExhibition({ reload, result, type }) {
+function TournamentExhibition({ reload, result, type, endDate }) {
     console.log(type);
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
 
@@ -210,6 +210,7 @@ function TournamentExhibition({ reload, result, type }) {
                         status={tournamentStatus}
                         areaList={areaList}
                         onUpdateResult={UpdateResultHandler}
+                        endDate={endDate}
                     />
                 </div>
             ) : (

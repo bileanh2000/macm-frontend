@@ -45,8 +45,8 @@ const eventApi = {
         const url = `/eventschedule/headculture/updateschedule/${id}?isOverwritten=true`;
         return axiosClient.post(url, params);
     },
-    createEvent: (params) => {
-        const url = `/event/headculture/createevent?isOverwritten=true`;
+    createEvent: (params, studentId) => {
+        const url = `/event/headculture/createevent/${studentId}?isOverwritten=true`;
         return axiosClient.post(url, params);
     },
     createScheduleSession: (params, eventId) => {
@@ -61,8 +61,8 @@ const eventApi = {
         const url = `/eventschedule/geteventschedulebyevent/${params}`;
         return axiosClient.get(url);
     },
-    deleteEvent: (params) => {
-        const url = `/event/headculture/deleteevent/${params}`;
+    deleteEvent: (params, studentId) => {
+        const url = `/event/headculture/deleteevent/${params}/${studentId}`;
         return axiosClient.put(url);
     },
 
@@ -118,8 +118,8 @@ const eventApi = {
         return axiosClient.get(url);
     },
 
-    updateAfterEvent: (params) => {
-        const url = `/event/headculture/updateafterevent/${params.id}`;
+    updateAfterEvent: (params, studentId) => {
+        const url = `/event/headculture/updateafterevent/${params.id}/${studentId}`;
         return axiosClient.put(url, null, {
             params: {
                 isIncurred: params.isIncurred,
@@ -171,6 +171,10 @@ const eventApi = {
         return axiosClient.get(url);
     },
 
+    getAllSuggestionRole: () => {
+        const url = '/event/headculture/getallsuggestionrole';
+        return axiosClient.get(url);
+    },
     // getAllOnGoingEvent:{}=>
 };
 export default eventApi;

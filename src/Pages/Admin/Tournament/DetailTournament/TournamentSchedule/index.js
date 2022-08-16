@@ -49,7 +49,7 @@ export const CustomTrainingSchedule = styled.div`
         cursor: pointer;
     }
     .fc-day-future:hover:after {
-        content: 'Tạo lịch cho giải đấu';
+        content: 'Tạo lịch';
         position: absolute;
         margin-top: -8vh;
         margin-left: 6px;
@@ -101,6 +101,7 @@ function TournamentSchedule({ isUpdate }) {
     const [isOpenEditSessionDialog, setIsOpenEditSessionDialog] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
+    const [isRender, setIsRender] = useState(true);
 
     const goToSemester = (date) => {
         let calApi = calendarComponentRef.current.getApi();
@@ -140,6 +141,12 @@ function TournamentSchedule({ isUpdate }) {
         setUpdate(false);
     }, [update]);
 
+    useEffect(() => {
+        isRender && fetchTournamentSchedule();
+        isRender && fetchCommonScheduleBySemester();
+        setIsRender(false);
+    }, [scheduleList, commonList, isRender]);
+
     const totalSchedule =
         commonList.length > 0 &&
         scheduleList.length > 0 &&
@@ -148,7 +155,6 @@ function TournamentSchedule({ isUpdate }) {
                 ? scheduleList.find((tourament) => tourament.date == common.date)
                 : common,
         );
-    console.log(totalSchedule);
 
     const scheduleData =
         totalSchedule &&
@@ -317,7 +323,7 @@ function TournamentSchedule({ isUpdate }) {
                             ? eventDate < current
                                 ? ''
                                 : 'Cập nhật thời gian'
-                            : `Không thể tạo lịch tập (trùng với ${eventInfo.event.title})`
+                            : `Không thể tạo lịch (trùng với ${eventInfo.event.title})`
                         : 'Quá thời gian cập nhật'
                 }
                 placement="top"
@@ -380,7 +386,7 @@ function TournamentSchedule({ isUpdate }) {
 
             {isOpenAddSessionDialog && (
                 <AddSession
-                    title="Tạo buổi tập"
+                    title="Tạo lịch mới"
                     isOpen={isOpenAddSessionDialog}
                     handleClose={() => {
                         setIsOpenAddSessionDialog(false);
@@ -389,13 +395,14 @@ function TournamentSchedule({ isUpdate }) {
                     date={scheduleUpdate}
                     isDisabled={isDisabled}
                     onSucess={(isUpdate) => {
+                        setIsRender(true);
                         setUpdate(isUpdate);
                     }}
                 />
             )}
             {isOpenEditSessionDialog && (
                 <EditSession
-                    title="Cập nhật thời gian buổi tập"
+                    title="Cập nhật thời gian"
                     isOpen={isOpenEditSessionDialog}
                     handleClose={() => {
                         setIsOpenEditSessionDialog(false);
@@ -403,6 +410,7 @@ function TournamentSchedule({ isUpdate }) {
                     }}
                     date={scheduleUpdate}
                     onSucess={(isUpdate) => {
+                        setIsRender(true);
                         setUpdate(isUpdate);
                     }}
                 />

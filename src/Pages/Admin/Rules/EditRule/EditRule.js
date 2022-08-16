@@ -1,23 +1,31 @@
-import { Box, Button, Container, Divider, TextField, Typography } from '@mui/material';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {
+    Box,
+    Button,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Divider,
+    TextField,
+    Typography,
+} from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useSnackbar } from 'notistack';
 
 import adminRuleAPI from 'src/api/adminRuleAPI';
 
-function EditRule() {
-    const location = useLocation();
-    const _rule = location.state?.rule;
-    const navigator = useNavigate();
+function EditRule({ rule, isOpen, handleClose, onSucess }) {
     const { enqueueSnackbar } = useSnackbar();
 
-    const [rule, setRule] = useState(_rule.description);
+    // const [rule, setRule] = useState(_rule.description);
 
     const validationSchema = Yup.object().shape({
-        description: Yup.string().required('Không được để trống trường này'),
+        description: Yup.string().trim().required('Không được để trống trường này'),
     });
 
     const {
@@ -26,76 +34,71 @@ function EditRule() {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const updateRule = async (data) => {
         try {
             const response = await adminRuleAPI.update({
-                id: _rule.id,
+                id: rule.id,
                 description: data.description,
             });
+            onSucess && onSucess();
             enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {}
     };
 
     const onSubmit = async (data) => {
         updateRule(data);
-
-        navigator({ pathname: '/admin/rules' });
+        handleClose && handleClose();
     };
 
     return (
-        <Box sx={{ m: 1, p: 1 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+        <Fragment>
+            <Dialog
+                fullWidth
+                maxWidth="md"
+                open={!!isOpen}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     Chỉnh sửa nội quy
-                </Typography>
-            </Box>
-            <Divider />
-            <Container>
-                <Box
-                    component="form"
-                    sx={{
-                        '& .MuiTextField-root': { m: 1, width: '100%' },
-                    }}
-                    Validate
-                    autoComplete="off"
-                >
-                    <TextField
-                        fullWidth
-                        id="outlined-error-helper-text fullWidth"
-                        label="Nội dung"
-                        multiline
-                        rows={6}
-                        {...register('description')}
-                        error={errors.description ? true : false}
-                        defaultValue={rule}
-                        helperText={errors.description?.message}
-                        required
-                    />
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '8px', mt: '8px' }}>
-                        <Button
-                            variant="contained"
-                            color="success"
-                            style={{ marginRight: 20 }}
-                            onClick={handleSubmit(onSubmit)}
-                        >
-                            Xác nhận
-                        </Button>
-                        <Button
-                            variant="contained"
-                            color="error"
-                            sx={{ maxHeight: '50px', minHeight: '50px' }}
-                            component={Link}
-                            to={'/admin/rules'}
-                        >
-                            Hủy bỏ
-                        </Button>
+                </DialogTitle>
+                <DialogContent>
+                    <Box
+                        component="form"
+                        sx={{
+                            '& .MuiTextField-root': { m: 1, width: '100%' },
+                        }}
+                        Validate
+                        autoComplete="off"
+                    >
+                        <TextField
+                            fullWidth
+                            id="outlined-error-helper-text fullWidth"
+                            label="Nội dung"
+                            multiline
+                            rows={6}
+                            {...register('description')}
+                            error={errors.description ? true : false}
+                            defaultValue={rule.description}
+                            helperText={errors.description?.message}
+                            required
+                        />
                     </Box>
-                </Box>
-            </Container>
-        </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" onClick={handleClose}>
+                        Hủy bỏ
+                    </Button>
+                    <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
+                        Xác nhận
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Fragment>
     );
 }
 

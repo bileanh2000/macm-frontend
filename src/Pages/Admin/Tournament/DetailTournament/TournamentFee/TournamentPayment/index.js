@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
+import { CurrencyExchange, RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
 import { Assessment } from '@mui/icons-material';
 import {
     Alert,
@@ -24,8 +24,9 @@ import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import adminFunAPi from 'src/api/adminFunAPi';
 import { styled } from '@mui/system';
 import { useSnackbar } from 'notistack';
+import TournamentSumUp from './TournamentSumUp';
 
-function TournamentPayment({ tournament, tournamentStatus, value, index }) {
+function TournamentPayment({ tournament, tournamentStatus, value, index, user, isFinish }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [funClub, setFunClub] = useState('');
@@ -35,6 +36,9 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
     const [paymentStatus, setPaymentStatus] = useState(true);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [idMember, setIdMember] = useState();
+    const [openSumUpDialog, setOpenSumUpDialog] = useState(false);
+    const [adminList, setAdminList] = useState([]);
+    const [userList, setUserList] = useState([]);
 
     let payment = userPaymentStatus.reduce((pay, user) => {
         return user.paymentStatus ? pay + 1 : pay;
@@ -53,6 +57,10 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
         console.log(newUserList);
         setUserPaymentStatus(newUserList);
         handleCloseConfirm();
+    };
+
+    const handleDialogOpen = () => {
+        setOpenSumUpDialog(true);
     };
 
     const fetchFunClub = async () => {
@@ -94,6 +102,29 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
             console.log('Không thể lấy danh sách đóng tiền của ban tổ chức');
         }
     };
+
+    useEffect(() => {
+        const fetchUserList = async () => {
+            try {
+                const response = await adminTournamentAPI.getAllTournamentPlayerPaymentStatus(tournamentId);
+                setUserList(response.data);
+            } catch (error) {
+                console.log('Không thể lấy danh sách đóng tiền của ban tổ chức');
+            }
+        };
+        const fetchAdminList = async () => {
+            try {
+                const response = await adminTournamentAPI.getAllTournamentOrganizingCommitteePaymentStatus(
+                    tournamentId,
+                );
+                setAdminList(response.data);
+            } catch (error) {
+                console.log('Không thể lấy danh sách đóng tiền của ban tổ chức');
+            }
+        };
+        fetchUserList();
+        fetchAdminList();
+    }, [tournamentId]);
 
     useEffect(() => {
         fetchUserPaymentStatus(tournamentId, type);
@@ -188,10 +219,13 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
     const updateUserPayment = async (id) => {
         try {
             if (type === 1) {
-                const response = await adminTournamentAPI.updateTournamentOrganizingCommitteePaymentStatus(id);
+                const response = await adminTournamentAPI.updateTournamentOrganizingCommitteePaymentStatus(
+                    id,
+                    user.studentId,
+                );
                 enqueueSnackbar(response.message, { variant: 'success' });
             } else {
-                const response = await adminTournamentAPI.updateTournamentPlayerPaymentStatus(id);
+                const response = await adminTournamentAPI.updateTournamentPlayerPaymentStatus(id, user.studentId);
                 enqueueSnackbar(response.message, { variant: 'success' });
             }
         } catch (error) {
@@ -234,37 +268,56 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
             id={`simple-tabpanel-${index}`}
             aria-labelledby={`simple-tab-${index}`}
         >
-            <Box sx={{ display: 'flex', alignItems: 'center', m: 2 }}>
-                <FormControl size="small">
-                    <Typography variant="caption">Danh sách đóng tiền</Typography>
-                    <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
-                        <MenuItem value={1}>Ban tổ chức</MenuItem>
-                        <MenuItem value={2}>Người chơi</MenuItem>
-                    </Select>
-                </FormControl>
-                {type === 1 ? (
-                    paymentStatus ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', m: 2, justifyContent: 'space-between' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', m: 2 }}>
+                    <FormControl size="small">
+                        <Typography variant="caption">Danh sách đóng tiền</Typography>
+                        <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
+                            <MenuItem value={1}>Ban tổ chức</MenuItem>
+                            <MenuItem value={2}>Người chơi</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {type === 1 ? (
+                        paymentStatus ? (
+                            <Typography variant="body1" sx={{ color: 'red', ml: 5 }}>
+                                Số tiền mỗi người trong ban tổ chức phải đóng:{' '}
+                                {tournament.feeOrganizingCommiteePay?.toLocaleString('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND',
+                                })}
+                            </Typography>
+                        ) : (
+                            ''
+                        )
+                    ) : paymentStatus ? (
                         <Typography variant="body1" sx={{ color: 'red', ml: 5 }}>
-                            Số tiền mỗi người trong ban tổ chức phải đóng:{' '}
-                            {tournament.feeOrganizingCommiteePay?.toLocaleString('vi-VN', {
+                            Số tiền mỗi người chơi phải đóng:{' '}
+                            {tournament.feePlayerPay?.toLocaleString('vi-VN', {
                                 style: 'currency',
                                 currency: 'VND',
                             })}
                         </Typography>
                     ) : (
                         ''
-                    )
-                ) : paymentStatus ? (
-                    <Typography variant="body1" sx={{ color: 'red', ml: 5 }}>
-                        Số tiền mỗi người chơi phải đóng:{' '}
-                        {tournament.feePlayerPay?.toLocaleString('vi-VN', {
-                            style: 'currency',
-                            currency: 'VND',
-                        })}
-                    </Typography>
-                ) : (
+                    )}
+                </Box>
+                {isFinish && tournament.totalAmount === 0 ? (
+                    <Button
+                        variant="outlined"
+                        startIcon={<CurrencyExchange />}
+                        sx={{ ml: 1 }}
+                        onClick={handleDialogOpen}
+                    >
+                        Tổng kết chi phí sau giải đấu
+                    </Button>
+                ) : tournament && !isFinish ? (
                     ''
+                ) : (
+                    <Typography variant="subtitle1">Giải đấu đã tổng kết</Typography>
                 )}
+                <Button variant="outlined" startIcon={<CurrencyExchange />} sx={{ ml: 1 }} onClick={handleDialogOpen}>
+                    Tổng kết chi phí sau giải đấu
+                </Button>
             </Box>
             {/* <Grid item xs={4}>
                     <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
@@ -346,6 +399,21 @@ function TournamentPayment({ tournament, tournamentStatus, value, index }) {
                         ? 'Giải đấu không yêu cầu ban tổ chức đóng phí tham gia'
                         : 'Giải đấu không yêu cầu người chơi đóng phí tham gia'}
                 </Typography>
+            )}
+            {tournament && userList && adminList && (
+                <TournamentSumUp
+                    title="Tổng kết chi phí sau giải đấu"
+                    params={{ tournament, userList, adminList, funClub }}
+                    isOpen={openSumUpDialog}
+                    handleClose={() => {
+                        setOpenSumUpDialog(false);
+                    }}
+                    onSucess={(newItem) => {
+                        setFunClub((prev) => prev + newItem);
+                        setOpenSumUpDialog(false);
+                    }}
+                    user={user}
+                />
             )}
         </Box>
     );

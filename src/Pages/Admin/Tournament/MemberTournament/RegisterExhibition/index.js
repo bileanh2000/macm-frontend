@@ -55,7 +55,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
     };
 
     const validationSchema = Yup.object().shape({
-        teamName: Yup.string().required('Không được để trống trường này'),
+        teamName: Yup.string().trim().required('Không được để trống trường này'),
     });
 
     const {
@@ -67,7 +67,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
         setError,
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const handleChangeExhibitionType = (event) => {
