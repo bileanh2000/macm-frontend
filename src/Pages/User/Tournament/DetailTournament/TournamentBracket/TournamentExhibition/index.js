@@ -29,7 +29,7 @@ import Gold from 'src/Components/Common/Material/Gold';
 import Sliver from 'src/Components/Common/Material/Sliver';
 import Brone from 'src/Components/Common/Material/Brone';
 
-function TournamentExhibition({ exhibition, result }) {
+function TournamentExhibition({ exhibition, result, type }) {
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
     console.log(exhibition);
     let { tournamentId } = useParams();
@@ -45,10 +45,11 @@ function TournamentExhibition({ exhibition, result }) {
         console.log(event.target.value);
         if (result && result.length > 0) {
             const _result = result.find((subResult) =>
-                subResult.data.find((d) => d.exhibitionType.id == event.target.value),
-            ).data[0].listResult;
-            setTournamentResult(_result);
-            console.log('result', _result);
+                subResult.data.length > 0
+                    ? subResult.data.find((d) => d.exhibitionType.id == event.target.value)
+                    : null,
+            );
+            setTournamentResult(_result ? _result.data[0].listResult : null);
         }
         setExhibitionType(event.target.value);
         const team = exhibition.find((t) => t.exhibitionTypeId === event.target.value);
@@ -69,10 +70,14 @@ function TournamentExhibition({ exhibition, result }) {
             console.log(response);
             setListExhibitionType(response.data);
             setExhibitionType(response.data[0].id);
+            type == 0 && setExhibitionType(response.data[0].id);
+            console.log(response.data[0].id, result);
             const _result = result.find((subResult) =>
-                subResult.data.find((d) => d.exhibitionType.id == response.data[0].id),
-            ).data[0].listResult;
-            setTournamentResult(_result);
+                subResult.data.length > 0
+                    ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
+                    : null,
+            );
+            setTournamentResult(_result ? _result.data[0].listResult : null);
             const team = exhibition.find((t) => t.exhibitionTypeId === response.data[0].id);
             setMyTeam(team);
             getExhibitionResult(response.data[0].id, nowDate);
@@ -188,7 +193,7 @@ function TournamentExhibition({ exhibition, result }) {
                     </Dialog>
                 )}
             </Box>
-            {tournamentResult != null && (
+            {tournamentResult && tournamentResult.length > 0 && (
                 <Paper elevation={3} sx={{ m: 2, p: 2 }}>
                     <Typography variant="h6">Kết quả bảng đấu</Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -196,21 +201,27 @@ function TournamentExhibition({ exhibition, result }) {
                             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                 <Gold />
 
-                                <Typography variant="body1">{tournamentResult[0].teamName}</Typography>
+                                <Typography variant="body1">
+                                    {tournamentResult.filter((result) => result.rank == 1)[0].teamName}
+                                </Typography>
                             </Box>
                         </Tooltip>
                         <Tooltip title="Huy chương bạc">
                             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                 <Sliver />
 
-                                <Typography variant="body1">{tournamentResult[1].teamName}</Typography>
+                                <Typography variant="body1">
+                                    {tournamentResult.filter((result) => result.rank == 2)[0].teamName}
+                                </Typography>
                             </Box>
                         </Tooltip>
                         <Tooltip title="Huy chương đồng">
                             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                 <Brone />
 
-                                <Typography variant="body1">{tournamentResult[2].teamName}</Typography>
+                                <Typography variant="body1">
+                                    {tournamentResult.filter((result) => result.rank == 3)[0].teamName}
+                                </Typography>
                             </Box>
                         </Tooltip>
                     </Box>
@@ -220,11 +231,11 @@ function TournamentExhibition({ exhibition, result }) {
                 <div>
                     <TableMatch matches={exhibitionTeam} status={tournamentStatus} />
                 </div>
-            ) : tournamentStatus == 1 ? (
-                <Box sx={{ d: 'flex' }}>
-                    <Typography variant="body1">Thể thức thi đấu này hiện đang chưa có tuyển thủ</Typography>
-                </Box>
             ) : (
+                // ) : tournamentStatus < 2 ? (
+                //     <Box sx={{ d: 'flex' }}>
+                //         <Typography variant="body1">Thể thức thi đấu này hiện đang chưa có tuyển thủ</Typography>
+                //     </Box>
                 <Box sx={{ d: 'flex' }}>
                     <Typography variant="body1" sx={{ m: 'auto' }}>
                         Thể thức thi đấu này không tổ chức

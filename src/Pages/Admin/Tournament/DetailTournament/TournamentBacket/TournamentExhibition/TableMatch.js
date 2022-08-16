@@ -73,7 +73,8 @@ function TableMatch(params) {
         score: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
+            .min(1, 'Vui lòng nhập giá trị lớn hơn 0')
+            .max(100, 'Số điểm không vượt quá 100'),
     });
 
     const {
@@ -83,7 +84,7 @@ function TableMatch(params) {
         reset,
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const handleClickResult = (data) => {
@@ -287,6 +288,7 @@ function TableMatch(params) {
                                 name={areaName}
                                 onClose={handleClose}
                                 onUpdate={handleUpdateTime}
+                                endDate={params.endDate}
                             />
                         </DialogContent>
                         {/* <DialogActions>

@@ -136,7 +136,7 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
     Yup.addMethod(Yup.mixed, 'uniqueEmail', uniqueEmail);
     Yup.addMethod(Yup.mixed, 'uniquePhone', uniquePhone);
     const validationSchema = Yup.object().shape({
-        name: Yup.string().required('Không được để trống trường này'),
+        name: Yup.string().trim().required('Không được để trống trường này'),
         studentId: Yup.mixed().uniqueStudentId(),
         dateOfBirth: Yup.string().nullable().required('Không được để trống trường này'),
         email: Yup.mixed().uniqueEmail(),
@@ -158,7 +158,7 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
         formState: { errors, isSubmitSuccessful },
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const onSubmit = async (data) => {

@@ -49,7 +49,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
     const [pageSize, setPageSize] = useState(10);
     const [openDelete, setOpenDelete] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
-    const [competitivePlayerId, setCompetitivePlayerId] = useState(0);
+    const [competitivePlayerId, setCompetitivePlayerId] = useState();
     const [openDialogExhibition, setOpenDialogExhibition] = useState(false);
     const [exhibitionTeam, setExhibitionTeam] = useState();
     const [page, setPage] = useState(0);
@@ -363,9 +363,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                         {index + 1}
                     </TableCell>
                     <TableCell align="left">{row.teamName}</TableCell>
-                    {/* <TableCell align="left">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell> */}
                     <TableCell align="left">{row.exhibitionTypeName}</TableCell>
-                    {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
                     {status <= 2 && (
                         <TableCell align="left">
                             <Tooltip title="Chỉnh sửa thông tin đội tham gia">
@@ -512,7 +510,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     </Table>
                 </TableContainer>
             )}
-            {competitivePlayerId > 0 && (
+            {competitivePlayerId && (
                 <Dialog
                     // fullWidth
                     // maxWidth="md"
@@ -539,7 +537,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     </DialogActions>
                 </Dialog>
             )}
-            {competitivePlayerId > 0 && (
+            {competitivePlayerId && (
                 <Dialog
                     // fullWidth
                     // maxWidth="md"
@@ -549,7 +547,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     aria-describedby="alert-dialog-description"
                 >
                     <DialogTitle id="alert-dialog-title">
-                        Chỉnh sửa cân nặng cho vận động viên
+                        Chỉnh sửa cân nặng cho vận động viên{' '}
                         <strong>
                             {competitivePlayerId.studentName} - {competitivePlayerId.studentId}
                         </strong>

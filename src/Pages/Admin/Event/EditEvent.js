@@ -37,6 +37,12 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 const cx = classNames.bind(styles);
 
 function EditEvent() {
+    const max = '2200-12-31';
+    const today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    const min = moment(tomorrow).format('yyyy-MM-DD');
+
     const [isChecked, setIsChecked] = useState(false);
     const [description, setDescription] = useState('');
     const [submitData, setSubmitData] = useState([]);
@@ -90,7 +96,7 @@ function EditEvent() {
     }, []);
     // console.log(events);
     const validationSchema = Yup.object().shape({
-        name: Yup.string().required('Không được để trống trường này'),
+        name: Yup.string().trim().required('Không được để trống trường này'),
         maxQuantityComitee: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
@@ -103,12 +109,18 @@ function EditEvent() {
         //     .required('Không được để trống trường này')
         //     .typeError('Vui lòng nhập số')
         //     .min(1, 'Vui lòng nhập giá trị lớn hơn 0'),
-        startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
+        startDate: Yup.date()
+            .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+            .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
+            .typeError('Vui lòng nhập đúng định dạng')
+            .required('Không được để trống trường này'),
         finishDate: Yup.date()
             .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được bé hơn ngày bắt đầu`)
-            .typeError('Vui lòng không để trống trường này'),
-        startTime: Yup.date().typeError('Vui lòng không để trống trường này'),
-        finishTime: Yup.date().typeError('Vui lòng không để trống trường này'),
+            .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
+            .typeError('Vui lòng nhập đúng định dạng')
+            .required('Không được để trống trường này'),
+        startTime: Yup.date().typeError('Vui lòng nhập đúng định dạng').required('Không được để trống trường này'),
+        finishTime: Yup.date().typeError('Vui lòng nhập đúng định dạng').required('Không được để trống trường này'),
     });
     const {
         register,
@@ -117,7 +129,7 @@ function EditEvent() {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });

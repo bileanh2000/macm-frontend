@@ -41,7 +41,7 @@ function EventItem({ data, onSuccess }) {
         (id) => () => {
             handleCloseDialog();
             setTimeout(() => {
-                eventApi.deleteEvent(id).then((res) => {
+                eventApi.deleteEvent(id, user.studentId).then((res) => {
                     if (res.data.length !== 0) {
                         console.log('delete', res);
                         console.log('delete', res.data);

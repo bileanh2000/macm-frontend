@@ -147,7 +147,17 @@ function EventDetails() {
             return false;
         }
     };
+
+    const checkFinish = () => {
+        const nowDate = new Date();
+        if (new Date(scheduleList[scheduleList.length - 1].date) <= nowDate) {
+            return true;
+        } else {
+            return false;
+        }
+    };
     const isUpdate = tournament && checkUpdate();
+    const isFinish = scheduleList.length > 0 && checkFinish();
 
     const handleDelete = useCallback(
         (id) => () => {
@@ -322,7 +332,7 @@ function EventDetails() {
                                 <MenberEvent />
                             </TabPanel>
                             <TabPanel value={value} index={4}>
-                                <EventFee event={tournament} isUpdate={isUpdate} user={user} />
+                                <EventFee event={tournament} isUpdate={isUpdate} user={user} isFinish={isFinish} />
                             </TabPanel>
                             <TabPanel value={value} index={5}>
                                 {/* <MemberTournament tournament={tournament} isUpdate={isUpdate} /> */}

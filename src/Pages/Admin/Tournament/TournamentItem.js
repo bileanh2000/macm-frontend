@@ -36,7 +36,7 @@ function TournamentItem({ data, onSuccess }) {
         (id) => () => {
             handleCloseDialog();
             setTimeout(() => {
-                adminTournament.deleteTournament(id).then((res) => {
+                adminTournament.deleteTournament(id, user.studentId).then((res) => {
                     if (res.data.length !== 0) {
                         console.log('delete', res);
                         console.log('delete', res.data);
@@ -61,10 +61,10 @@ function TournamentItem({ data, onSuccess }) {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa sự kiện "${tournamentOnclick.name}"?`}</DialogTitle>
+                <DialogTitle id="alert-dialog-title">{`Bạn muốn xóa giải đấu "${tournamentOnclick.name}"?`}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        "{tournamentOnclick.name}" sẽ được xóa khỏi danh sách sự kiện!
+                        "{tournamentOnclick.name}" sẽ được xóa khỏi danh sách giải đấu!
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

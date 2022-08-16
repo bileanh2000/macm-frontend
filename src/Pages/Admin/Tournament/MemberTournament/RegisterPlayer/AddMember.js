@@ -17,6 +17,7 @@ const icon = <CheckBoxOutlineBlank fontSize="small" />;
 const checkedIcon = <CheckBox fontSize="small" />;
 
 function AddMember(props) {
+    console.log('data', props.allMember);
     const [user, setUser] = useState(props.data);
     const allSelected = props.allMember.length === user.length;
 

@@ -14,13 +14,13 @@ const adminFunAPi = {
         return axiosClient.get(url);
     },
 
-    depositToClubFund: (amount, note) => {
-        const url = `/admin/treasurer/deposittoclubfund/${amount}`;
+    depositToClubFund: (amount, note, studentId) => {
+        const url = `/admin/treasurer/deposittoclubfund/${amount}/${studentId}`;
         return axiosClient.put(url, null, { params: { note: note } });
     },
 
-    withdrawFromClubFund: (amount, note) => {
-        const url = `/admin/treasurer/withdrawfromclubfund/${amount}`;
+    withdrawFromClubFund: (amount, note, studentId) => {
+        const url = `/admin/treasurer/withdrawfromclubfund/${amount}/${studentId}`;
         return axiosClient.put(url, null, { params: { note: note } });
     },
 };

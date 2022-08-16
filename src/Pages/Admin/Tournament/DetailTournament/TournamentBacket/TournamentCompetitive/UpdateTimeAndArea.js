@@ -8,12 +8,26 @@ import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import moment from 'moment';
 
-function UpdateTimeAndArea({ areaList, match, name, onClose, onUpdate }) {
+function UpdateTimeAndArea({ areaList, match, name, onClose, onUpdate, endDate }) {
+    const max = moment(endDate).format('yyyy-MM-DD');
+    const today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    const min = moment(tomorrow).format('yyyy-MM-DD');
+
     const [areaName, setAreaId] = useState(name);
 
     const validationSchema = Yup.object().shape({
-        date: Yup.string().nullable().required('Không được để trống trường này'),
-        startTime: Yup.string().nullable().required('Không được để trống trường này'),
+        date: Yup.date()
+            .nullable()
+            .required('Vui lòng không để trống trường này')
+            .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+            .max(max, 'Vui lòng chọn ngày trong thời gian thi đấu')
+            .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy'),
+        startTime: Yup.date()
+            .nullable()
+            .required('Vui lòng không để trống trường này')
+            .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm'),
     });
 
     const {

@@ -3,13 +3,13 @@
 import axiosClient from './axiosClient';
 
 const adminTournament = {
-    createTournament: (params) => {
-        const url = `/tournament/headclub/createtournament?isOverwritten=true`;
+    createTournament: (params, studentId) => {
+        const url = `/tournament/headclub/createtournament/${studentId}?isOverwritten=true`;
         return axiosClient.post(url, params);
     },
 
-    deleteTournament: (tournamentId) => {
-        const url = `tournament/headclub/delete/${tournamentId}`;
+    deleteTournament: (tournamentId, studentId) => {
+        const url = `tournament/headclub/delete/${tournamentId}/${studentId}`;
         return axiosClient.put(url);
     },
 
@@ -179,8 +179,8 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
-    updateTournamentOrganizingCommitteePaymentStatus: (id) => {
-        const url = `/tournament/treasurer/updatetournamentorganizingcommitteepaymentstatus/${id}`;
+    updateTournamentOrganizingCommitteePaymentStatus: (id, studentId) => {
+        const url = `/tournament/treasurer/updatetournamentorganizingcommitteepaymentstatus/${id}/${studentId}`;
         return axiosClient.put(url);
     },
 
@@ -194,14 +194,19 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
-    updateTournamentPlayerPaymentStatus: (tournamentId) => {
-        const url = `/tournament/treasurer/updatetournamentplayerpaymentstatus/${tournamentId}`;
+    updateTournamentPlayerPaymentStatus: (tournamentId, studentId) => {
+        const url = `/tournament/treasurer/updatetournamentplayerpaymentstatus/${tournamentId}/${studentId}`;
         return axiosClient.put(url);
     },
 
     getAllTournamentPlayerPaymentStatusReport: (tournamentId) => {
         const url = `/tournament/treasurer/getalltournamentplayerpaymentstatusreport/${tournamentId}`;
         return axiosClient.get(url);
+    },
+
+    updateAfterTournament: (tournamentId, studentId, totalAmountActual) => {
+        const url = `/tournament/headclub/updateaftertournament/${tournamentId}/${studentId}`;
+        return axiosClient.put(url, null, { params: { totalAmountActual: totalAmountActual } });
     },
 
     ///////////////////////////
@@ -335,6 +340,11 @@ const adminTournament = {
     updateExhibitionResult: (exhibitionTeamId, score) => {
         const url = `/exhibition/headclub/updateexhibitionresult/${exhibitionTeamId}`;
         return axiosClient.put(url, null, { params: { score: score } });
+    },
+
+    getAllSuggestType: () => {
+        const url = `/tournament/headclub/getallsuggesttype`;
+        return axiosClient.get(url);
     },
 };
 export default adminTournament;

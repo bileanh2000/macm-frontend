@@ -41,10 +41,13 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
 
     const schema = Yup.object().shape({
         // date: Yup.string().nullable().required('Vui lòng không để trống trường này'),
-        startTime: Yup.date().nullable().required('Vui lòng không để trống trường này'),
+        startTime: Yup.date()
+            .nullable()
+            .required('Vui lòng không để trống trường này')
+            .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm'),
         finishTime: Yup.date()
             // .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
-            .typeError('Vui lòng không để trống trường này')
+            .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm')
             .test('deadline_test', 'Thời gian kết thúc không được sớm hơn thời gian bắt đầu', function (value) {
                 const { startTime } = this.parent;
                 return value.getTime() > startTime.getTime();

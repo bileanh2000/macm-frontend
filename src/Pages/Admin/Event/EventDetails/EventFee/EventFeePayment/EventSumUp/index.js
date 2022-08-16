@@ -23,6 +23,7 @@ import NumberFormat from 'react-number-format';
 import eventApi from 'src/api/eventApi';
 
 function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
     const [isFirstChecked, setIsFirstChecked] = useState(false);
     const [isSecondChecked, setIsSecondChecked] = useState(false);
     const [customAlert, setCustomAlert] = useState({ severity: '', message: '' });
@@ -123,7 +124,7 @@ function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
             money: !isFirstChecked ? data.balance : costIncurred,
         };
         console.log(submitData);
-        eventApi.updateAfterEvent(submitData).then((res) => {
+        eventApi.updateAfterEvent(submitData, user.studentId).then((res) => {
             console.log(res);
             if (res.data.length != 0) {
                 setOpenSnackBar(true);

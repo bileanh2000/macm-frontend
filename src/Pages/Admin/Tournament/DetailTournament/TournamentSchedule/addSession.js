@@ -32,6 +32,12 @@ import { useSnackbar } from 'notistack';
 import adminTournament from 'src/api/adminTournamentAPI';
 
 function AddSession({ title, children, isOpen, handleClose, onSucess, date, isDisabled }) {
+    const max = '2200-12-31';
+    const today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    const min = moment(tomorrow).format('yyyy-MM-DD');
+
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     moment().locale('vi');
     let { tournamentId } = useParams();
@@ -39,15 +45,24 @@ function AddSession({ title, children, isOpen, handleClose, onSucess, date, isDi
     let navigate = useNavigate();
 
     const schema = Yup.object().shape({
-        date: Yup.string().nullable().required('Vui lòng không để trống trường này'),
-        startTime: Yup.date().nullable().required('Vui lòng không để trống trường này'),
+        date: Yup.date()
+            .nullable()
+            .required('Vui lòng không để trống trường này')
+            .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+            .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
+            .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy'),
+        startTime: Yup.date()
+            .nullable()
+            .required('Vui lòng không để trống trường này')
+            .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm'),
         finishTime: Yup.date()
             // .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
-            .typeError('Vui lòng không để trống trường này')
+            .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm')
             .test('deadline_test', 'Thời gian kết thúc không được sớm hơn thời gian bắt đầu', function (value) {
                 const { startTime } = this.parent;
                 return value.getTime() >= startTime.getTime();
-            }),
+            })
+            .required('Vui lòng không để trống trường này'),
     });
 
     const { control, handleSubmit } = useForm({

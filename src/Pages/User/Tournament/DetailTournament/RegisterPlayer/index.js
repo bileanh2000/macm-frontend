@@ -34,7 +34,15 @@ import { Delete } from '@mui/icons-material';
 import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
 
-function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCompetitive, isJoinExhibition }) {
+function RegisterPlayer({
+    title,
+    isOpen,
+    handleClose,
+    userInformation,
+    isJoinCompetitive,
+    isJoinExhibition,
+    onRegister,
+}) {
     const userInfo = { ...userInformation, studentName: userInformation.name };
     // const userInfo = { gender: true, studentId: 'HE150001', studentName: 'dam van toan 22' };
     // console.log(userInfo);
@@ -74,7 +82,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                 .max(maxWeight, `Vui lòng nhập hạng cân trong khoảng ${minWeight} - ${maxWeight} Kg`),
         }),
         ...(type === 2 && {
-            teamName: Yup.string().required('Không được để trống trường này'),
+            teamName: Yup.string().trim().required('Không được để trống trường này'),
         }),
     });
 
@@ -87,7 +95,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
         setError,
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
     const checkValidWeight = (e) => {
         console.log(e.target.value, minWeight, maxWeight);
@@ -152,6 +160,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
             );
             let variant = response.data > 0 ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
+            onRegister && onRegister();
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar(error, { variant });
@@ -167,6 +176,7 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
             );
             let variant = response.data > 0 ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
+            onRegister && onRegister();
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar(error, { variant });
@@ -194,7 +204,8 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
             console.log(params);
             registerToJoinTournamentExhibitionType(tournamentId, userInformation.studentId, params);
         }
-        handleClose && handleClose();
+
+        handleCloseDialog();
     };
 
     const handleDelete = (data) => {
@@ -244,8 +255,8 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
         <Dialog
             open={!!isOpen}
             onClose={handleClose}
-            fullWidth
-            maxWidth="lg"
+            // fullWidth
+            // maxWidth="lg"
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
@@ -469,8 +480,18 @@ function RegisterPlayer({ title, isOpen, handleClose, userInformation, isJoinCom
                 )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
-                <Button onClick={handleSubmit(handleRegister)} autoFocus>
+                <Button variant="outline" onClick={handleCloseDialog}>
+                    Hủy bỏ
+                </Button>
+                <Button
+                    variant="contained"
+                    onClick={handleSubmit(handleRegister)}
+                    autoFocus
+                    disabled={
+                        (type == 2 && (dataFemale.length != numberFemale || dataMale.length != numberMale)) ||
+                        (type == 1 && !(isJoinCompetitive.length == 0 && listWeightRange.length > 0))
+                    }
+                >
                     {/* <Button onClick={handleSubmit(onSubmit)} autoFocus> */}
                     Đồng ý
                 </Button>

@@ -45,6 +45,7 @@ function Event() {
     const [pageSize, setPageSize] = useState(10);
     const [semester, setSemester] = useState('Summer2022');
     const [monthInSemester, setMonthInSemester] = useState([]);
+    const [suggestionRole, setSuggestionRole] = useState([]);
     const [month, setMonth] = useState(0);
     const [semesterList, setSemesterList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
@@ -95,6 +96,19 @@ function Event() {
         }
     };
 
+    const getAllSuggestionRole = async () => {
+        try {
+            const response = await eventApi.getAllSuggestionRole();
+            const roles = response.data.map((role) => {
+                return { ...role, maxQuantity: 5 };
+            });
+            console.log('suggestion role: ', roles);
+            setSuggestionRole(roles);
+        } catch (error) {
+            console.warn('Failed to get all suggestion role', error);
+        }
+    };
+
     const fetchSemester = async () => {
         try {
             const response = await semesterApi.getTop3Semester();
@@ -142,6 +156,7 @@ function Event() {
     }, [page]);
     useEffect(() => {
         fetchSemester();
+        getAllSuggestionRole();
     }, []);
     useEffect(() => {
         getListEventsBySemester(month, page - 1, semester);
@@ -163,13 +178,17 @@ function Event() {
 
     return (
         <Fragment>
-            <AddEventDialog
-                title="Thêm sự kiện mới"
-                isOpen={openDialog}
-                handleClose={() => {
-                    setOpenDialog(false);
-                }}
-            />
+            {suggestionRole && (
+                <AddEventDialog
+                    title="Thêm sự kiện mới"
+                    roles={suggestionRole}
+                    isOpen={openDialog}
+                    handleClose={() => {
+                        setOpenDialog(false);
+                    }}
+                    user={user}
+                />
+            )}
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                     Danh sách sự kiện
@@ -257,6 +276,7 @@ function Event() {
                                                         prev.filter((item) => item.id !== deletedId),
                                                     )
                                                 }
+                                                user={user}
                                             />
                                         );
                                     })}

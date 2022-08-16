@@ -235,7 +235,7 @@ function CreateTourament() {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     return (

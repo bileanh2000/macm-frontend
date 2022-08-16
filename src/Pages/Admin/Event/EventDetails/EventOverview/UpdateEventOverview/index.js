@@ -33,7 +33,12 @@ import eventApi from 'src/api/eventApi';
 import EditableSchedule from 'src/Pages/Admin/Tournament/CreateTournament/Schedule/EditableSchedule';
 
 function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessSchedule, onSuccessEvent, schedule }) {
-    console.log(data);
+    const max = '2200-12-31';
+    const today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    const min = moment(tomorrow).format('yyyy-MM-DD');
+
     const { enqueueSnackbar } = useSnackbar();
     const [datasFightingCompetition, setDataFightingCompetition] = useState(data.competitiveTypes);
     const [datasPerformanceCompetition, setDataPerformanceCompetition] = useState(data.exhibitionTypes);
@@ -94,33 +99,35 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
     };
 
     const validationSchema = Yup.object().shape({
-        name: Yup.string().required('Không được để trống trường này'),
+        name: Yup.string().trim().required('Không được để trống trường này'),
         // description: Yup.string().required('Không được để trống trường này'),
         startDate: Yup.date()
-
-            .typeError('Vui lòng không để trống trường này')
-            .required('Vui lòng không để trống trường này'),
-
+            .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+            .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
+            .required('Vui lòng không để trống trường này')
+            .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy'),
         finishDate: Yup.date()
             .test('same_dates_test', 'Thời gian kết thúc phải muộn hơn thời gian bắt đầu', function (value) {
                 const { startDate } = this.parent;
                 return value.getTime() !== startDate.getTime();
             })
             .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc phải muộn hơn thời gian bắt đầu`)
-            .required('Vui lòng không để trống trường này')
-            .typeError('Vui lòng không để trống trường này')
+            .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
+            .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy')
             .required('Vui lòng không để trống trường này'),
 
         registrationMemberDeadline: Yup.date()
             .max(Yup.ref('startDate'), ({ max }) => `Deadline không được muộn hơn thời gian bắt đầu`)
-            .typeError('Vui lòng không để trống trường này')
+            .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+            .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy')
             .required('Vui lòng không để trống trường này'),
         ...(data.registrationOrganizingCommitteeDeadline === null
             ? null
             : {
                   registrationOrganizingCommitteeDeadline: Yup.date()
                       .max(Yup.ref('startDate'), ({ max }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`)
-                      .typeError('Vui lòng không để trống trường này')
+                      .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+                      .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy')
                       .required('Vui lòng không để trống trường này')
                       .test('same_dates_test', 'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu', function (value) {
                           const { startDate } = this.parent;
@@ -282,7 +289,7 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
         reset,
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
     return (
         <Fragment>
