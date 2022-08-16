@@ -62,7 +62,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     const [previewEvent, setPreviewEvent] = useState([]);
     //-------
     const [existedDate, setExistedDate] = useState([]);
-    const [submitOption, setSubmitOption] = useState(0);
+    const [submitOption, setSubmitOption] = useState(-1);
     const [isOpenPreviewDialog, setIsOpenPreviewDialog] = useState(false);
     const [isEditableSchedule, setIsEditableSchedule] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
@@ -674,7 +674,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                 <FormControlLabel
                                                     value={2}
                                                     control={<Radio onClick={handleBack} />}
-                                                    label="Chỉnh sửa thời gian giải đấu"
+                                                    label="Chỉnh sửa thời gian sự kiện"
                                                 />
                                             </RadioGroup>
                                         </FormControl>
@@ -1153,7 +1153,12 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                             </Button>
                         )}
                         {activeStep === steps.length - 1 ? (
-                            <Button onClick={handleSubmit(handleCreateEvent)}>Tạo sự kiện</Button>
+                            <Button
+                                onClick={handleSubmit(handleCreateEvent)}
+                                disabled={submitOption != 0 && existedDate.length !== 0}
+                            >
+                                Tạo sự kiện
+                            </Button>
                         ) : activeStep === 1 ? (
                             <Button onClick={handleNext} disabled={datas.length === 0}>
                                 {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}

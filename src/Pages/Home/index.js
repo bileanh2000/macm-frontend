@@ -21,10 +21,12 @@ import { getAllRole } from 'src/Roles/index';
 import { IfAllGranted, IfAuthorized } from 'react-authorization';
 import ForbiddenPage from '../ForbiddenPage';
 import UpNext from '../Admin/Home/UpNext';
+import notificationApi from 'src/api/notificationApi';
 
 function Index() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
+    const [paymentStatus, setPaymentStatus] = useState([]);
 
     const roleId = JSON.parse(localStorage.getItem('currentUser')).role.id;
 
@@ -36,6 +38,16 @@ function Index() {
         localStorage.removeItem('toShowPopup');
         setOpenNotificationDialog(false);
     };
+    const fetchPaymentNotification = async (studentId) => {
+        try {
+            const response = await notificationApi.checkPaymentStatus(studentId);
+            console.log('fetchPaymentNotification', response);
+            setPaymentStatus(response.data);
+        } catch (error) {
+            console.log('failed when fetchPaymentNotification', error);
+        }
+    };
+
     useEffect(() => {
         console.log(getAllRole);
         if (

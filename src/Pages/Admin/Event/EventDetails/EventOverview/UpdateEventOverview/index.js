@@ -6,8 +6,12 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    FormControl,
+    FormControlLabel,
     Grid,
     InputAdornment,
+    Radio,
+    RadioGroup,
     TextField,
     Typography,
 } from '@mui/material';
@@ -26,6 +30,7 @@ import moment from 'moment';
 import NumberFormat from 'react-number-format';
 import PreviewSchedule from '../../../PreviewSchedule';
 import eventApi from 'src/api/eventApi';
+import EditableSchedule from 'src/Pages/Admin/Tournament/CreateTournament/Schedule/EditableSchedule';
 
 function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessSchedule, onSuccessEvent, schedule }) {
     console.log(data);
@@ -40,11 +45,52 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
     const [eventSchedule, setEventSchedule] = useState([]);
     const [eventTime, setEventTime] = useState([]);
 
+    const [existedDate, setExistedDate] = useState([]);
+    const [submitOption, setSubmitOption] = useState(-1);
+    // const [isOpenPreviewDialog, setIsOpenPreviewDialog] = useState(false);
+    const [isEditableSchedule, setIsEditableSchedule] = useState(false);
+    const [isUpdate, setIsUpdate] = useState(false);
+    const [preview, setPreview] = useState([]);
+    const [disabled, setDisabled] = useState(false);
+    const [isOverride, setIsOverride] = useState(-1);
+
     const AddFightingCompetitionHandler = (FightingCompetition) => {
         setDataFightingCompetition(FightingCompetition);
     };
     const PerformanceCompetitionHandler = (PerformanceCompetition) => {
         setDataPerformanceCompetition(PerformanceCompetition);
+    };
+
+    const handleChange = (event) => {
+        setSubmitOption(event.target.value);
+    };
+    const checkOverride = (TournamentSchedule) => {
+        const arrayCheck = TournamentSchedule.map((item) => {
+            if (item.title.toString() === 'Trùng với Lịch tập') {
+                return 2;
+            } else if (item.title.toString().includes('Trùng với')) {
+                return 1;
+            } else {
+                return -1;
+            }
+        });
+        console.log('arrayCheck', arrayCheck);
+        if (arrayCheck.find((item) => item === 1)) {
+            console.log('check', 1);
+            setDisabled(true);
+            setIsOverride(1);
+        } else {
+            if (arrayCheck.find((item) => item === 2)) {
+                console.log('check', 2);
+                setDisabled(true);
+                setIsOverride(2);
+                // isStepFailed(4);
+            } else {
+                console.log('check', -1);
+                setDisabled(false);
+                setIsOverride(-1);
+            }
+        }
     };
 
     const validationSchema = Yup.object().shape({
@@ -109,7 +155,7 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
         //     .max(100000000, 'Giá trị không hợp lệ'),
     });
 
-    const onPreviewData = async (data) => {
+    const onPreviewData = (data) => {
         let eventInforPreview = {
             name: data.name,
             description: data.description,
@@ -134,12 +180,48 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
         // setEventSchedulePreview(previewScheduleData);
         setEventTime(data);
         setPreviewEvent(eventInforPreview);
-
+        setPreview(previewScheduleData);
         console.log('eventInforPreview', eventInforPreview);
         console.log('previewScheduleData', previewScheduleData);
-        eventApi.udpateEventPreview(previewScheduleData).then((res) => {
+
+        // eventApi.udpateEventPreview(previewScheduleData).then((res) => {
+        //     if (res.data.length !== 0) {
+        //         checkOverride(res.data);
+        //         setEventSchedule(res.data);
+        //         let existedDate = res.data.filter((i) => i.existed);
+        //         setExistedDate(existedDate);
+        //         console.log(res.data);
+        //         const scheduleData = res.data.map((item) => {
+        //             const container = {};
+        //             container['id'] = item.id;
+        //             container['date'] = item.date;
+        //             container['title'] = item.title;
+        //             container['display'] = 'background';
+        //             container['time'] = item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
+
+        //             container['backgroundColor'] = item.existed ? '#ffb199' : '#ccffe6';
+        //             return container;
+        //         });
+        //         setEventSchedulePreview(scheduleData);
+        //         setIsOpenPreviewDialog(true);
+
+        //         // let variant = 'success';
+        //         // enqueueSnackbar(res.message, { variant });
+        //         // onSuccess && onSuccess(res.data[0]);
+        //     } else {
+        //         enqueueSnackbar(res.message, { variant: 'error' });
+        //     }
+        // });
+
+        // handleClose && handleClose();
+    };
+    useEffect(() => {
+        eventApi.udpateEventPreview(preview).then((res) => {
             if (res.data.length !== 0) {
+                checkOverride(res.data);
                 setEventSchedule(res.data);
+                let existedDate = res.data.filter((i) => i.existed);
+                setExistedDate(existedDate);
                 console.log(res.data);
                 const scheduleData = res.data.map((item) => {
                     const container = {};
@@ -153,8 +235,9 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
                     return container;
                 });
                 setEventSchedulePreview(scheduleData);
-                setIsOpenPreviewDialog(true);
-
+                if (!isOpenPreviewDialog) {
+                    setIsOpenPreviewDialog(true);
+                }
                 // let variant = 'success';
                 // enqueueSnackbar(res.message, { variant });
                 // onSuccess && onSuccess(res.data[0]);
@@ -162,9 +245,8 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
                 enqueueSnackbar(res.message, { variant: 'error' });
             }
         });
-
-        // handleClose && handleClose();
-    };
+        setIsUpdate(false);
+    }, [preview, isUpdate]);
     const onUpdateEvent = () => {
         console.log('EVENTSCHEDULE 153', eventSchedule);
         console.log('EVENTSCHEDULE Id 154', id);
@@ -204,6 +286,21 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
     });
     return (
         <Fragment>
+            {isEditableSchedule && (
+                <EditableSchedule
+                    isOpen={isEditableSchedule}
+                    handleClose={() => {
+                        setIsEditableSchedule(false);
+                        // handleSubmit(handlePreviewSchedule);
+                        // handlePreviewSchedule();
+                        // handleSubmit(handlePreviewSchedule);
+
+                        setIsUpdate(true);
+                    }}
+                    initialDate={eventSchedule[0] && new Date(eventSchedule[0].date)}
+                    description={existedDate}
+                />
+            )}
             <Dialog
                 fullWidth
                 maxWidth="md"
@@ -285,6 +382,49 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
                                     </Box>
                                 </Grid>
                             </Grid>
+                            {isOverride === 3 || isOverride === 2 ? (
+                                <>
+                                    <Typography color="error">
+                                        <strong>
+                                            Ngày {existedDate.map((i) => moment(i.date).format('DD/MM/yyyy') + ', ')}
+                                            đang trùng với lịch tập, vui lòng lựa chọn:
+                                        </strong>
+                                    </Typography>
+                                    <FormControl>
+                                        {/* <FormLabel id="demo-controlled-radio-buttons-group">Gender</FormLabel> */}
+                                        <RadioGroup
+                                            aria-labelledby="demo-controlled-radio-buttons-group"
+                                            name="controlled-radio-buttons-group"
+                                            value={submitOption}
+                                            onChange={handleChange}
+                                        >
+                                            <FormControlLabel value={0} control={<Radio />} label="Bỏ lịch tập" />
+                                            <FormControlLabel
+                                                value={1}
+                                                control={<Radio onClick={() => setIsEditableSchedule(true)} />}
+                                                label="Thay đổi lịch tập"
+                                            />
+                                            <FormControlLabel
+                                                value={2}
+                                                control={<Radio onClick={() => setIsOpenPreviewDialog(false)} />}
+                                                label="Chỉnh sửa thời gian sự kiện"
+                                            />
+                                        </RadioGroup>
+                                    </FormControl>
+                                </>
+                            ) : isOverride === 1 ? (
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography color="error">
+                                        <strong>
+                                            Không thể tạo Sự kiện (lịch bị trùng với Sự kiện hoặc giải đấu khác) vui
+                                            lòng chọn lại ngày !
+                                        </strong>
+                                    </Typography>
+                                    <Button onClick={() => setIsOpenPreviewDialog(false)}>Chọn lại ngày</Button>
+                                </Box>
+                            ) : (
+                                ''
+                            )}
                             <Box sx={{ height: '50vh', ml: 0 }}>
                                 <PreviewSchedule
                                     dataPreview={eventSchedulePreview}
@@ -296,7 +436,11 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setIsOpenPreviewDialog(false)}>Quay lại</Button>
-                    <Button variant="contained" onClick={handleSubmit(onUpdateEvent)}>
+                    <Button
+                        variant="contained"
+                        onClick={handleSubmit(onUpdateEvent)}
+                        disabled={submitOption != 0 && existedDate.length !== 0}
+                    >
                         Cập nhật thông tin
                     </Button>
                 </DialogActions>

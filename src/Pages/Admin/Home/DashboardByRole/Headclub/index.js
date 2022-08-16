@@ -16,6 +16,8 @@ import FeeReport from 'src/Pages/Admin/Home/Charts/Fee';
 import HowToRegRoundedIcon from '@mui/icons-material/HowToRegRounded';
 import semesterApi from 'src/api/semesterApi';
 import LoadingProgress from 'src/Components/LoadingProgress';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import PaymentNotification from 'src/Pages/Home/PaymentNotification';
 
 export const CustomPersentStatus = ({ persent }) => {
     let bgColor = '#ccf5e7';
@@ -51,6 +53,7 @@ function HeadClubDashboard() {
     const [balanceInCurrentMonth, setBalanceInCurrentMonth] = useState([]);
     const [balanceInLastMonth, setBalanceInLastMonth] = useState([]);
     const [currentSemester, setCurrentSemester] = useState([]);
+    const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
 
     const currentMonth = new Date().getMonth() + 1;
 
@@ -85,10 +88,23 @@ function HeadClubDashboard() {
             console.log('Failed when fetch member report', error);
         }
     };
+    const handleCloseNotificationDialog = () => {
+        // setAlreadyVisited(false);
+        localStorage.removeItem('toShowPopup');
+        setOpenNotificationDialog(false);
+    };
+    const handleOpenNotificationDialog = () => {
+        setOpenNotificationDialog(true);
+    };
     useEffect(() => {
         fetchFeeInCurrentSemester();
         fetchMemberReport();
         getPersentMemberSinceLastSemester();
+        let visited = localStorage['toShowPopup'] !== 'true';
+
+        if (!visited) {
+            handleOpenNotificationDialog();
+        }
     }, []);
     // useEffect(() => {
     //     console.log(balanceInCurrentMonth);
@@ -111,6 +127,24 @@ function HeadClubDashboard() {
 
     return (
         <Fragment>
+            <Dialog
+                open={openNotificationDialog}
+                onClose={handleCloseNotificationDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
+                <DialogContent>
+                    {/* <DialogContentText id="alert-dialog-description"></DialogContentText> */}
+                    <PaymentNotification />
+                </DialogContent>
+                <DialogActions>
+                    {/* <Button onClick={handleCloseNotificationDialog}>Disagree</Button> */}
+                    <Button onClick={handleCloseNotificationDialog} autoFocus>
+                        Thoát
+                    </Button>
+                </DialogActions>
+            </Dialog>
             {memberReport[0] ? (
                 <Fragment>
                     <Typography variant="h4" color="initial" sx={{ fontWeight: 500, mb: 2 }}>

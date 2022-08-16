@@ -51,7 +51,7 @@ function ForbiddenPage() {
             </div>
             <div className={cx('error')}>
                 <h1 className={cx('error-code')}>403</h1>
-                <h2 className={cx('error-des')}>Oops, Bạn có quyền truy cập vào nội dung này !</h2>
+                <h2 className={cx('error-des')}>Oops, Bạn không có quyền truy cập vào nội dung này !</h2>
                 {/* <a className={cx('btn')} href="/Thuedi"></a> */}
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Box
