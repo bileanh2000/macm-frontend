@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import moment from 'moment';
 
 import styles from './CustomMatchBracket.module.scss';
-import { Box, Paper, Tooltip } from '@mui/material';
+import { Box, Paper, Tooltip, Typography } from '@mui/material';
 
 const cx = classNames.bind(styles);
 
@@ -48,85 +48,165 @@ function CustomMatchBracket(params) {
                                             )}
                                             key={match.id}
                                         >
-                                            <Box sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}>
-                                                <div>
-                                                    <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                                </div>
-                                                <Tooltip
-                                                    title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
-                                                    disableHoverListener={match.firstPlayer === null}
+                                            <Box
+                                                sx={{
+                                                    pr: '1em',
+                                                    backgroundColor: '#0000000a',
+                                                    width: '100%',
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    pl: 0,
+                                                }}
+                                            >
+                                                <Typography variant="caption" sx={{ m: 1, width: '4em' }}>
+                                                    Cặp {match.matchNo}
+                                                </Typography>
+                                                <Box
+                                                    sx={{
+                                                        width: '100%',
+                                                    }}
                                                 >
-                                                    <div className={cx('tournament-bracket__match')}>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.firstPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.firstPlayer?.point}</small>
-                                                        </Box>
+                                                    <div>
+                                                        <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
                                                     </div>
-                                                </Tooltip>
-                                                <Tooltip
-                                                    title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
-                                                    disableHoverListener={match.secondPlayer === null}
-                                                >
-                                                    <div className={cx('tournament-bracket__match')}>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.secondPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.secondPlayer?.point}</small>
-                                                        </Box>
-                                                    </div>
-                                                </Tooltip>
+                                                    <Tooltip
+                                                        title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
+                                                        disableHoverListener={match.firstPlayer === null}
+                                                    >
+                                                        <div
+                                                            className={cx(
+                                                                'tournament-bracket__match',
+                                                                match.firstPlayer?.point && match.secondPlayer?.point
+                                                                    ? match.firstPlayer?.point >
+                                                                      match.secondPlayer?.point
+                                                                        ? 'winner'
+                                                                        : 'loser'
+                                                                    : '',
+                                                            )}
+                                                        >
+                                                            <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                                <small>{match.firstPlayer?.studentName}</small>
+                                                            </Box>
+                                                            <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                                <small>{match.firstPlayer?.point}</small>
+                                                            </Box>
+                                                        </div>
+                                                    </Tooltip>
+                                                    <Tooltip
+                                                        title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
+                                                        disableHoverListener={match.secondPlayer === null}
+                                                    >
+                                                        <div
+                                                            className={cx(
+                                                                'tournament-bracket__match',
+                                                                match.firstPlayer?.point && match.secondPlayer?.point
+                                                                    ? match.secondPlayer?.point >
+                                                                      match.firstPlayer?.point
+                                                                        ? 'winner'
+                                                                        : 'loser'
+                                                                    : '',
+                                                            )}
+                                                        >
+                                                            <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                                <small>{match.secondPlayer?.studentName}</small>
+                                                            </Box>
+                                                            <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                                <small>{match.secondPlayer?.point}</small>
+                                                            </Box>
+                                                        </div>
+                                                    </Tooltip>
 
-                                                <div>
-                                                    <small>
-                                                        {match.time
-                                                            ? 'Thời gian: ' + moment(match.time).format('hh:mm - DD/MM')
-                                                            : ''}
-                                                    </small>
-                                                </div>
+                                                    <div>
+                                                        <small>
+                                                            {match.time
+                                                                ? 'Thời gian: ' +
+                                                                  moment(match.time).format('HH:mm - DD/MM')
+                                                                : ''}
+                                                        </small>
+                                                    </div>
+                                                </Box>
                                             </Box>
                                         </li>
                                     ) : (
                                         <li className={cx('tournament-bracket__item')} key={match.id}>
-                                            <Box sx={{ p: '1em', backgroundColor: '#0000000a', width: '100%' }}>
-                                                <div>
-                                                    <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                                </div>
-                                                <Tooltip
-                                                    title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
-                                                    disableHoverListener={match.firstPlayer === null}
+                                            <Box
+                                                sx={{
+                                                    pr: '1em',
+                                                    backgroundColor: '#0000000a',
+                                                    width: '100%',
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    pl: 0,
+                                                }}
+                                            >
+                                                <Typography variant="caption" sx={{ m: 1, width: '4em' }}>
+                                                    Cặp {match.matchNo}
+                                                </Typography>
+                                                <Box
+                                                    sx={{
+                                                        width: '100%',
+                                                    }}
                                                 >
-                                                    <div className={cx('tournament-bracket__match')}>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.firstPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.firstPlayer?.point}</small>
-                                                        </Box>
+                                                    <div>
+                                                        <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
                                                     </div>
-                                                </Tooltip>
-                                                <Tooltip
-                                                    title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
-                                                    disableHoverListener={match.secondPlayer === null}
-                                                >
-                                                    <div className={cx('tournament-bracket__match')}>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('name')}>
-                                                            <small>{match.secondPlayer?.studentName}</small>
-                                                        </Box>
-                                                        <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                            <small>{match.secondPlayer?.point}</small>
-                                                        </Box>
+                                                    <Tooltip
+                                                        title={`${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`}
+                                                        disableHoverListener={match.firstPlayer === null}
+                                                    >
+                                                        <div
+                                                            className={cx(
+                                                                'tournament-bracket__match',
+                                                                match.firstPlayer?.point && match.secondPlayer?.point
+                                                                    ? match.firstPlayer?.point >
+                                                                      match.secondPlayer?.point
+                                                                        ? 'winner'
+                                                                        : 'loser'
+                                                                    : '',
+                                                            )}
+                                                        >
+                                                            <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                                <small>{match.firstPlayer?.studentName}</small>
+                                                            </Box>
+                                                            <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                                <small>{match.firstPlayer?.point}</small>
+                                                            </Box>
+                                                        </div>
+                                                    </Tooltip>
+                                                    <Tooltip
+                                                        title={`${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`}
+                                                        disableHoverListener={match.secondPlayer === null}
+                                                    >
+                                                        <div
+                                                            className={cx(
+                                                                'tournament-bracket__match',
+                                                                match.firstPlayer?.point && match.secondPlayer?.point
+                                                                    ? match.secondPlayer?.point >
+                                                                      match.firstPlayer?.point
+                                                                        ? 'winner'
+                                                                        : 'loser'
+                                                                    : '',
+                                                            )}
+                                                        >
+                                                            <Box sx={{ m: '0.5em' }} className={cx('name')}>
+                                                                <small>{match.secondPlayer?.studentName}</small>
+                                                            </Box>
+                                                            <Box sx={{ m: '0.5em' }} className={cx('score')}>
+                                                                <small>{match.secondPlayer?.point}</small>
+                                                            </Box>
+                                                        </div>
+                                                    </Tooltip>
+                                                    <div>
+                                                        <small>
+                                                            {match.time
+                                                                ? 'Thời gian: ' +
+                                                                  moment(match.time).format('HH:mm - DD/MM')
+                                                                : ''}
+                                                        </small>
                                                     </div>
-                                                </Tooltip>
-                                                <div>
-                                                    <small>
-                                                        {match.time
-                                                            ? 'Thời gian: ' + moment(match.time).format('hh:mm - DD/MM')
-                                                            : ''}
-                                                    </small>
-                                                </div>
+                                                </Box>
                                             </Box>
                                         </li>
                                     ),

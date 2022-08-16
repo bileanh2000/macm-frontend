@@ -42,14 +42,18 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
 
     const schema = Yup.object().shape({
         // date: Yup.string().nullable().required('Vui lòng không để trống trường này'),
-        startTime: Yup.date().nullable().required('Vui lòng không để trống trường này'),
+        startTime: Yup.date()
+            .nullable()
+            .required('Vui lòng không để trống trường này')
+            .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm'),
         finishTime: Yup.date()
             // .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
-            .typeError('Vui lòng không để trống trường này')
+            .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm')
             .test('deadline_test', 'Thời gian kết thúc không được sớm hơn thời gian bắt đầu', function (value) {
                 const { startTime } = this.parent;
                 return value.getTime() > startTime.getTime();
-            }),
+            })
+            .required('Vui lòng không để trống trường này'),
     });
 
     const handleClickOpen = () => {
@@ -124,11 +128,11 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                 <DialogTitle id="alert-dialog-title">{'Xác nhận xóa ?'}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Bạn muốn xóa buổi tập ngày {moment(date).format('DD/MM/yyyy')} ?
+                        Bạn muốn xóa buổi lịch giải đấu ngày {moment(date).format('DD/MM/yyyy')} ?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseConfirmDialog}>Từ chối</Button>
+                    <Button onClick={handleCloseConfirmDialog}>Hủy bỏ</Button>
                     <Button onClick={handleConfirmDialog} autoFocus>
                         Đồng ý
                     </Button>

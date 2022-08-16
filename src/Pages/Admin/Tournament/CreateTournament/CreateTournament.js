@@ -53,7 +53,23 @@ import EditRole from './EditRole';
 
 const steps = ['Thông tin sự kiện', 'Thêm vai trò BTC', 'Nội dung thi đấu', 'Thêm chi phí', 'Thêm lịch', 'Xem trước'];
 
-function CreateTournament({ title, children, isOpen, handleClose, onSucess, roles }) {
+function CreateTournament({
+    title,
+    children,
+    isOpen,
+    handleClose,
+    onSucess,
+    roles,
+    competitiveType,
+    exhibitionType,
+    user,
+}) {
+    const max = '2200-12-31';
+    const today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    const min = moment(tomorrow).format('yyyy-MM-DD');
+
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [activeStep, setActiveStep] = useState(0);
     // const [description, setDescription] = useState('');
@@ -67,8 +83,8 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
     const [isOverride, setIsOverride] = useState(-1);
     const [disabled, setDisabled] = useState(false);
     const [checked, setChecked] = useState(false);
-    const [datasFightingCompetition, setDataFightingCompetition] = useState([]);
-    const [datasPerformanceCompetition, setDataPerformanceCompetition] = useState([]);
+    const [datasFightingCompetition, setDataFightingCompetition] = useState(competitiveType);
+    const [datasPerformanceCompetition, setDataPerformanceCompetition] = useState(exhibitionType);
     const [existedDate, setExistedDate] = useState([]);
     const [submitOption, setSubmitOption] = useState(-1);
     const [isOpenPreviewDialog, setIsOpenPreviewDialog] = useState(false);
@@ -82,6 +98,12 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
     useEffect(() => {
         setDatas(roles);
     }, [roles]);
+    useEffect(() => {
+        setDataFightingCompetition(competitiveType);
+    }, [competitiveType]);
+    useEffect(() => {
+        setDataPerformanceCompetition(exhibitionType);
+    }, [exhibitionType]);
 
     const handleChange = (event) => {
         setSubmitOption(event.target.value);
@@ -186,14 +208,15 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
     const validationSchema = Yup.object().shape({
         ...(activeStep === 0
             ? {
-                  name: Yup.string().required('Không được để trống trường này'),
-                  description: Yup.string().required('Không được để trống trường này'),
+                  name: Yup.string().trim().required('Không được để trống trường này'),
+                  description: Yup.string().trim().required('Không được để trống trường này'),
               }
             : activeStep === 1
             ? {
                   ...(isChecked
                       ? {
                             roleName: Yup.string()
+                                .trim()
                                 .nullable()
                                 .required('Không được để trống trường này')
                                 .test('len', 'Không hợp lệ', (val) => val.length > 1)
@@ -243,8 +266,11 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
             ? {
                   startDate: Yup.date()
                       //   .max(Yup.ref('finishDate'), ({ min }) => `Thời gian bắt không được bé hơn thời gian kết thúc`)
-                      .typeError('Vui lòng không để trống trường này')
-                      .required('Vui lòng không để trống trường này'),
+                      .nullable()
+                      .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+                      .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
+                      .required('Vui lòng không để trống trường này')
+                      .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy'),
 
                   //   finishDate: Yup.date()
                   //       .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
@@ -257,16 +283,21 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                           return value.getDate() !== startDate.getDate();
                       })
                       .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
+                      .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
                       .required('Vui lòng không để trống trường này')
-                      .typeError('Vui lòng không để trống trường này')
+                      .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy')
                       .required('Vui lòng không để trống trường này'),
-                  startTime: Yup.date().typeError('Vui lòng không để trống trường này'),
+                  startTime: Yup.date()
+                      .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm')
+                      .required('Vui lòng không để trống trường này'),
                   endTime: Yup.date()
                       .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được bé hơn thời gian bắt đầu`)
-                      .typeError('Vui lòng không để trống trường này'),
+                      .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm')
+                      .required('Vui lòng không để trống trường này'),
                   datePlayerDeadline: Yup.date()
+                      .min(min, 'Vui lòng không nhập ngày trong quá khứ')
                       .max(Yup.ref('startDate'), ({ max }) => `Deadline không được muộn hơn thời gian bắt đầu`)
-                      .typeError('Vui lòng không để trống trường này')
+                      .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy HH:mm')
                       .required('Vui lòng không để trống trường này'),
                   ...(!skipped.has(1)
                       ? {
@@ -275,7 +306,8 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                     Yup.ref('startDate'),
                                     ({ min }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`,
                                 )
-                                .typeError('Vui lòng không để trống trường này')
+                                .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+                                .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy HH:mm')
                                 .required('Vui lòng không để trống trường này')
                                 .test(
                                     'same_dates_test',
@@ -468,7 +500,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
             rolesEventDto: datas,
             listPreview: previewSchedule,
         };
-        adminTournament.createTournament(createTournamentData).then((response) => {
+        adminTournament.createTournament(createTournamentData, user.studentId).then((response) => {
             enqueueSnackbar(response.message, {
                 variant: response.message.includes('Tạo giải đấu thành công') ? 'success' : 'error',
             });
@@ -509,6 +541,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
             clearErrors('registrationOrganizingCommitteeDeadline');
         }
     }, [activeStep]);
+
     return (
         <Fragment>
             <Box
@@ -539,7 +572,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                 )}
                 <Dialog
                     fullWidth
-                    maxWidth="md"
+                    maxWidth="lg"
                     open={!!isOpen}
                     onClose={handleClose}
                     aria-labelledby="alert-dialog-title"
@@ -611,7 +644,7 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                         component="span"
                                                         sx={{ fontSize: '16px', fontWeight: '700' }}
                                                     >
-                                                        Vai trò trong sự kiện:{' '}
+                                                        Vai trò trong giải đấu:{' '}
                                                     </Typography>
                                                     {skipped.has(1) ? (
                                                         <span>Không có</span>
@@ -874,12 +907,12 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                                 <TableCell align="center">{data.maxQuantity}</TableCell>
                                                                 <TableCell>
                                                                     <IconButton
-                                                                        aria-label="delete"
+                                                                        aria-label="edit"
                                                                         onClick={() => {
                                                                             // handleOpenDialog();
                                                                             handleEdit(data);
                                                                         }}
-                                                                        disabled={isEdit}
+                                                                        disabled={isEdit || isChecked}
                                                                     >
                                                                         <Edit />
                                                                     </IconButton>
@@ -1005,8 +1038,9 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                                 sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }}
                                                 variant="body1"
                                             >
-                                                Thi đấu đối kháng
+                                                Thi đấu đối kháng{' '}
                                             </Typography>
+                                            <small>Số lượng hạng mục hiện tại: {datasFightingCompetition.length}</small>
                                             <FightingCompetition
                                                 onAddFightingCompetition={AddFightingCompetitionHandler}
                                                 data={datasFightingCompetition}
@@ -1020,6 +1054,9 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                             >
                                                 Thi đấu biểu diễn
                                             </Typography>
+                                            <small>
+                                                Số lượng hạng mục hiện tại: {datasPerformanceCompetition.length}
+                                            </small>
                                             <PerformanceCompetition
                                                 onAddPerformanceCompetition={PerformanceCompetitionHandler}
                                                 data={datasPerformanceCompetition}
@@ -1427,6 +1464,8 @@ function CreateTournament({ title, children, isOpen, handleClose, onSucess, role
                                 <Button
                                     onClick={handleNext}
                                     disabled={
+                                        datasFightingCompetition &&
+                                        datasPerformanceCompetition &&
                                         datasFightingCompetition.length === 0 &&
                                         datasPerformanceCompetition.length === 0
                                     }

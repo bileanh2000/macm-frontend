@@ -11,8 +11,9 @@ function a11yProps(index) {
     };
 }
 
-function TournamentFee({ tournament, tournamentStatus }) {
+function TournamentFee({ tournament, tournamentStatus, isFinish }) {
     const [value, setValue] = React.useState(0);
+    const user = JSON.parse(localStorage.getItem('currentUser'));
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -43,6 +44,8 @@ function TournamentFee({ tournament, tournamentStatus }) {
                         index={1}
                         tournament={tournament}
                         tournamentStatus={tournamentStatus}
+                        user={user}
+                        isFinish={isFinish}
                     />
                 )}
                 {value == 2 && (
@@ -51,6 +54,8 @@ function TournamentFee({ tournament, tournamentStatus }) {
                         index={2}
                         tournament={tournament}
                         tournamentStatus={tournamentStatus}
+                        user={user}
+                        isFinish={isFinish}
                     />
                 )}
             </Box>

@@ -17,6 +17,11 @@ import interactionPlugin from '@fullcalendar/interaction';
 
 function EditEventSchedule() {
     const currentDate = new Date();
+    const max = '2200-12-31';
+    const today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    const min = moment(tomorrow).format('yyyy-MM-DD');
 
     const [open, setOpen] = useState(false);
     const { id } = useParams();
@@ -28,12 +33,22 @@ function EditEventSchedule() {
     const [dateValue, setDateValue] = useState();
 
     const schema = Yup.object().shape({
-        startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
+        startDate: Yup.date()
+            .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+            .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
+            .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy')
+            .required('Vui lòng không để trống trường này'),
         finishDate: Yup.date()
             .min(Yup.ref('startDate'), ({ min }) => `Ngày kết thúc không được bé hơn ngày bắt đầu`)
-            .typeError('Vui lòng không để trống trường này'),
-        startTime: Yup.date().typeError('Vui lòng không để trống trường này'),
-        finishTime: Yup.date().typeError('Vui lòng không để trống trường này'),
+            .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
+            .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy')
+            .required('Vui lòng không để trống trường này'),
+        startTime: Yup.date()
+            .typeError('Vui lòng nhập đúng định dạng giờ HH:mm')
+            .required('Vui lòng không để trống trường này'),
+        finishTime: Yup.date()
+            .typeError('Vui lòng nhập đúng định dạng giờ HH:mm')
+            .required('Vui lòng không để trống trường này'),
     });
 
     const fetchEventScheduleByEventId = async (params) => {

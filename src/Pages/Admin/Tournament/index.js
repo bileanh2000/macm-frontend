@@ -29,8 +29,6 @@ import trainingScheduleApi from 'src/api/trainingScheduleApi';
 import CreateTournament from './CreateTournament/CreateTournament';
 import { IfAllGranted, IfAuthorized, IfAnyGranted } from 'react-authorization';
 function Tournament() {
-    const user = JSON.parse(localStorage.getItem('currentUser'));
-
     const [tournaments, setTournaments] = useState();
     const [semester, setSemester] = useState('Summer2022');
     const [semesterList, setSemesterList] = useState([]);
@@ -41,6 +39,8 @@ function Tournament() {
     const [openDialogCreate, setOpenDialogCreate] = useState(false);
     const [suggestionRole, setSuggestionRole] = useState([]);
     const [isRender, setIsRender] = useState(true);
+    const [suggestType, setSuggestType] = useState([]);
+    const user = JSON.parse(localStorage.getItem('currentUser'));
     let navigate = useNavigate();
 
     const handleChange = (event) => {
@@ -99,6 +99,17 @@ function Tournament() {
             console.log('That bai roi huhu ', error);
         }
     };
+
+    const getAllSuggestType = async () => {
+        try {
+            const response = await adminTournamentAPI.getAllSuggestType();
+            console.log('getAllSuggestType', response.data);
+            setSuggestType(response.data[0]);
+        } catch (error) {
+            console.warn('Failed to get all suggest type', error);
+        }
+    };
+
     const getAllTournamentSchedule = async () => {
         try {
             const response = await adminTournamentAPI.getAllTournamentSchedule();
@@ -143,6 +154,7 @@ function Tournament() {
     useEffect(() => {
         fetchSemester();
         getAllSuggestionRole();
+        getAllSuggestType();
         getAllTournamentSchedule();
     }, []);
 
@@ -155,6 +167,64 @@ function Tournament() {
     };
 
     return (
+        // <Box sx={{ m: 1, p: 1 }}>
+        //     <Dialog
+        //         open={openClosedTournament}
+        //         onClose={handleCloseDialogTournament}
+        //         aria-labelledby="alert-dialog-title"
+        //         aria-describedby="alert-dialog-description"
+        //         fullWidth
+        //         maxWidth="md"
+        //     >
+        //         <DialogTitle id="alert-dialog-title">Sự kiện đã kết thúc</DialogTitle>
+        //         <DialogContent>
+        //             {tournaments && tournaments.filter((t) => t.status === 1).length > 0 ? (
+        //                 tournaments
+        //                     .filter((t) => t.status === 1)
+        //                     .map((tournament) => (
+        //                         <TournamentItem
+        //                             key={tournament.id}
+        //                             data={tournament}
+        //                             onSuccess={() => setIsRender(true)}
+        //                         />
+        //                     ))
+        //             ) : (
+        //                 <DialogContentText>Không có sự kiện đã kết thúc</DialogContentText>
+        //             )}
+        //         </DialogContent>
+        //         <DialogActions>
+        //             <Button onClick={handleCloseDialogTournament} autoFocus>
+        //                 Đóng
+        //             </Button>
+        //         </DialogActions>
+        //     </Dialog>
+        //     {suggestionRole && suggestType && (
+        //         <CreateTournament
+        //             title="Tạo giải đấu"
+        //             roles={suggestionRole}
+        //             competitiveType={suggestType.competitiveTypeSamples}
+        //             exhibitionType={suggestType.exhibitionTypeSamples}
+        //             isOpen={openDialogCreate}
+        //             handleClose={() => {
+        //                 setOpenDialogCreate(false);
+        //             }}
+        //             user={user}
+        //         />
+        //     )}
+        //     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        //         <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+        //             Danh sách giải đấu
+        //         </Typography>
+
+        //         <Button
+        //             variant="outlined"
+        //             sx={{ maxHeight: '50px', minHeight: '50px' }}
+        //             // component={Link}
+        //             // to={'./create'}
+        //             startIcon={<AddCircle />}
+        //             onClick={() => {
+        //                 setOpenDialogCreate(true);
+        //             }}
         <IfAnyGranted
             expected={['ROLE_HeadTechnique', 'ROLE_HeadClub', 'ROLE_ViceHeadTechnique', 'ROLE_Treasurer']}
             actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
@@ -254,6 +324,35 @@ function Tournament() {
                     </TextField>
                 </Box>
 
+                {/* <Grid container spacing={4}>
+                <Grid item xs={12} md={4}>
+                    {tournaments && tournaments.length === 0 ? (
+                        <Typography variant="h5" sx={{ textAlign: 'center', mt: 3 }}>
+                            KHÔNG CÓ GIẢI ĐẤU NÀO
+                        </Typography>
+                    ) : (
+                        ''
+                    )}
+                    {tournaments ? (
+                        <Box>
+                            {tournaments.filter((t) => t.status === 2).length > 0 ? (
+                                <Paper elevation={1} sx={{ backgroundColor: '#fcfeff', p: 2 }}>
+                                    <Typography variant="body1">Giải đấu đang diễn ra</Typography>
+                                    <Divider />
+                                    {tournaments
+                                        .filter((t) => t.status === 2)
+                                        .map((tournament) => (
+                                            <TournamentItem
+                                                key={tournament.id}
+                                                data={tournament}
+                                                user={user}
+                                                onSuccess={() => setIsRender(true)}
+                                            />
+                                        ))}
+                                </Paper>
+                            ) : (
+                                ''
+                            )} */}
                 <Grid container spacing={4}>
                     <Grid item xs={12} md={4}>
                         {tournaments && tournaments.length === 0 ? (
@@ -275,6 +374,7 @@ function Tournament() {
                                                 <TournamentItem
                                                     key={tournament.id}
                                                     data={tournament}
+                                                    user={user}
                                                     onSuccess={() => setIsRender(true)}
                                                 />
                                             ))}
@@ -293,6 +393,7 @@ function Tournament() {
                                                 <TournamentItem
                                                     key={tournament.id}
                                                     data={tournament}
+                                                    user={user}
                                                     onSuccess={() => setIsRender(true)}
                                                 />
                                             ))}

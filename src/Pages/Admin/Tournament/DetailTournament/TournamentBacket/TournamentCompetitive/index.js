@@ -24,7 +24,7 @@ import Sliver from 'src/Components/Common/Material/Sliver';
 import Trophy from 'src/Components/Common/Material/Trophy';
 import Brone from 'src/Components/Common/Material/Brone';
 
-function TournamentCompetitive({ reload, result, type }) {
+function TournamentCompetitive({ reload, result, type, endDate }) {
     console.log(result, type);
     let { tournamentId } = useParams();
     const [tournamentResult, setTournamentResult] = useState();
@@ -36,7 +36,7 @@ function TournamentCompetitive({ reload, result, type }) {
     const [rounds, setRounds] = useState();
     const [areaList, setAreaList] = useState();
     const [open, setOpen] = useState(false);
-    const [isCreate, setIsCreate] = useState(true);
+    // const [isCreate, setIsCreate] = useState(true);
     const [isRender, setIsRender] = useState(true);
     // const [tournamentStatus, setTournamentStatus] = useState(-1);
 
@@ -71,12 +71,12 @@ function TournamentCompetitive({ reload, result, type }) {
                 setListPlayer(response.data[0].listMatchDto);
                 setTournamentStatus(response.data[0].status);
                 setRounds(response.totalResult);
-                setIsCreate(response.data[0].changed);
+                // setIsCreate(response.data[0].changed);
             } else {
                 setListPlayer(response.data);
                 setTournamentStatus(0);
                 setRounds(0);
-                setIsCreate(true);
+                // setIsCreate(true);
             }
         } catch (error) {
             console.log('Failed to fetch match: ', error);
@@ -172,7 +172,7 @@ function TournamentCompetitive({ reload, result, type }) {
         isRender && fetchTournamentById(tournamentId);
         getAllArea();
         console.log('re-render');
-    }, [tournamentId, isRender, result]);
+    }, [tournamentId, isRender, result, type]);
 
     return (
         <Fragment>
@@ -272,12 +272,13 @@ function TournamentCompetitive({ reload, result, type }) {
                         status={tournamentStatus}
                         areaList={areaList}
                         onUpdateResult={UpdateResultHandler}
-                        isCreate={isCreate}
+                        // isCreate={isCreate}
                         onCreateMatches={handleDialogCreate}
                         onChangeData={() => {
                             console.log('render data bracket');
                             setIsRender(true);
                         }}
+                        endDate={endDate}
                     />
                 </div>
             ) : (

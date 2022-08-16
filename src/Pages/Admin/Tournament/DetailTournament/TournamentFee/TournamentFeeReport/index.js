@@ -73,11 +73,11 @@ function TournamentFeeReport({ tournament, tournamentStatus, value, index }) {
             flex: 0.1,
         },
         { field: 'note', headerName: 'Nội dung chỉnh sửa', flex: 0.5 },
-        {
-            field: 'userStudentId',
-            headerName: 'Mã sinh viên',
-            flex: 0.1,
-        },
+        // {
+        //     field: 'userStudentId',
+        //     headerName: 'Mã sinh viên',
+        //     flex: 0.1,
+        // },
         {
             field: 'fundChange',
             headerName: 'Số tiền',
@@ -105,8 +105,8 @@ function TournamentFeeReport({ tournament, tournamentStatus, value, index }) {
         container['paymentStatus'] = item.paymentStatus;
         container['note'] =
             item.paymentStatus == true
-                ? `Cập nhật thành viên "${item.userName}" đã đóng tiền `
-                : `Cập nhật thành viên "${item.userName}" chưa đóng tiền`;
+                ? `Cập nhật thành viên "${item.userName} - ${item.userStudentId}" đã đóng tiền `
+                : `Cập nhật thành viên "${item.userName} - ${item.userStudentId}" chưa đóng tiền`;
         container['fundChange'] =
             item.fundChange > 0
                 ? '+' + item.fundChange.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
@@ -180,6 +180,13 @@ function TournamentFeeReport({ tournament, tournamentStatus, value, index }) {
                             components={{
                                 Toolbar: CustomToolbar,
                                 NoRowsOverlay: CustomNoRowsOverlay,
+                            }}
+                            getRowHeight={() => 'auto'}
+                            getEstimatedRowHeight={() => 200}
+                            sx={{
+                                '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': { py: '8px' },
+                                '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': { py: '15px' },
+                                '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': { py: '22px' },
                             }}
                         />
                     )}

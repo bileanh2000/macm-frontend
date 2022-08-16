@@ -1,5 +1,16 @@
-import { useState } from 'react';
-import { Box, Button, Container, Divider, TextField, Typography } from '@mui/material';
+import { Fragment, useState } from 'react';
+import {
+    Box,
+    Button,
+    Container,
+    Divider,
+    TextField,
+    Typography,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+} from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
@@ -8,13 +19,13 @@ import { useSnackbar } from 'notistack';
 
 import adminRuleAPI from 'src/api/adminRuleAPI';
 
-function CreateRule() {
+function CreateRule({ title, isOpen, handleClose, onSucess }) {
     let navigator = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
     // const [rule, setRule] = useState('');
 
     const validationSchema = Yup.object().shape({
-        description: Yup.string().required('Không được để trống trường này'),
+        description: Yup.string().trim().required('Không được để trống trường này'),
     });
 
     const {
@@ -32,6 +43,7 @@ function CreateRule() {
                 description: data.description,
             });
             enqueueSnackbar(response.message, { variant: 'success' });
+            onSucess && onSucess();
         } catch (error) {
             console.warn('Failed to create new rule');
         }
@@ -39,39 +51,44 @@ function CreateRule() {
 
     const handleCreateRule = async (data) => {
         createRule(data);
-        navigator({ pathname: '/admin/rules' });
+        handleClose && handleClose()
     };
 
     return (
-        <Box sx={{ m: 1, p: 1 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
+        <Fragment>
+            <Dialog
+                fullWidth
+                maxWidth="md"
+                open={!!isOpen}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     Thêm mới nội quy
-                </Typography>
-            </Box>
-            <Divider />
-            <Container>
-                <Box
-                    component="form"
-                    sx={{
-                        '& .MuiTextField-root': { m: 1, width: '100%' },
-                    }}
-                    Validate
-                    autoComplete="off"
-                >
-                    <TextField
-                        fullWidth
-                        id="outlined-error-helper-text fullWidth"
-                        label="Nội dung"
-                        multiline
-                        rows={6}
-                        {...register('description')}
-                        error={errors.description ? true : false}
-                        defaultValue=""
-                        helperText={errors.description?.message}
-                        required
-                    />
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '8px', mt: '8px' }}>
+                </DialogTitle>
+                <DialogContent>
+                    <Box
+                        component="form"
+                        sx={{
+                            '& .MuiTextField-root': { m: 1, width: '100%' },
+                        }}
+                        Validate
+                        autoComplete="off"
+                    >
+                        <TextField
+                            fullWidth
+                            id="outlined-error-helper-text fullWidth"
+                            label="Nội dung"
+                            multiline
+                            rows={6}
+                            {...register('description')}
+                            error={errors.description ? true : false}
+                            defaultValue=""
+                            helperText={errors.description?.message}
+                            required
+                        />
+                        {/* <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '8px', mt: '8px' }}>
                         <Button
                             variant="contained"
                             color="success"
@@ -89,10 +106,19 @@ function CreateRule() {
                         >
                             Hủy bỏ
                         </Button>
+                    </Box> */}
                     </Box>
-                </Box>
-            </Container>
-        </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" onClick={handleClose}>
+                        Hủy bỏ
+                    </Button>
+                    <Button variant="contained" onClick={handleSubmit(handleCreateRule)} autoFocus>
+                        Xác nhận
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Fragment>
     );
 }
 

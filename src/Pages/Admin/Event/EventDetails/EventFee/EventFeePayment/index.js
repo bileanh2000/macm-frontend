@@ -25,7 +25,8 @@ import adminFunAPi from 'src/api/adminFunAPi';
 import eventApi from 'src/api/eventApi';
 import EventSumUp from './EventSumUp';
 
-function EventFeePayment({ event, value, index }) {
+function EventFeePayment({ event, value, index, isFinish }) {
+    // console.log('ket thuc', isFinish);
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
     const [funClub, setFunClub] = useState('');
@@ -36,6 +37,7 @@ function EventFeePayment({ event, value, index }) {
     const { id } = useParams();
     const [idMember, setIdMember] = useState();
     const [isRender, setIsRender] = useState(true);
+    const user = JSON.parse(localStorage.getItem('currentUser'));
     const history = useNavigate();
 
     let payment = userList.reduce((paymentCount, user) => {
@@ -62,7 +64,7 @@ function EventFeePayment({ event, value, index }) {
 
     const updateUserPayment = async (id) => {
         try {
-            const response = await adminClubFeeAPI.updateUserPayment(id);
+            const response = await adminClubFeeAPI.updateUserPayment(id, user.studentId);
             enqueueSnackbar(response.message, { variant: 'success' });
             setIsRender(true);
         } catch (error) {
@@ -251,7 +253,7 @@ function EventFeePayment({ event, value, index }) {
                             style: 'currency',
                             currency: 'VND',
                         })}
-                        {event.status === 'Đã kết thúc' && event.totalAmountActual === 0 ? (
+                        {isFinish && event.totalAmountActual === 0 ? (
                             <Button
                                 variant="outlined"
                                 startIcon={<CurrencyExchange />}
@@ -260,7 +262,7 @@ function EventFeePayment({ event, value, index }) {
                             >
                                 Tổng kết chi phí sau sự kiện
                             </Button>
-                        ) : event && event.status !== 'Đã kết thúc' ? (
+                        ) : event && !isFinish ? (
                             ''
                         ) : (
                             <Typography variant="subtitle1">Sự kiện đã tổng kết</Typography>

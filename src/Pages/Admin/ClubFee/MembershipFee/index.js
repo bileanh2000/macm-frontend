@@ -49,6 +49,7 @@ function MembershipFee() {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [idMember, setIdMember] = useState();
     const [isRender, setIsRender] = useState(true);
+    const user = JSON.parse(localStorage.getItem('currentUser'));
 
     let payment = userList.reduce((paymentCount, user) => {
         return user.status ? paymentCount + 1 : paymentCount;
@@ -133,7 +134,7 @@ function MembershipFee() {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const handleChangeSemester = (e) => {
@@ -259,7 +260,7 @@ function MembershipFee() {
 
     const updateMembership = async (id) => {
         try {
-            const res = await adminClubFeeAPI.updateMembership(id);
+            const res = await adminClubFeeAPI.updateMembership(id, user.studentId);
             console.log(res.message);
             enqueueSnackbar(res.message, { variant: 'success' });
         } catch (error) {

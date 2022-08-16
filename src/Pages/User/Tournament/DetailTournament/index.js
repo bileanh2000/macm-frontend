@@ -86,10 +86,20 @@ function DetailTournament() {
     const [isJoinExhibition, setIsJoinExhibition] = useState([]);
     const [isJoinAdmin, setIsJoinAdmin] = useState();
     const [message, setMessage] = useState('');
+    const [valueTab, SetValueTabs] = useState(0);
+    const [type, SetType] = useState(0);
+    const [isRender, setIsRender] = useState(true);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    const handleChangeTab = (newValue, tab, id) => {
+        setValue(newValue);
+        SetValueTabs(tab);
+        SetType(id);
+    };
+
     let navigate = useNavigate();
 
     const handleOpenDialog = () => {
@@ -133,18 +143,10 @@ function DetailTournament() {
             const response = userTournamentAPI.registerToJoinOrganizingCommittee(tournamentId, studentId, roleId);
             let variant = response.data > 0 ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
+            setIsRender(true);
         } catch (error) {
             let variant = 'error';
             enqueueSnackbar(error, { variant });
-        }
-    };
-
-    const getRoleInTournament = async () => {
-        try {
-            const response = await userTournamentAPI.getAllOrginizingCommitteeRole(tournamentId);
-            setRoleInTournament(response.data);
-        } catch (error) {
-            console.log('Khong the lay duoc role', error);
         }
     };
 
@@ -178,36 +180,6 @@ function DetailTournament() {
         }
     };
 
-    const getAllUserCompetitivePlayer = async () => {
-        try {
-            const response = await userTournamentAPI.getAllUserCompetitivePlayer(tournamentId, user.studentId);
-            // console.log(response.data);
-            setIsJoinCompetitive(response.data);
-        } catch (error) {
-            console.log('Loi roi', error);
-        }
-    };
-
-    const getAllUserExhibitionPlayer = async () => {
-        try {
-            const response = await userTournamentAPI.getAllUserExhibitionPlayer(tournamentId, user.studentId);
-            console.log(response.data);
-            setIsJoinExhibition(response.data);
-        } catch (error) {
-            console.log('Loi roi', error);
-        }
-    };
-
-    const getAllOrginizingCommitteeRole = async () => {
-        try {
-            const response = await userTournamentAPI.getAllUserOrganizingCommittee(tournamentId, user.studentId);
-            console.log(response);
-            setIsJoinAdmin(response);
-        } catch (error) {
-            console.log('Loi roi', error);
-        }
-    };
-
     useEffect(() => {
         getTournamentById(tournamentId);
         fetchAdminInTournament(tournamentId);
@@ -216,11 +188,50 @@ function DetailTournament() {
     }, [tournamentId]);
 
     useEffect(() => {
-        getRoleInTournament();
-        getAllUserCompetitivePlayer();
-        getAllUserExhibitionPlayer();
-        getAllOrginizingCommitteeRole();
-    }, []);
+        const getAllOrginizingCommitteeRole = async () => {
+            try {
+                const response = await userTournamentAPI.getAllUserOrganizingCommittee(tournamentId, user.studentId);
+                console.log(response);
+                setIsJoinAdmin(response);
+            } catch (error) {
+                console.log('Loi roi', error);
+            }
+        };
+        const getAllUserCompetitivePlayer = async () => {
+            try {
+                const response = await userTournamentAPI.getAllUserCompetitivePlayer(tournamentId, user.studentId);
+                // console.log(response.data);
+                setIsJoinCompetitive(response.data);
+            } catch (error) {
+                console.log('Loi roi', error);
+            }
+        };
+        const getAllUserExhibitionPlayer = async () => {
+            try {
+                const response = await userTournamentAPI.getAllUserExhibitionPlayer(tournamentId, user.studentId);
+                console.log(response.data);
+                setIsJoinExhibition(response.data);
+            } catch (error) {
+                console.log('Loi roi', error);
+            }
+        };
+
+        const getRoleInTournament = async () => {
+            try {
+                const response = await userTournamentAPI.getAllOrginizingCommitteeRole(tournamentId);
+                setRoleInTournament(response.data);
+            } catch (error) {
+                console.log('Khong the lay duoc role', error);
+            }
+        };
+
+        isRender && getRoleInTournament();
+        isRender && getAllUserCompetitivePlayer();
+        isRender && getAllUserExhibitionPlayer();
+        isRender && getAllOrginizingCommitteeRole();
+
+        setIsRender(false);
+    }, [isRender, tournamentId, user.studentId, isJoinCompetitive, isJoinExhibition, isJoinAdmin]);
 
     const scheduleData = scheduleList.map((item) => {
         const container = {};
@@ -266,6 +277,7 @@ function DetailTournament() {
                 }}
                 isJoinCompetitive={isJoinCompetitive}
                 isJoinExhibition={isJoinExhibition}
+                onRegister={() => setIsRender(true)}
             />
             <Dialog
                 open={openDialogAdmin}
@@ -301,7 +313,12 @@ function DetailTournament() {
                                 )}
                                 <FormHelperText>{helperText}</FormHelperText>
                                 <Box sx={{ display: 'flex', alignContent: 'space-between' }}>
-                                    <Button sx={{ mt: 1, mr: 1 }} type="submit" variant="outlined">
+                                    <Button
+                                        sx={{ mt: 1, mr: 1 }}
+                                        type="submit"
+                                        variant="contained"
+                                        disabled={valueRadio == 0}
+                                    >
                                         Đăng kí
                                     </Button>
                                     <Button sx={{ mt: 1, mr: 1 }} onClick={handleCloseDialogAdmin} variant="outlined">
@@ -359,7 +376,8 @@ function DetailTournament() {
                                             {tournament.name}
                                         </Typography>
                                         <Typography variant="caption" sx={{ fontSize: 'bold' }}>
-                                            {scheduleData[0].date} - {scheduleData[scheduleData.length - 1].date}
+                                            {moment(scheduleData[0].date).format('DD/MM/yyyy')} -{' '}
+                                            {moment(scheduleData[scheduleData.length - 1].date).format('DD/MM/yyyy')}
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -411,20 +429,6 @@ function DetailTournament() {
                                         ) : (
                                             <Typography variant="h6">Bạn là thành viên ban tổ chức</Typography>
                                         )}
-                                        <Box>
-                                            <Typography variant="body1">
-                                                Hạn đăng kí người chơi:{' '}
-                                                {moment(new Date(tournament.registrationPlayerDeadline)).format(
-                                                    'DD/MM/yyyy',
-                                                )}
-                                            </Typography>
-                                            <Typography variant="body1">
-                                                Hạn đăng kí ban tổ chức:{' '}
-                                                {moment(
-                                                    new Date(tournament.registrationOrganizingCommitteeDeadline),
-                                                ).format('DD/MM/yyyy')}
-                                            </Typography>
-                                        </Box>
                                     </Box>
                                 ) : (
                                     ''
@@ -443,25 +447,31 @@ function DetailTournament() {
                         </Container>
                     </Paper>
                     <Paper elevation={3} sx={{ mt: 1 }}>
-                        <Container maxWidth="lg">
-                            <TournamentOverview tournament={tournament} value={value} index={0} />
-                            <TabPanel value={value} index={1}>
-                                <TournamentSchedule />
-                            </TabPanel>
-                            <TabPanel value={value} index={2}>
-                                <AdminTournament />
-                            </TabPanel>
-                            <TabPanel value={value} index={3}>
-                                <MemberTournament competitive={isJoinCompetitive} exhibition={isJoinExhibition} />
-                            </TabPanel>
-                            <TabPanel value={value} index={4}>
-                                <TournamentBracket
-                                    tournament={tournament}
-                                    competitive={isJoinCompetitive}
-                                    exhibition={isJoinExhibition}
-                                />
-                            </TabPanel>
-                        </Container>
+                        <TournamentOverview
+                            tournament={tournament}
+                            value={value}
+                            index={0}
+                            schedule={scheduleList}
+                            onChangeTab={handleChangeTab}
+                        />
+                        <TabPanel value={value} index={1}>
+                            <TournamentSchedule />
+                        </TabPanel>
+                        <TabPanel value={value} index={2}>
+                            <AdminTournament />
+                        </TabPanel>
+                        <TabPanel value={value} index={3}>
+                            <MemberTournament competitive={isJoinCompetitive} exhibition={isJoinExhibition} />
+                        </TabPanel>
+                        <TabPanel value={value} index={4}>
+                            <TournamentBracket
+                                tournament={tournament}
+                                competitive={isJoinCompetitive}
+                                exhibition={isJoinExhibition}
+                                valueTab={valueTab}
+                                type={type}
+                            />
+                        </TabPanel>
                     </Paper>
                 </Fragment>
             )}

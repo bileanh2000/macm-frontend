@@ -83,6 +83,7 @@ import ErrorPage from 'src/Pages/ErrorPage';
 import EventDetail from 'src/Pages/User/Events/EventDetail';
 import Notification from 'src/Pages/Notification';
 import AttendanceReport from 'src/Pages/Home/AttendanceReport';
+import Rule from 'src/Pages/User/Rule';
 
 import UserEventDetails from 'src/Pages/User/Events/EventDetails';
 
@@ -182,8 +183,15 @@ const userRouter = [
     { path: '/events', component: EventListPage, layout: HeaderOnly },
     { path: '/events/:id', component: UserEventDetails, layout: HeaderOnly },
     { path: '/home', component: Home, layout: HeaderOnly },
+
+    { path: '/rule', component: Rule, layout: HeaderOnly },
+    //{ path: '/:userId', component: UserProfile, layout: HeaderOnly },
+    //{ path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
+
+    { path: '/rule', component: Rule, layout: HeaderOnly },
     { path: '/profile/:userId', component: UserProfile, layout: HeaderOnly },
     { path: '/profile/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
+
     { path: '/tournament', component: UserTournament, layout: HeaderOnly },
     { path: '/tournament/:tournamentId', component: UserTournamentDetail, layout: HeaderOnly },
     // 403 Page

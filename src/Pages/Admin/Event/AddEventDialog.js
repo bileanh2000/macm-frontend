@@ -39,7 +39,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
 import moment from 'moment';
 import { useSnackbar } from 'notistack';
-import { Add, Delete } from '@mui/icons-material';
+import { Add, Delete, Edit } from '@mui/icons-material';
 import { useRef } from 'react';
 import eventApi from 'src/api/eventApi';
 import PreviewSchedule from './PreviewSchedule';
@@ -47,15 +47,22 @@ import adminFunAPi from 'src/api/adminFunAPi';
 import { useNavigate } from 'react-router-dom';
 import PreviewCommonSchedule from '../Tournament/CreateTournament/Schedule/Schedule';
 import EditableSchedule from '../Tournament/CreateTournament/Schedule/EditableSchedule';
+import EditRole from './EditRole';
 
 const steps = ['Thông tin sự kiện', 'Thêm vai trò BTC', 'Thêm chi phí', 'Thêm lịch', 'Xem trước'];
-const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
+const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles, user }) => {
+    const max = '2200-12-31';
+    const today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    const min = moment(tomorrow).format('yyyy-MM-DD');
+
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [activeStep, setActiveStep] = useState(0);
     const [description, setDescription] = useState('');
     const [skipped, setSkipped] = useState(new Set());
     const [isChecked, setIsChecked] = useState(false);
-    const [datas, setDatas] = useState([]);
+    const [datas, setDatas] = useState(roles);
     const [isAmountPerRegister, setIsAmountPerRegister] = useState(false);
     const [totalClubFunds, setTotalClubFunds] = useState(20000);
     const [previewSchedule, setPreviewSchedule] = useState([]);
@@ -69,6 +76,12 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     const [preview, setPreview] = useState([]);
     const [disabled, setDisabled] = useState(false);
     const [isOverride, setIsOverride] = useState(-1);
+    const [dataEdit, setDataEdit] = useState();
+    const [isEdit, setIsEdit] = useState(false);
+
+    useEffect(() => {
+        setDatas(roles);
+    }, [roles]);
 
     const handleChange = (event) => {
         setSubmitOption(event.target.value);
@@ -158,11 +171,12 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
     const validationSchema = Yup.object().shape({
         ...(activeStep === 0
             ? {
-                  name: Yup.string().required('Không được để trống trường này'),
+                  name: Yup.string().trim().required('Không được để trống trường này'),
               }
             : activeStep === 1
             ? {
                   roleName: Yup.string()
+                      .trim()
                       .nullable()
                       .required('Không được để trống trường này')
                       .test('len', 'Độ dài không cho phép', (val) => val.length > 1)
@@ -203,8 +217,10 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
             : activeStep === 3
             ? {
                   startDate: Yup.date()
+                      .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+                      .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
                       //   .max(Yup.ref('finishDate'), ({ min }) => `Thời gian bắt không được bé hơn thời gian kết thúc`)
-                      .typeError('Vui lòng không để trống trường này')
+                      .typeError('Vui lòng nhập đúng định dạng')
                       .required('Vui lòng không để trống trường này'),
 
                   //   finishDate: Yup.date()
@@ -212,27 +228,30 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                   //       .typeError('Vui lòng không để trống trường này')
                   //       .required('Vui lòng không để trống trường này'),
                   finishDate: Yup.date()
+                      .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
                       .test('same_dates_test', 'Thời gian kết thúc phải muộn hơn thời gian bắt đầu', function (value) {
                           const { startDate } = this.parent;
                           return value.getTime() !== startDate.getTime();
                       })
                       .min(Yup.ref('startDate'), ({ min }) => `Thời gian kết thúc phải muộn hơn thời gian bắt đầu`)
                       .required('Vui lòng không để trống trường này')
-                      .typeError('Vui lòng không để trống trường này')
+                      .typeError('Vui lòng nhập đúng định dạng')
                       .required('Vui lòng không để trống trường này'),
 
                   registrationMemberDeadline: Yup.date()
-                      .max(Yup.ref('startDate'), ({ max }) => `Deadline không được muộn hơn thời gian bắt đầu`)
-                      .typeError('Vui lòng không để trống trường này')
+                      .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+                      .max(Yup.ref('startDate'), ({ max }) => `Deadline phải sớm hơn thời gian bắt đầu`)
+                      .typeError('Vui lòng nhập đúng định dạng')
                       .required('Vui lòng không để trống trường này'),
                   ...(!skipped.has(1)
                       ? {
                             registrationOrganizingCommitteeDeadline: Yup.date()
+                                .min(min, 'Vui lòng không nhập ngày trong quá khứ')
                                 .max(
                                     Yup.ref('startDate'),
                                     ({ min }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`,
                                 )
-                                .typeError('Vui lòng không để trống trường này')
+                                .typeError('Vui lòng nhập đúng định dạng')
                                 .required('Vui lòng không để trống trường này')
                                 .test(
                                     'same_dates_test',
@@ -279,6 +298,18 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
         // });
         setDatas((prevRows) => prevRows.filter((item) => item.id !== id));
     };
+
+    const handleEdit = (role) => {
+        // datas.map((data) => {
+        //     return data.id === id;
+        // });
+        const data = datas.filter((item) => item.id !== role.id);
+        const dataEdit = datas.filter((item) => item.id === role.id);
+        setDataEdit(dataEdit[0]);
+        setIsEdit(true);
+        setIsChecked(!isChecked);
+    };
+
     const handleAddEventRoles = (data) => {
         console.log(data);
         const newData = [...datas, { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity }];
@@ -292,6 +323,33 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
 
         setIsChecked(!isChecked);
     };
+
+    const handleEditEventRoles = (data) => {
+        console.log(data);
+        if (
+            datas.findIndex((d) => d.name.includes(data.roleName)) >= 0 &&
+            datas.findIndex((d) => d.maxQuantity == data.maxQuantity) >= 0
+        ) {
+            setError('maxQuantity', {
+                message: 'Số lượng sau chỉnh sửa không thay đổi',
+            });
+            return;
+        }
+
+        const newData = datas.map((role) => (role.id == data.id ? { ...role, maxQuantity: data.maxQuantity } : role));
+        setDatas(newData);
+
+        /**
+         * Reset field keep error (isValid)
+         */
+
+        resetField('roleName', { keepError: true });
+        resetField('maxQuantity', { keepError: true });
+
+        isEdit && setIsEdit(false);
+        setIsChecked(!isChecked);
+    };
+
     const handleCancel = () => {
         setIsChecked(!isChecked);
 
@@ -371,7 +429,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
             // rolesEventDto: datas,
             listPreview: previewSchedule,
         };
-        eventApi.createEvent(createEventData).then((response) => {
+        eventApi.createEvent(createEventData, user.studentId).then((response) => {
             if (response.data.length !== 0) {
                 console.log(response);
                 enqueueSnackbar(response.message, { variant: 'success' });
@@ -732,10 +790,14 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                     {datas.length > 0 && (
                                         <TableContainer sx={{ maxHeight: 440, m: 1, p: 1 }}>
                                             <Table stickyHeader aria-label="sticky table">
+                                                <caption style={{ captionSide: 'top' }}>
+                                                    Số lượng vai trò hiện tại : {datas.length}
+                                                </caption>
                                                 <TableHead>
                                                     <TableRow>
                                                         <TableCell align="center">Tên vai trò</TableCell>
                                                         <TableCell align="center">Số lượng</TableCell>
+                                                        <TableCell align="center"></TableCell>
                                                         <TableCell align="center"></TableCell>
                                                     </TableRow>
                                                 </TableHead>
@@ -744,6 +806,18 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                                         <TableRow key={data.id}>
                                                             <TableCell align="center">{data.name}</TableCell>
                                                             <TableCell align="center">{data.maxQuantity}</TableCell>
+                                                            <TableCell>
+                                                                <IconButton
+                                                                    aria-label="edit"
+                                                                    onClick={() => {
+                                                                        // handleOpenDialog();
+                                                                        handleEdit(data);
+                                                                    }}
+                                                                    disabled={isEdit || isChecked}
+                                                                >
+                                                                    <Edit />
+                                                                </IconButton>
+                                                            </TableCell>
                                                             <TableCell>
                                                                 <IconButton
                                                                     aria-label="delete"
@@ -763,45 +837,59 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess }) => {
                                     )}
                                     <Paper elevation={3}>
                                         <Collapse in={isChecked}>
-                                            <Grid container spacing={2} sx={{ p: 2 }}>
-                                                <Grid item xs={12} container spacing={2}>
-                                                    <Grid item xs={6}>
-                                                        <TextField
-                                                            id="outlined-basic"
-                                                            label="Tên vai trò"
-                                                            variant="outlined"
-                                                            fullWidth
-                                                            {...register('roleName')}
-                                                            error={errors.roleName ? true : false}
-                                                            helperText={errors.roleName?.message}
-                                                        />
+                                            {!isEdit ? (
+                                                <Grid container spacing={2} sx={{ p: 2 }}>
+                                                    <Grid item xs={12} container spacing={2}>
+                                                        <Grid item xs={6}>
+                                                            <TextField
+                                                                id="outlined-basic"
+                                                                label="Tên vai trò"
+                                                                variant="outlined"
+                                                                fullWidth
+                                                                {...register('roleName')}
+                                                                error={errors.roleName ? true : false}
+                                                                helperText={errors.roleName?.message}
+                                                            />
+                                                        </Grid>
+                                                        <Grid item xs={6}>
+                                                            <TextField
+                                                                label="Số lượng"
+                                                                type="number"
+                                                                id="outlined-basic"
+                                                                variant="outlined"
+                                                                fullWidth
+                                                                {...register('maxQuantity')}
+                                                                error={errors.maxQuantity ? true : false}
+                                                                helperText={errors.maxQuantity?.message}
+                                                            />
+                                                        </Grid>
                                                     </Grid>
-                                                    <Grid item xs={6}>
-                                                        <TextField
-                                                            label="Số lượng"
-                                                            type="number"
-                                                            id="outlined-basic"
-                                                            variant="outlined"
-                                                            fullWidth
-                                                            {...register('maxQuantity')}
-                                                            error={errors.maxQuantity ? true : false}
-                                                            helperText={errors.maxQuantity?.message}
-                                                        />
+                                                    <Grid item xs={12}>
+                                                        <Button
+                                                            variant="contained"
+                                                            onClick={handleSubmit(handleAddEventRoles)}
+                                                            sx={{ mr: 1 }}
+                                                        >
+                                                            Thêm
+                                                        </Button>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="error"
+                                                            onClick={handleCancel}
+                                                        >
+                                                            Hủy
+                                                        </Button>
                                                     </Grid>
                                                 </Grid>
-                                                <Grid item xs={12}>
-                                                    <Button
-                                                        variant="contained"
-                                                        onClick={handleSubmit(handleAddEventRoles)}
-                                                        sx={{ mr: 1 }}
-                                                    >
-                                                        Thêm
-                                                    </Button>
-                                                    <Button variant="contained" color="error" onClick={handleCancel}>
-                                                        Hủy
-                                                    </Button>
-                                                </Grid>
-                                            </Grid>
+                                            ) : (
+                                                dataEdit && (
+                                                    <EditRole
+                                                        roleEdit={dataEdit}
+                                                        onEdit={handleEditEventRoles}
+                                                        onCancel={handleCancel}
+                                                    />
+                                                )
+                                            )}
                                         </Collapse>
                                     </Paper>
                                     <Collapse in={!isChecked}>

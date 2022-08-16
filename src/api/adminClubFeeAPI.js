@@ -7,8 +7,8 @@ const adminClubFeeAPI = {
         return axiosClient.get(url);
     },
 
-    updateMembership: (studentId) => {
-        const url = `/admin/treasure/membership/update/${studentId}`;
+    updateMembership: (id, studentId) => {
+        const url = `/admin/treasure/membership/update/${id}/${studentId}`;
         return axiosClient.put(url);
     },
 
@@ -52,8 +52,8 @@ const adminClubFeeAPI = {
         return axiosClient.get(url);
     },
 
-    updateUserPayment: (id) => {
-        const url = `/event/treasurer/updatemembereventpaymentstatus/${id}`;
+    updateUserPayment: (id, studentId) => {
+        const url = `/event/treasurer/updatemembereventpaymentstatus/${id}/${studentId}`;
         return axiosClient.put(url);
     },
 

@@ -246,7 +246,7 @@ function Header({ onLogout }) {
                                     </ListItemIcon>
                                     <ListItemText>Giải đấu</ListItemText>
                                 </MenuItem>
-                                <MenuItem onClick={handleCloseNavMenu}>
+                                <MenuItem component={Link} to="/rule" onClick={handleCloseNavMenu}>
                                     <ListItemIcon>
                                         <RuleIcon />
                                     </ListItemIcon>
@@ -318,7 +318,13 @@ function Header({ onLogout }) {
                                 </ListItemIcon>
                                 <ListItemText>Giải đấu</ListItemText>
                             </MenuItem>
-                            <MenuItem onClick={handleCloseNavMenu} sx={{ height: '64px' }}>
+                            <MenuItem
+                                component={Link}
+                                to="/rule"
+                                selected={selectedIndex === 2}
+                                onClick={(event) => handleListItemClick(event, 2)}
+                                sx={{ height: '64px' }}
+                            >
                                 <ListItemIcon>
                                     <RuleIcon sx={{ color: 'white' }} />
                                 </ListItemIcon>

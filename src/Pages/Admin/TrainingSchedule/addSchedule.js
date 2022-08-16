@@ -39,14 +39,20 @@ import semesterApi from 'src/api/semesterApi';
 import { useSnackbar } from 'notistack';
 
 function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
+    const max = '2200-12-31'; 
+    const today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    const min = moment(tomorrow).format('yyyy-MM-DD');
+
     moment().locale('vi');
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [open, setOpen] = useState(false);
     const [submitData, setSubmitData] = useState();
     const [previewData, setPreviewData] = useState();
     const [currentSemester, setCurrentSemester] = useState([]);
-    const today = new Date();
-    const tomorrow = today.setDate(today.getDate() + 1);
+    // const today = new Date();
+    // const tomorrow = today.setDate(today.getDate() + 1);
     const [selectStartDate, setSelectStartDate] = useState();
     const [selectEndDate, setSelectEndDate] = useState();
     const [previewStatistical, setPreviewStatistical] = useState({
@@ -84,12 +90,15 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
     const schema = Yup.object().shape({
         startDate: Yup.date()
             .nullable()
+            .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+            .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
             .required('Vui lòng không để trống trường này')
-            .typeError('Vui lòng không để trống trường này'),
+            .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy'),
 
         endDate: Yup.date()
-            // .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
-            .typeError('Vui lòng không để trống trường này')
+            .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+            .max(max, 'Vui lòng không nhập ngày với số năm quá lớn')
+            .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy')
             .test('abc', 'Thời gian kết thúc không được sớm hơn thời gian bắt đầu', function (value) {
                 const { startDate } = this.parent;
                 return value.getTime() > startDate.getTime();
@@ -97,10 +106,10 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
         startTime: Yup.date()
             .nullable()
             .required('Vui lòng không để trống trường này')
-            .typeError('Vui lòng nhập đúng định dạng HH:mm'),
+            .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm'),
         endTime: Yup.date()
-            // .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
-            .typeError('Vui lòng nhập đúng định dạng HH:mm')
+            .min(Yup.ref('startTime'), ({ min }) => `Thời gian kết thúc không được sớm hơn thời gian bắt đầu`)
+            .typeError('Vui lòng nhập đúng định dạng thời gian HH:mm')
             .test('cde', 'Thời gian kết thúc không được sớm hơn thời gian bắt đầu', function (value) {
                 const { startTime } = this.parent;
                 return value.getTime() > startTime.getTime();
@@ -346,8 +355,10 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                         render={({ field: { onChange, value }, fieldState: { error } }) => (
                                             <DatePicker
                                                 label="Ngày bắt đầu"
+
                                                 // disablePast
                                                 minDate={addDays(new Date(), 1)}
+
                                                 ampm={false}
                                                 value={value}
                                                 onChange={(value) => {

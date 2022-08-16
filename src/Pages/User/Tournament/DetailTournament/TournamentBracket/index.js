@@ -31,7 +31,7 @@ function TabPanel(props) {
     );
 }
 
-function TournamentBracket({ tournament, competitive, exhibition }) {
+function TournamentBracket({ tournament, competitive, exhibition, valueTab, type }) {
     let isDisplay = false;
     if (tournament.competitiveTypes.length > 0 || tournament.exhibitionTypes.length > 0) {
         const competitiveStatus = tournament.competitiveTypes.map((competitive) => competitive.status);
@@ -93,6 +93,7 @@ function TournamentBracket({ tournament, competitive, exhibition }) {
                             competitive={competitive}
                             reload={isRender}
                             result={tournamentResult.listCompetitiveResult}
+                            type={valueTab == 0 ? type : 0}
                         />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
@@ -100,6 +101,7 @@ function TournamentBracket({ tournament, competitive, exhibition }) {
                             exhibition={exhibition}
                             reload={isRender}
                             result={tournamentResult.listExhibitionResult}
+                            type={valueTab == 1 ? type : 0}
                         />
                     </TabPanel>
                 </Box>

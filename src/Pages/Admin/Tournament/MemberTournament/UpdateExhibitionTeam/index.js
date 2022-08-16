@@ -55,21 +55,21 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
         setDateFemale(data);
     };
 
-    const validationSchema = Yup.object().shape({
-        teamName: Yup.string().required('Không được để trống trường này'),
-    });
+    // const validationSchema = Yup.object().shape({
+    //     teamName: Yup.string().trim().required('Không được để trống trường này'),
+    // });
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-        setFocus,
-        setError,
-    } = useForm({
-        resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
-    });
+    // const {
+    //     register,
+    //     handleSubmit,
+    //     formState: { errors },
+    //     reset,
+    //     setFocus,
+    //     setError,
+    // } = useForm({
+    //     resolver: yupResolver(validationSchema),
+    //     mode: 'onChange',
+    // });
 
     const getAllMember = async (exhibitionType) => {
         try {
@@ -109,18 +109,18 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
     const handleCloseDialog = () => {
         setDataMale([]);
         setDateFemale([]);
-        reset({
-            teamName: '',
-        });
+        // reset({
+        //     teamName: '',
+        // });
         handleClose && handleClose();
     };
 
     const handleRegister = (data) => {
         const teamMember = [...dataMale, ...dataFemale];
-        // const listStudentId = teamMember.map((student) => student.studentId);
+        const listStudentId = teamMember.map((student) => student.studentId);
         console.log(teamMember);
         // const params = { listStudentId, teamName: data.teamName, exhibitionTypeId: exhibitionTeam.exhibitionTypeId };
-        updateTeam(exhibitionTeam.exhibitionTypeId, teamMember);
+        updateTeam(exhibitionTeam.exhibitionTypeId, listStudentId);
         onSuccess && onSuccess();
         handleCloseDialog();
     };
@@ -171,12 +171,15 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
                                 id="outlined-basic"
                                 label="Tên đội"
                                 variant="outlined"
-                                {...register('teamName')}
+                                // {...register('teamName')}
                                 defaultValue={exhibitionTeam.teamName}
                                 // onChange={checkValidWeight}
-                                error={errors.teamName ? true : false}
-                                helperText={errors.teamName?.message}
+                                // error={errors.teamName ? true : false}
+                                // helperText={errors.teamName?.message}
                                 required
+                                InputProps={{
+                                    readOnly: true,
+                                }}
                             />
                             <Grid container spacing={2}>
                                 <Grid item xs={12} md={6}>
@@ -293,7 +296,7 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
                     <DialogActions>
                         <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
                         <Button
-                            onClick={handleSubmit(handleRegister)}
+                            onClick={handleRegister}
                             autoFocus
                             disabled={dataFemale.length !== numberFemale || dataMale.length !== numberMale}
                         >

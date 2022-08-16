@@ -16,6 +16,7 @@ import {
     TableCell,
     TableContainer,
     TableRow,
+    Typography,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -25,12 +26,12 @@ import AddMember from './AddMember';
 import { Delete } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 
-function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competitiveId }) {
+function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competitiveId, genderCompetitive }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [player, setPlayer] = useState([]);
     const [weightRange, setWeightRange] = useState(competitiveId);
-    const [gender, setGender] = useState();
+    const [gender, setGender] = useState(genderCompetitive);
     const [listWeightRange, setListWeightRange] = useState([]);
     const [minWeight, setMinWeight] = useState();
     const [maxWeight, setMaxWeight] = useState();
@@ -122,29 +123,36 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
         handleClose && handleClose();
     };
 
-    const fetchCompetitiveType = async (tournamentId) => {
-        try {
-            const response = await adminTournament.getAllCompetitiveType(tournamentId);
-            console.log(response.data[0]);
-            setListWeightRange(response.data[0]);
-            // setWeightRange(response.data[0][0].id);
-            setGender(response.data[0][0].gender);
-            setMinWeight(response.data[0][0].weightMin);
-            setMaxWeight(response.data[0][0].weightMax);
-        } catch (error) {
-            console.log('Failed to fetch user list: ', error);
-        }
-    };
-
     useEffect(() => {
-        fetchCompetitiveType(tournamentId);
-    }, [tournamentId]);
+        setGender(genderCompetitive);
+        setIsRender(true);
+    }, [genderCompetitive]);
 
     useEffect(() => {
         setWeightRange(competitiveId);
+        setIsRender(true);
     }, [competitiveId]);
 
     useEffect(() => {
+        const fetchCompetitiveType = async (tournamentId) => {
+            try {
+                const response = await adminTournament.getAllCompetitiveType(tournamentId);
+                console.log(response.data[0]);
+                setListWeightRange(response.data[0]);
+                // setWeightRange(response.data[0][0].id);
+                console.log('check', gender == null);
+                gender == null && setGender(response.data[0][0].gender);
+                setMinWeight(response.data[0][0].weightMin);
+                setMaxWeight(response.data[0][0].weightMax);
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
+        fetchCompetitiveType(tournamentId);
+    }, [tournamentId, gender]);
+
+    useEffect(() => {
+        console.log('type', weightRange);
         isRender && getAllMember(weightRange);
         setIsRender(false);
     }, [weightRange, allMember, isRender]);
@@ -169,7 +177,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
                         />
                     )}
                     <FormControl size="small">
-                        {/* <Typography variant="caption">Hạng cân</Typography> */}
+                        <Typography variant="caption">{gender ? 'Nam' : 'Nu'}</Typography>
                         <Select id="demo-simple-select" value={weightRange} displayEmpty onChange={handleChangeWeight}>
                             {listWeightRange &&
                                 listWeightRange.map((range) => (
@@ -223,8 +231,10 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
                 </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
-                <Button onClick={handleRegister} autoFocus>
+                <Button variant="outlined" onClick={handleCloseDialog}>
+                    Hủy bỏ
+                </Button>
+                <Button variant="contained" onClick={handleRegister} autoFocus disabled={player.length == 0}>
                     Đồng ý
                 </Button>
             </DialogActions>

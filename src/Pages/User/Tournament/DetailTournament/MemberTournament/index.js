@@ -18,7 +18,7 @@ function MemberTournament(props) {
     const handleChangeType = (event) => {
         setType(event.target.value);
         if (type === 1) {
-            fetchCompetitivePlayer(tournamentId, weightRange);
+            fetchCompetitivePlayer(weightRange);
         } else {
             fetchExhibitionTeam(tournamentId, exhibitionType);
         }
@@ -32,7 +32,7 @@ function MemberTournament(props) {
         } else {
             range = listWeightRange.find((weight) => weight.id === event.target.value);
         }
-        fetchCompetitivePlayer(tournamentId, range);
+        fetchCompetitivePlayer(event.target.value);
     };
 
     const handleChangeExhibitionType = (event) => {
@@ -68,14 +68,20 @@ function MemberTournament(props) {
         }
     };
 
-    const fetchCompetitivePlayer = async (params, weightRange) => {
+    const fetchCompetitivePlayer = async (weightRange) => {
         try {
-            const response = await adminTournamentAPI.getAllCompetitivePlayer(params, weightRange);
-            setCompetitivePlayer(response.data);
+            const response = await adminTournamentAPI.getListPlayerBracket(weightRange);
+            console.log('fetchCompetitivePlayer', response.data);
+            if (response.data.length > 0) {
+                setCompetitivePlayer(response.data[0].listPlayers);
+                // setTournamentStatus(response.data[0].status);
+                // setIsRenderCompe(false);
+            }
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
     };
+
     const fetchExhibitionTeam = async (params, exhibitionType) => {
         try {
             const response = await adminTournamentAPI.getAllExhibitionTeam(params, exhibitionType);
@@ -86,11 +92,14 @@ function MemberTournament(props) {
     };
 
     useEffect(() => {
-        fetchCompetitivePlayer(tournamentId, weightRange == 0 ? { weightMin: 0, weightMax: 0 } : weightRange);
+        fetchCompetitivePlayer(weightRange);
+    }, [weightRange]);
+
+    useEffect(() => {
         fetchExhibitionTeam(tournamentId, exhibitionType == 0 ? { exhibitionType: 0 } : exhibitionType);
         fetchTournamentById(tournamentId);
         fetchExhibitionType(tournamentId);
-    }, [type]);
+    }, [exhibitionType, tournamentId]);
 
     return (
         <Fragment>
@@ -117,14 +126,10 @@ function MemberTournament(props) {
                                 displayEmpty
                                 onChange={handleChangeWeight}
                             >
-                                <MenuItem value={0}>
-                                    <em>Tất cả</em>
-                                </MenuItem>
                                 {listWeightRange &&
                                     listWeightRange.map((range) => (
                                         <MenuItem value={range.id} key={range.id}>
-                                            {range.gender == 0 ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax}{' '}
-                                            Kg
+                                            {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
                                         </MenuItem>
                                     ))}
                             </Select>

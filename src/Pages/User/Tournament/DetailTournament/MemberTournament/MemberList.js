@@ -3,13 +3,49 @@ import { Box } from '@mui/system';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { styled } from '@mui/material/styles';
-import { Button } from '@mui/material';
+import {
+    FirstPage,
+    KeyboardArrowDown,
+    KeyboardArrowLeft,
+    KeyboardArrowRight,
+    KeyboardArrowUp,
+    LastPage,
+} from '@mui/icons-material';
+import {
+    Tooltip,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    IconButton,
+    Collapse,
+    Typography,
+    TableFooter,
+    TablePagination,
+    useTheme,
+} from '@mui/material';
 
 function MemberList({ data, type }) {
     const [pageSize, setPageSize] = useState(10);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
 
     let columns;
     let rowsPlayer;
+
+    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     if (type === 2) {
         columns = [
@@ -61,19 +97,21 @@ function MemberList({ data, type }) {
             data &&
             data.map((item, index) => {
                 const container = {};
-                container['id'] = index + 1;
-                container['studentName'] = item.playerName;
+                container['id'] = item.id;
+                container['studentName'] = item.tournamentPlayer.user.name;
                 container['weight'] = item.weight + 'Kg';
-                container['studentId'] = item.playerStudentId;
-                container['playerGender'] = item.playerGender ? 'Nam' : 'Nữ';
-                container['weightRange'] = item.weightMin + ' - ' + item.weightMax + 'Kg';
+                container['isEligible'] = item.isEligible ? 'Đạt tiêu chuẩn' : 'Không đạt tiêu chuẩn';
+                container['studentId'] = item.tournamentPlayer.user.studentId;
+                container['playerGender'] = item.tournamentPlayer.user.gender ? 'Nam' : 'Nữ';
+                container['weightRange'] =
+                    item.competitiveType.weightMin + ' - ' + item.competitiveType.weightMax + 'Kg';
                 return container;
             });
     }
 
     function CustomToolbar() {
         return (
-            <GridToolbarContainer>
+            <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
                 <Box
                     sx={{
                         p: 0.5,
@@ -81,6 +119,9 @@ function MemberList({ data, type }) {
                     }}
                 >
                     <GridToolbarQuickFilter />
+                </Box>
+                <Box>
+                    <Typography>Số lượng vận động viên: {data.length}</Typography>
                 </Box>
             </GridToolbarContainer>
         );
@@ -142,6 +183,74 @@ function MemberList({ data, type }) {
             </StyledGridOverlay>
         );
     }
+
+    function Row(props) {
+        const { row, status, index } = props;
+        const [open, setOpen] = React.useState(false);
+
+        return (
+            <React.Fragment>
+                <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                    <TableCell>
+                        <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                            {open ? (
+                                <Tooltip title="Đóng" arrow>
+                                    <KeyboardArrowUp />
+                                </Tooltip>
+                            ) : (
+                                <Tooltip title="Thành viên trong đội" arrow>
+                                    <KeyboardArrowDown />
+                                </Tooltip>
+                            )}
+                        </IconButton>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                        {index + 1}
+                    </TableCell>
+                    <TableCell align="left">{row.teamName}</TableCell>
+                    {/* <TableCell align="left">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell> */}
+                    <TableCell align="left">{row.exhibitionTypeName}</TableCell>
+                    {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
+                </TableRow>
+                <TableRow>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                        <Collapse in={open} timeout="auto" unmountOnExit>
+                            <Box sx={{ margin: 1 }}>
+                                <Typography variant="h6" gutterBottom component="div">
+                                    Thành viên
+                                </Typography>
+                                <Table size="small" aria-label="purchases">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Tên thành viên</TableCell>
+                                            <TableCell>Mã số sinh viên</TableCell>
+                                            <TableCell align="left">Giới tính</TableCell>
+                                            <TableCell align="left">Vai trò</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {row.exhibitionPlayersDto.map((player) => (
+                                            <TableRow key={player.id}>
+                                                <TableCell component="th" scope="row">
+                                                    {player.playerName}
+                                                </TableCell>
+                                                <TableCell>{player.playerStudentId}</TableCell>
+                                                <TableCell align="left">{player.playerGender ? 'Nam' : 'Nữ'}</TableCell>
+                                                <TableCell align="left">
+                                                    {player.roleInTeam ? 'Trưởng nhóm' : ''}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </Box>
+                        </Collapse>
+                    </TableCell>
+                </TableRow>
+            </React.Fragment>
+        );
+    }
+
     return (
         <Box
             sx={{
@@ -170,19 +279,115 @@ function MemberList({ data, type }) {
                 },
             }}
         >
-            <DataGrid
-                loading={data.length === 0}
-                disableSelectionOnClick={true}
-                rows={rowsPlayer}
-                columns={columns}
-                pageSize={pageSize}
-                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                rowsPerPageOptions={[10, 20, 30]}
-                components={{
-                    Toolbar: CustomToolbar,
-                    NoRowsOverlay: CustomNoRowsOverlay,
-                }}
-            />
+            {type === 1 ? (
+                <DataGrid
+                    // loading={data.length === 0}
+                    disableSelectionOnClick={true}
+                    rows={rowsPlayer}
+                    columns={columns}
+                    pageSize={pageSize}
+                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                    rowsPerPageOptions={[10, 20, 30]}
+                    components={{
+                        Toolbar: CustomToolbar,
+                        NoRowsOverlay: CustomNoRowsOverlay,
+                    }}
+                />
+            ) : (
+                <TableContainer component={Paper}>
+                    <Table sx={{ minWidth: 650 }} aria-label="caption table">
+                        <caption>
+                            <Typography>Số lượng đội thi đấu: {data.length}</Typography>
+                        </caption>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell></TableCell>
+                                <TableCell>STT</TableCell>
+                                <TableCell align="left">Tên đội</TableCell>
+                                <TableCell align="left">Nội dung thi đấu</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {(rowsPerPage > 0
+                                ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                : data
+                            ).map((row, index) => (
+                                <Row key={row.id} row={row} index={index} />
+                            ))}
+                            {emptyRows > 0 && (
+                                <TableRow style={{ height: 53 * emptyRows }}>
+                                    <TableCell colSpan={6} />
+                                </TableRow>
+                            )}
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TablePagination
+                                    rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                                    // colSpan={3}
+                                    count={data.length}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    SelectProps={{
+                                        inputProps: {
+                                            'aria-label': 'Số lượng đội hiển thị',
+                                        },
+                                        native: true,
+                                    }}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                    ActionsComponent={TablePaginationActions}
+                                />
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </TableContainer>
+            )}
+        </Box>
+    );
+}
+function TablePaginationActions(props) {
+    const theme = useTheme();
+    const { count, page, rowsPerPage, onPageChange } = props;
+
+    const handleFirstPageButtonClick = (event) => {
+        onPageChange(event, 0);
+    };
+
+    const handleBackButtonClick = (event) => {
+        onPageChange(event, page - 1);
+    };
+
+    const handleNextButtonClick = (event) => {
+        onPageChange(event, page + 1);
+    };
+
+    const handleLastPageButtonClick = (event) => {
+        onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+    };
+
+    return (
+        <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+            <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} aria-label="first page">
+                {theme.direction === 'rtl' ? <LastPage /> : <FirstPage />}
+            </IconButton>
+            <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page">
+                {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+            </IconButton>
+            <IconButton
+                onClick={handleNextButtonClick}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                aria-label="next page"
+            >
+                {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+            </IconButton>
+            <IconButton
+                onClick={handleLastPageButtonClick}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                aria-label="last page"
+            >
+                {theme.direction === 'rtl' ? <FirstPage /> : <LastPage />}
+            </IconButton>
         </Box>
     );
 }

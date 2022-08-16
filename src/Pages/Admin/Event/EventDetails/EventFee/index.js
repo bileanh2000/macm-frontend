@@ -3,7 +3,7 @@ import { Box, Tab, Tabs, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import EventFeePayment from './EventFeePayment';
 import EventFeeReport from './EventFeeReport';
 
-function EventFee({ event }) {
+function EventFee({ event, isFinish, user }) {
     const [notiStatus, setNotiStatus] = useState(0);
 
     return (
@@ -46,7 +46,11 @@ function EventFee({ event }) {
                         </ToggleButton>
                     </ToggleButtonGroup>
                 </Box>
-                {notiStatus === 0 ? <EventFeePayment event={event} /> : <EventFeeReport event={event} />}
+                {notiStatus === 0 ? (
+                    <EventFeePayment event={event} isFinish={isFinish} user={user} />
+                ) : (
+                    <EventFeeReport event={event} isFinish={isFinish} user={user} />
+                )}
             </Box>
         </Fragment>
     );

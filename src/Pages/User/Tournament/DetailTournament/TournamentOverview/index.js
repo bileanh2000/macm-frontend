@@ -12,8 +12,9 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
+import moment from 'moment';
 
-function TournamentOverview({ tournament, value, index }) {
+function TournamentOverview({ tournament, value, index, schedule, onChangeTab }) {
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
         // [`&.${tableCellClasses.head}`]: {
         //     backgroundColor: theme.palette.common.black,
@@ -32,6 +33,10 @@ function TournamentOverview({ tournament, value, index }) {
         '&:last-child td, &:last-child th': {
             border: 0,
         },
+        '&:hover': {
+            backgroundColor: '#57a6f4 !important',
+            cursor: 'pointer',
+        },
     }));
 
     return (
@@ -43,18 +48,117 @@ function TournamentOverview({ tournament, value, index }) {
         >
             {tournament && (
                 <Fragment>
-                    <Grid container columns={12} sx={{ mt: 2, ml: 0 }} spacing={2}>
+                    <Grid container columns={12} sx={{ width: '100% ', m: 0 }} spacing={2}>
                         <Grid item xs={12}>
-                            <Typography variant="body1" sx={{ p: 2, m: 1 }}>
+                            {/* <Typography variant="body1" sx={{ p: 2, m: 1 }}>
                                 <strong>Nội dung: </strong>
                                 {tournament.description}
                             </Typography>
                             <Typography variant="body1" sx={{ p: 2, m: 1 }}>
                                 <strong>Hạng mục thi đấu:</strong>
-                            </Typography>
+                            </Typography> */}
+                            <TableContainer>
+                                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Nội dung</TableCell>
+                                            <TableCell align="left">Chi phí</TableCell>
+                                            <TableCell align="left">Thời gian</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        <TableRow
+                                            sx={{
+                                                '&:last-child td, &:last-child th': { border: 0 },
+                                                verticalAlign: 'baseline',
+                                            }}
+                                        >
+                                            <TableCell component="th" scope="row">
+                                                <Typography variant="body1" sx={{}}>
+                                                    {tournament.description}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell align="left">
+                                                <ul>
+                                                    <li>
+                                                        {!tournament.totalAmountActual ? (
+                                                            <>
+                                                                <strong>Tổng số tiền dự kiến: </strong>
+                                                                {tournament.totalAmountEstimate.toLocaleString()} VND
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <strong>Tổng số tiền thực tế: </strong>
+                                                                {tournament.totalAmount.toLocaleString()} VND
+                                                            </>
+                                                        )}
+                                                    </li>
+                                                    <li>
+                                                        <strong>Số tiền tài trợ từ CLB: </strong>
+                                                        {tournament.totalAmountFromClubActual > 0
+                                                            ? tournament.totalAmountFromClubActual.toLocaleString()
+                                                            : tournament.totalAmountFromClubEstimate.toLocaleString()}{' '}
+                                                        VND
+                                                    </li>
+                                                    <li>
+                                                        <>
+                                                            <strong>
+                                                                Dự kiến số tiền mỗi vận động viên cần phải đóng:{' '}
+                                                            </strong>
+                                                            {tournament.feePlayerPay.toLocaleString()} VND
+                                                        </>
+                                                        <br />
+                                                        <>
+                                                            <strong>
+                                                                Số tiền mỗi người ban tổ chức cần phải đóng:{' '}
+                                                            </strong>
+                                                            {tournament.feeOrganizingCommiteePay.toLocaleString()} VND
+                                                        </>
+                                                    </li>
+                                                </ul>
+                                            </TableCell>
+                                            <TableCell align="left">
+                                                <ul>
+                                                    <li>
+                                                        <strong>Thời gian bắt đầu: </strong>
+                                                        <br />
+                                                        {schedule[0].startTime.slice(0, 5)} -{' '}
+                                                        {moment(schedule[0].date).format('DD/MM/yyyy')}
+                                                    </li>
+                                                    <li>
+                                                        <strong>Thời gian kết thúc: </strong>
+                                                        <br />
+                                                        {schedule[schedule.length - 1].finishTime.slice(0, 5)} -{' '}
+                                                        {moment(schedule[schedule.length - 1].date).format(
+                                                            'DD/MM/yyyy',
+                                                        )}
+                                                    </li>
+                                                    <li>
+                                                        <strong>Deadline đăng ký tham gia: </strong>
+                                                        <br />
+                                                        {moment(tournament.registrationMemberDeadline).format(
+                                                            'HH:mm - DD/MM/yyyy',
+                                                        )}
+                                                    </li>
+                                                    {tournament.registrationOrganizingCommitteeDeadline ===
+                                                    null ? null : (
+                                                        <li>
+                                                            <strong>Deadline đăng ký BTC: </strong>
+                                                            <br />
+                                                            {moment(
+                                                                tournament.registrationOrganizingCommitteeDeadline,
+                                                            ).format('HH:mm - DD/MM/yyyy')}
+                                                        </li>
+                                                    )}
+                                                </ul>
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
                         </Grid>
-                        <Grid container columns={12} sx={{ mb: 2 }} spacing={2}>
-                            <Grid item xs={4}>
+                        <Grid container columns={12} sx={{ width: '100% ', mb: 2, ml: 0, p: 2 }} spacing={2}>
+                            <Grid item xs={12} md={4}>
                                 <Paper elevation={3}>
                                     {tournament.competitiveTypes.length > 0 && (
                                         <TableContainer sx={{ maxHeight: 440 }}>
@@ -70,7 +174,12 @@ function TournamentOverview({ tournament, value, index }) {
                                                 </TableHead>
                                                 <TableBody>
                                                     {tournament.competitiveTypes.map((data) => (
-                                                        <StyledTableRow key={data.id}>
+                                                        <StyledTableRow
+                                                            key={data.id}
+                                                            onClick={(e) => {
+                                                                onChangeTab && onChangeTab(4, 0, data.id);
+                                                            }}
+                                                        >
                                                             <StyledTableCell align="center">
                                                                 {data.gender ? 'Nam' : 'Nữ'}
                                                             </StyledTableCell>
@@ -85,7 +194,7 @@ function TournamentOverview({ tournament, value, index }) {
                                     )}
                                 </Paper>
                             </Grid>
-                            <Grid item xs={8}>
+                            <Grid item xs={12} md={8}>
                                 <Paper elevation={3}>
                                     {tournament.exhibitionTypes.length > 0 && (
                                         <TableContainer sx={{ maxHeight: 440 }}>
@@ -104,7 +213,12 @@ function TournamentOverview({ tournament, value, index }) {
                                                 </TableHead>
                                                 <TableBody>
                                                     {tournament.exhibitionTypes.map((data) => (
-                                                        <StyledTableRow key={data.id}>
+                                                        <StyledTableRow
+                                                            key={data.id}
+                                                            onClick={(e) => {
+                                                                onChangeTab && onChangeTab(4, 1, data.id);
+                                                            }}
+                                                        >
                                                             <StyledTableCell align="center">
                                                                 {data.name}
                                                             </StyledTableCell>

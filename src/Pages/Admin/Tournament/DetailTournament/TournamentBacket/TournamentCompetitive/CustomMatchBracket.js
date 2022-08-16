@@ -115,7 +115,7 @@ function CustomMatchBracket(params) {
         setError,
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const onDragStart = (e, match, index, round, isFirst) => {
@@ -478,6 +478,7 @@ function CustomMatchBracket(params) {
                         name={areaName}
                         onClose={handleClose}
                         onUpdate={handleUpdateTime}
+                        endDate={params.endDate}
                     />
                 )}
             </Box>
@@ -537,49 +538,49 @@ function CustomMatchBracket(params) {
                     *Chọn vào 1 cặp trận để cập nhật thời gian và địa điểm thi đấu
                 </Typography>
             )}
-            {params.status === 0 ? (
-                !params.isCreate ? (
-                    <Paper sx={{ p: 2 }}>
-                        <Typography variant="caption">
-                            Bảng đấu này chỉ là tạm thời, và có thể thay đổi được trước khi giải đấu bắt đầu
+            {params.status < 2 ? (
+                // !params.isCreate ? (
+                <Paper sx={{ p: 2 }}>
+                    <Typography variant="caption">
+                        Bảng đấu này chỉ là tạm thời, và có thể thay đổi được trước khi giải đấu bắt đầu
+                    </Typography>
+                    {!isEdit ? (
+                        <Typography variant="caption" component={Box}>
+                            Bấm chỉnh sửa để chỉnh sửa thứ tự thi đấu
+                            <Button variant="outlined" onClick={() => setEdit(true)} sx={{ ml: 2 }}>
+                                Chỉnh sửa bảng đấu
+                            </Button>
                         </Typography>
-                        {!isEdit ? (
-                            <Typography variant="caption" component={Box}>
-                                Bấm chỉnh sửa để chỉnh sửa thứ tự thi đấu
-                                <Button variant="outlined" onClick={() => setEdit(true)} sx={{ ml: 2 }}>
-                                    Chỉnh sửa bảng đấu
-                                </Button>
-                            </Typography>
-                        ) : (
-                            <Typography variant="caption" component={Box}>
-                                Kéo thả thứ tự thi đấu của vận động viên để cập nhật vị trí
-                                <Button variant="outlined" onClick={handleUpdateMatches} sx={{ ml: 2 }}>
-                                    Xác nhận
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    onClick={() => {
-                                        params.onChangeData && params.onChangeData();
-                                        setEdit(false);
-                                    }}
-                                    sx={{ ml: 2 }}
-                                >
-                                    Hủy
-                                </Button>
-                            </Typography>
-                        )}
-                    </Paper>
-                ) : (
-                    <Paper sx={{ p: 2 }}>
-                        <Typography variant="caption">
-                            Danh sách thi đấu có sự thay đổi, bấm tạo để có thể cập nhật số lượng tuyển thủ
+                    ) : (
+                        <Typography variant="caption" component={Box}>
+                            Kéo thả thứ tự thi đấu của vận động viên để cập nhật vị trí
+                            <Button variant="outlined" onClick={handleUpdateMatches} sx={{ ml: 2 }}>
+                                Xác nhận
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                onClick={() => {
+                                    params.onChangeData && params.onChangeData();
+                                    setEdit(false);
+                                }}
+                                sx={{ ml: 2 }}
+                            >
+                                Hủy
+                            </Button>
                         </Typography>
-                        <Button variant="outlined" onClick={handleCreateMatches}>
-                            Tạo bảng đấu
-                        </Button>
-                    </Paper>
-                )
+                    )}
+                </Paper>
             ) : (
+                // ) : (
+                //     <Paper sx={{ p: 2 }}>
+                //         <Typography variant="caption">
+                //             Danh sách thi đấu có sự thay đổi, bấm tạo để có thể cập nhật số lượng tuyển thủ
+                //         </Typography>
+                //         <Button variant="outlined" onClick={handleCreateMatches}>
+                //             Tạo bảng đấu
+                //         </Button>
+                //     </Paper>
+                // )
                 ''
             )}
             <Paper sx={{ overflow: 'auto', maxHeight: '80vh', mt: 2 }}>
@@ -620,8 +621,8 @@ function CustomMatchBracket(params) {
                                                 }}
                                                 onClick={(e) => handleClickResult(e, match)}
                                             >
-                                                <Typography variant="caption" sx={{ m: 1, width: '3em' }}>
-                                                    Cặp:{match.matchNo}
+                                                <Typography variant="caption" sx={{ m: 1, width: '4em' }}>
+                                                    Cặp {match.matchNo}
                                                 </Typography>
                                                 <Box
                                                     sx={{
@@ -762,8 +763,8 @@ function CustomMatchBracket(params) {
                                                 }}
                                                 onClick={(e) => handleClickResult(e, match)}
                                             >
-                                                <Typography variant="caption" sx={{ m: 1, width: '3em' }}>
-                                                    Cặp:{match.matchNo}
+                                                <Typography variant="caption" sx={{ m: 1, width: '4em' }}>
+                                                    Cặp {match.matchNo}
                                                 </Typography>
                                                 <Box
                                                     sx={{

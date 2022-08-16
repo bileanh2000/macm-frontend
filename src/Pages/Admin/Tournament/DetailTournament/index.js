@@ -154,6 +154,16 @@ function DetailTournament() {
             return false;
         }
     };
+
+    const checkFinish = () => {
+        const nowDate = new Date();
+        if (new Date(scheduleList[scheduleList.length - 1].date) <= nowDate) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+    const isFinish = scheduleList.length > 0 && checkFinish();
     const isUpdate = tournament && checkUpdate();
 
     const handleDelete = useCallback(
@@ -300,7 +310,11 @@ function DetailTournament() {
                                 )}
                             </TabPanel>
                             <TabPanel value={value} index={2}>
-                                <TournamentFee tournament={tournament} tournamentStatus={tournament.status} />
+                                <TournamentFee
+                                    tournament={tournament}
+                                    tournamentStatus={tournament.status}
+                                    isFinish={isFinish}
+                                />
                             </TabPanel>
                             <TabPanel value={value} index={3}>
                                 <AdminTournament isUpdate={isUpdate} user={user} />
@@ -318,6 +332,9 @@ function DetailTournament() {
                                     tournamentStatus={tournament.status}
                                     valueTab={valueTab}
                                     type={type}
+                                    endDate={
+                                        scheduleList.length > 0 && new Date(scheduleList[scheduleList.length - 1].date)
+                                    }
                                 />
                             </TabPanel>
                         </Paper>

@@ -23,7 +23,7 @@ import { Fragment, useCallback, useState } from 'react';
 import { useSnackbar } from 'notistack';
 import eventApi from 'src/api/eventApi';
 
-function EventItem({ data, onSuccess }) {
+function EventItem({ data, onSuccess, user }) {
     const [eventOnclick, SetEventOnclick] = useState({ name: '', id: '' });
     const [openDialog, setOpenDialog] = useState(false);
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -41,7 +41,7 @@ function EventItem({ data, onSuccess }) {
         (id) => () => {
             handleCloseDialog();
             setTimeout(() => {
-                eventApi.deleteEvent(id).then((res) => {
+                eventApi.deleteEvent(id, user.studentId).then((res) => {
                     if (res.data.length !== 0) {
                         console.log('delete', res);
                         console.log('delete', res.data);
