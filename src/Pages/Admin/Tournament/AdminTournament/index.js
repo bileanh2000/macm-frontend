@@ -6,6 +6,7 @@ import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import AddAdminTourament from './AddAdminTourament';
 import AdminList from './AdminList';
 import UpdateAdminTournament from './UpdateAdminTournament';
+import UpdateRole from './AdminList/UpdateRole';
 
 function a11yProps(index) {
     return {
@@ -65,6 +66,7 @@ function AdminTournament({ isUpdate, user }) {
                         </Button>
                     )} 
                 </Box> */}
+
                 <AdminList
                     adminList={adminList}
                     isUpdate={isUpdate}

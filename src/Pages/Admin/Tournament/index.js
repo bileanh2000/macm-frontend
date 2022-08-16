@@ -261,14 +261,17 @@ function Tournament() {
                         </Button>
                     </DialogActions>
                 </Dialog>
-                {suggestionRole && (
+                {suggestionRole && suggestType && (
                     <CreateTournament
                         title="Tạo giải đấu"
                         roles={suggestionRole}
+                        competitiveType={suggestType.competitiveTypeSamples}
+                        exhibitionType={suggestType.exhibitionTypeSamples}
                         isOpen={openDialogCreate}
                         handleClose={() => {
                             setOpenDialogCreate(false);
                         }}
+                        user={user}
                     />
                 )}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
