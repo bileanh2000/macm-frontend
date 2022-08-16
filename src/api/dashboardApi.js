@@ -23,6 +23,11 @@ const dashboardApi = {
         const url = `/admin/dashboard/getallupcomingactivities`;
         return axiosClient.get(url);
     },
+
+    getActivityReport: (semester) => {
+        const url = `/admin/dashboard/activityreport?semester=${semester}`;
+        return axiosClient.get(url);
+    },
 };
 
 export default dashboardApi;

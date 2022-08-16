@@ -20,6 +20,7 @@ import { hover } from '@testing-library/user-event/dist/hover';
 
 function TournamentOverview({ tournament, onUpdateTournament, value, index, startTime, isUpdate, onChangeTab }) {
     const [openEditDialog, setOpenEditDialog] = useState(false);
+    const user = JSON.parse(localStorage.getItem('currentUser'));
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
         // [`&.${tableCellClasses.head}`]: {
@@ -66,7 +67,10 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                             </Typography>
                         </Grid>
                         <Grid item xs={5}>
-                            {!isUpdate && (
+                            {user.role.name === 'ROLE_HeadClub' ||
+                            user.role.name === 'ROLE_HeadTechnique' ||
+                            user.role.name === 'ROLE_ViceHeadTechnique' ||
+                            isUpdate ? (
                                 <Button
                                     variant="outlined"
                                     startIcon={<Edit />}
@@ -75,7 +79,8 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                                 >
                                     Chỉnh sửa
                                 </Button>
-                            )}
+                            ) : null}
+
                             {openEditDialog && (
                                 <UpdateTournamentOverview
                                     // DialogOpen={true}

@@ -3,87 +3,22 @@ import { Fragment, useEffect, useState } from 'react';
 import userApi from 'src/api/userApi';
 import { Box } from '@mui/system';
 import TextField from '@mui/material/TextField';
-import { Grid } from '@mui/material';
+import { Container, Grid } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import * as Yup from 'yup';
-
-const ImageUpload = (props) => {
-    const [selectedFile, setSelectedFile] = useState();
-    const [preview, setPreview] = useState(props.image);
-    const user = JSON.parse(localStorage.getItem('currentUser'));
-    const Input = styled('input')({
-        display: 'none',
-    });
-
-    // create a preview as a side effect, whenever selected file is changed
-    useEffect(() => {
-        if (!selectedFile) {
-            setPreview(undefined);
-            return;
-        }
-
-        const objectUrl = URL.createObjectURL(selectedFile);
-        setPreview(objectUrl);
-        // free memory when ever this component is unmounted
-        return () => URL.revokeObjectURL(objectUrl);
-    }, [selectedFile]);
-
-    const onSelectFile = (e) => {
-        if (!e.target.files || e.target.files.length === 0) {
-            setSelectedFile(undefined);
-            return;
-        }
-
-        // I've kept this example simple by using the first image instead of multiple
-        setSelectedFile(e.target.files[0]);
-        const data = convertBase64(e.target.files[0]);
-        data.then((res) => props.onAddImageSrc(res));
-    };
-
-    const convertBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(file);
-            fileReader.onload = () => {
-                resolve(fileReader.result);
-            };
-            fileReader.onerror = (error) => {
-                reject(error);
-            };
-        });
-    };
-
-    return (
-        <div>
-            {/* <input type="file" onChange={onSelectFile} /> */}
-            {/* {selectedFile && (
-                <Avatar
-                    alt="anh dai dien"
-                    srcSet="https://png.pngitem.com/pimgs/s/14-148388_twitch-pepe-the-frog-youtube-video-game-pepe.png"
-                    sx={{ width: 180, height: 180, position: 'absolute', top: 55, left: 16 }}
-                />
-            )} */}
-            <label htmlFor="contained-button-file">
-                <Input accept="image/*" id="contained-button-file" type="file" onChange={onSelectFile} />
-                <Avatar
-                    alt="anh dai dien"
-                    // srcSet={preview ? preview : props.image}
-                    srcSet={user.image}
-                    sx={{ width: 180, height: 180, position: 'absolute', top: 55, left: 16 }}
-                />
-            </label>
-        </div>
-    );
-};
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { vi } from 'date-fns/locale';
+import { useSnackbar } from 'notistack';
 
 function EditUserProfile() {
     let { userId } = useParams();
@@ -94,8 +29,7 @@ function EditUserProfile() {
     const [listEmail, setListEmailId] = useState();
     const [listPhone, setListPhone] = useState();
     const [imageSrc, setImageSrc] = useState();
-    let snackBarStatus;
-
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     useEffect(() => {
         const fetchUserList = async () => {
             try {
@@ -200,6 +134,7 @@ function EditUserProfile() {
         //email: Yup.mixed().uniqueEmail(),
         //gender: Yup.string().required('Không được để trống trường này'),
         phone: Yup.mixed().uniquePhone(),
+        currentAddress: Yup.string().trim(),
     });
     const roleData = [
         {
@@ -326,17 +261,11 @@ function EditUserProfile() {
             console.log('1', res);
             console.log('2', res.data);
             if (res.data.length !== 0) {
-                setOpenSnackBar(true);
-                // setSnackBarStatus(true);
-                snackBarStatus = true;
-                dynamicAlert(snackBarStatus, res.message);
-                navigate(-1);
+                enqueueSnackbar(res.message, { variant: 'success' });
+                navigate(`/profile/${userId}`);
             } else {
                 console.log('huhu');
-                setOpenSnackBar(true);
                 // setSnackBarStatus(false);
-                snackBarStatus = false;
-                dynamicAlert(snackBarStatus, res.message);
             }
         });
         console.log('form submit', data);
@@ -364,99 +293,126 @@ function EditUserProfile() {
                         {customAlert.message}
                     </Alert>
                 </Snackbar>
-                <Box component="div" sx={{ marginBottom: 12, position: 'relative' }}>
-                    <Box component="div">
-                        <img src="https://source.unsplash.com/random" alt="" width="100%" height="146px" />
+                <Container maxWidth="xl">
+                    <Box component="div" sx={{ marginBottom: 12, position: 'relative' }}>
+                        <Box component="div">
+                            <img src="https://source.unsplash.com/random" alt="" width="100%" height="146px" />
 
-                        <ImageUpload image={item.image} onAddImageSrc={addImage} />
-                        {/* <Avatar
-                            alt="anh dai dien"
-                            srcSet="https://png.pngitem.com/pimgs/s/14-148388_twitch-pepe-the-frog-youtube-video-game-pepe.png"
-                            sx={{ width: 180, height: 180, position: 'absolute', top: 55, left: 16 }}
-                        /> */}
+                            {/* <ImageUpload image={item.image} onAddImageSrc={addImage} /> */}
+                            <Avatar
+                                alt="anh dai dien"
+                                srcSet={item.image}
+                                sx={{ width: 180, height: 180, position: 'absolute', top: 55, left: 16 }}
+                            />
+                        </Box>
                     </Box>
-                </Box>
-                <Typography variant="h5" component="div" sx={{ marginBottom: '16px', fontWeight: '700' }}>
-                    Chỉnh sửa thông tin
-                </Typography>
-                <Box
-                    component="form"
-                    sx={{
-                        '& .MuiTextField-root': { m: 1 },
-                    }}
-                    noValidate
-                    autoComplete="off"
-                    onSubmit={handleSubmit}
-                >
-                    <Grid container spacing={6} columns={12}>
-                        <Grid item xs={12} sm={6}>
-                            <Typography variant="h6" component="div">
-                                Thông tin cá nhân
-                            </Typography>
-                            <TextField
-                                required
-                                id="outlined-disabled"
-                                label="Họ và Tên"
-                                defaultValue={item.name}
-                                fullWidth
-                                {...register('name')}
-                                //error={errors.name ? true : false}
-                                //helperText={errors.name?.message}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            />
-                            <TextField
-                                required
-                                id="outlined-disabled"
-                                label="Mã sinh viên"
-                                defaultValue={item.studentId}
-                                fullWidth
-                                {...register('studentId')}
-                                //error={errors.studentId ? true : false}
-                                //helperText={errors.studentId?.message}
-                                // InputProps={{
-                                //     readOnly: true,
-                                // }}
-                                disabled
-                            />
-                            <TextField
-                                required
-                                id="outlined-disabled"
-                                label="Ngày sinh"
-                                defaultValue={item.dateOfBirth}
-                                fullWidth
-                                {...register('dateOfBirth')}
-                                //error={errors.dateOfBirth ? true : false}
-                                //helperText={errors.dateOfBirth?.message}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            />
+                    <Typography variant="h5" component="div" sx={{ marginBottom: '16px', fontWeight: '700' }}>
+                        Chỉnh sửa thông tin
+                    </Typography>
+                    <Box
+                        component="form"
+                        sx={{
+                            '& .MuiTextField-root': { mt: 2 },
+                        }}
+                        noValidate
+                        autoComplete="off"
+                        onSubmit={handleSubmit}
+                    >
+                        <Grid container spacing={6} columns={12}>
+                            <Grid item xs={12} sm={6}>
+                                <Typography variant="h6" component="div">
+                                    Thông tin cá nhân
+                                </Typography>
+                                <TextField
+                                    required
+                                    id="outlined-disabled"
+                                    label="Họ và Tên"
+                                    defaultValue={item.name}
+                                    fullWidth
+                                    {...register('name')}
+                                    //error={errors.name ? true : false}
+                                    //helperText={errors.name?.message}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                                <TextField
+                                    required
+                                    id="outlined-disabled"
+                                    label="Mã sinh viên"
+                                    defaultValue={item.studentId}
+                                    fullWidth
+                                    {...register('studentId')}
+                                    //error={errors.studentId ? true : false}
+                                    //helperText={errors.studentId?.message}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                                    <Controller
+                                        required
+                                        name="dateOfBirth"
+                                        control={control}
+                                        defaultValue={item.dateOfBirth}
+                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
+                                            <DatePicker
+                                                label="Ngày sinh"
+                                                disableFuture
+                                                views={['year', 'month', 'day']}
+                                                ampm={false}
+                                                value={value}
+                                                onChange={(value) => onChange(value)}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        required
+                                                        id="outlined-disabled"
+                                                        error={invalid}
+                                                        helperText={invalid ? error.message : null}
+                                                        // id="startDate"
+                                                        variant="outlined"
+                                                        fullWidth
+                                                    />
+                                                )}
+                                            />
+                                        )}
+                                    />
+                                </LocalizationProvider>
 
-                            <TextField
-                                required
-                                select
-                                id="outlined-disabled"
-                                label="Giới tính"
-                                defaultValue={item.gender}
-                                fullWidth
-                                {...register('gender')}
-                                //error={errors.gender ? true : false}
-                                //helperText={errors.gender?.message}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            >
-                                <MenuItem value={true}>Nam</MenuItem>
-                                <MenuItem value={false}>Nữ</MenuItem>
-                            </TextField>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <Typography variant="h6" component="div">
-                                Liên hệ
-                            </Typography>
-                            <FormControl fullWidth>
+                                <TextField
+                                    required
+                                    select
+                                    id="outlined-disabled"
+                                    label="Giới tính"
+                                    defaultValue={item.gender}
+                                    fullWidth
+                                    {...register('gender')}
+                                    //error={errors.gender ? true : false}
+                                    //helperText={errors.gender?.message}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                >
+                                    <MenuItem value={true}>Nam</MenuItem>
+                                    <MenuItem value={false}>Nữ</MenuItem>
+                                </TextField>
+                                <TextField
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                    defaultValue={item.role.name}
+                                    // value={item.role.id}
+                                    label="Chức vụ"
+                                    // onChange={handleChange}
+                                    {...register('roleName')}
+                                    fullWidth
+                                ></TextField>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <Typography variant="h6" component="div">
+                                    Liên hệ
+                                </Typography>
                                 <TextField
                                     required
                                     id="outlined-disabled"
@@ -468,6 +424,7 @@ function EditUserProfile() {
                                     InputProps={{
                                         readOnly: true,
                                     }}
+                                    fullWidth
                                 />
                                 <TextField
                                     required
@@ -477,6 +434,7 @@ function EditUserProfile() {
                                     {...register('phone')}
                                     error={errors.phone ? true : false}
                                     helperText={errors.phone?.message}
+                                    fullWidth
                                 />
                                 <TextField
                                     required
@@ -484,28 +442,18 @@ function EditUserProfile() {
                                     label="Địa chỉ hiện tại"
                                     defaultValue={item.currentAddress}
                                     {...register('currentAddress')}
+                                    fullWidth
                                 />
-
-                                <TextField
-                                    InputProps={{
-                                        readOnly: true,
-                                    }}
-                                    defaultValue={item.role.name}
-                                    // value={item.role.id}
-                                    label="Chức vụ"
-                                    // onChange={handleChange}
-                                    {...register('roleName')}
-                                ></TextField>
-                            </FormControl>
+                            </Grid>
                         </Grid>
-                    </Grid>
 
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '8px', mt: '8px' }}>
-                        <Button variant="contained" component="span" onClick={handleSubmit(onSubmit)}>
-                            Lưu lại
-                        </Button>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: '8px', mt: '8px' }}>
+                            <Button variant="contained" component="span" onClick={handleSubmit(onSubmit)}>
+                                Lưu lại
+                            </Button>
+                        </Box>
                     </Box>
-                </Box>
+                </Container>
             </Fragment>
         );
     });

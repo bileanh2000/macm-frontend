@@ -27,6 +27,7 @@ function EventItem({ data, onSuccess, user }) {
     const [eventOnclick, SetEventOnclick] = useState({ name: '', id: '' });
     const [openDialog, setOpenDialog] = useState(false);
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const user = JSON.parse(localStorage.getItem('currentUser'));
 
     let navigator = useNavigate();
 
@@ -159,19 +160,21 @@ function EventItem({ data, onSuccess, user }) {
                         <Box>
                             {data.status === 'Chưa diễn ra' ? (
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Tooltip title="Xóa sự kiện">
-                                        <IconButton
-                                            aria-label="delete"
-                                            onClick={(event) => {
-                                                handleOpenDialog();
-                                                SetEventOnclick({ name: data.name, id: data.id });
-                                                event.preventDefault();
-                                                event.stopPropagation();
-                                            }}
-                                        >
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </Tooltip>
+                                    {user.role.name !== 'ROLE_Treasurer' ? (
+                                        <Tooltip title="Xóa sự kiện">
+                                            <IconButton
+                                                aria-label="delete"
+                                                onClick={(event) => {
+                                                    handleOpenDialog();
+                                                    SetEventOnclick({ name: data.name, id: data.id });
+                                                    event.preventDefault();
+                                                    event.stopPropagation();
+                                                }}
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    ) : null}
 
                                     {/* <Tooltip title="Chỉnh sửa">
                                         <IconButton

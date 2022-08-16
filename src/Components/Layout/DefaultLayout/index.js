@@ -34,7 +34,7 @@ import {
     Tooltip,
 } from '@mui/material';
 import SportsMartialArtsIcon from '@mui/icons-material/SportsMartialArts';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -64,6 +64,7 @@ function DefaultLayout({ children, onLogout }) {
     const [checked, setChecked] = React.useState(false);
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
+    let navigator = useNavigate();
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -426,9 +427,12 @@ function DefaultLayout({ children, onLogout }) {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
+                                <Box sx={{ p: 1.5, mb: 0.8, borderBottom: '1px solid #dddd', textAlign: 'center' }}>
+                                    <Typography sx={{ fontWeight: 500 }}>Xin chào, {user.name}</Typography>
+                                </Box>
                                 <MenuItem
                                     component={Link}
-                                    to={`/${user.studentId}`}
+                                    to={`/profile/${user.studentId}`}
                                     // sx={{ height: '64px' }}
                                     onClick={handleCloseUserMenu}
                                 >

@@ -18,11 +18,12 @@ import {
     Typography,
 } from '@mui/material';
 import moment from 'moment';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 import semesterApi from 'src/api/semesterApi';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 import { BorderColorOutlined, VisibilityOutlined } from '@mui/icons-material';
+import { IfAnyGranted } from 'react-authorization';
 
 function EditAttendance() {
     const [semester, setSemester] = useState('Summer2022');
@@ -76,107 +77,113 @@ function EditAttendance() {
     }, []);
 
     return (
-        <Box sx={{ m: 1, p: 1 }}>
-            <Container maxWidth="xl">
-                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                    {/* Trạng thái điểm danh ngày: {moment(new Date(_nowDate)).format('DD/MM/yyyy')} */}
-                    {type == 0 ? 'Danh sách lịch tập' : 'Danh sách lịch sự kiện'}
-                </Typography>
-                <Divider />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', m: 2 }}>
-                    <TextField
-                        id="outlined-select-currency"
-                        select
-                        size="small"
-                        label="Chọn kỳ"
-                        value={semester}
-                        onChange={handleChange}
-                    >
-                        {semesterList.map((option) => (
-                            <MenuItem key={option.id} value={option.name}>
-                                {option.name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                    <TextField
-                        size="small"
-                        id="demo-simple-select"
-                        value={type}
-                        select
-                        label="Chọn lịch"
-                        onChange={handleChangeType}
-                        variant="outlined"
-                    >
-                        <MenuItem value={0}>Tập luyện</MenuItem>
-                        <MenuItem value={1}>Sự kiện</MenuItem>
-                    </TextField>
-                </Box>
-                <TableContainer component={Paper} sx={{ mt: 1 }}>
-                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>STT</TableCell>
-                                <TableCell>Hoạt động</TableCell>
-                                <TableCell>Ngày</TableCell>
-                                <TableCell>Giờ</TableCell>
-                                <TableCell>Có mặt</TableCell>
-                                <TableCell></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {listDate.map((row, index) => (
-                                <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                    <TableCell component="th" scope="row">
-                                        {index + 1}
-                                    </TableCell>
-                                    <TableCell>{type == 0 ? 'Lịch tập' : row.name}</TableCell>
-                                    <TableCell>
-                                        {moment(row.date).format('dddd')}
-                                        <br />
-                                        {moment(row.date).format('DD/MM/YYYY')}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.startTime} - {type == 0 ? row.finishTime : row.endTime}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.totalAttend}/{type == 0 ? row.totalSize : row.totalJoin}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Tooltip title="Xem trạng thái điểm danh">
-                                            <IconButton
-                                                LinkComponent={Link}
-                                                to={`../admin/attendance`}
-                                                state={{
-                                                    id: row.id,
-                                                    date: moment(row.date).format('DD/MM/YYYY'),
-                                                    type: type,
-                                                }}
-                                                sx={{ mr: 1 }}
-                                            >
-                                                <VisibilityOutlined />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Chỉnh sửa trạng thái điểm danh">
-                                            <IconButton
-                                                LinkComponent={Link}
-                                                to="../admin/attendance/take"
-                                                state={{
-                                                    id: row.id,
-                                                    date: moment(row.date).format('DD/MM/YYYY'),
-                                                    type: type,
-                                                }}
-                                            >
-                                                <BorderColorOutlined />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </TableCell>
-                                </TableRow>
+        <IfAnyGranted
+            expected={['ROLE_ViceHeadClub', 'ROLE_HeadClub', 'ROLE_HeadTechnique', 'ROLE_ViceHeadTechnique']}
+            actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
+            unauthorized={<Navigate to="/forbidden" />}
+        >
+            <Box sx={{ m: 1, p: 1 }}>
+                <Container maxWidth="xl">
+                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                        {/* Trạng thái điểm danh ngày: {moment(new Date(_nowDate)).format('DD/MM/yyyy')} */}
+                        {type == 0 ? 'Danh sách lịch tập' : 'Danh sách lịch sự kiện'}
+                    </Typography>
+                    <Divider />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', m: 2 }}>
+                        <TextField
+                            id="outlined-select-currency"
+                            select
+                            size="small"
+                            label="Chọn kỳ"
+                            value={semester}
+                            onChange={handleChange}
+                        >
+                            {semesterList.map((option) => (
+                                <MenuItem key={option.id} value={option.name}>
+                                    {option.name}
+                                </MenuItem>
                             ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Container>
-        </Box>
+                        </TextField>
+                        <TextField
+                            size="small"
+                            id="demo-simple-select"
+                            value={type}
+                            select
+                            label="Chọn lịch"
+                            onChange={handleChangeType}
+                            variant="outlined"
+                        >
+                            <MenuItem value={0}>Tập luyện</MenuItem>
+                            <MenuItem value={1}>Sự kiện</MenuItem>
+                        </TextField>
+                    </Box>
+                    <TableContainer component={Paper} sx={{ mt: 1 }}>
+                        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>STT</TableCell>
+                                    <TableCell>Hoạt động</TableCell>
+                                    <TableCell>Ngày</TableCell>
+                                    <TableCell>Giờ</TableCell>
+                                    <TableCell>Có mặt</TableCell>
+                                    <TableCell></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {listDate.map((row, index) => (
+                                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                        <TableCell component="th" scope="row">
+                                            {index + 1}
+                                        </TableCell>
+                                        <TableCell>{type == 0 ? 'Lịch tập' : row.name}</TableCell>
+                                        <TableCell>
+                                            {moment(row.date).format('dddd')}
+                                            <br />
+                                            {moment(row.date).format('DD/MM/YYYY')}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.startTime} - {type == 0 ? row.finishTime : row.endTime}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.totalAttend}/{type == 0 ? row.totalSize : row.totalJoin}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Tooltip title="Xem trạng thái điểm danh">
+                                                <IconButton
+                                                    LinkComponent={Link}
+                                                    to={`../admin/attendance`}
+                                                    state={{
+                                                        id: row.id,
+                                                        date: moment(row.date).format('DD/MM/YYYY'),
+                                                        type: type,
+                                                    }}
+                                                    sx={{ mr: 1 }}
+                                                >
+                                                    <VisibilityOutlined />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Chỉnh sửa trạng thái điểm danh">
+                                                <IconButton
+                                                    LinkComponent={Link}
+                                                    to="../admin/attendance/take"
+                                                    state={{
+                                                        id: row.id,
+                                                        date: moment(row.date).format('DD/MM/YYYY'),
+                                                        type: type,
+                                                    }}
+                                                >
+                                                    <BorderColorOutlined />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Container>
+            </Box>
+        </IfAnyGranted>
     );
 }
 

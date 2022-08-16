@@ -4,7 +4,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import styles from './TrainingSchedule.module.scss';
 import classNames from 'classnames/bind';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { useState } from 'react';
 import trainingSchedule from 'src/api/trainingScheduleApi';
@@ -18,6 +18,8 @@ import { CollectionsBookmarkOutlined } from '@material-ui/icons';
 import AddSession from './addSession';
 import EditSession from './editSession';
 import AddSchedule from './addSchedule';
+import { IfAllGranted, IfAuthorized, IfAnyGranted, IfNoneGranted } from 'react-authorization';
+import ForbiddenPage from 'src/Pages/ForbiddenPage';
 
 const cx = classNames.bind(styles);
 
@@ -284,110 +286,115 @@ function TrainingSchedule() {
     };
 
     return (
-        <Fragment>
-            {isOpenAddSessionDialog && (
-                <AddSession
-                    title="Tạo buổi tập"
-                    isOpen={isOpenAddSessionDialog}
-                    handleClose={() => {
-                        setIsOpenAddSessionDialog(false);
-                        setSelectedDate(null);
-                    }}
-                    date={selectedDate}
-                    isDisabled={isDisabled}
-                    onSucess={(isUpdate) => {
-                        setIsUpdate(isUpdate);
-                    }}
-                />
-            )}
-            {isOpenEditSessionDialog && (
-                <EditSession
-                    title="Cập nhật thời gian buổi tập"
-                    isOpen={isOpenEditSessionDialog}
-                    handleClose={() => {
-                        setIsOpenEditSessionDialog(false);
-                        setSelectedDate(null);
-                    }}
-                    date={selectedDate}
-                    onSucess={(isUpdate) => {
-                        setIsUpdate(isUpdate);
-                    }}
-                />
-            )}
-            {isOpenAddScheduleDialog && (
-                <AddSchedule
-                    title="Thêm lịch tập"
-                    isOpen={isOpenAddScheduleDialog}
-                    handleClose={() => {
-                        // setIsOpenEditSessionDialog(false);
-                        // setSelectedDate(null);
-                        setIsOpenAddScheduleDialog(false);
-                    }}
-                    date={selectedDate}
-                    onSucess={(isUpdate) => {
-                        setIsUpdate(isUpdate);
-                    }}
-                />
-            )}
-
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 700, marginBottom: 2 }}>
-                    Theo dõi lịch tập
-                </Typography>
-                <Box>
-                    {/* <Box sx={{ mt: 8, ml: 2 }}>
-                    </Box> */}
-                    <Button
-                        // component={Link}
-                        // to="/admin/trainingschedules/addsession"
-                        onClick={() => {
-                            setIsOpenAddSessionDialog(true);
-                            setIsDisabled(false);
+        <IfNoneGranted
+            expected={['ROLE_Treasurer']}
+            actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
+            unauthorized={<Navigate to="/forbidden" />}
+        >
+            <Fragment>
+                {isOpenAddSessionDialog && (
+                    <AddSession
+                        title="Tạo buổi tập"
+                        isOpen={isOpenAddSessionDialog}
+                        handleClose={() => {
+                            setIsOpenAddSessionDialog(false);
+                            setSelectedDate(null);
                         }}
-                        startIcon={<AddCircleIcon />}
-                        variant="outlined"
-                        sx={{ mr: 1 }}
-                    >
-                        Thêm buổi tập
-                    </Button>
-                    <Button
-                        // component={Link}
-                        // to="/admin/trainingschedules/add"
-                        onClick={() => setIsOpenAddScheduleDialog(true)}
-                        startIcon={<AddCircleIcon />}
-                        variant="outlined"
-                    >
-                        Thêm lịch tập
-                    </Button>
+                        date={selectedDate}
+                        isDisabled={isDisabled}
+                        onSucess={(isUpdate) => {
+                            setIsUpdate(isUpdate);
+                        }}
+                    />
+                )}
+                {isOpenEditSessionDialog && (
+                    <EditSession
+                        title="Cập nhật thời gian buổi tập"
+                        isOpen={isOpenEditSessionDialog}
+                        handleClose={() => {
+                            setIsOpenEditSessionDialog(false);
+                            setSelectedDate(null);
+                        }}
+                        date={selectedDate}
+                        onSucess={(isUpdate) => {
+                            setIsUpdate(isUpdate);
+                        }}
+                    />
+                )}
+                {isOpenAddScheduleDialog && (
+                    <AddSchedule
+                        title="Thêm lịch tập"
+                        isOpen={isOpenAddScheduleDialog}
+                        handleClose={() => {
+                            // setIsOpenEditSessionDialog(false);
+                            // setSelectedDate(null);
+                            setIsOpenAddScheduleDialog(false);
+                        }}
+                        date={selectedDate}
+                        onSucess={(isUpdate) => {
+                            setIsUpdate(isUpdate);
+                        }}
+                    />
+                )}
+
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                    <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 700, marginBottom: 2 }}>
+                        Theo dõi lịch tập
+                    </Typography>
+                    <Box>
+                        {/* <Box sx={{ mt: 8, ml: 2 }}>
+                    </Box> */}
+                        <Button
+                            // component={Link}
+                            // to="/admin/trainingschedules/addsession"
+                            onClick={() => {
+                                setIsOpenAddSessionDialog(true);
+                                setIsDisabled(false);
+                            }}
+                            startIcon={<AddCircleIcon />}
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                        >
+                            Thêm buổi tập
+                        </Button>
+                        <Button
+                            // component={Link}
+                            // to="/admin/trainingschedules/add"
+                            onClick={() => setIsOpenAddScheduleDialog(true)}
+                            startIcon={<AddCircleIcon />}
+                            variant="outlined"
+                        >
+                            Thêm lịch tập
+                        </Button>
+                    </Box>
                 </Box>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <TextField
-                    id="outlined-select-currency"
-                    size="small"
-                    select
-                    label="Select"
-                    value={semester}
-                    onChange={handleChange}
-                >
-                    {semesterList.map((option) => (
-                        <MenuItem key={option.id} value={parseInt(option.id, 10)}>
-                            {option.name}
-                        </MenuItem>
-                    ))}
-                </TextField>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {/* <Typography>Bấm vào ngày trống trong tương lai để tạo lịch tập</Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                    <TextField
+                        id="outlined-select-currency"
+                        size="small"
+                        select
+                        label="Select"
+                        value={semester}
+                        onChange={handleChange}
+                    >
+                        {semesterList.map((option) => (
+                            <MenuItem key={option.id} value={parseInt(option.id, 10)}>
+                                {option.name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {/* <Typography>Bấm vào ngày trống trong tương lai để tạo lịch tập</Typography>
                     <Typography>Bấm vào lịch tập cũ để xem trạng thái điểm danh</Typography> */}
-                    {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                        {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
                         <SquareIcon sx={{ color: '#BBBBBB', mr: 0.5 }} />
                         <span>Lịch trong quá khứ</span>
                     </Box> */}
-                    {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                        {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
                         <SquareIcon sx={{ color: '#9fccf9', mr: 0.5 }} />
                         <span>Tập luyện</span>
                     </Box> */}
-                    {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                        {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
                         <SquareIcon sx={{ color: '#80ffc1', mr: 0.5 }} />
                         <span>Sự kiện</span>
                     </Box>
@@ -395,79 +402,80 @@ function TrainingSchedule() {
                         <SquareIcon sx={{ color: '#f8aaa0', mr: 0.5 }} />
                         <span>Giải đấu</span>
                     </Box> */}
+                    </Box>
                 </Box>
-            </Box>
-            <div className={cx('schedule-container')}>
-                <CustomTrainingSchedule>
-                    {/* <div className={cx('schedule-content')}> */}
-                    {semester && (
-                        <FullCalendar
-                            initialDate={new Date()}
-                            // {...(semester!==2?(initialDate: '2022-10-01'):{})}
-                            // initialDate={semester !== 2 ? new Date('2022-10-01') : new Date()}
-                            locale="vie"
-                            height="100%"
-                            plugins={[dayGridPlugin, interactionPlugin]}
-                            initialView="dayGridMonth"
-                            eventContent={renderEventContent}
-                            // events={[
-                            //     {
-                            //         id: 1,
-                            //         title: 'Teambuiding Tam đảo 18:00-19:00',
-                            //         start: '2022-06-24',
-                            //         end: '2022-06-27',
-                            //         // display: 'background',
-                            //         // textColor: 'white',
-                            //         // backgroundColor: '#5ba8f5',
-                            //         classNames: ['test-css'],
-                            //     },
-                            // ]}
-                            events={scheduleData}
-                            ref={calendarComponentRef}
-                            weekends={true}
-                            headerToolbar={{
-                                left: 'title',
-                                center: 'dayGridMonth,dayGridWeek',
-                                right: 'prev next today',
-                                // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                            }}
-                            datesSet={(dateInfo) => {
-                                getMonthInCurrentTableView(dateInfo.start);
-                            }}
-                            eventClick={(args) => {
-                                navigateToUpdate(args.event.id, args.event.start);
-                                // console.log(args);
-                            }}
-                            dateClick={function (arg) {
-                                // console.log(arg.dateStr);
-                                navigateToCreate(arg.dateStr);
-                                // swal({
-                                //     title: 'Date',
-                                //     text: arg.dateStr,
-                                //     type: 'success',
-                                // });
-                            }}
-                            // selectable
-                            // select={handleEventAdd}
-                            // eventDrop={(e) => console.log(e)}
-                            // selectable={true}
-                            // editable={true}
-                            // droppable={true}
-                            // eventDrop={function (eventBj, date) {
-                            //     console.log('eventDrop function');
-                            // }}
-                            // drop={(date, jsEvent, ui, resourceId) => {
-                            //     console.log('drop function');
-                            // }}
-                            // select={(start, end, allDay) => {
-                            //     this.handleSelect(start, end, allDay);
-                            // }}
-                        />
-                    )}
-                    {/* </div> */}
-                </CustomTrainingSchedule>
-            </div>
-        </Fragment>
+                <div className={cx('schedule-container')}>
+                    <CustomTrainingSchedule>
+                        {/* <div className={cx('schedule-content')}> */}
+                        {semester && (
+                            <FullCalendar
+                                initialDate={new Date()}
+                                // {...(semester!==2?(initialDate: '2022-10-01'):{})}
+                                // initialDate={semester !== 2 ? new Date('2022-10-01') : new Date()}
+                                locale="vie"
+                                height="100%"
+                                plugins={[dayGridPlugin, interactionPlugin]}
+                                initialView="dayGridMonth"
+                                eventContent={renderEventContent}
+                                // events={[
+                                //     {
+                                //         id: 1,
+                                //         title: 'Teambuiding Tam đảo 18:00-19:00',
+                                //         start: '2022-06-24',
+                                //         end: '2022-06-27',
+                                //         // display: 'background',
+                                //         // textColor: 'white',
+                                //         // backgroundColor: '#5ba8f5',
+                                //         classNames: ['test-css'],
+                                //     },
+                                // ]}
+                                events={scheduleData}
+                                ref={calendarComponentRef}
+                                weekends={true}
+                                headerToolbar={{
+                                    left: 'title',
+                                    center: 'dayGridMonth,dayGridWeek',
+                                    right: 'prev next today',
+                                    // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                                }}
+                                datesSet={(dateInfo) => {
+                                    getMonthInCurrentTableView(dateInfo.start);
+                                }}
+                                eventClick={(args) => {
+                                    navigateToUpdate(args.event.id, args.event.start);
+                                    // console.log(args);
+                                }}
+                                dateClick={function (arg) {
+                                    // console.log(arg.dateStr);
+                                    navigateToCreate(arg.dateStr);
+                                    // swal({
+                                    //     title: 'Date',
+                                    //     text: arg.dateStr,
+                                    //     type: 'success',
+                                    // });
+                                }}
+                                // selectable
+                                // select={handleEventAdd}
+                                // eventDrop={(e) => console.log(e)}
+                                // selectable={true}
+                                // editable={true}
+                                // droppable={true}
+                                // eventDrop={function (eventBj, date) {
+                                //     console.log('eventDrop function');
+                                // }}
+                                // drop={(date, jsEvent, ui, resourceId) => {
+                                //     console.log('drop function');
+                                // }}
+                                // select={(start, end, allDay) => {
+                                //     this.handleSelect(start, end, allDay);
+                                // }}
+                            />
+                        )}
+                        {/* </div> */}
+                    </CustomTrainingSchedule>
+                </div>
+            </Fragment>
+        </IfNoneGranted>
     );
 }
 
