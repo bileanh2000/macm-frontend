@@ -25,8 +25,7 @@ import adminFunAPi from 'src/api/adminFunAPi';
 import eventApi from 'src/api/eventApi';
 import EventSumUp from './EventSumUp';
 
-function EventFeePayment({ event, value, index, isFinish }) {
-    // console.log('ket thuc', isFinish);
+function EventFeePayment({ event, value, index, isFinish, onChange }) {
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(10);
     const [funClub, setFunClub] = useState('');
@@ -62,9 +61,9 @@ function EventFeePayment({ event, value, index, isFinish }) {
         } catch (error) {}
     };
 
-    const updateUserPayment = async (id) => {
+    const updateUserPayment = async (data) => {
         try {
-            const response = await adminClubFeeAPI.updateUserPayment(id, user.studentId);
+            const response = await adminClubFeeAPI.updateUserPayment(data.id, user.studentId);
             enqueueSnackbar(response.message, { variant: 'success' });
             setIsRender(true);
         } catch (error) {
@@ -85,7 +84,7 @@ function EventFeePayment({ event, value, index, isFinish }) {
         setOpenSumUpDialog(true);
     };
     const handleCloseConfirm = () => {
-        setIdMember(-1);
+        setIdMember();
         setOpenConfirm(false);
     };
 
@@ -95,7 +94,7 @@ function EventFeePayment({ event, value, index, isFinish }) {
     };
 
     const columns = [
-        { field: 'id', headerName: 'ID', flex: 0.5 },
+        // { field: 'id', headerName: 'ID', flex: 0.5 },
         { field: 'userName', headerName: 'Tên', flex: 0.8 },
         { field: 'userStudentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
         {
@@ -115,9 +114,9 @@ function EventFeePayment({ event, value, index, isFinish }) {
             },
         },
         {
-            field: 'actions',
+            field: 'pay',
             type: 'actions',
-            headerName: 'Đã đóng - Chưa đóng',
+            headerName: 'Đã đóng',
             width: 100,
             flex: 0.5,
             cellClassName: 'actions',
@@ -127,14 +126,9 @@ function EventFeePayment({ event, value, index, isFinish }) {
                         <GridActionsCellItem
                             icon={<RadioButtonChecked />}
                             label="Đã đóng"
-                            onClick={() => toggleStatus(params.row.id, true)}
+                            onClick={() => toggleStatus(params.row, true)}
                             color="primary"
                             aria-details="Đã đóng"
-                        />,
-                        <GridActionsCellItem
-                            icon={<RadioButtonUnchecked />}
-                            label="Chưa đóng"
-                            onClick={() => toggleStatus(params.row.id, false)}
                         />,
                     ];
                 }
@@ -142,12 +136,34 @@ function EventFeePayment({ event, value, index, isFinish }) {
                     <GridActionsCellItem
                         icon={<RadioButtonUnchecked />}
                         label="Đã đóng"
-                        onClick={() => toggleStatus(params.row.id, true)}
+                        onClick={() => toggleStatus(params.row, true)}
                     />,
+                ];
+            },
+            // hide: view,
+        },
+        {
+            field: 'notpay',
+            type: 'actions',
+            headerName: 'Chưa đóng',
+            width: 100,
+            flex: 0.5,
+            cellClassName: 'actions',
+            getActions: (params) => {
+                if (params.row.paymentStatus == 'Đã đóng') {
+                    return [
+                        <GridActionsCellItem
+                            icon={<RadioButtonUnchecked />}
+                            label="Chưa đóng"
+                            onClick={() => toggleStatus(params.row, false)}
+                        />,
+                    ];
+                }
+                return [
                     <GridActionsCellItem
                         icon={<RadioButtonChecked />}
                         label="Chưa đóng"
-                        onClick={() => toggleStatus(params.row.id, false)}
+                        onClick={() => toggleStatus(params.row, false)}
                         color="primary"
                     />,
                 ];
@@ -220,54 +236,67 @@ function EventFeePayment({ event, value, index, isFinish }) {
                     }}
                     onSucess={(newItem) => {
                         setFunClub((prev) => prev + newItem);
+                        onChange && onChange();
                         setOpenSumUpDialog(false);
                     }}
                 />
             )}
 
-            <Dialog
-                fullWidth
-                maxWidth="md"
-                open={openConfirm}
-                onClose={handleCloseConfirm}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    Xác nhận
-                </DialogTitle>
-                <DialogContent>Bạn có chắc chắn muốn cập nhật trạng thái đóng tiền</DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseConfirm}>Hủy</Button>
-                    <Button onClick={handleOpenConfirm} autoFocus>
-                        Đồng ý
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {idMember && (
+                <Dialog
+                    // fullWidth
+                    // maxWidth="md"
+                    open={openConfirm}
+                    onClose={handleCloseConfirm}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        Xác nhận
+                    </DialogTitle>
+                    <DialogContent>
+                        Bạn có chắc chắn muốn cập nhật trạng thái đóng tiền cho{' '}
+                        <strong>
+                            {idMember.userName} - {idMember.userStudentId}
+                        </strong>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseConfirm}>Hủy</Button>
+                        <Button onClick={handleOpenConfirm} autoFocus>
+                            Đồng ý
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
 
             {event && (
-                <Box sx={{ display: 'flex' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="h6" sx={{ color: 'red', marginRight: 5 }}>
                         Số tiền :{' '}
-                        {event.amountPerRegisterEstimated.toLocaleString('vi-VN', {
-                            style: 'currency',
-                            currency: 'VND',
-                        })}
-                        {isFinish && event.totalAmountActual === 0 ? (
-                            <Button
-                                variant="outlined"
-                                startIcon={<CurrencyExchange />}
-                                sx={{ ml: 1 }}
-                                onClick={handleDialogOpen}
-                            >
-                                Tổng kết chi phí sau sự kiện
-                            </Button>
-                        ) : event && !isFinish ? (
-                            ''
-                        ) : (
-                            <Typography variant="subtitle1">Sự kiện đã tổng kết</Typography>
-                        )}
+                        {isFinish
+                            ? event.amountPerRegisterActual.toLocaleString('vi-VN', {
+                                  style: 'currency',
+                                  currency: 'VND',
+                              })
+                            : event.amountPerRegisterEstimated.toLocaleString('vi-VN', {
+                                  style: 'currency',
+                                  currency: 'VND',
+                              })}
                     </Typography>
+                    {isFinish && event.totalAmountActual === 0 ? (
+                        <Button
+                            variant="outlined"
+                            startIcon={<CurrencyExchange />}
+                            sx={{ ml: 1 }}
+                            onClick={handleDialogOpen}
+                        >
+                            Tổng kết chi phí sau sự kiện
+                        </Button>
+                    ) : event && !isFinish ? (
+                        ''
+                    ) : (
+                        <Typography variant="subtitle1">Sự kiện đã tổng kết</Typography>
+                    )}
                 </Box>
             )}
             <Box
@@ -295,19 +324,26 @@ function EventFeePayment({ event, value, index, isFinish }) {
                     },
                 }}
             >
-                <DataGrid
-                    // loading={!userList.length}
-                    disableSelectionOnClick={true}
-                    rows={rowsUser}
-                    columns={columns}
-                    pageSize={pageSize}
-                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                    rowsPerPageOptions={[10, 20, 30]}
-                    components={{
-                        Toolbar: CustomToolbar,
-                        NoRowsOverlay: CustomNoRowsOverlay,
-                    }}
-                />
+                {(isFinish && event.amountPerRegisterActual > 0) ||
+                (!isFinish && event.amountPerRegisterEstimated > 0) ? (
+                    <DataGrid
+                        // loading={!userList.length}
+                        disableSelectionOnClick={true}
+                        rows={rowsUser}
+                        columns={columns}
+                        pageSize={pageSize}
+                        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                        rowsPerPageOptions={[10, 20, 30]}
+                        components={{
+                            Toolbar: CustomToolbar,
+                            NoRowsOverlay: CustomNoRowsOverlay,
+                        }}
+                    />
+                ) : (
+                    <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
+                        Sự kiện không yêu cầu đóng phí tham gia
+                    </Typography>
+                )}
             </Box>
         </Box>
     );
