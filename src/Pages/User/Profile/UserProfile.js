@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { Fragment, useEffect, useState } from 'react';
 import userApi from 'src/api/userApi';
 import { Box } from '@mui/system';
@@ -17,6 +17,7 @@ import { useSnackbar } from 'notistack';
 import moment from 'moment';
 
 import QRCode from './QRCode';
+import ForbiddenPage from 'src/Pages/ForbiddenPage';
 
 function UserProfile() {
     const min = '1970-12-31';
@@ -46,7 +47,7 @@ function UserProfile() {
                 setListStudentId(listStudentId);
                 setListEmailId(listEmail);
                 setListPhone(listPhone);
-                console.log(listStudentId, listEmail, listPhone);
+                console.log(listPhone);
             } catch (error) {
                 console.log('Failed to fetch user list: ', error);
             }
@@ -55,30 +56,30 @@ function UserProfile() {
     }, []);
 
     function uniquePhone(message) {
-        return this.test('uniquePhone', message, function (value) {
-            const index = listPhone.indexOf(value);
-            if (index > -1) {
-                listPhone.splice(index, 1);
-            }
-            let filterPhone = listPhone.filter((i) => i === value.toString());
-            const { path, createError } = this;
+        if (listPhone) {
+            return this.test('uniquePhone', message, function (value) {
+                if (value !== undefined) {
+                    let filterPhone = listPhone.filter((i) => i === value.toString());
+                    const { path, createError } = this;
 
-            if (filterPhone.length === 1) {
-                return createError({ path, message: message ?? `Số điện thoại "${value}" đã tồn tại` });
-            }
-            if (!value) {
-                return createError({ path, message: 'Không được để trống trường này' });
-            }
+                    if (filterPhone.length === 1) {
+                        return createError({ path, message: message ?? `Số điện thoại "${value}" đã tồn tại` });
+                    }
+                    if (!value) {
+                        return createError({ path, message: 'Không được để trống trường này' });
+                    }
 
-            if (!value.match(/(84|0[3|5|7|8|9])+([0-9]{8})\b/)) {
-                return createError({
-                    path,
-                    message: 'Vui lòng nhập đúng số điện thoại',
-                });
-            }
+                    if (!value.match(/(84|0[3|5|7|8|9])+([0-9]{8})\b/)) {
+                        return createError({
+                            path,
+                            message: 'Vui lòng nhập đúng số điện thoại',
+                        });
+                    }
+                }
 
-            return true;
-        });
+                return true;
+            });
+        }
     }
     //Yup.addMethod(Yup.mixed, 'uniqueStudentId', uniqueStudentId);
     //Yup.addMethod(Yup.mixed, 'uniqueEmail', uniqueEmail);
@@ -96,68 +97,6 @@ function UserProfile() {
         phone: Yup.mixed().uniquePhone(),
         currentAddress: Yup.string().trim(),
     });
-    const roleData = [
-        {
-            id: 1,
-            name: 'Chủ nhiệm',
-        },
-        {
-            id: 2,
-            name: 'Phó chủ nhiệm',
-        },
-        {
-            id: 3,
-            name: 'Thủ quỹ',
-        },
-        {
-            id: 4,
-            name: 'Trưởng ban văn hóa',
-        },
-        {
-            id: 5,
-            name: 'Phó ban văn hóa',
-        },
-        {
-            id: 6,
-            name: 'Trưởng ban truyền thông',
-        },
-        {
-            id: 7,
-            name: 'Phó ban truyền thông',
-        },
-        {
-            id: 8,
-            name: 'Trưởng ban chuyên môn',
-        },
-        {
-            id: 9,
-            name: 'Phó ban chuyên môn',
-        },
-        {
-            id: 10,
-            name: 'Thành viên ban truyền thông',
-        },
-        {
-            id: 11,
-            name: 'Thành viên ban văn hóa',
-        },
-        {
-            id: 12,
-            name: 'Thành viên ban chuyên môn',
-        },
-        {
-            id: 13,
-            name: 'CTV ban truyền thông',
-        },
-        {
-            id: 14,
-            name: 'CTV ban văn hóa',
-        },
-        {
-            id: 15,
-            name: 'CTV ban chuyên môn',
-        },
-    ];
 
     const {
         register,
@@ -205,14 +144,27 @@ function UserProfile() {
     };
 
     const onSubmit = async (data) => {
-        console.log(data);
-        const roleId = roleData.filter((item) => item.name === data.roleName);
+        console.log('day la data truoc khi format', data);
+        // const roleId = roleData.filter((item) => item.name === data.roleName);
         data = {
             ...data,
+            dateOfBirth: moment(data.dateOfBirth).format('yyyy-MM-DD'),
             studentId: userId,
-            roleId: roleId[0].id,
+            roleId: userDetail[0].role.id,
+            roleName: userDetail[0].role.name,
+            generation: userDetail[0].generation,
+            gender: userDetail[0].gender,
+            email: userDetail[0].email,
+            name: userDetail[0].name,
+            currentAddress: data.currentAddress,
+
+            ...(data.phone === undefined ? { phone: userDetail[0].phone } : { phone: data.phone }),
+            ...(data.currentAddress === undefined
+                ? { currentAddress: userDetail[0].currentAddress }
+                : { currentAddress: data.currentAddress }),
         };
-        console.log(data);
+        console.log('day la data sau khi format', data);
+
         await userApi.updateUser(data).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
@@ -227,207 +179,237 @@ function UserProfile() {
         console.log('form submit', data);
     };
 
-    return userDetail.map((item) => {
-        return (
-            <Fragment key={item.id}>
-                <Box sx={{ display: 'none' }}>
-                    {listPhone && listPhone.splice(listPhone.indexOf(item.phone), 1)}
-                    {listEmail && listEmail.splice(listEmail.indexOf(item.email), 1)}
-                    {listStudentId && listStudentId.splice(listStudentId.indexOf(item.studentId), 1)}
-                </Box>
-                <QRCode
-                    title="Mã QR của bạn"
-                    params={{ userDetail, QRUrl }}
-                    isOpen={openQRDialog}
-                    handleClose={() => {
-                        setOpenQRDialog(false);
-                    }}
-                    onSucess={(newItem) => {
-                        setOpenQRDialog(false);
-                    }}
-                />
-                <Box component="div" sx={{ margin: 'auto', marginBottom: 12, position: 'relative', width: '95%' }}>
-                    <Box component="div">
-                        <img src="https://source.unsplash.com/random" alt="" width="100%" height="146px" />
-                        <Avatar
-                            alt="anh dai dien"
-                            srcSet={user.image}
-                            sx={{ width: 180, height: 180, position: 'absolute', top: 55, left: 16 }}
-                        />
-                    </Box>
-                    <Box>
-                        {!isEditable && (
-                            <Tooltip title="Chỉnh sửa" placement="left-start">
-                                <IconButton
-                                    aria-label="edit"
-                                    // size=""
-                                    sx={{ ml: 1, mt: 1, float: 'right' }}
-                                    onClick={() => {
-                                        setIsEditable(true);
-                                    }}
-                                >
-                                    <EditRounded fontSize="inherit" />
-                                </IconButton>
-                            </Tooltip>
-                        )}
-                        <Button
-                            variant="outlined"
-                            startIcon={<QrCode2 />}
-                            sx={{ ml: 1, mt: 1, float: 'right' }}
-                            onClick={handleDialogOpen}
-                        >
-                            Mã QR của bạn
-                        </Button>
-                    </Box>
-                </Box>
+    if (userId !== user.studentId) {
+        return <Navigate to="*" />;
+    }
 
-                <Box
-                    component="form"
-                    sx={{
-                        '& .MuiTextField-root': { m: 1 },
-                        width: '90%',
-                        margin: 'auto',
-                    }}
-                    noValidate
-                    autoComplete="off"
-                >
-                    {isEditable && (
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Typography variant="h5" component="div" sx={{ marginBottom: '16px', fontWeight: '700' }}>
-                                Chỉnh sửa thông tin
-                            </Typography>
-                            <Box>
-                                <Button variant="outlined" onClick={() => setIsEditable(false)} sx={{ mr: 2 }}>
-                                    Hủy bỏ
-                                </Button>
-                                <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
-                                    Xác nhận
-                                </Button>
-                            </Box>
+    return (
+        userDetail &&
+        userDetail.map((item) => {
+            return (
+                <Fragment key={item.id}>
+                    <Box sx={{ display: 'none' }}>
+                        {listPhone && listPhone.splice(listPhone.indexOf(item.phone), 1)}
+                        {listEmail && listEmail.splice(listEmail.indexOf(item.email), 1)}
+                        {listStudentId && listStudentId.splice(listStudentId.indexOf(item.studentId), 1)}
+                    </Box>
+                    <QRCode
+                        title="Mã QR của bạn"
+                        params={{ userDetail, QRUrl }}
+                        isOpen={openQRDialog}
+                        handleClose={() => {
+                            setOpenQRDialog(false);
+                        }}
+                        onSucess={(newItem) => {
+                            setOpenQRDialog(false);
+                        }}
+                    />
+                    <Box component="div" sx={{ margin: 'auto', marginBottom: 12, position: 'relative', width: '95%' }}>
+                        <Box component="div">
+                            <img src="https://source.unsplash.com/random" alt="" width="100%" height="146px" />
+                            <Avatar
+                                alt="anh dai dien"
+                                srcSet={user.image}
+                                sx={{ width: 180, height: 180, position: 'absolute', top: 55, left: 16 }}
+                            />
                         </Box>
-                    )}
+                        <Box>
+                            {!isEditable && (
+                                <Tooltip title="Chỉnh sửa" placement="left-start">
+                                    <IconButton
+                                        aria-label="edit"
+                                        // size=""
+                                        sx={{ ml: 1, mt: 1, float: 'right' }}
+                                        onClick={() => {
+                                            setIsEditable(true);
+                                        }}
+                                    >
+                                        <EditRounded fontSize="inherit" />
+                                    </IconButton>
+                                </Tooltip>
+                            )}
+                            <Button
+                                variant="outlined"
+                                startIcon={<QrCode2 />}
+                                sx={{ ml: 1, mt: 1, float: 'right' }}
+                                onClick={handleDialogOpen}
+                            >
+                                Mã QR của bạn
+                            </Button>
+                        </Box>
+                    </Box>
 
-                    <Grid container spacing={6} columns={12}>
-                        <Grid item xs={12} sm={6}>
-                            <Paper elevation={2} sx={{ p: 1, pr: 2 }}>
-                                <Typography variant="h6" component="div">
-                                    Thông tin cá nhân
+                    <Box
+                        component="form"
+                        sx={{
+                            '& .MuiTextField-root': { m: 1 },
+                            width: '90%',
+                            margin: 'auto',
+                        }}
+                        noValidate
+                        autoComplete="off"
+                    >
+                        {isEditable && (
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Typography
+                                    variant="h5"
+                                    component="div"
+                                    sx={{ marginBottom: '16px', fontWeight: '700' }}
+                                >
+                                    Chỉnh sửa thông tin
                                 </Typography>
-                                <Divider />
-                                <TextField
-                                    id="outlined-disabled"
-                                    label="Họ và Tên"
-                                    defaultValue={item.name}
-                                    {...(!isEditable ? { disabled: true } : {})}
-                                    fullWidth
-                                />
-                                <TextField
-                                    disabled
-                                    id="outlined-disabled"
-                                    label="Mã sinh viên"
-                                    defaultValue={item.studentId}
-                                    fullWidth
-                                />
-                                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
-                                    <Controller
-                                        required
-                                        name="dateOfBirth"
-                                        control={control}
-                                        defaultValue={item.dateOfBirth}
-                                        render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                                            <DatePicker
-                                                label="Ngày sinh"
-                                                disableFuture
-                                                views={['year', 'month', 'day']}
-                                                ampm={false}
-                                                value={value}
-                                                onChange={(value) => onChange(value)}
-                                                disabled={!isEditable}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        required
-                                                        id="outlined-disabled"
-                                                        error={invalid}
-                                                        helperText={invalid ? error.message : null}
-                                                        // id="startDate"
-                                                        variant="outlined"
-                                                        fullWidth
-                                                    />
-                                                )}
-                                            />
-                                        )}
+                                <Box>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => {
+                                            setIsEditable(false);
+                                            setIsRender(true);
+                                        }}
+                                        sx={{ mr: 2 }}
+                                    >
+                                        Hủy bỏ
+                                    </Button>
+                                    <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
+                                        Xác nhận
+                                    </Button>
+                                </Box>
+                            </Box>
+                        )}
+
+                        <Grid container spacing={6} columns={12}>
+                            <Grid item xs={12} sm={6}>
+                                <Paper elevation={2} sx={{ p: 1, pr: 2 }}>
+                                    <Typography variant="h6" component="div">
+                                        Thông tin cá nhân
+                                    </Typography>
+                                    <Divider />
+                                    <TextField
+                                        id="outlined-disabled"
+                                        label="Họ và Tên"
+                                        defaultValue={item.name}
+                                        // {...(!isEditable ? { disabled: true } : {})}
+                                        // disabled={true}
+                                        fullWidth
+                                        disabled={true}
+                                        {...register('name')}
                                     />
-                                </LocalizationProvider>
-                                {/* <TextField
+                                    <TextField
+                                        disabled={true}
+                                        id="outlined-disabled"
+                                        label="Mã sinh viên"
+                                        defaultValue={item.studentId}
+                                        {...register('studentId')}
+                                        fullWidth
+                                    />
+                                    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                                        <Controller
+                                            required
+                                            name="dateOfBirth"
+                                            control={control}
+                                            defaultValue={item.dateOfBirth}
+                                            render={({
+                                                field: { onChange, value },
+                                                fieldState: { error, invalid },
+                                            }) => (
+                                                <DatePicker
+                                                    label="Ngày sinh"
+                                                    disableFuture
+                                                    views={['year', 'month', 'day']}
+                                                    ampm={false}
+                                                    value={value}
+                                                    onChange={(value) => onChange(value)}
+                                                    disabled={!isEditable}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            required
+                                                            id="outlined-disabled"
+                                                            error={invalid}
+                                                            helperText={invalid ? error.message : null}
+                                                            // id="startDate"
+                                                            variant="outlined"
+                                                            fullWidth
+                                                        />
+                                                    )}
+                                                />
+                                            )}
+                                        />
+                                    </LocalizationProvider>
+                                    {/* <TextField
                                     disabled
                                     id="outlined-disabled"
                                     label="Ngày sinh"
                                     defaultValue={item.dateOfBirth}
                                     fullWidth
                                 /> */}
-                                <TextField
-                                    disabled
-                                    id="outlined-disabled"
-                                    label="Giới tính"
-                                    defaultValue={item.gender ? 'Nam' : 'Nữ'}
-                                    fullWidth
-                                />
-                            </Paper>
+                                    <TextField
+                                        disabled={true}
+                                        id="outlined-disabled"
+                                        label="Giới tính"
+                                        defaultValue={item.gender ? 'Nam' : 'Nữ'}
+                                        {...register('gender')}
+                                        fullWidth
+                                    />
+                                    <TextField
+                                        disabled={true}
+                                        defaultValue={item.role.name}
+                                        // value={item.role.id}
+                                        label="Chức vụ"
+                                        // onChange={handleChange}
+                                        {...register('roleName')}
+                                        fullWidth
+                                    />
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <Paper elevation={2} sx={{ p: 1, pr: 2 }}>
+                                    <Typography variant="h6" component="div">
+                                        Thông tin liên hệ
+                                    </Typography>
+                                    <Divider />
+                                    <TextField
+                                        disabled={true}
+                                        id="outlined-disabled"
+                                        label="Email"
+                                        defaultValue={item.email}
+                                        fullWidth
+                                        {...register('email')}
+                                        error={errors.email ? true : false}
+                                        helperText={errors.email?.message}
+                                    />
+                                    <TextField
+                                        id="outlined-disabled"
+                                        label="Số điện thoại"
+                                        defaultValue={item.phone}
+                                        {...register('phone')}
+                                        error={errors.phone ? true : false}
+                                        helperText={errors.phone?.message}
+                                        fullWidth
+                                        // InputProps={{
+                                        //     readOnly: !isEditable,
+                                        // }}
+                                        disabled={!isEditable}
+                                    />
+                                    <TextField
+                                        required
+                                        id="outlined-disabled"
+                                        label="Địa chỉ hiện tại"
+                                        defaultValue={item.currentAddress}
+                                        {...register('currentAddress')}
+                                        error={errors.currentAddress ? true : false}
+                                        helperText={errors.currentAddress?.message}
+                                        fullWidth
+                                        disabled={!isEditable}
+                                        // {...(!isEditable ? { disabled: true } : {})}
+                                    />
+                                </Paper>
+                            </Grid>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <Paper elevation={2} sx={{ p: 1, pr: 2 }}>
-                                <Typography variant="h6" component="div">
-                                    Thông tin iên hệ
-                                </Typography>
-                                <Divider />
-                                <TextField
-                                    disabled
-                                    id="outlined-disabled"
-                                    label="Email"
-                                    defaultValue={item.email}
-                                    fullWidth
-                                />
-                                <TextField
-                                    id="outlined-disabled"
-                                    label="Số điện thoại"
-                                    defaultValue={item.phone}
-                                    {...register('phone')}
-                                    error={errors.phone ? true : false}
-                                    helperText={errors.phone?.message}
-                                    fullWidth
-                                    disabled={!isEditable}
-                                />
-                                <TextField
-                                    required
-                                    id="outlined-disabled"
-                                    label="Địa chỉ hiện tại"
-                                    defaultValue={item.currentAddress}
-                                    {...register('currentAddress')}
-                                    error={errors.currentAddress ? true : false}
-                                    helperText={errors.currentAddress?.message}
-                                    fullWidth
-                                    // {...(!isEditable ? { disabled: true } : {})}
-                                    disabled={!isEditable}
-                                />
-                                <TextField
-                                    InputProps={{
-                                        readOnly: true,
-                                    }}
-                                    defaultValue={item.role.name}
-                                    // value={item.role.id}
-                                    label="Chức vụ"
-                                    // onChange={handleChange}
-                                    {...register('roleName')}
-                                    fullWidth
-                                />
-                            </Paper>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </Fragment>
-        );
-    });
+                    </Box>
+                </Fragment>
+            );
+        })
+    );
 }
 
 export default UserProfile;

@@ -53,7 +53,7 @@ function ErrorPage() {
                 <h1 className={cx('error-code')}>404</h1>
                 <h2 className={cx('error-des')}>Oops, có vẻ như bạn đang lạc đường !</h2>
                 {/* <a className={cx('btn')} href="/Thuedi"></a> */}
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                     <Box
                         component="a"
                         href="/"
