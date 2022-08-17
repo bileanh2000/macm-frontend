@@ -58,19 +58,19 @@ function QRScanner({ activityData, activityType }) {
         return () => clearTimeout(timer);
     }, []);
 
-    useEffect(() => {
-        let setupTime = localStorage.getItem('setupTime');
-        if (setupTime == null) {
-            localStorage.setItem('setupTime', now);
-        } else {
-            if (now - new Date(setupTime) > LIMIT_TIME * 60 * 60 * 1000) {
-                localStorage.removeItem('attendanced');
-                localStorage.removeItem('setupTime');
-                localStorage.setItem('setupTime', now);
-            }
-        }
-        console.log('test', now - new Date(setupTime));
-    }, [now]);
+    // useEffect(() => {
+    //     let setupTime = localStorage.getItem('setupTime');
+    //     if (setupTime == null) {
+    //         localStorage.setItem('setupTime', now);
+    //     } else {
+    //         if (now - new Date(setupTime) > LIMIT_TIME * 60 * 60 * 1000) {
+    //             localStorage.removeItem('attendanced');
+    //             localStorage.removeItem('setupTime');
+    //             localStorage.setItem('setupTime', now);
+    //         }
+    //     }
+    //     console.log('test', now - new Date(setupTime));
+    // }, [now]);
 
     const reload = () => {
         window.location.reload();
@@ -81,7 +81,7 @@ function QRScanner({ activityData, activityType }) {
             if (!activityType) {
                 response = await adminAttendanceAPI.takeAttendance(studentId, activityData.id, 1);
             } else {
-                response = await adminAttendanceAPI.takeAttendanceEvent(activityData.id, studentId, 1);
+                response = await adminAttendanceAPI.takeAttendanceEvent(activityData.event.id, studentId, 1);
             }
             // const response = await userApi.updateUserStatus(studentId);
 
@@ -130,6 +130,7 @@ function QRScanner({ activityData, activityType }) {
                 let checkStudentId = attendancedLocal.filter(
                     (value, index, self) => index === self.findIndex((t) => t.studentId === value.studentId),
                 );
+
                 if (attendancedLocal.filter((item) => item.studentId === JSONResult.studentId).length !== 0) {
                     checkStudentId.filter((item) => {
                         if (item.studentId === JSONResult.studentId) {
@@ -151,7 +152,7 @@ function QRScanner({ activityData, activityType }) {
                 }
             } catch (error) {
                 enqueueSnackbar('Mã QR không hợp lệ error', {
-                    variant: 'error',
+                    variant: 'warning',
                 });
                 console.log(error);
                 // setAttendanceMessages('Mã QR không hợp lệ');
