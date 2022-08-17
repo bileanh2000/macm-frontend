@@ -91,7 +91,7 @@ function EditRule({ rule, isOpen, handleClose, onSucess }) {
                 </DialogContent>
                 <DialogActions>
                     <Button variant="outlined" onClick={handleClose}>
-                        Hủy bỏ
+                        Hủy
                     </Button>
                     <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
                         Xác nhận

@@ -142,7 +142,7 @@ function EditContact() {
                             </Button>
                             {/* <input type="submit" /> */}
                             <Button variant="contained" color="error">
-                                <Link to="/admin/contact">Hủy bỏ</Link>
+                                <Link to="/admin/contact">Hủy</Link>
                             </Button>
                         </Box>
                         {/* <h3>Mạng xã hội</h3>

@@ -189,7 +189,7 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
                 </DialogContent>
                 <DialogActions>
                     <Button variant="outline" autoFocus onClick={handleCancel}>
-                        Hủy bỏ
+                        Hủy
                     </Button>
                     <Button variant="contained" onClick={handleOk}>
                         Đồng ý

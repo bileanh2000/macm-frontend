@@ -185,7 +185,7 @@ function MemberTournament({ tournament, isUpdate }) {
                                         </Box>
                                     )}
                                     {/* <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialog(true)}>
-                                        Thêm người chơi thi đấu đối kháng
+                                        Thêm vận động viên thi đấu đối kháng
                                     </Button> */}
                                     <FormControl size="small">
                                         <Typography variant="caption">Hạng cân</Typography>
@@ -228,7 +228,7 @@ function MemberTournament({ tournament, isUpdate }) {
                                             sx={{ mr: 2 }}
                                             onClick={() => handleOpenDialogExhibition(true)}
                                         >
-                                            Thêm người chơi thi đấu biểu diễn
+                                            Thêm vận động viên thi đấu biểu diễn
                                         </Button>
                                         {/* <Button
                                     variant="outlined"

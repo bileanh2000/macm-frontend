@@ -195,7 +195,7 @@ function TournamentFeeReport({ tournament, tournamentStatus, value, index }) {
                 <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                     {type == 1
                         ? 'Giải đấu không yêu cầu ban tổ chức đóng phí tham gia'
-                        : 'Giải đấu không yêu cầu người chơi đóng phí tham gia'}
+                        : 'Giải đấu không yêu cầu vận động viên đóng phí tham gia'}
                 </Typography>
             )}
         </Box>

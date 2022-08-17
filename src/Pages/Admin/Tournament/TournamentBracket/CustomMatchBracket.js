@@ -164,10 +164,10 @@ function CustomMatchBracket(params) {
         console.log(data);
         if (data.score1 == data.score2) {
             setError('score1', {
-                message: 'Điểm 2 người chơi không được bằng nhau',
+                message: 'Điểm 2 vận động viên không được bằng nhau',
             });
             setError('score2', {
-                message: 'Điểm 2 người chơi không được bằng nhau',
+                message: 'Điểm 2 vận động viên không được bằng nhau',
             });
         } else {
             match.firstPoint = data.score1;
@@ -203,7 +203,7 @@ function CustomMatchBracket(params) {
                                 <Table stickyHeader aria-label="sticky table">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell align="center">Tên cầu thủ</TableCell>
+                                            <TableCell align="center">Tên vận động viên</TableCell>
                                             <TableCell align="center">Điểm số</TableCell>
                                         </TableRow>
                                     </TableHead>

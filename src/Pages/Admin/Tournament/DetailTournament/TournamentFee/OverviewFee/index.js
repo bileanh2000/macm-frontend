@@ -38,7 +38,7 @@ function OverviewFee({ value, index, tournament, tournamentStatus }) {
                     )}
                     {tournament.feePlayerPay > 0 ? (
                         <Typography variant="body1" sx={{ p: 2, m: 1 }}>
-                            <strong>Số tiền người chơi cần đóng: </strong>
+                            <strong>Số tiền vận động viên cần đóng: </strong>
                             {tournament.feePlayerPay?.toLocaleString('vi-VN', {
                                 style: 'currency',
                                 currency: 'VND',

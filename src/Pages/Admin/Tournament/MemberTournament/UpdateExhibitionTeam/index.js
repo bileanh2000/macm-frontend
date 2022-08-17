@@ -297,7 +297,7 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
                     </DialogContent>
                     <DialogActions>
                         <Button variant="outlined" onClick={handleCloseDialog}>
-                            Hủy bỏ
+                            Hủy
                         </Button>
                         <Button
                             variant="contained"

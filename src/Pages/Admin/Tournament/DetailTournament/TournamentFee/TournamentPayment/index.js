@@ -291,7 +291,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index, user, i
                         )
                     ) : paymentStatus ? (
                         <Typography variant="body1" sx={{ color: 'red', ml: 5 }}>
-                            Số tiền mỗi người chơi phải đóng:{' '}
+                            Số tiền mỗi vận động viên phải đóng:{' '}
                             {tournament.feePlayerPay?.toLocaleString('vi-VN', {
                                 style: 'currency',
                                 currency: 'VND',
@@ -397,7 +397,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index, user, i
                 <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                     {type == 1
                         ? 'Giải đấu không yêu cầu ban tổ chức đóng phí tham gia'
-                        : 'Giải đấu không yêu cầu người chơi đóng phí tham gia'}
+                        : 'Giải đấu không yêu cầu vận động viên đóng phí tham gia'}
                 </Typography>
             )}
             {tournament && userList && adminList && (

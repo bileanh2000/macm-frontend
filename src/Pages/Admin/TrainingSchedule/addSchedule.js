@@ -308,7 +308,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClosePreviewDialog}>Hủy bỏ</Button>
+                    <Button onClick={handleClosePreviewDialog}>Hủy</Button>
                     <Button onClick={handleCreate}>Đồng ý</Button>
                 </DialogActions>
             </Dialog>
@@ -561,7 +561,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} sx={{ mr: 1 }}>
-                        Hủy bỏ
+                        Hủy
                     </Button>
                     <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
                         Xem trước

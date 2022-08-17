@@ -214,7 +214,7 @@ function UpdateAdminTournament({ value, index }) {
                     <DialogContentText id="alert-dialog-description">Bạn có muốn lưu các thay đổi ?</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog}>Từ chối</Button>
+                    <Button onClick={handleCloseDialog}>Hủy</Button>
                     <Button onClick={handleUpdate} autoFocus>
                         Đồng ý
                     </Button>

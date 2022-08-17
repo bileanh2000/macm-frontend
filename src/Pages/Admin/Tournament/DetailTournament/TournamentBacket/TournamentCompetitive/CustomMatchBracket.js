@@ -286,10 +286,10 @@ function CustomMatchBracket(params) {
     const handleUpdate = (data) => {
         if (data.score1 == data.score2) {
             setError('score1', {
-                message: 'Điểm 2 người chơi không được bằng nhau',
+                message: 'Điểm 2 vận động viên không được bằng nhau',
             });
             setError('score2', {
-                message: 'Điểm 2 người chơi không được bằng nhau',
+                message: 'Điểm 2 vận động viên không được bằng nhau',
             });
         } else {
             match.firstPlayer.point = data.score1;
@@ -448,7 +448,7 @@ function CustomMatchBracket(params) {
                             )}
                             <Box sx={{ float: 'right' }}>
                                 <Button variant="outlined" onClick={handleClose} sx={{ mr: 2 }}>
-                                    Hủy bỏ
+                                    Hủy
                                 </Button>
                                 <Button variant="contained" onClick={handleSubmit(handleUpdate)}>
                                     Đồng ý
@@ -523,7 +523,7 @@ function CustomMatchBracket(params) {
                         </Box>
                     </DialogContent>
                     {/* <DialogActions>
-                        <Button onClick={handleClose}>Hủy bỏ</Button>
+                        <Button onClick={handleClose}>Hủy</Button>
                         {value == 1 ? (
                             <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
                         ) : (

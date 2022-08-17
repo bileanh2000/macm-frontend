@@ -478,7 +478,7 @@ function RegisterPlayer({
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" onClick={handleCloseDialog}>
-                    Hủy bỏ
+                    Hủy
                 </Button>
                 <Button
                     variant="contained"

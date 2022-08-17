@@ -68,7 +68,7 @@ function TournamentItem({ data, onSuccess }) {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
+                    <Button onClick={handleCloseDialog}>Hủy</Button>
                     <Button onClick={handleDelete(tournamentOnclick.id)} autoFocus>
                         Đồng ý
                     </Button>

@@ -132,7 +132,7 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseConfirmDialog}>Hủy bỏ</Button>
+                    <Button onClick={handleCloseConfirmDialog}>Hủy</Button>
                     <Button onClick={handleConfirmDialog} autoFocus>
                         Đồng ý
                     </Button>
@@ -271,7 +271,7 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                     </Button>
                     <Box>
                         <Button ariant="outlined" onClick={handleClose} sx={{ mr: 1 }}>
-                            Hủy bỏ
+                            Hủy
                         </Button>
                         <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
                             Xác nhận

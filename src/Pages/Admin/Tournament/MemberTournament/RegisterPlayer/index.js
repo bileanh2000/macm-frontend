@@ -103,7 +103,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
         // const params = { userId: player[0].id, competitiveTypeId: weightRange, weight: data.weight, tournamentId };
         if (player.length === 0) {
             let variant = 'error';
-            enqueueSnackbar('Vui lòng chọn thông tin người chơi', { variant });
+            enqueueSnackbar('Vui lòng chọn thông tin vận động viên', { variant });
             return;
         }
         addNewCompetitivePlayer(weightRange, player);
@@ -232,7 +232,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" onClick={handleCloseDialog}>
-                    Hủy bỏ
+                    Hủy
                 </Button>
                 <Button variant="contained" onClick={handleRegister} autoFocus disabled={player.length == 0}>
                     Đồng ý

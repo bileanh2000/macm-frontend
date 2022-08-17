@@ -332,7 +332,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
                     </DialogContent>
                     <DialogActions>
                         <Button variant="outlined" onClick={handleCloseDialog}>
-                            Hủy bỏ
+                            Hủy
                         </Button>
                         <Button
                             variant="contained"

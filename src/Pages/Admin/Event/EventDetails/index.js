@@ -225,7 +225,7 @@ function EventDetails() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
+                    <Button onClick={handleCloseDialog}>Hủy</Button>
                     <Button onClick={handleDelete(id)} autoFocus>
                         Đồng ý
                     </Button>

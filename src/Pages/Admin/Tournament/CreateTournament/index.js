@@ -429,7 +429,7 @@ function CreateTourament() {
                                                     fieldState: { error, invalid },
                                                 }) => (
                                                     <DatePicker
-                                                        label="Hạn đăng kí cho người chơi"
+                                                        label="Hạn đăng kí cho vận động viên"
                                                         inputFormat="dd/MM/yyyy"
                                                         disablePast
                                                         ampm={false}

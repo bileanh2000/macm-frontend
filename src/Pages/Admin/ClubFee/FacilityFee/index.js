@@ -114,7 +114,7 @@ function FacilityFee() {
                         onClick={() => handleOpenDialog(params.row.id, false)}
                         style={{ backgroundColor: 'lightcoral' }}
                     >
-                        Từ chối
+                        Hủy
                     </Button>,
                 ];
             },
@@ -216,7 +216,7 @@ function FacilityFee() {
                     <DialogContentText id="alert-dialog-description">Bạn có muốn lưu các thay đổi ?</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog}>Từ chối</Button>
+                    <Button onClick={handleCloseDialog}>Hủy</Button>
                     <Button onClick={handleUpdate} autoFocus>
                         Đồng ý
                     </Button>

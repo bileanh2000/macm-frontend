@@ -267,7 +267,7 @@ function TableMatch(params) {
                         </DialogContent>
                         <DialogActions>
                             <Button variant="outlined" onClick={handleClose}>
-                                Hủy bỏ
+                                Hủy
                             </Button>
                             <Button variant="contained" onClick={handleSubmit(handleUpdate)}>
                                 Đồng ý

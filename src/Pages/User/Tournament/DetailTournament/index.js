@@ -321,7 +321,7 @@ function DetailTournament() {
                                         Đăng kí
                                     </Button>
                                     <Button sx={{ mt: 1, mr: 1 }} onClick={handleCloseDialogAdmin} variant="outlined">
-                                        Hủy bỏ
+                                        Hủy
                                     </Button>
                                 </Box>
                             </FormControl>
@@ -439,7 +439,7 @@ function DetailTournament() {
                                     <Tab label="Tổng quan" {...a11yProps(0)} value={0} />
                                     <Tab label="Lịch thi đấu" {...a11yProps(1)} value={1} />
                                     <Tab label="Danh sách ban tổ chức" {...a11yProps(2)} value={2} />
-                                    <Tab label="Danh sách người chơi" {...a11yProps(3)} value={3} />
+                                    <Tab label="Danh sách vận động viên" {...a11yProps(3)} value={3} />
                                     <Tab label="Bảng đấu" {...a11yProps(4)} value={4} />
                                 </Tabs>
                             </Box>
