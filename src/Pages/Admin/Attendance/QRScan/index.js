@@ -80,8 +80,16 @@ function QRScanner({ activityData, activityType }) {
             let response;
             if (!activityType) {
                 response = await adminAttendanceAPI.takeAttendance(studentId, activityData.id, 1);
+                if (response.data.length === 0) {
+                    enqueueSnackbar(response.message, { variant: 'warning' });
+                    return;
+                }
             } else {
                 response = await adminAttendanceAPI.takeAttendanceEvent(activityData.event.id, studentId, 1);
+                if (response.data.length === 0) {
+                    enqueueSnackbar(response.message, { variant: 'warning' });
+                    return;
+                }
             }
             // const response = await userApi.updateUserStatus(studentId);
 
