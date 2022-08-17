@@ -315,9 +315,9 @@ function TournamentPayment({ tournament, tournamentStatus, value, index, user, i
                 ) : (
                     <Typography variant="subtitle1">Giải đấu đã tổng kết</Typography>
                 )}
-                <Button variant="outlined" startIcon={<CurrencyExchange />} sx={{ ml: 1 }} onClick={handleDialogOpen}>
+                {/* <Button variant="outlined" startIcon={<CurrencyExchange />} sx={{ ml: 1 }} onClick={handleDialogOpen}>
                     Tổng kết chi phí sau giải đấu
-                </Button>
+                </Button> */}
             </Box>
             {/* <Grid item xs={4}>
                     <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>

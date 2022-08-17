@@ -45,8 +45,8 @@ function AdminTournament({ isUpdate, user }) {
         try {
             const response = await eventApi.getAllMemberEvent(params, index);
             console.log(response);
-            // const newUser = response.data.filter((user) => user.registerStatus === 'Đã chấp nhận');
-            setAdminList(response.data);
+            const newUser = response.data.filter((user) => user.registerStatus === 'Đã chấp nhận');
+            setAdminList(newUser);
             setActive(response.totalActive);
             setTotal(response.totalResult);
         } catch (error) {
@@ -64,7 +64,7 @@ function AdminTournament({ isUpdate, user }) {
             {/* <UpdateAdminTournament value={value} active={active} total={total} index={1} /> */}
             {/* <AddMemberToAdminEvent value={value} active={active} total={total} index={1} /> */}
             {/* </Box> */}
-            {/* <Box sx={{ padding: '8px 8px 5px 8px' }}>
+            <Box sx={{ padding: '8px 8px 5px 8px' }}>
                 <ToggleButtonGroup
                     color="primary"
                     value={notiStatus}
@@ -100,26 +100,27 @@ function AdminTournament({ isUpdate, user }) {
                         CẬP NHẬT VAI TRÒ
                     </ToggleButton>
                 </ToggleButtonGroup>
-            </Box> */}
-            {/* {notiStatus === 0 ? ( */}
-            <AdminList
-                adminList={adminList}
-                isUpdate={isUpdate}
-                user={user}
-                active={active}
-                total={total}
-                value={value}
-                index={0}
-                Success={(newItem) => {
-                    // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
-                    //     return;
-                    // }
-                    console.log(newItem);
-                    setAdminList([...newItem, ...adminList]);
-                }}
-            />
-            {/* ) : ( // <AddMemberToAdminEvent />
-             )} */}
+            </Box>
+            {notiStatus === 0 ? (
+                <AdminList
+                    adminList={adminList}
+                    isUpdate={isUpdate}
+                    user={user}
+                    active={active}
+                    total={total}
+                    value={value}
+                    index={0}
+                    Success={(newItem) => {
+                        // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
+                        //     return;
+                        // }
+                        console.log(newItem);
+                        setAdminList([...newItem, ...adminList]);
+                    }}
+                />
+            ) : (
+                <AddMemberToAdminEvent />
+            )}
         </Fragment>
     );
 }

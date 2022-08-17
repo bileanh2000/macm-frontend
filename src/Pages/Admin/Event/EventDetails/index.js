@@ -89,6 +89,7 @@ function EventDetails() {
     const [value, setValue] = useState(0);
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [isUpdateEvent, setIsUpdateEvent] = useState(false);
+    const [isRender, setIsRender] = useState(true);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -119,11 +120,12 @@ function EventDetails() {
     };
 
     useEffect(() => {
-        getEventById(id);
+        isRender && getEventById(id);
         fetchTournamentSchedule(id);
         window.scrollTo({ behavior: 'smooth', top: '0px' });
         setIsUpdateEvent(false);
-    }, [id, isUpdateEvent]);
+        setIsRender(false);
+    }, [id, isUpdateEvent, isRender, tournament]);
 
     const scheduleData = scheduleList.map((item) => {
         const container = {};
@@ -332,7 +334,13 @@ function EventDetails() {
                                 <MenberEvent />
                             </TabPanel>
                             <TabPanel value={value} index={4}>
-                                <EventFee event={tournament} isUpdate={isUpdate} user={user} isFinish={isFinish} />
+                                <EventFee
+                                    event={tournament}
+                                    isUpdate={isUpdate}
+                                    user={user}
+                                    isFinish={isFinish}
+                                    onChange={() => setIsRender(true)}
+                                />
                             </TabPanel>
                             <TabPanel value={value} index={5}>
                                 {/* <MemberTournament tournament={tournament} isUpdate={isUpdate} /> */}

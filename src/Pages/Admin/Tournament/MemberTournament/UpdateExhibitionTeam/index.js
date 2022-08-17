@@ -117,10 +117,12 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
 
     const handleRegister = (data) => {
         const teamMember = [...dataMale, ...dataFemale];
-        const listStudentId = teamMember.map((student) => student.studentId);
+        const listStudentId = teamMember.map((student) => {
+            return { studentId: student.studentId };
+        });
         console.log(teamMember);
         // const params = { listStudentId, teamName: data.teamName, exhibitionTypeId: exhibitionTeam.exhibitionTypeId };
-        updateTeam(exhibitionTeam.exhibitionTypeId, listStudentId);
+        updateTeam(exhibitionTeam.id, listStudentId);
         onSuccess && onSuccess();
         handleCloseDialog();
     };
@@ -294,8 +296,11 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
                         </Box>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
+                        <Button variant="outlined" onClick={handleCloseDialog}>
+                            Hủy bỏ
+                        </Button>
                         <Button
+                            variant="contained"
                             onClick={handleRegister}
                             autoFocus
                             disabled={dataFemale.length !== numberFemale || dataMale.length !== numberMale}

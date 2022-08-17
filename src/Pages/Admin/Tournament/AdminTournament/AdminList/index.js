@@ -79,6 +79,11 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
         setOpenDialog(true);
     };
 
+    const handleOpenDialogCancel = () => {
+        setData(adminList);
+        setIsEdit(false);
+    };
+
     const deleteTournamentOrganizingCommittee = async (tournamentAdminId) => {
         try {
             const response = await adminTournament.deleteTournamentOrganizingCommittee(tournamentAdminId);
@@ -323,14 +328,17 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 },
             }}
         >
-            <Box sx={{ mb: 2, float: 'right' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 {!isUpdate && (
-                    <Button variant="outlined" sx={{ mr: 2 }} onClick={() => setOpenDialogEdit(true)}>
+                    <Button variant="outlined" sx={{ m: 1 }} onClick={() => setOpenDialogEdit(true)}>
                         Chỉnh sửa vai trò của giải đấu
                     </Button>
                 )}
                 {isEdit && (
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button variant="outlined" onClick={handleOpenDialogCancel} sx={{ m: 1 }} disabled={!isEdit}>
+                            Hủy bỏ
+                        </Button>
                         <Button variant="contained" onClick={handleOpenDialogSave} sx={{ m: 1 }} disabled={!isEdit}>
                             Lưu lại
                         </Button>

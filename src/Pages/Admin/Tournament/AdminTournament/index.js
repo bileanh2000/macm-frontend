@@ -79,7 +79,7 @@ function AdminTournament({ isUpdate, user }) {
                         // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
                         //     return;
                         // }
-                        setAdminList([...newItem, ...adminList]);
+                        // setAdminList([...newItem, ...adminList]);
                         SetIsRender(true);
                     }}
                     tournamentId={tournamentId}
