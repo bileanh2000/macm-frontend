@@ -143,7 +143,7 @@ function TournamentSchedule({ isUpdate }) {
     }, [update]);
 
     useEffect(() => {
-        isRender && fetchTournamentSchedule();
+        isRender && fetchTournamentSchedule(tournamentId);
         isRender && fetchCommonScheduleBySemester();
         setIsRender(false);
     }, [scheduleList, commonList, isRender]);
@@ -323,7 +323,7 @@ function TournamentSchedule({ isUpdate }) {
                         ? eventInfo.event.extendedProps.type === 3
                             ? eventDate < current
                                 ? ''
-                                : 'Cập nhật thời gian'
+                                : 'Cập nhật thời gian (' + eventInfo.event.extendedProps.time + ')'
                             : `Không thể tạo lịch (trùng với ${eventInfo.event.title})`
                         : 'Quá thời gian cập nhật'
                 }
@@ -336,13 +336,13 @@ function TournamentSchedule({ isUpdate }) {
                                 {eventDate === current ? (
                                     <>
                                         <strong>
-                                            {eventInfo.event.title} <br />
+                                            {/* {eventInfo.event.title} <br /> */}
                                             {eventInfo.event.extendedProps.time}
                                         </strong>
                                     </>
                                 ) : (
                                     <>
-                                        {eventInfo.event.title} <br />
+                                        {/* {eventInfo.event.title} <br /> */}
                                         {eventInfo.event.extendedProps.time}
                                     </>
                                 )}

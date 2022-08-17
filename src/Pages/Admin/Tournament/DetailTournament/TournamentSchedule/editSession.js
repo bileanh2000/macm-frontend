@@ -95,14 +95,14 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
     const onSubmit = async (data) => {
         const formatData = {
             id: scheduleList[0].id,
-            date: moment(date).format('yyyy-MM-DD'),
+            date: scheduleList[0].date,
             startTime: moment(data.startTime).format('HH:mm'),
             finishTime: moment(data.finishTime).format('HH:mm'),
         };
         await adminTournament.updateTournamentSession(formatData.id, formatData).then((res) => {
             if (res.data.length != 0) {
                 let variant = 'success';
-                enqueueSnackbar(res.message, { variant });
+                enqueueSnackbar('Cập nhật thời gian giải đấu thành công', { variant });
                 onSucess && onSucess(true);
                 handleClose();
                 handleClose();
@@ -112,7 +112,7 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                 handleClose();
             }
         });
-        console.log('form submit', data);
+        console.log('form submit', formatData);
     };
     // const onSubmit = (data) => {
     //     console.log('form submit', data);
@@ -128,7 +128,7 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                 <DialogTitle id="alert-dialog-title">{'Xác nhận xóa ?'}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Bạn muốn xóa buổi lịch giải đấu ngày {moment(date).format('DD/MM/yyyy')} ?
+                        Bạn muốn xóa buổi đấu ngày {moment(scheduleList[0].date).format('DD/MM/yyyy')} ?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
