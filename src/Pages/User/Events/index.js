@@ -56,7 +56,7 @@ function EventList() {
             const response = await eventApi.getEventBySemesterAndStudentId(studentId, month, page, semester);
             setEvents(response.data);
             console.log('getListEventsBySemester', response);
-            setPageSize(Math.ceil(response.totalResult / 5));
+            setPageSize(Math.ceil(response.totalResult / 10));
             setTotalResult(response.totalResult);
             let upComing = response.data.filter((event) => event.eventDto.status === 'Chưa diễn ra');
             let goingOn = response.data.filter((event) => event.eventDto.status === 'Đang diễn ra');
@@ -101,6 +101,10 @@ function EventList() {
         getListEventsBySemester(JSON.parse(localStorage.getItem('currentUser')).studentId, month, page - 1, semester);
     }, [semester, month, page]);
 
+    useEffect(() => {
+        let currentMonth = new Date().getMonth() + 1;
+        setMonth(currentMonth);
+    }, []);
     if (!events.length && totalResult) {
         return <LoadingProgress />;
     }
@@ -148,14 +152,6 @@ function EventList() {
             </Box>
             <Box sx={{}}>
                 <Box>
-                    {/* {!totalResult ? (
-                        <Typography variant="h5" sx={{ textAlign: 'center', mt: 3 }}>
-                            KHÔNG CÓ SỰ KIỆN NÀO
-                        </Typography>
-                    ) : (
-                        ''
-                    )} */}
-
                     <Grid container spacing={4}>
                         <Grid item xs={12}>
                             {events.length !== 0 ? null : (
