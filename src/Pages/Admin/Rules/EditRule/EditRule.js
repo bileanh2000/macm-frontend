@@ -44,7 +44,7 @@ function EditRule({ rule, isOpen, handleClose, onSucess }) {
                 description: data.description,
             });
             onSucess && onSucess();
-            enqueueSnackbar(response.message, { variant: 'success' });
+            enqueueSnackbar('Sửa nội quy thành công', { variant: 'success' });
         } catch (error) {}
     };
 

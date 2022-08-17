@@ -267,7 +267,7 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Button variant="contained" color="error" onClick={handleClickOpen}>
-                        Xóa lichj
+                        Xóa lịch
                     </Button>
                     <Box>
                         <Button ariant="outlined" onClick={handleClose} sx={{ mr: 1 }}>
