@@ -347,7 +347,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index, user, i
                             Hủy
                         </Button>
                         <Button variant="contained" onClick={handleOpenConfirm} autoFocus>
-                            Đồng ý
+                            Xác nhận
                         </Button>
                     </DialogActions>
                 </Dialog>

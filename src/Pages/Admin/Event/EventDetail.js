@@ -112,7 +112,7 @@ function EventDetail() {
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>Hủy</Button>
                     <Button onClick={handleDelete(id)} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>

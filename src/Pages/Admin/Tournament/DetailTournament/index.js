@@ -209,7 +209,7 @@ function DetailTournament() {
                     <DialogActions>
                         <Button onClick={handleCloseDialog}>Hủy</Button>
                         <Button onClick={handleDelete(tournamentId)} autoFocus>
-                            Đồng ý
+                            Xác nhận
                         </Button>
                     </DialogActions>
                 </Dialog>

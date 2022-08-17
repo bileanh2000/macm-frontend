@@ -309,7 +309,7 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClosePreviewDialog}>Hủy</Button>
-                    <Button onClick={handleCreate}>Đồng ý</Button>
+                    <Button onClick={handleCreate}>Xác nhận</Button>
                 </DialogActions>
             </Dialog>
             <Dialog

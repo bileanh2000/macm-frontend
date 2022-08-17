@@ -318,7 +318,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>Hủy</Button>
                     <Button onClick={handleUpdate} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>

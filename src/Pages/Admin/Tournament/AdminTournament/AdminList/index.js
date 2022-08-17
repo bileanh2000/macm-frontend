@@ -380,7 +380,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                             Hủy
                         </Button>
                         <Button variant="contained" onClick={handleConfirmDelete} autoFocus>
-                            Đồng ý
+                            Xác nhận
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -446,7 +446,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                         Hủy
                     </Button>
                     <Button variant="contained" onClick={handleUpdate} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -352,7 +352,7 @@ function TournamentFee() {
                     }}
                 />
             </Box>
-            {/* <Button onClick={onSubmit}>Đồng ý</Button> */}
+            {/* <Button onClick={onSubmit}>Xác nhận</Button> */}
             {editDialog.isLoading && (
                 <DialogCommon onDialog={areUSureEdit} message={editDialog.message} id={editDialog.params} />
             )}

@@ -285,7 +285,7 @@ function CustomMatchBracket(params) {
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose}>Quay lại</Button>
-                            <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
+                            <Button onClick={handleSubmit(handleUpdate)}>Xác nhận</Button>
                         </DialogActions>
                     </div>
                 )}

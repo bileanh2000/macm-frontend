@@ -192,7 +192,7 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
                         Hủy
                     </Button>
                     <Button variant="contained" onClick={handleOk}>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>

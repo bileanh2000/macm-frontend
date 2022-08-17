@@ -80,7 +80,7 @@ function EventItem({ data, onSuccess }) {
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>Hủy</Button>
                     <Button onClick={handleDelete(eventOnclick.id)} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>

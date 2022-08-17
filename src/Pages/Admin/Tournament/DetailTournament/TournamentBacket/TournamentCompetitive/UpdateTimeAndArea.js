@@ -145,7 +145,7 @@ function UpdateTimeAndArea({ areaList, match, name, onClose, onUpdate, endDate }
                     Hủy
                 </Button>
                 <Button variant="contained" onClick={handleSubmit(handleUpdate)}>
-                    Đồng ý
+                    Xác nhận
                 </Button>
             </Box>
         </LocalizationProvider>

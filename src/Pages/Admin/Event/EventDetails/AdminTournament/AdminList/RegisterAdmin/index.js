@@ -301,7 +301,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user }) {
             <DialogActions>
                 <Button onClick={handleCloseDialog}>Hủy</Button>
                 <Button onClick={handleRegister} autoFocus>
-                    Đồng ý
+                    Xác nhận
                 </Button>
             </DialogActions>
         </Dialog>

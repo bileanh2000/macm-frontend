@@ -136,7 +136,7 @@ function UpdateTouramentSchedule() {
                 <DialogActions>
                     <Button onClick={handleClose}>Hủy</Button>
                     <Button onClick={handleConfirmDialog} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>

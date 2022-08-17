@@ -451,7 +451,7 @@ function CustomMatchBracket(params) {
                                     Hủy
                                 </Button>
                                 <Button variant="contained" onClick={handleSubmit(handleUpdate)}>
-                                    Đồng ý
+                                    Xác nhận
                                 </Button>
                             </Box>
                         </Box>
@@ -525,9 +525,9 @@ function CustomMatchBracket(params) {
                     {/* <DialogActions>
                         <Button onClick={handleClose}>Hủy</Button>
                         {value == 1 ? (
-                            <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
+                            <Button onClick={handleSubmit(handleUpdate)}>Xác nhận</Button>
                         ) : (
-                            <Button onClick={handleSubmit(handleUpdateTime)}>Đồng ý</Button>
+                            <Button onClick={handleSubmit(handleUpdateTime)}>Xác nhận</Button>
                         )}
                     </DialogActions> */}
                 </div>

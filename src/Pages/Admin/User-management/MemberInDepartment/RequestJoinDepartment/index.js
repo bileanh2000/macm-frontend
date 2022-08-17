@@ -218,7 +218,7 @@ function RequestJoinDepartment() {
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>Hủy</Button>
                     <Button onClick={handleUpdate} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -272,7 +272,7 @@ function RequestJoinDepartment() {
                     }}
                 />
             </Box>
-            {/* <Button type="submit">Đồng ý</Button> */}
+            {/* <Button type="submit">Xác nhận</Button> */}
         </Fragment>
     );
 }

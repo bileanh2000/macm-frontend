@@ -139,7 +139,7 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                 <DialogActions>
                     <Button onClick={handleCloseConfirmDialog}>Hủy</Button>
                     <Button onClick={handleConfirmDialog} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>

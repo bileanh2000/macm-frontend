@@ -197,7 +197,7 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>Hủy</Button>
                     <Button onClick={handleUpdate} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>

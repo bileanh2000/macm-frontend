@@ -287,7 +287,7 @@ function CreateTourament() {
                 <DialogActions>
                     <Button onClick={handleClose}>Quay lại</Button>
                     <Button onClick={handleCreate} disabled={disabled}>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>

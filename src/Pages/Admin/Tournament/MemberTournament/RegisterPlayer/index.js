@@ -235,7 +235,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
                     Hủy
                 </Button>
                 <Button variant="contained" onClick={handleRegister} autoFocus disabled={player.length == 0}>
-                    Đồng ý
+                    Xác nhận
                 </Button>
             </DialogActions>
         </Dialog>

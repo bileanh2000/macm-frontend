@@ -230,7 +230,7 @@ function HeadOfDepartment() {
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>Hủy</Button>
                     <Button onClick={deleteUser(stageStudentId.studentId)} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>

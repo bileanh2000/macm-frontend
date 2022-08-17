@@ -340,7 +340,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
                             autoFocus
                             disabled={dataMale.length < numberMale || dataFemale.length < numberFemale}
                         >
-                            Đồng ý
+                            Xác nhận
                         </Button>
                     </DialogActions>
                 </Dialog>

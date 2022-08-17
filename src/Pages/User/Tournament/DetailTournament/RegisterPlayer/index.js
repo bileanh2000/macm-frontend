@@ -490,7 +490,7 @@ function RegisterPlayer({
                     }
                 >
                     {/* <Button onClick={handleSubmit(onSubmit)} autoFocus> */}
-                    Đồng ý
+                    Xác nhận
                 </Button>
             </DialogActions>
         </Dialog>

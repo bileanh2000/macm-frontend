@@ -184,7 +184,7 @@ function AddMemberToEvent({ title, children, isOpen, handleClose, onSucess }) {
                 <DialogActions>
                     <Button onClick={handleCloseConfirmDialog}>Hủy</Button>
                     <Button onClick={addMemberToEvent} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -287,7 +287,7 @@ function AddMemberToEvent({ title, children, isOpen, handleClose, onSucess }) {
         //         <DialogActions>
         //             <Button onClick={handleClose}>Hủy</Button>
         //             <Button onClick={addMemberToEvent} autoFocus>
-        //                 Đồng ý
+        //                 Xác nhận
         //             </Button>
         //         </DialogActions>
         //     </Dialog>

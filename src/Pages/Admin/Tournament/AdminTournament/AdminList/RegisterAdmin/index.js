@@ -316,7 +316,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
                     Hủy
                 </Button>
                 <Button variant="contained" onClick={handleRegister} autoFocus disabled={admin.length === 0}>
-                    Đồng ý
+                    Xác nhận
                 </Button>
             </DialogActions>
         </Dialog>

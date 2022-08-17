@@ -286,7 +286,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
                     Hủy
                 </Button>
                 <Button variant="contained" onClick={handleRegister} autoFocus disabled={datas && datas.length === 0}>
-                    Đồng ý
+                    Xác nhận
                 </Button>
             </DialogActions>
         </Dialog>

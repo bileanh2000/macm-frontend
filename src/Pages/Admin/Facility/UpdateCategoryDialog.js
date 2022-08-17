@@ -204,7 +204,7 @@ const UpdateCategoryDialog = ({ title, children, isOpen, handleClose, onSucess, 
                 <DialogActions>
                     <Button onClick={handleClose}>Hủy</Button>
                     <Button onClick={deleteCategory(selectedCategory.id)} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>
