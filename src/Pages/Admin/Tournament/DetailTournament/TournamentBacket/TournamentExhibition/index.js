@@ -9,6 +9,7 @@ import TableMatch from './TableMatch';
 import Gold from 'src/Components/Common/Material/Gold';
 import Sliver from 'src/Components/Common/Material/Sliver';
 import Brone from 'src/Components/Common/Material/Brone';
+import LoadingProgress from 'src/Components/LoadingProgress';
 
 function TournamentExhibition({ reload, result, type, endDate }) {
     console.log(type);
@@ -192,19 +193,8 @@ function TournamentExhibition({ reload, result, type, endDate }) {
                     </Box>
                 </Paper>
             )}
-            {exhibitionTeam && exhibitionTeam.length > 0 && areaList ? (
-                <div>
-                    {/* {tournamentStatus == 2 ? (
-                        exhibitionTeam[0].area ? (
-                            ''
-                        ) : (
-                            <Button variant="outlined" onClick={handleDialogUpdateTime} sx={{ mr: 2, float: 'right' }}>
-                                Cập nhật thời gian thi đấu
-                            </Button>
-                        )
-                    ) : (
-                        ''
-                    )} */}
+            {exhibitionTeam && areaList ? (
+                exhibitionTeam.length > 0 ? (
                     <TableMatch
                         matches={exhibitionTeam}
                         status={tournamentStatus}
@@ -212,7 +202,13 @@ function TournamentExhibition({ reload, result, type, endDate }) {
                         onUpdateResult={UpdateResultHandler}
                         endDate={endDate}
                     />
-                </div>
+                ) : (
+                    <Box sx={{ display: 'flex' }}>
+                        <Typography variant="body1" sx={{ m: 'auto' }}>
+                            Thể thức này chưa tổ chức
+                        </Typography>
+                    </Box>
+                )
             ) : (
                 // ) : tournamentStatus == 1 ? (
                 //     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -221,11 +217,7 @@ function TournamentExhibition({ reload, result, type, endDate }) {
                 //             Tạo bảng đấu
                 //         </Button>
                 //     </Box>
-                <Box sx={{ d: 'flex' }}>
-                    <Typography variant="body1" sx={{ m: 'auto' }}>
-                        Thể thức thi đấu này không tổ chức
-                    </Typography>
-                </Box>
+                <LoadingProgress />
             )}
         </Fragment>
     );

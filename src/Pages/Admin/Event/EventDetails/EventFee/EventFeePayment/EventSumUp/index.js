@@ -30,7 +30,7 @@ function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
     const [submittedData, setSubmitedData] = useState([]);
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [costIncurred, setCostIncurred] = useState(0);
-    const [amountSumUp, setAmountSumUp] = useState(params.userList.length * params.event.amountPerMemberRegister);
+    const [amountSumUp, setAmountSumUp] = useState(params.userList.length * params.event.amountPerRegisterEstimated);
     let snackBarStatus;
 
     const handleCloseSnackBar = (event, reason) => {
@@ -55,13 +55,15 @@ function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
             balance: Yup.number()
                 .required('Không được để trống trường này')
                 .typeError('Vui lòng nhập số')
-                .min(0, 'Vui lòng nhập giá trị lớn hơn 0'),
+                .min(0, 'Vui lòng nhập giá trị lớn hơn 0')
+                .max(1000000000, 'Vui lòng nhập giá trị số tiền thực tế (không quá lớn)'),
         }),
         ...(isFirstChecked && {
             amountSumUp: Yup.number()
                 .required('Không được để trống trường này')
                 .typeError('Vui lòng nhập số')
-                .min(1, 'Vui lòng nhập giá trị lớn hơn 1'),
+                .min(1, 'Vui lòng nhập giá trị lớn hơn 1')
+                .max(1000000000, 'Vui lòng nhập giá trị số tiền thực tế (không quá lớn)'),
         }),
     });
 
@@ -74,7 +76,7 @@ function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
         // formState: { errors, isSubmitSuccessful },
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     useEffect(() => {
@@ -83,13 +85,17 @@ function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
             setIsFirstChecked(false);
             setIsSecondChecked(false);
             setCostIncurred(0);
-            setAmountSumUp(params.userList.length * params.event.amountPerMemberRegister);
+            setAmountSumUp(params.userList.length * params.event.amountPerRegisterEstimated);
         }
-    }, [formState, submittedData, reset]);
+    }, [formState, submittedData, reset, params.userList.length, params.event.amountPerRegisterEstimated]);
+
+    useEffect(() => {
+        setAmountSumUp(params.userList.length * params.event.amountPerRegisterEstimated);
+    }, [params.userList.length, params.event.amountPerRegisterEstimated]);
 
     const updateAmount = (v) => {
-        const cost = +(params.userList.length * params.event.amountPerMemberRegister) + +Number(v.split(',').join(''));
-        console.log(cost);
+        const cost = +(params.userList.length * params.event.amountPerRegisterEstimated) + +Number(v.split(',').join(''));
+        console.log(cost, Number(v.split(',').join('')));
         setCostIncurred(Number(v.split(',').join('')));
         setAmountSumUp(cost);
     };
@@ -104,7 +110,7 @@ function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
         setIsFirstChecked(false);
         setIsSecondChecked(false);
         setCostIncurred(0);
-        setAmountSumUp(params.userList.length * params.event.amountPerMemberRegister);
+        setAmountSumUp(params.userList.length * params.event.amountPerRegisterEstimated);
         handleClose && handleClose();
     };
 
@@ -144,7 +150,7 @@ function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
         setIsFirstChecked(false);
         setIsSecondChecked(false);
         setCostIncurred(0);
-        setAmountSumUp(params.userList.length * params.event.amountPerMemberRegister);
+        setAmountSumUp(params.userList.length * params.event.amountPerRegisterEstimated);
         handleClose && handleClose();
     };
 
@@ -268,7 +274,7 @@ function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
                                         onValueChange={(v) => {
                                             onChange(Number(v.value));
                                         }}
-                                        onBlur={(v) => updateAmount(v.target.value)}
+                                        onChange={(v) => updateAmount(v.target.value)}
                                         InputProps={{
                                             endAdornment: <InputAdornment position="end">VND</InputAdornment>,
                                         }}
@@ -297,7 +303,7 @@ function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
                                         onValueChange={(v) => {
                                             onChange(Number(v.value));
                                         }}
-                                        onBlur={(v) => updateFunClub(v.target.value)}
+                                        onChange={(v) => updateFunClub(v.target.value)}
                                         InputProps={{
                                             endAdornment: <InputAdornment position="end">VND</InputAdornment>,
                                         }}
@@ -312,15 +318,20 @@ function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
                         <Typography variant="body1">Số người tham gia thực tế: {params.userList.length}</Typography>
                         <Typography variant="body1">
                             Tổng số tiền thu được thực tế:{' '}
-                            {(params.userList.length * params.event.amountPerMemberRegister).toLocaleString('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND',
-                            })}
+                            {(params.userList.length * params.event.amountPerRegisterEstimated).toLocaleString(
+                                'vi-VN',
+                                {
+                                    style: 'currency',
+                                    currency: 'VND',
+                                },
+                            )}
                         </Typography>
-                        <Typography variant="body1">
-                            Tổng chi phí thực tế:{' '}
-                            {amountSumUp.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-                        </Typography>
+                        {amountSumUp > 0 && (
+                            <Typography variant="body1">
+                                Tổng chi phí thực tế:{' '}
+                                {amountSumUp.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                            </Typography>
+                        )}
                         {isFirstChecked && (
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                 <FormControlLabel
@@ -401,8 +412,10 @@ function EventSumUp({ title, params, isOpen, handleClose, onSucess }) {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog}>Hủy</Button>
-                    <Button onClick={handleSubmit(onSubmit)} autoFocus>
+                    <Button variant="outlined" onClick={handleCloseDialog}>
+                        Hủy
+                    </Button>
+                    <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
                         Xác nhận
                     </Button>
                 </DialogActions>

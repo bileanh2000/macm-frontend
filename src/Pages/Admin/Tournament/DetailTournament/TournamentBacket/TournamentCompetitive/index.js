@@ -23,6 +23,7 @@ import Gold from 'src/Components/Common/Material/Gold';
 import Sliver from 'src/Components/Common/Material/Sliver';
 import Trophy from 'src/Components/Common/Material/Trophy';
 import Brone from 'src/Components/Common/Material/Brone';
+import LoadingProgress from 'src/Components/LoadingProgress';
 
 function TournamentCompetitive({ reload, result, type, endDate }) {
     console.log(result, type);
@@ -252,19 +253,8 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
                     </Box>
                 </Paper>
             )}
-            {listPlayer && areaList && listPlayer.length > 0 ? (
-                <div>
-                    {/* {tournamentStatus == 2 ? (
-                        listPlayer[listPlayer.length - 1].area ? (
-                            ''
-                        ) : (
-                            <Button variant="outlined" onClick={handleDialogUpdateTime} sx={{ mr: 2, float: 'right' }}>
-                                Cập nhật thời gian thi đấu
-                            </Button>
-                        )
-                    ) : (
-                        ''
-                    )} */}
+            {listPlayer && areaList ? (
+                listPlayer.length > 0 ? (
                     <CustomMatchBracket
                         matches={listPlayer}
                         competitiveId={competitiveId}
@@ -280,22 +270,15 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
                         }}
                         endDate={endDate}
                     />
-                </div>
+                ) : (
+                    <Box sx={{ display: 'flex' }}>
+                        <Typography variant="body1" sx={{ m: 'auto' }}>
+                            Thể thức này chưa tổ chức
+                        </Typography>
+                    </Box>
+                )
             ) : (
-                // ) : tournamentStatus == 1 ? (
-                //     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                //         <Typography variant="body1" sx={{ m: '0 auto' }}>
-                //             Thể thức này chưa có bảng thi đấu
-                //         </Typography>
-                //         <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2, float: 'right' }}>
-                //             Tạo bảng đấu
-                //         </Button>
-                //     </Box>
-                <Box sx={{ display: 'flex' }}>
-                    <Typography variant="body1" sx={{ m: 'auto' }}>
-                        Thể thức này chưa tổ chức
-                    </Typography>
-                </Box>
+                <LoadingProgress />
             )}
         </Fragment>
     );

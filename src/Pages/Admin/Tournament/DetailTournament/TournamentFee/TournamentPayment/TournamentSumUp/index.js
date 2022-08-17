@@ -158,45 +158,33 @@ function TournamentSumUp({ title, params, isOpen, handleClose, onSucess, user })
                         <Typography variant="body1" sx={{ m: 1, lineHeight: 2 }}>
                             <strong>Tổng chi phí thu được: </strong>
                             {amountSumUp.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-                            <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                                {open ? (
-                                    <Tooltip title="Ẩn" arrow>
-                                        <KeyboardArrowUp />
-                                    </Tooltip>
-                                ) : (
-                                    <Tooltip title="Mở rộng" arrow>
-                                        <KeyboardArrowDown />
-                                    </Tooltip>
-                                )}
-                            </IconButton>
                         </Typography>
-                        <Collapse in={open} timeout="auto" unmountOnExit sx={{ m: 1 }} component={Paper}>
-                            <Typography variant="body1" sx={{ m: 1, lineHeight: 2 }}>
-                                <strong>Số vận động viên tham gia thực tế: </strong>
-                                {params.userList.length}
-                            </Typography>
-                            <Typography variant="body1" sx={{ m: 1, lineHeight: 2 }}>
-                                <strong>Tổng số tiền thu được từ vận động viên: </strong>
-                                {(params.userList.length * params.tournament.feePlayerPay).toLocaleString('vi-VN', {
+
+                        <Typography variant="body1" sx={{ m: 1, lineHeight: 2 }}>
+                            <strong>Số vận động viên tham gia thực tế: </strong>
+                            {params.userList.length}
+                        </Typography>
+                        <Typography variant="body1" sx={{ m: 1, lineHeight: 2 }}>
+                            <strong>Tổng số tiền thu được từ vận động viên: </strong>
+                            {(params.userList.length * params.tournament.feePlayerPay).toLocaleString('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND',
+                            })}
+                        </Typography>
+                        <Typography variant="body1" sx={{ m: 1, lineHeight: 2 }}>
+                            <strong>Số người tham gia ban tổ chức thực tế: </strong>
+                            {params.adminList.length}
+                        </Typography>
+                        <Typography variant="body1" sx={{ m: 1, lineHeight: 2 }}>
+                            <strong>Tổng số tiền thu được từ ban tổ chức: </strong>
+                            {(params.adminList.length * params.tournament.feeOrganizingCommiteePay).toLocaleString(
+                                'vi-VN',
+                                {
                                     style: 'currency',
                                     currency: 'VND',
-                                })}
-                            </Typography>
-                            <Typography variant="body1" sx={{ m: 1, lineHeight: 2 }}>
-                                <strong>Số người tham gia ban tổ chức thực tế: </strong>
-                                {params.adminList.length}
-                            </Typography>
-                            <Typography variant="body1" sx={{ m: 1, lineHeight: 2 }}>
-                                <strong>Tổng số tiền thu được từ ban tổ chức: </strong>
-                                {(params.adminList.length * params.tournament.feeOrganizingCommiteePay).toLocaleString(
-                                    'vi-VN',
-                                    {
-                                        style: 'currency',
-                                        currency: 'VND',
-                                    },
-                                )}
-                            </Typography>
-                        </Collapse>
+                                },
+                            )}
+                        </Typography>
 
                         <Controller
                             name="amountActual"
@@ -250,7 +238,7 @@ function TournamentSumUp({ title, params, isOpen, handleClose, onSucess, user })
                             </>
                         ) : (
                             <>
-                                <Typography variant="body1">
+                                {/* <Typography variant="body1">
                                     <strong>Số tiền tài trợ thực tế từ câu lạc bộ: </strong>
                                     {(amountActual - amountSumUp).toLocaleString('vi-VN', {
                                         style: 'currency',
@@ -270,14 +258,14 @@ function TournamentSumUp({ title, params, isOpen, handleClose, onSucess, user })
                                             currency: 'VND',
                                         })}
                                     </Typography>
-                                )}
+                                )} */}
                             </>
                         )}
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog}>Hủy</Button>
-                    <Button onClick={handleSubmit(onSubmit)} autoFocus>
+                    <Button variant="outlined" onClick={handleCloseDialog}>Hủy</Button>
+                    <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
                         Xác nhận
                     </Button>
                 </DialogActions>

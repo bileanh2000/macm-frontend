@@ -140,9 +140,8 @@ function DetailTournament() {
 
     const registerToJoinOrganizingCommittee = async (tournamentId, studentId, roleId) => {
         try {
-            const response = userTournamentAPI.registerToJoinOrganizingCommittee(tournamentId, studentId, roleId);
-            let variant = response.data > 0 ? 'success' : 'error';
-            enqueueSnackbar(response.message, { variant });
+            const response = await userTournamentAPI.registerToJoinOrganizingCommittee(tournamentId, studentId, roleId);
+            enqueueSnackbar(response.message, { variant: 'success' });
             setIsRender(true);
         } catch (error) {
             let variant = 'error';

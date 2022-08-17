@@ -137,20 +137,6 @@ function RegisterPlayer({
         }
     };
 
-    const fetchExhibitionType = async (tournamentId) => {
-        try {
-            const response = await adminTournament.getAllExhibitionType(tournamentId);
-            let exhibitionType = response.data.filter((exhibitionType) =>
-                userInformation.gender ? exhibitionType.numberMale > 0 : exhibitionType.numberFemale > 0,
-            );
-            setListExhibitionType(exhibitionType);
-            exhibitionType.length > 0 && setExhibitionType(exhibitionType[0].id);
-            setNumberMale(exhibitionType[0].numberMale);
-            setNumberFemale(exhibitionType[0].numberFemale);
-        } catch (error) {
-            console.log('Failed to fetch user list: ', error);
-        }
-    };
     const registerToJoinTournamentCompetitiveType = async (tournamentId, studentId, params) => {
         try {
             const response = await userTournamentAPI.registerToJoinTournamentCompetitiveType(
@@ -158,8 +144,7 @@ function RegisterPlayer({
                 studentId,
                 params,
             );
-            let variant = response.data > 0 ? 'success' : 'error';
-            enqueueSnackbar(response.message, { variant });
+            enqueueSnackbar(response.message, { variant: 'success' });
             onRegister && onRegister();
         } catch (error) {
             let variant = 'error';
@@ -174,8 +159,7 @@ function RegisterPlayer({
                 studentId,
                 params,
             );
-            let variant = response.data > 0 ? 'success' : 'error';
-            enqueueSnackbar(response.message, { variant });
+            enqueueSnackbar(response.message, { variant: 'success' });
             onRegister && onRegister();
         } catch (error) {
             let variant = 'error';
@@ -226,26 +210,39 @@ function RegisterPlayer({
         }
     };
 
-    const fetchCompetitiveType = async (tournamentId) => {
-        try {
-            const response = await adminTournament.getAllCompetitiveType(tournamentId);
-            const listWeightByGender = response.data[0].filter(
-                (weightRange) => weightRange.gender == userInformation.gender,
-            );
-            setListWeightRange(listWeightByGender);
-            listWeightByGender.length > 0 && setWeightRange(listWeightByGender[0].id);
-            setMinWeight(listWeightByGender[0].weightMin);
-            setMaxWeight(listWeightByGender[0].weightMax);
-        } catch (error) {
-            console.log('Failed to fetch user list: ', error);
-        }
-    };
-
     useEffect(() => {
+        const fetchCompetitiveType = async (tournamentId) => {
+            try {
+                const response = await adminTournament.getAllCompetitiveType(tournamentId);
+                const listWeightByGender = response.data[0].filter(
+                    (weightRange) => weightRange.gender == userInformation.gender,
+                );
+                setListWeightRange(listWeightByGender);
+                listWeightByGender.length > 0 && setWeightRange(listWeightByGender[0].id);
+                setMinWeight(listWeightByGender[0].weightMin);
+                setMaxWeight(listWeightByGender[0].weightMax);
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
+        const fetchExhibitionType = async (tournamentId) => {
+            try {
+                const response = await adminTournament.getAllExhibitionType(tournamentId);
+                let exhibitionType = response.data.filter((exhibitionType) =>
+                    userInformation.gender ? exhibitionType.numberMale > 0 : exhibitionType.numberFemale > 0,
+                );
+                setListExhibitionType(exhibitionType);
+                exhibitionType.length > 0 && setExhibitionType(exhibitionType[0].id);
+                setNumberMale(exhibitionType[0].numberMale);
+                setNumberFemale(exhibitionType[0].numberFemale);
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
         fetchCompetitiveType(tournamentId);
         fetchExhibitionType(tournamentId);
         // getAllMember();
-    }, [tournamentId]);
+    }, [tournamentId, userInformation.gender]);
 
     useEffect(() => {
         getAllMember();
@@ -480,7 +477,7 @@ function RegisterPlayer({
                 )}
             </DialogContent>
             <DialogActions>
-                <Button variant="outline" onClick={handleCloseDialog}>
+                <Button variant="outlined" onClick={handleCloseDialog}>
                     Hủy bỏ
                 </Button>
                 <Button

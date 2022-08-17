@@ -267,10 +267,10 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Button variant="contained" color="error" onClick={handleClickOpen}>
-                        Xóa buổi tập
+                        Xóa lichj
                     </Button>
                     <Box>
-                        <Button onClick={handleClose} sx={{ mr: 1 }}>
+                        <Button ariant="outlined" onClick={handleClose} sx={{ mr: 1 }}>
                             Hủy bỏ
                         </Button>
                         <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>

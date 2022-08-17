@@ -472,8 +472,20 @@ function CreateTournament({
             tournament: {
                 name: data.name,
                 description: data.description,
-                competitiveTypes: datasFightingCompetition,
-                exhibitionTypes: datasPerformanceCompetition,
+                competitiveTypes: datasFightingCompetition.map((competitive) => {
+                    return {
+                        weightMax: competitive.weightMax,
+                        weightMin: competitive.weightMin,
+                        gender: competitive.gender,
+                    };
+                }),
+                exhibitionTypes: datasPerformanceCompetition.map((exhibition) => {
+                    return {
+                        name: exhibition.name,
+                        numberFemale: exhibition.numberFemale,
+                        numberMale: exhibition.numberMale,
+                    };
+                }),
                 maxQuantityComitee: data.numOfOrganizingCommitee,
                 registrationPlayerDeadline: moment(data.datePlayerDeadline).format('yyyy-MM-DDTHH:mm:ss'),
                 registrationOrganizingCommitteeDeadline: moment(
@@ -1143,6 +1155,22 @@ function CreateTournament({
                                                 id="outlined-basic"
                                                 label="Số người dự kiến tham gia thi đấu"
                                                 variant="outlined"
+                                                defaultValue={
+                                                    Number(
+                                                        datasPerformanceCompetition.length > 0
+                                                            ? +datasPerformanceCompetition.reduce(
+                                                                  (total, data) =>
+                                                                      total + (data.numberMale + data.numberMale) * 3,
+                                                                  0,
+                                                              )
+                                                            : +0,
+                                                    ) +
+                                                    Number(
+                                                        datasFightingCompetition.length > 0
+                                                            ? +datasPerformanceCompetition.length * 3
+                                                            : +0,
+                                                    )
+                                                }
                                                 fullWidth
                                                 {...register('numOfParticipants')}
                                                 error={errors.numOfParticipants ? true : false}
@@ -1272,7 +1300,7 @@ function CreateTournament({
                                                     required
                                                     name="startTime"
                                                     control={control}
-                                                    defaultValue={new Date('1/1/2000 18:00:00')}
+                                                    defaultValue={new Date('1/1/2000 8:00:00')}
                                                     render={({
                                                         field: { onChange, value },
                                                         fieldState: { error, invalid },
@@ -1308,7 +1336,7 @@ function CreateTournament({
                                                     required
                                                     name="finishTime"
                                                     control={control}
-                                                    defaultValue={new Date('1/1/2000 19:45:00')}
+                                                    defaultValue={new Date('1/1/2000 16:00:00')}
                                                     render={({
                                                         field: { onChange, value },
                                                         fieldState: { error, invalid },
