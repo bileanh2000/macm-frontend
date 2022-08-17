@@ -172,7 +172,7 @@ function MemberTournament({ tournament, isUpdate }) {
                                                 sx={{ mr: 2 }}
                                                 onClick={() => handleOpenDialog(true)}
                                             >
-                                                Thêm vận động viến thi đấu đối kháng
+                                                Thêm vận động viên thi đấu đối kháng
                                             </Button>
                                             {/* <Button
                                                 variant="outlined"
