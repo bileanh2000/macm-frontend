@@ -434,7 +434,7 @@ function TrainingSchedule() {
                                 weekends={true}
                                 headerToolbar={{
                                     left: 'title',
-                                    center: 'dayGridMonth,dayGridWeek',
+                                    center: '',
                                     right: 'prev next today',
                                     // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
                                 }}

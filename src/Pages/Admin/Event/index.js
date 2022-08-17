@@ -180,7 +180,7 @@ function Event() {
         <Fragment>
             {suggestionRole && (
                 <AddEventDialog
-                    title="Thêm sự kiện mới"
+                    title="Tạo sự kiện"
                     roles={suggestionRole}
                     isOpen={openDialog}
                     handleClose={() => {

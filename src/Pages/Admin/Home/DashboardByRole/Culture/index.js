@@ -253,7 +253,7 @@ function CultureDashboard() {
                             <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                 <Box>
                                     <Typography variant="button" color="initial">
-                                        Tỷ lệ tham gia giải đấu
+                                        Tỷ lệ thành viên tham gia giải đấu
                                     </Typography>
                                     <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
                                         {activityReport[0].averageJoinEvent}%
@@ -285,7 +285,7 @@ function CultureDashboard() {
                             <Paper elevation={2} sx={{ p: 2, display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                 <Box>
                                     <Typography variant="button" color="initial">
-                                        Tỷ lệ tham gia sự kiện
+                                        Tỷ lệ thành viên tham gia sự kiện
                                     </Typography>
                                     <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
                                         {activityReport[0].averageJoinTournament}%
