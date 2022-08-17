@@ -104,14 +104,14 @@ function CreateRule({ title, isOpen, handleClose, onSucess }) {
                             component={Link}
                             to={'/admin/rules'}
                         >
-                            Hủy bỏ
+                            Hủy
                         </Button>
                     </Box> */}
                     </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button variant="outlined" onClick={handleClose}>
-                        Hủy bỏ
+                        Hủy
                     </Button>
                     <Button variant="contained" onClick={handleSubmit(handleCreateRule)} autoFocus>
                         Xác nhận

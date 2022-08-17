@@ -532,7 +532,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                             Hủy
                         </Button>
                         <Button variant="contained" onClick={handleConfirmDelete} autoFocus>
-                            Đồng ý
+                            Xác nhận
                         </Button>
                     </DialogActions>
                 </Dialog>

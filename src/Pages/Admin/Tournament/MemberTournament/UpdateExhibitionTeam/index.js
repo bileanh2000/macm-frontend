@@ -297,7 +297,7 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
                     </DialogContent>
                     <DialogActions>
                         <Button variant="outlined" onClick={handleCloseDialog}>
-                            Hủy bỏ
+                            Hủy
                         </Button>
                         <Button
                             variant="contained"
@@ -305,7 +305,7 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
                             autoFocus
                             disabled={dataFemale.length !== numberFemale || dataMale.length !== numberMale}
                         >
-                            Đồng ý
+                            Xác nhận
                         </Button>
                     </DialogActions>
                 </Dialog>

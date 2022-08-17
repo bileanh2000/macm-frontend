@@ -263,7 +263,7 @@ function TournamentFee() {
                         <Typography variant="caption">Danh sách đóng tiền</Typography>
                         <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
                             <MenuItem value={1}>Ban tổ chức</MenuItem>
-                            <MenuItem value={2}>Người chơi</MenuItem>
+                            <MenuItem value={2}>Vận động viên</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
@@ -352,7 +352,7 @@ function TournamentFee() {
                     }}
                 />
             </Box>
-            {/* <Button onClick={onSubmit}>Đồng ý</Button> */}
+            {/* <Button onClick={onSubmit}>Xác nhận</Button> */}
             {editDialog.isLoading && (
                 <DialogCommon onDialog={areUSureEdit} message={editDialog.message} id={editDialog.params} />
             )}

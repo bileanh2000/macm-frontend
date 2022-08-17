@@ -214,7 +214,7 @@ function AddSession({ title, children, isOpen, handleClose, onSucess, date, isDi
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Hủy bỏ</Button>
+                    <Button onClick={handleClose}>Hủy</Button>
                     <Button onClick={handleSubmit(onSubmit)} autoFocus>
                         Xác nhận
                     </Button>

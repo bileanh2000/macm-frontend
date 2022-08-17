@@ -62,7 +62,7 @@ function AdminTournament({ isUpdate, user }) {
                     </Tabs>
                     {/* {!isUpdate && (
                         <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialogExhibition(true)}>
-                            Thêm người chơi thi đấu biểu diễn
+                            Thêm vận động viên thi đấu biểu diễn
                         </Button>
                     )} 
                 </Box> */}

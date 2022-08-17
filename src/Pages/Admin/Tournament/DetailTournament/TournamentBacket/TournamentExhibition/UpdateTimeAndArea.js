@@ -143,10 +143,10 @@ function UpdateTimeAndArea({ areaList, match, name, onClose, onUpdate, endDate }
             </Grid>
             <Box sx={{ float: 'right' }}>
                 <Button variant="outlined" onClick={onClose} sx={{ mr: 2 }}>
-                    Hủy bỏ
+                    Hủy
                 </Button>
                 <Button variant="contained" onClick={handleSubmit(handleUpdate)}>
-                    Đồng ý
+                    Xác nhận
                 </Button>
             </Box>
         </LocalizationProvider>

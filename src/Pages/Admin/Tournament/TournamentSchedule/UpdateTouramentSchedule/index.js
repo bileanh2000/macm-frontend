@@ -134,9 +134,9 @@ function UpdateTouramentSchedule() {
                     <DialogContentText id="alert-dialog-description">Bạn muốn xóa buổi tập này?</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Từ chối</Button>
+                    <Button onClick={handleClose}>Hủy</Button>
                     <Button onClick={handleConfirmDialog} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -120,7 +120,7 @@ function EditNews() {
                                 Đăng
                             </Button>
                             <Button variant="contained" color="error">
-                                <Link to="/admin/news">Hủy bỏ</Link>
+                                <Link to="/admin/news">Hủy</Link>
                             </Button>
                         </Box>
                     </Box>

@@ -94,7 +94,7 @@ function EditRole({ roleEdit, onEdit, onCancel }) {
                     Chỉnh sửa
                 </Button>
                 <Button variant="contained" color="error" onClick={() => onCancel && onCancel()}>
-                    Hủy bỏ
+                    Hủy
                 </Button>
             </Grid>
         </Grid>

@@ -287,7 +287,7 @@ function CreateTourament() {
                 <DialogActions>
                     <Button onClick={handleClose}>Quay lại</Button>
                     <Button onClick={handleCreate} disabled={disabled}>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -429,7 +429,7 @@ function CreateTourament() {
                                                     fieldState: { error, invalid },
                                                 }) => (
                                                     <DatePicker
-                                                        label="Hạn đăng kí cho người chơi"
+                                                        label="Hạn đăng kí cho vận động viên"
                                                         inputFormat="dd/MM/yyyy"
                                                         disablePast
                                                         ampm={false}

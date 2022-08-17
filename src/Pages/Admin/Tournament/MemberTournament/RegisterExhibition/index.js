@@ -332,7 +332,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
                     </DialogContent>
                     <DialogActions>
                         <Button variant="outlined" onClick={handleCloseDialog}>
-                            Hủy bỏ
+                            Hủy
                         </Button>
                         <Button
                             variant="contained"
@@ -340,7 +340,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
                             autoFocus
                             disabled={dataMale.length < numberMale || dataFemale.length < numberFemale}
                         >
-                            Đồng ý
+                            Xác nhận
                         </Button>
                     </DialogActions>
                 </Dialog>

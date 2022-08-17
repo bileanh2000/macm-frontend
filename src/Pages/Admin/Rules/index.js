@@ -140,7 +140,7 @@ function Rules() {
                             <DialogActions>
                                 <Button onClick={handleCloseConfirm}>Hủy</Button>
                                 <Button onClick={handleOpenConfirm} autoFocus>
-                                    Đồng ý
+                                    Xác nhận
                                 </Button>
                             </DialogActions>
                         </Dialog>

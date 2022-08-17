@@ -172,7 +172,7 @@ function AddMember(props) {
                         size="medium"
                     >
                         <Add />
-                        Thêm người chơi
+                        Thêm vận động viên
                     </Fab>
                 </Collapse>
             )}

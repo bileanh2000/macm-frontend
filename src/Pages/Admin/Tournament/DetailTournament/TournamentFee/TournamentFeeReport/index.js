@@ -142,7 +142,7 @@ function TournamentFeeReport({ tournament, tournamentStatus, value, index }) {
                     <Typography variant="caption">Lịch sử đóng tiền</Typography>
                     <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
                         <MenuItem value={1}>Ban tổ chức</MenuItem>
-                        <MenuItem value={2}>Người chơi</MenuItem>
+                        <MenuItem value={2}>Vận động viên</MenuItem>
                     </Select>
                 </FormControl>
             </Box>
@@ -195,7 +195,7 @@ function TournamentFeeReport({ tournament, tournamentStatus, value, index }) {
                 <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                     {type == 1
                         ? 'Giải đấu không yêu cầu ban tổ chức đóng phí tham gia'
-                        : 'Giải đấu không yêu cầu người chơi đóng phí tham gia'}
+                        : 'Giải đấu không yêu cầu vận động viên đóng phí tham gia'}
                 </Typography>
             )}
         </Box>

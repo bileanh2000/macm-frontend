@@ -229,7 +229,7 @@ function EditEventSchedule() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Quay lại</Button>
-                    <Button onClick={handleCreate}>Đồng ý</Button>
+                    <Button onClick={handleCreate}>Xác nhận</Button>
                 </DialogActions>
             </Dialog>
             <Box
