@@ -142,7 +142,7 @@ function TournamentFeeReport({ tournament, tournamentStatus, value, index }) {
                     <Typography variant="caption">Lịch sử đóng tiền</Typography>
                     <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
                         <MenuItem value={1}>Ban tổ chức</MenuItem>
-                        <MenuItem value={2}>Người chơi</MenuItem>
+                        <MenuItem value={2}>Vận động viên</MenuItem>
                     </Select>
                 </FormControl>
             </Box>

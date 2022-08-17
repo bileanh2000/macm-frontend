@@ -274,7 +274,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index, user, i
                         <Typography variant="caption">Danh sách đóng tiền</Typography>
                         <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
                             <MenuItem value={1}>Ban tổ chức</MenuItem>
-                            <MenuItem value={2}>Người chơi</MenuItem>
+                            <MenuItem value={2}>Vận động viên</MenuItem>
                         </Select>
                     </FormControl>
                     {type === 1 ? (
