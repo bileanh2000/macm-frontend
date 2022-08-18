@@ -125,7 +125,6 @@ function TableMatch(params) {
     function Row(props) {
         const { row, status, stage, index } = props;
         const [open, setOpen] = React.useState(false);
-
         return (
             <React.Fragment>
                 <TableRow>
@@ -149,7 +148,7 @@ function TableMatch(params) {
                     <TableCell align="left">{moment(row.time).format('HH:mm  -  DD/MM')}</TableCell>
                     <TableCell align="left">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
                     {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
-                    {3 >= stage >= 2 && (
+                    {(stage >= 3 || stage >= 2) && (
                         <TableCell align="left">
                             <Chip
                                 icon={<Update />}
@@ -159,7 +158,7 @@ function TableMatch(params) {
                             />
                         </TableCell>
                     )}
-                    {3 >= stage >= 2 && (
+                    {(stage >= 3 || stage >= 2) && (
                         <TableCell align="left">
                             <Chip
                                 icon={<SportsScore />}

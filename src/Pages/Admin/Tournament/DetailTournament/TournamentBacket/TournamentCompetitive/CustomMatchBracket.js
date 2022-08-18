@@ -85,7 +85,7 @@ function CustomMatchBracket(params) {
         // if (params.status !== 0) {
         //     return;
         // }
-        if (params.stage < 2) {
+        if (params.stage > 2) {
             return;
         }
         if ((isFirst == 0 && match.firstPlayer == null) || (isFirst == 1 && match.secondPlayer == null)) {
@@ -101,7 +101,7 @@ function CustomMatchBracket(params) {
         // if (params.status !== 0) {
         //     return;
         // }
-        if (params.stage < 2) {
+        if (params.stage > 2) {
             return;
         }
         e.preventDefault();
@@ -113,7 +113,7 @@ function CustomMatchBracket(params) {
         // if (params.status !== 0) {
         //     return;
         // }
-        if (params.stage < 2) {
+        if (params.stage > 2) {
             return;
         }
         setDragItem(null);
@@ -123,7 +123,7 @@ function CustomMatchBracket(params) {
         // if (params.status !== 0) {
         //     return;
         // }
-        if (params.stage < 2) {
+        if (params.stage > 2) {
             return;
         }
         if ((isFirst == 0 && match.firstPlayer == null) || (isFirst == 1 && match.secondPlayer == null)) {

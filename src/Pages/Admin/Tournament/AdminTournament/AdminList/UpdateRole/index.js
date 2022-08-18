@@ -114,7 +114,15 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
             return;
         }
 
-        const newData = [...datas, { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity }];
+        const newData = [
+            ...datas,
+            {
+                id: Math.random(),
+                name: data.roleName,
+                maxQuantity: data.maxQuantity,
+                availableQuantity: data.maxQuantity,
+            },
+        ];
         setDatas(newData);
 
         /**
@@ -189,9 +197,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
                                     <TableRow key={data.id}>
                                         <TableCell align="center">{data.name}</TableCell>
                                         <TableCell align="center">
-                                            {data.availableQuantity
-                                                ? data.maxQuantity - data.availableQuantity + '/' + data.maxQuantity
-                                                : 'Mới thêm'}
+                                            {data.maxQuantity - data.availableQuantity + '/' + data.maxQuantity}
                                         </TableCell>
                                         <TableCell>
                                             <IconButton
