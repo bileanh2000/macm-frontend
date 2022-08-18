@@ -45,13 +45,11 @@ function UpdateTimeAndArea({ areaList, match, name, onClose, onUpdate, endDate }
     });
 
     const handleUpdate = (data) => {
-        console.log('time');
         const date = moment(data.date).format('YYYY-MM-DD');
         const time = moment(data.startTime).format('HH:mm:ss');
         const dateTime = date + 'T' + time;
         const areaId = areaList.filter((area) => area.name == areaName)[0];
         const request = { time: dateTime, area: areaId };
-        console.log(request);
         match.time = dateTime;
         //updateTimeAndPlace(match.id, request);
         // var merged = [].concat.apply([], __matches);

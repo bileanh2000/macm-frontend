@@ -43,7 +43,6 @@ function MemberTournament({ tournament, isUpdate }) {
     };
 
     const handleChangeWeight = (event) => {
-        console.log(event.target.value);
         setWeightRange(event.target.value);
         let range;
         if (event.target.value === 0) {
@@ -55,7 +54,6 @@ function MemberTournament({ tournament, isUpdate }) {
     };
 
     const handleChangeExhibitionType = (event) => {
-        console.log(event.target.value);
         setExhibitionType(event.target.value);
         let exType;
         if (event.target.value === 0) {
@@ -63,8 +61,7 @@ function MemberTournament({ tournament, isUpdate }) {
         } else {
             exType = listExhibitionType.find((type) => type.id === event.target.value);
         }
-        console.log(exType);
-        fetchExhibitionTeam(tournamentId, exType);
+        fetchExhibitionTeam(tournamentId, event.target.value);
     };
 
     const fetchExhibitionType = async (tournamentId) => {
@@ -90,7 +87,6 @@ function MemberTournament({ tournament, isUpdate }) {
     const fetchCompetitivePlayer = async (weightRange) => {
         try {
             const response = await adminTournamentAPI.getListPlayerBracket(weightRange);
-            console.log('fetchCompetitivePlayer', response.data);
             if (response.data.length > 0) {
                 setCompetitivePlayer(response.data[0].listPlayers);
                 setIsCreate(response.data[0].changed);
@@ -104,44 +100,25 @@ function MemberTournament({ tournament, isUpdate }) {
     const fetchExhibitionTeam = async (params, exhibitionType) => {
         try {
             const response = await adminTournamentAPI.getAllExhibitionTeam(params, exhibitionType);
-
+            console.log('fetchExhibitionTeam', response);
             setExhibitionTeam(response.data);
+            setIsRender(false);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
     };
 
-    const spawnMatches = async (weightRange) => {
-        try {
-            const response = await adminTournamentAPI.spawnMatchs(weightRange);
-            enqueueSnackbar(response.message, { variant: 'success' });
-        } catch (error) {
-            console.log('Failed to fetch match: ', error);
-        }
-    };
-
-    const handleCreateMatches = () => {
-        if (weightRange == 0) {
-            let varian = 'error';
-            enqueueSnackbar('Vui lòng chọn hạng cân trước khi tạo bảng đấu', { varian });
-            return;
-        }
-        spawnMatches(weightRange);
-    };
-
-    const handleChange = () => {
-        setIsRender(true);
-    };
+    useEffect(() => {
+        getAllCompetitiveType(tournamentId);
+        fetchExhibitionType(tournamentId);
+    }, [tournamentId]);
 
     useEffect(() => {
         isRenderCompe && fetchCompetitivePlayer(weightRange);
     }, [weightRange, competitivePlayer, isRenderCompe]);
 
     useEffect(() => {
-        isRender && getAllCompetitiveType(tournamentId);
-        isRender && fetchExhibitionType(tournamentId);
-        isRender && fetchExhibitionTeam(tournamentId, exhibitionType == 0 ? { exhibitionType: 0 } : exhibitionType);
-        setIsRender(false);
+        isRender && fetchExhibitionTeam(tournamentId, exhibitionType);
     }, [tournamentId, exhibitionType, exhibitionTeam, isRender]);
 
     return (
@@ -267,7 +244,6 @@ function MemberTournament({ tournament, isUpdate }) {
                             data={competitivePlayer}
                             type={type}
                             onChange={() => {
-                                console.log('change compe');
                                 return setIsRenderCompe(true);
                             }}
                             isUpdate={isUpdate}
@@ -280,7 +256,6 @@ function MemberTournament({ tournament, isUpdate }) {
                             data={exhibitionTeam}
                             type={type}
                             onChange={() => {
-                                console.log('change exhi');
                                 return setIsRender(true);
                             }}
                             isUpdate={isUpdate}
@@ -304,7 +279,6 @@ function MemberTournament({ tournament, isUpdate }) {
                             setOpenDialog(false);
                         }}
                         onChangeData={() => {
-                            console.log('change compe');
                             return setIsRenderCompe(true);
                         }}
                     />
@@ -320,7 +294,6 @@ function MemberTournament({ tournament, isUpdate }) {
                             setOpenDialogExhibition(false);
                         }}
                         onChangeData={() => {
-                            console.log('change exhi');
                             return setIsRender(true);
                         }}
                     />

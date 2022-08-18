@@ -130,6 +130,7 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
 
     useEffect(() => {
         setWeightRange(competitiveId);
+        getAllMember(competitiveId);
         setIsRender(true);
     }, [competitiveId]);
 

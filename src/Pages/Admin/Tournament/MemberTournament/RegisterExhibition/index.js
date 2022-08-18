@@ -35,6 +35,7 @@ import { useSnackbar } from 'notistack';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
 function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhibitionId }) {
+    console.log(exhibitionId);
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [exhibitionType, setExhibitionType] = useState(exhibitionId);
@@ -98,8 +99,9 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
             const response = await adminTournament.getAllExhibitionType(tournamentId);
             setListExhibitionType(response.data);
             // setExhibitionType(response.data[0].id);
-            setNumberMale(response.data[0].numberMale);
-            setNumberFemale(response.data[0].numberFemale);
+            const type = response.data.filter((type) => type.id == exhibitionId);
+            setNumberMale(type[0].numberMale);
+            setNumberFemale(type[0].numberFemale);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -156,16 +158,18 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
 
     useEffect(() => {
         fetchExhibitionType(tournamentId);
-    }, [tournamentId]);
+    }, [tournamentId, exhibitionId]);
+
+    useEffect(() => {
+        setExhibitionType(exhibitionId);
+        getAllMember(exhibitionId);
+        setIsRender(true);
+    }, [exhibitionId]);
 
     useEffect(() => {
         isRender && getAllMember(exhibitionType);
         setIsRender(false);
-    }, [exhibitionType, isRender, allMember]);
-
-    useEffect(() => {
-        setExhibitionType(exhibitionId);
-    }, [exhibitionId]);
+    }, [exhibitionType, isRender, allMember, tournamentId]);
 
     return (
         <Fragment>

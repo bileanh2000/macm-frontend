@@ -26,7 +26,7 @@ import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
 function TournamentCompetitive({ reload, result, type, endDate }) {
-    console.log(result, type);
+    // console.log(result, type);
     let { tournamentId } = useParams();
     const [tournamentResult, setTournamentResult] = useState();
     const [tournamentStatus, setTournamentStatus] = useState(0);
@@ -37,11 +37,11 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
     const [rounds, setRounds] = useState();
     const [areaList, setAreaList] = useState();
     const [open, setOpen] = useState(false);
-    // const [isCreate, setIsCreate] = useState(true);
+    const [isRenderTotal, setIsRenderTotal] = useState(true);
     const [isRender, setIsRender] = useState(true);
     // const [tournamentStatus, setTournamentStatus] = useState(-1);
 
-    console.log('ewsult', tournamentResult);
+    // console.log('ewsult', tournamentResult);
 
     const handleChangeCompetitiveId = (event) => {
         if (result && result.length > 0) {
@@ -49,7 +49,7 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
                 subResult.data.find((d) => d.competitiveType.id == event.target.value),
             ).data[0].listResult;
             setTournamentResult(_result);
-            console.log('result', _result);
+            // console.log('result', _result);
         }
 
         setCompetitiveId(event.target.value);
@@ -84,6 +84,29 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
         }
     };
 
+    useEffect(() => {
+        const getListPlayerByCompetitiveID = async (weightRange) => {
+            try {
+                const response = await adminTournament.listMatchs(weightRange);
+                if (response.data.length > 0) {
+                    setListPlayer(response.data[0].listMatchDto);
+                    setTournamentStatus(response.data[0].status);
+                    setRounds(response.totalResult);
+                    // setIsCreate(response.data[0].changed);
+                } else {
+                    setListPlayer(response.data);
+                    setTournamentStatus(0);
+                    setRounds(0);
+                    // setIsCreate(true);
+                }
+            } catch (error) {
+                console.log('Failed to fetch match: ', error);
+            }
+        };
+        isRender && getListPlayerByCompetitiveID(competitiveId);
+        setIsRender(false);
+    }, [isRender, listPlayer, competitiveId]);
+
     const spawnMatches = async (weightRange) => {
         try {
             const response = await adminTournament.spawnMatchs(weightRange);
@@ -102,7 +125,7 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
             enqueueSnackbar('Vui lòng chọn hạng cân trước khi tạo bảng đấu', { varian });
             return;
         }
-        console.log('haha');
+        // console.log('haha');
         spawnMatches(competitiveId);
     };
 
@@ -156,24 +179,20 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
                 if (response.data.length > 0) {
                     setListWeightRange(response.data[0]);
                     type == 0 && setCompetitiveId(response.data[0][0].id);
-                    console.log(response.data[0][0].id, result);
                     const _result = result.find((subResult) =>
                         subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id),
                     ).data[0].listResult;
                     setTournamentResult(_result);
-                    console.log('result', _result);
-
                     getListPlayerByCompetitiveID(response.data[0][0].id);
                 }
-                setIsRender(false);
+                setIsRenderTotal(false);
             } catch (error) {
                 console.log('Failed to fetch user list: ', error);
             }
         };
-        isRender && fetchTournamentById(tournamentId);
+        isRenderTotal && fetchTournamentById(tournamentId);
         getAllArea();
-        console.log('re-render');
-    }, [tournamentId, isRender, result, type]);
+    }, [tournamentId, isRenderTotal, result, type]);
 
     return (
         <Fragment>
@@ -265,7 +284,7 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
                         // isCreate={isCreate}
                         onCreateMatches={handleDialogCreate}
                         onChangeData={() => {
-                            console.log('render data bracket');
+                            // console.log('render data bracket');
                             setIsRender(true);
                         }}
                         endDate={endDate}

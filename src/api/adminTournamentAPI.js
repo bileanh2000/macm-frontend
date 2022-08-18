@@ -112,9 +112,14 @@ const adminTournament = {
         const url = `/tournament/headclub/getallexhibitionteam/${tournamentId}`;
         return axiosClient.get(url, {
             params: {
-                exhibitionType: params.id,
+                exhibitionType: params,
             },
         });
+    },
+
+    getTeamByType: (exhibitionTypeId) => {
+        const url = `/exhibition/headclub/getteambytype/${exhibitionTypeId}`;
+        return axiosClient.get(url);
     },
 
     getAllTournamentOrganizingCommittee: (tournamentId) => {
