@@ -297,46 +297,48 @@ function Event() {
                         </>
                     ) : null}
                 </Grid>
-                <Grid item xs={8} sx={{ height: '80vh' }}>
-                    <FullCalendar
-                        // initialDate={new Date(2022, month - 1, 1)}
-                        // {...(semester!==2?(initialDate: '2022-10-01'):{})}
-                        // initialDate={semester !== 2 ? new Date('2022-10-01') : new Date()}
-                        locale="vie"
-                        height="100%"
-                        plugins={[dayGridPlugin, interactionPlugin]}
-                        initialView="dayGridMonth"
-                        events={scheduleData}
-                        weekends={true}
-                        headerToolbar={{
-                            left: 'title',
-                            center: 'dayGridMonth,dayGridWeek',
-                            right: 'prev next today',
-                            // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                        }}
-                        // editable={true}
-                        // selectable={true}
-                        // datesSet={(dateInfo) => {
-                        //     getMonthInCurrentTableView(dateInfo.start);
-                        // }}
-                        eventClick={(args) => {
-                            navigateToUpdate(args.event, args.event.start);
-                            // console.log(args);
-                        }}
-                        dateClick={function (arg) {
-                            // console.log(arg.dateStr);
-                            // navigateToCreate(arg.dateStr);
-                            // swal({
-                            //     title: 'Date',
-                            //     text: arg.dateStr,
-                            //     type: 'success',
-                            // });
-                        }}
-                        ref={calendarComponentRef}
-                        // selectable
-                        // select={handleEventAdd}
-                        // eventDrop={(e) => console.log(e)}
-                    />
+                <Grid item xs={8}>
+                    <Box sx={{ backgroundColor: '#fff', height: '80vh', padding: 2, borderRadius: '5px' }}>
+                        <FullCalendar
+                            // initialDate={new Date(2022, month - 1, 1)}
+                            // {...(semester!==2?(initialDate: '2022-10-01'):{})}
+                            // initialDate={semester !== 2 ? new Date('2022-10-01') : new Date()}
+                            locale="vie"
+                            height="100%"
+                            plugins={[dayGridPlugin, interactionPlugin]}
+                            initialView="dayGridMonth"
+                            events={scheduleData}
+                            weekends={true}
+                            headerToolbar={{
+                                left: 'title',
+                                center: 'dayGridMonth,dayGridWeek',
+                                right: 'prev next today',
+                                // right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                            }}
+                            // editable={true}
+                            // selectable={true}
+                            // datesSet={(dateInfo) => {
+                            //     getMonthInCurrentTableView(dateInfo.start);
+                            // }}
+                            eventClick={(args) => {
+                                navigateToUpdate(args.event, args.event.start);
+                                // console.log(args);
+                            }}
+                            dateClick={function (arg) {
+                                // console.log(arg.dateStr);
+                                // navigateToCreate(arg.dateStr);
+                                // swal({
+                                //     title: 'Date',
+                                //     text: arg.dateStr,
+                                //     type: 'success',
+                                // });
+                            }}
+                            ref={calendarComponentRef}
+                            // selectable
+                            // select={handleEventAdd}
+                            // eventDrop={(e) => console.log(e)}
+                        />
+                    </Box>
                 </Grid>
             </Grid>
             <Box>

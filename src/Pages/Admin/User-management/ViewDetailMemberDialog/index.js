@@ -225,7 +225,7 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                             border: '4px solid #fff',
                         }}
                     />
-                    {user.role.name === 'ROLE_HeadClub' || user.role.name === 'ROLE_ViceHeadClub' ? (
+                    {/* {user.role.name === 'ROLE_HeadClub' || user.role.name === 'ROLE_ViceHeadClub' ? (
                         <Tooltip title="Chỉnh sửa" placement="left-start">
                             <IconButton
                                 aria-label="edit"
@@ -243,7 +243,7 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                                 <EditRoundedIcon fontSize="inherit" />
                             </IconButton>
                         </Tooltip>
-                    ) : null}
+                    ) : null} */}
                 </DialogTitle>
                 <DialogContent>
                     {/* <DialogContentText id="alert-dialog-description">{children}</DialogContentText> */}
