@@ -149,27 +149,27 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             field: 'role',
             headerName: `Vai trò trong sự kiện`,
             flex: 1,
-            editable: true,
-            type: 'singleSelect',
-            valueOptions: formatRoles.map((role) => role.roleName),
-            // valueOptions: roleValueOptions,
-            renderCell: (params) => (
-                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>{params.value}</span>
-                    <Tooltip title="DoubleClick để chỉnh sửa vai trò">
-                        <span>
-                            <GridActionsCellItem icon={<Edit />} label="Edit" sx={{ ml: 2 }} />
-                        </span>
-                    </Tooltip>
-                </Box>
-            ),
-            cellClassName: (params) => {
-                if (params.value == null) {
-                    return '';
-                }
+            // editable: true,
+            // type: 'singleSelect',
+            // valueOptions: formatRoles.map((role) => role.roleName),
+            // // valueOptions: roleValueOptions,
+            // renderCell: (params) => (
+            //     <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            //         <span>{params.value}</span>
+            //         <Tooltip title="DoubleClick để chỉnh sửa vai trò">
+            //             <span>
+            //                 <GridActionsCellItem icon={<Edit />} label="Edit" sx={{ ml: 2 }} />
+            //             </span>
+            //         </Tooltip>
+            //     </Box>
+            // ),
+            // cellClassName: (params) => {
+            //     if (params.value == null) {
+            //         return '';
+            //     }
 
-                return clsx('role-edit');
-            },
+            //     return clsx('role-edit');
+            // },
         },
     ];
 
@@ -275,13 +275,13 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 mt: '1rem',
                 display: 'flex',
                 flexDirection: 'column',
-                '& .role-edit:hover': {
-                    // backgroundColor: '#655151 !important',
-                    border: '1px dashed #655151',
-                    // content: "'\\270E'",
-                    // // color: 'red',
-                    // fontSize: '1.2rem',
-                },
+                // '& .role-edit:hover': {
+                //     // backgroundColor: '#655151 !important',
+                //     border: '1px dashed #655151',
+                //     // content: "'\\270E'",
+                //     // // color: 'red',
+                //     // fontSize: '1.2rem',
+                // },
                 '& .status-rows': {
                     justifyContent: 'center !important',
                     minHeight: '0px !important',
@@ -342,7 +342,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                     Toolbar: CustomToolbar,
                     NoRowsOverlay: CustomNoRowsOverlay,
                 }}
-                onCellEditCommit={handleRowEditCommit}
+                // onCellEditCommit={handleRowEditCommit}
             />
         </Box>
     );
