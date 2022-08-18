@@ -34,7 +34,7 @@ function CreateRule({ title, isOpen, handleClose, onSucess }) {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const createRule = async (data) => {
@@ -51,7 +51,7 @@ function CreateRule({ title, isOpen, handleClose, onSucess }) {
 
     const handleCreateRule = async (data) => {
         createRule(data);
-        handleClose && handleClose()
+        handleClose && handleClose();
     };
 
     return (
