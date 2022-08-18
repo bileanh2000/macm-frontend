@@ -35,7 +35,6 @@ import { useSnackbar } from 'notistack';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
 function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, exhibitionTeam }) {
-    console.log(exhibitionTeam);
     // let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     // const [exhibitionType, setExhibitionType] = useState(exhibitionId);
@@ -74,7 +73,6 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
     const getAllMember = async (exhibitionType) => {
         try {
             const response = await adminTournament.listUserNotJoinExhibition(exhibitionType);
-            console.log(response.data);
             setAllMember(response.data);
         } catch (error) {
             console.log('khong the lay data');
@@ -120,7 +118,6 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
         const listStudentId = teamMember.map((student) => {
             return { studentId: student.studentId };
         });
-        console.log(teamMember);
         // const params = { listStudentId, teamName: data.teamName, exhibitionTypeId: exhibitionTeam.exhibitionTypeId };
         updateTeam(exhibitionTeam.id, listStudentId);
         onSuccess && onSuccess();
@@ -129,12 +126,10 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
 
     const handleDelete = (data) => {
         let newData;
-        console.log(data, dataMale, dataFemale);
         if (data.gender) {
             newData = dataMale.filter((d) => {
                 return d.studentId !== data.studentId;
             });
-            console.log(newData);
             setDataMale(newData);
         } else {
             newData = dataFemale.filter((d) => {

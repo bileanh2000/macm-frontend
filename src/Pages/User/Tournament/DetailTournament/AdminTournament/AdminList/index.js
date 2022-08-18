@@ -6,6 +6,7 @@ import { styled } from '@mui/material/styles';
 import { Button, Typography } from '@mui/material';
 
 function AdminList({ data }) {
+    console.log(data);
     const [pageSize, setPageSize] = useState(10);
 
     const columns = [

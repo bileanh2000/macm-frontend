@@ -18,7 +18,16 @@ import { Edit } from '@mui/icons-material';
 import UpdateTournamentOverview from './UpdateTournamentOverview';
 import { hover } from '@testing-library/user-event/dist/hover';
 
-function TournamentOverview({ tournament, onUpdateTournament, value, index, startTime, isUpdate, onChangeTab }) {
+function TournamentOverview({
+    tournament,
+    onUpdateTournament,
+    value,
+    index,
+    startTime,
+    isUpdate,
+    onChangeTab,
+    tournamentStage,
+}) {
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const user = JSON.parse(localStorage.getItem('currentUser'));
 
@@ -71,7 +80,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                             user.role.name === 'ROLE_HeadTechnique' ||
                             user.role.name === 'ROLE_ViceHeadTechnique' ||
                             user.role.name === 'ROLE_ViceHeadClub' ||
-                            isUpdate ? (
+                            tournamentStage == 0 ? (
                                 <Button
                                     variant="outlined"
                                     startIcon={<Edit />}

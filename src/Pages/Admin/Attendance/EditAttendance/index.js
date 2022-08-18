@@ -137,9 +137,15 @@ function EditAttendance() {
                                         </TableCell>
                                         <TableCell>{type == 0 ? 'Lịch tập' : row.name}</TableCell>
                                         <TableCell>
-                                            {moment(row.startDate).format('dddd')}
+                                            {type == 0
+                                                ? moment(row.date).format('dddd')
+                                                : moment(row.date).format('dddd')}
                                             <br />
-                                            {moment(row.startDate).format('DD/MM/YYYY')}
+
+                                            {type == 0
+                                                ? moment(row.startDate).format('DD/MM/YYYY')
+                                                : moment(row.startDate).format('DD/MM/YYYY')}
+                                            <br />
                                         </TableCell>
                                         <TableCell>
                                             {row.startTime} - {type == 0 ? row.finishTime : row.endTime}
@@ -154,7 +160,10 @@ function EditAttendance() {
                                                     to={`../admin/attendance`}
                                                     state={{
                                                         id: row.id,
-                                                        date: moment(row.date).format('DD/MM/YYYY'),
+                                                        date:
+                                                            type == 0
+                                                                ? moment(row.date).format('DD/MM/YYYY')
+                                                                : moment(row.startDate).format('DD/MM/YYYY'),
                                                         type: type,
                                                     }}
                                                     sx={{ mr: 1 }}
@@ -168,7 +177,10 @@ function EditAttendance() {
                                                     to="../admin/attendance/take"
                                                     state={{
                                                         id: row.id,
-                                                        date: moment(row.date).format('DD/MM/YYYY'),
+                                                        date:
+                                                            type == 0
+                                                                ? moment(row.date).format('DD/MM/YYYY')
+                                                                : moment(row.startDate).format('DD/MM/YYYY'),
                                                         type: type,
                                                     }}
                                                 >

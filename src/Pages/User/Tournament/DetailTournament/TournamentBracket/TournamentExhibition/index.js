@@ -28,13 +28,14 @@ import TableMatch from './TableMatch';
 import Gold from 'src/Components/Common/Material/Gold';
 import Sliver from 'src/Components/Common/Material/Sliver';
 import Brone from 'src/Components/Common/Material/Brone';
+import LoadingProgress from 'src/Components/LoadingProgress';
 
 function TournamentExhibition({ exhibition, result, type }) {
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
     console.log(exhibition);
     let { tournamentId } = useParams();
     const [exhibitionType, setExhibitionType] = useState(0);
-    const [exhibitionTeam, setExhibitionTeam] = useState([]);
+    const [exhibitionTeam, setExhibitionTeam] = useState();
     const [listExhibitionType, setListExhibitionType] = useState([]);
     const [tournamentStatus, setTournamentStatus] = useState(-1);
     const [open, setOpen] = useState(false);
@@ -98,7 +99,7 @@ function TournamentExhibition({ exhibition, result, type }) {
     };
 
     useEffect(() => {
-        getExhibitionResult(exhibitionType == 0 ? 0 : exhibitionType, nowDate);
+        getExhibitionResult(exhibitionType, nowDate);
         fetchExhibitionType(tournamentId);
     }, [tournamentId]);
 
@@ -111,11 +112,11 @@ function TournamentExhibition({ exhibition, result, type }) {
 
     return (
         <Fragment>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            {/* <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                     Bảng đấu biểu diễn
                 </Typography>
-            </Box>
+            </Box> */}
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
                 <FormControl size="small">
@@ -227,20 +228,18 @@ function TournamentExhibition({ exhibition, result, type }) {
                     </Box>
                 </Paper>
             )}
-            {exhibitionTeam && exhibitionTeam.length > 0 ? (
-                <div>
+            {exhibitionTeam ? (
+                exhibitionTeam.length > 0 ? (
                     <TableMatch matches={exhibitionTeam} status={tournamentStatus} />
-                </div>
+                ) : (
+                    <Box sx={{ d: 'flex' }}>
+                        <Typography variant="body1" sx={{ m: 'auto' }}>
+                            Thể thức này chưa có thời gian và địa điểm thi đấu
+                        </Typography>
+                    </Box>
+                )
             ) : (
-                // ) : tournamentStatus < 2 ? (
-                //     <Box sx={{ d: 'flex' }}>
-                //         <Typography variant="body1">Thể thức thi đấu này hiện đang chưa có tuyển thủ</Typography>
-                //     </Box>
-                <Box sx={{ d: 'flex' }}>
-                    <Typography variant="body1" sx={{ m: 'auto' }}>
-                        Thể thức thi đấu này không tổ chức
-                    </Typography>
-                </Box>
+                <LoadingProgress />
             )}
         </Fragment>
     );

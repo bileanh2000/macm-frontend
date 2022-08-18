@@ -11,7 +11,7 @@ function a11yProps(index) {
     };
 }
 
-function TournamentFee({ tournament, tournamentStatus, isFinish }) {
+function TournamentFee({ tournament, tournamentStatus, isFinish, tournamentStage }) {
     const [value, setValue] = React.useState(0);
     const user = JSON.parse(localStorage.getItem('currentUser'));
 
@@ -44,6 +44,7 @@ function TournamentFee({ tournament, tournamentStatus, isFinish }) {
                         index={1}
                         tournament={tournament}
                         tournamentStatus={tournamentStatus}
+                        tournamentStage={tournamentStage}
                         user={user}
                         isFinish={isFinish}
                     />

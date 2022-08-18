@@ -147,6 +147,7 @@ function Tournament() {
     useEffect(() => {
         isRender && getListTournamentBySemester(semester, status);
         // fetchCommonScheduleBySemester();
+        isRender && getAllTournamentSchedule();
         setIsRender(false);
     }, [semester, status, tournaments, isRender]);
 

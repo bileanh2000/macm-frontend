@@ -93,11 +93,12 @@ function TableMatch(params) {
                 <caption>Địa điểm thi đấu: {params.matches[0].area.name}</caption>
                 <TableHead>
                     <TableRow>
+                        <TableCell></TableCell>
                         <TableCell>STT</TableCell>
-                        <TableCell align="right">Tên đội</TableCell>
-                        <TableCell align="right">Thời gian thi đấu</TableCell>
-                        <TableCell align="right">Điểm số</TableCell>
-                        <TableCell align="right"></TableCell>
+                        <TableCell>Tên đội</TableCell>
+                        <TableCell>Thời gian thi đấu</TableCell>
+                        <TableCell>Điểm số</TableCell>
+                        <TableCell></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

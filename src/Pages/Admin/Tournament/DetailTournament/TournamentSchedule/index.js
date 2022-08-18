@@ -86,7 +86,7 @@ export const CustomTrainingSchedule = styled.div`
     width: 70%;
 `;
 
-function TournamentSchedule({ isUpdate }) {
+function TournamentSchedule({ isUpdate, tournamentStage }) {
     const calendarComponentRef = useRef(null);
     const nowDate = new Date();
     let { tournamentId } = useParams();
@@ -259,7 +259,7 @@ function TournamentSchedule({ isUpdate }) {
     };
 
     const navigateToUpdate = (params, date) => {
-        if (isUpdate) {
+        if (isUpdate || tournamentStage != 0) {
             return;
         }
         console.log(params);
@@ -281,7 +281,7 @@ function TournamentSchedule({ isUpdate }) {
     };
 
     const navigateToCreate = (date) => {
-        if (isUpdate) {
+        if (isUpdate || tournamentStage != 0) {
             return;
         }
         console.log(date);

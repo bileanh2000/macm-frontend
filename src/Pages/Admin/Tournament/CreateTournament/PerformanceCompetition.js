@@ -120,8 +120,8 @@ function PerformanceCompetition(props) {
                             <TableHead>
                                 <TableRow>
                                     <TableCell align="center">Nội dung thi đấu</TableCell>
-                                    <TableCell align="center">Số lượng nữ</TableCell>
                                     <TableCell align="center">Số lượng nam</TableCell>
+                                    <TableCell align="center">Số lượng nữ</TableCell>
                                     <TableCell align="center"></TableCell>
                                     <TableCell align="center"></TableCell>
                                 </TableRow>
@@ -130,8 +130,8 @@ function PerformanceCompetition(props) {
                                 {datas.map((data) => (
                                     <TableRow key={data.id}>
                                         <TableCell>{data.name}</TableCell>
-                                        <TableCell align="center">{data.numberFemale}</TableCell>
                                         <TableCell align="center">{data.numberMale}</TableCell>
+                                        <TableCell align="center">{data.numberFemale}</TableCell>
                                         <TableCell>
                                             <IconButton
                                                 aria-label="delete"

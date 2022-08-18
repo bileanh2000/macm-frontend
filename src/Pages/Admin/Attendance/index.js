@@ -8,6 +8,7 @@ import moment from 'moment';
 function Attendance() {
     const location = useLocation();
     const [type, setType] = useState(0);
+    const [title, setTitle] = useState();
 
     moment().locale('vi');
 
@@ -29,6 +30,8 @@ function Attendance() {
                 if (!_trainingScheduleId && response.data.length > 0) {
                     setTrainingScheduleId(response.data[0].id);
                 }
+                console.log('common shedule', response);
+                response.data[0].type == 0 ? setTitle('buổi tập') : setTitle(response.data[0].title);
                 setType(response.data[0].type);
             } catch (error) {
                 console.log('dm', error);
@@ -47,7 +50,7 @@ function Attendance() {
                 {trainingScheduleId ? (
                     <Container maxWidth="xl">
                         <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                            Trạng thái điểm danh ngày: {_nowDate}
+                            Trạng thái điểm danh {type == 0 ? title : 'sự kiện ' + title} ngày: {_nowDate}
                         </Typography>
                         <Divider />
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, mt: 2 }}>

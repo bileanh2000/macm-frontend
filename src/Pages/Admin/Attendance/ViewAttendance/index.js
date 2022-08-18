@@ -98,7 +98,7 @@ function ViewAttendance({ data }) {
                     <GridToolbarQuickFilter />
                 </Box>
                 <Typography variant="body1">
-                    Số người tham gia hôm nay {totalActive}/{totalResult}
+                    Số người tham gia điểm danh: {totalActive}/{totalResult}
                 </Typography>
             </GridToolbarContainer>
         );

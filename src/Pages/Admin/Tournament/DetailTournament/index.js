@@ -296,6 +296,7 @@ function DetailTournament() {
                             <TournamentOverview
                                 tournament={tournament}
                                 onUpdateTournament={handleUpdateTournament}
+                                tournamentStage={tournament.stage}
                                 value={value}
                                 index={0}
                                 startTime={scheduleList[0].date}
@@ -307,7 +308,7 @@ function DetailTournament() {
                                 user.role.name === 'ROLE_HeadTechnique' ||
                                 user.role.name === 'ROLE_ViceHeadTechnique' ||
                                 user.role.name === 'ROLE_ViceHeadClub' ? (
-                                    <TournamentSchedule isUpdate={isUpdate} />
+                                    <TournamentSchedule isUpdate={isUpdate} tournamentStage={tournament.stage}/>
                                 ) : (
                                     <Preview />
                                 )}
@@ -316,6 +317,7 @@ function DetailTournament() {
                                 <TournamentFee
                                     tournament={tournament}
                                     tournamentStatus={tournament.status}
+                                    tournamentStage={tournament.stage}
                                     isFinish={isFinish}
                                 />
                             </TabPanel>
@@ -326,6 +328,7 @@ function DetailTournament() {
                                 <MemberTournament
                                     tournament={tournament}
                                     tournamentStatus={tournament.status}
+                                    tournamentStage={tournament.stage}
                                     isUpdate={isUpdate}
                                 />
                             </TabPanel>
@@ -333,11 +336,13 @@ function DetailTournament() {
                                 <TournamentBacket
                                     tournament={tournament}
                                     tournamentStatus={tournament.status}
+                                    tournamentStage={tournament.stage}
                                     valueTab={valueTab}
                                     type={type}
                                     endDate={
                                         scheduleList.length > 0 && new Date(scheduleList[scheduleList.length - 1].date)
                                     }
+                                    changeData={() => setIsRender(true)}
                                 />
                             </TabPanel>
                         </Paper>

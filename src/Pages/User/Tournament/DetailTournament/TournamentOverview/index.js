@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
     Grid,
     Paper,
@@ -13,8 +13,14 @@ import {
 import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
 import moment from 'moment';
+import { useParams } from 'react-router-dom';
+import userTournamentAPI from 'src/api/userTournamentAPI';
 
 function TournamentOverview({ tournament, value, index, schedule, onChangeTab }) {
+    let { tournamentId } = useParams();
+    const [isRender, setIsRender] = useState(true);
+    const [roleInTournament, setRoleInTournament] = useState([]);
+
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
         // [`&.${tableCellClasses.head}`]: {
         //     backgroundColor: theme.palette.common.black,
@@ -39,6 +45,20 @@ function TournamentOverview({ tournament, value, index, schedule, onChangeTab })
         },
     }));
 
+    useEffect(() => {
+        const getRoleInTournament = async () => {
+            try {
+                const response = await userTournamentAPI.getAllOrginizingCommitteeRole(tournamentId);
+                console.log('role', response);
+                setRoleInTournament(response.data);
+                setIsRender(false);
+            } catch (error) {
+                console.log('Khong the lay duoc role', error);
+            }
+        };
+        isRender && getRoleInTournament();
+    }, [tournamentId, roleInTournament, isRender]);
+
     return (
         <div
             role="tabpanel"
@@ -62,6 +82,7 @@ function TournamentOverview({ tournament, value, index, schedule, onChangeTab })
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>Nội dung</TableCell>
+                                            <TableCell>Vai trò</TableCell>
                                             <TableCell align="left">Chi phí</TableCell>
                                             <TableCell align="left">Thời gian</TableCell>
                                         </TableRow>
@@ -77,6 +98,19 @@ function TournamentOverview({ tournament, value, index, schedule, onChangeTab })
                                                 <Typography variant="body1" sx={{}}>
                                                     {tournament.description}
                                                 </Typography>
+                                            </TableCell>
+                                            <TableCell align="left">
+                                                <ul>
+                                                    {roleInTournament.map((role) => {
+                                                        return (
+                                                            <li key={role.id}>
+                                                                <strong>{role.name}</strong>:{' '}
+                                                                {role.maxQuantity - role.availableQuantity}/
+                                                                {role.maxQuantity} người
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
                                             </TableCell>
                                             <TableCell align="left">
                                                 <ul>

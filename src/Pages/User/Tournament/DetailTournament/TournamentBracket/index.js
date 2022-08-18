@@ -5,6 +5,7 @@ import { useSnackbar } from 'notistack';
 
 import TournamentCompetitive from './TournamentCompetitive';
 import TournamentExhibition from './TournamentExhibition';
+import MyTeam from './MyTeam';
 import adminTournament from 'src/api/adminTournamentAPI';
 
 function a11yProps(index) {
@@ -85,6 +86,7 @@ function TournamentBracket({ tournament, competitive, exhibition, valueTab, type
                         >
                             <Tab label="Đối kháng" {...a11yProps(0)} />
                             <Tab label="Biểu diễn" {...a11yProps(1)} />
+                            <Tab label="Đội của tôi" {...a11yProps(2)} />
                         </Tabs>
                     </Box>
 
@@ -103,6 +105,9 @@ function TournamentBracket({ tournament, competitive, exhibition, valueTab, type
                             result={tournamentResult.listExhibitionResult}
                             type={valueTab == 1 ? type : 0}
                         />
+                    </TabPanel>
+                    <TabPanel value={value} index={2}>
+                        <MyTeam competitive={competitive} exhibition={exhibition} />
                     </TabPanel>
                 </Box>
             )}

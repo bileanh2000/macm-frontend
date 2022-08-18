@@ -8,7 +8,7 @@ const checkedIcon = <CheckBox fontSize="small" />;
 function AddMember(props) {
     const [isChecked, setIsChecked] = useState(false);
     const fixedOptions = props.fixedOptions ? [props.fixedOptions] : null;
-    // const fixedOptions = [{ gender: true, studentId: 'HE150001', studentName: 'dam van toan 22' }];
+    // const fixedOptions = [{ gender: true, studentId: 'HE150001', name: 'dam van toan 22' }];
     const [user, setUser] = useState(props.data);
 
     const handleAddMember = () => {
@@ -67,7 +67,7 @@ function AddMember(props) {
                                                 style={{ marginRight: 8 }}
                                                 checked={selected}
                                             />
-                                            {option.studentId} - {option.studentName}
+                                            {option.studentId} - {option.name}
                                         </li>
                                     )}
                                     renderTags={(tagValue, getTagProps) =>
@@ -122,7 +122,7 @@ function AddMember(props) {
                                                 style={{ marginRight: 8 }}
                                                 checked={selected}
                                             />
-                                            {option.studentId} - {option.studentName}
+                                            {option.studentId} - {option.name}
                                         </li>
                                     )}
                                     renderTags={(tagValue, getTagProps) =>

@@ -6,10 +6,10 @@ import adminTournament from 'src/api/adminTournamentAPI';
 import Brone from 'src/Components/Common/Material/Brone';
 import Gold from 'src/Components/Common/Material/Gold';
 import Sliver from 'src/Components/Common/Material/Sliver';
+import LoadingProgress from 'src/Components/LoadingProgress';
 import CustomMatchBracket from './CustomMatchBracket';
 
 function TournamentCompetitive({ competitive, result }) {
-    console.log(competitive);
     let { tournamentId } = useParams();
     const [competitiveId, setCompetitiveId] = useState(0);
     const [listWeightRange, setListWeightRange] = useState([]);
@@ -90,11 +90,11 @@ function TournamentCompetitive({ competitive, result }) {
 
     return (
         <Fragment>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            {/* <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                     Bảng đấu
                 </Typography>
-            </Box>
+            </Box> */}
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
                 <FormControl size="small">
@@ -150,16 +150,18 @@ function TournamentCompetitive({ competitive, result }) {
                 </Paper>
             )}
 
-            {listPlayer && listPlayer.length > 0 ? (
-                <div>
+            {listPlayer ? (
+                listPlayer.length > 0 ? (
                     <CustomMatchBracket matches={listPlayer} rounds={rounds} />
-                </div>
+                ) : (
+                    <Box sx={{ d: 'flex' }}>
+                        <Typography variant="body1" sx={{ m: 'auto' }}>
+                            Thể thức này chưa có thời gian và địa điểm thi đấu
+                        </Typography>
+                    </Box>
+                )
             ) : (
-                <Box sx={{ d: 'flex' }}>
-                    <Typography variant="body1" sx={{ m: 'auto' }}>
-                        Hạng cân này hiện đang chưa có lịch thi đấu
-                    </Typography>
-                </Box>
+                <LoadingProgress />
             )}
         </Fragment>
     );
