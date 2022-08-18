@@ -137,9 +137,9 @@ function EditAttendance() {
                                         </TableCell>
                                         <TableCell>{type == 0 ? 'Lịch tập' : row.name}</TableCell>
                                         <TableCell>
-                                            {moment(row.date).format('dddd')}
+                                            {moment(row.startDate).format('dddd')}
                                             <br />
-                                            {moment(row.date).format('DD/MM/YYYY')}
+                                            {moment(row.startDate).format('DD/MM/YYYY')}
                                         </TableCell>
                                         <TableCell>
                                             {row.startTime} - {type == 0 ? row.finishTime : row.endTime}

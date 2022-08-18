@@ -20,6 +20,7 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useGlobalState, setGlobalState } from 'src/state';
+import CircleNotificationsRoundedIcon from '@mui/icons-material/CircleNotificationsRounded';
 import 'moment/locale/vi';
 
 import {
@@ -51,6 +52,7 @@ import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 // import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import notificationApi from 'src/api/notificationApi';
+import NotificationsPausedRoundedIcon from '@mui/icons-material/NotificationsPausedRounded';
 
 const cx = classNames.bind(styles);
 
@@ -66,7 +68,9 @@ function Header({ onLogout }) {
     const [totalUnRead, setTotalUnRead] = React.useState(0);
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
     const [notiStatus, setNotiStatus] = React.useState(0);
+    const [notificationMessage, setNotificationMessage] = React.useState('');
     const [totalNotification] = useGlobalState('totalNotification');
+
     moment().locale('vi');
     const [page, setPage] = React.useState(1);
     const [total, setTotal] = React.useState(0);
@@ -93,6 +97,7 @@ function Header({ onLogout }) {
             console.log('fetchUnreadNotification', response);
             setNews(response.data);
             setTotal(response.totalPage);
+            setNotificationMessage(response.message);
         } catch (error) {
             console.error('Lấy dữ liệu news thất bại');
         }
@@ -454,6 +459,34 @@ function Header({ onLogout }) {
                                             </Box>
 
                                             <List sx={{ width: 400 }}>
+                                                {newsList.length !== 0 ? null : (
+                                                    <Box
+                                                        sx={{
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                            mb: 2,
+                                                        }}
+                                                    >
+                                                        <NotificationsPausedRoundedIcon
+                                                            sx={{
+                                                                fontSize: '8rem',
+                                                                transform: 'rotate(354deg)',
+                                                                color: '#c1cfdb',
+                                                            }}
+                                                        />
+                                                        <Typography
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                fontSize: '1.2rem',
+                                                                color: '#747b82',
+                                                            }}
+                                                        >
+                                                            Opps, Bạn đã đọc tất cả các thông báo!
+                                                        </Typography>
+                                                    </Box>
+                                                )}
                                                 {newsList.map((news, index) => (
                                                     <React.Fragment key={index}>
                                                         <ListItemButton

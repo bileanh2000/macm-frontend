@@ -47,6 +47,8 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ContactPageIcon from '@mui/icons-material/ContactPage';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import NotificationsPausedRoundedIcon from '@mui/icons-material/NotificationsPausedRounded';
+
 import moment from 'moment';
 
 const cx = classNames.bind(styles);
@@ -326,6 +328,34 @@ function DefaultLayout({ children, onLogout }) {
                                             </Box>
 
                                             <List sx={{ width: 400 }}>
+                                                {newsList.length !== 0 ? null : (
+                                                    <Box
+                                                        sx={{
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                            mb: 2,
+                                                        }}
+                                                    >
+                                                        <NotificationsPausedRoundedIcon
+                                                            sx={{
+                                                                fontSize: '8rem',
+                                                                transform: 'rotate(354deg)',
+                                                                color: '#c1cfdb',
+                                                            }}
+                                                        />
+                                                        <Typography
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                fontSize: '1.2rem',
+                                                                color: '#747b82',
+                                                            }}
+                                                        >
+                                                            Opps, Bạn đã đọc tất cả các thông báo!
+                                                        </Typography>
+                                                    </Box>
+                                                )}
                                                 {newsList.map((news, index) => (
                                                     <React.Fragment key={index}>
                                                         <ListItemButton

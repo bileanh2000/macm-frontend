@@ -293,24 +293,6 @@ function Event() {
                                             return <EventItem key={item.id} data={item} />;
                                         })}
                                 </ul>
-                                <ul>
-                                    {closedEvent &&
-                                        closedEvent.map((item) => {
-                                            return <EventItem key={item.id} data={item} />;
-                                        })}
-                                </ul>
-                                <ul>
-                                    {closedEvent &&
-                                        closedEvent.map((item) => {
-                                            return <EventItem key={item.id} data={item} />;
-                                        })}
-                                </ul>
-                                <ul>
-                                    {closedEvent &&
-                                        closedEvent.map((item) => {
-                                            return <EventItem key={item.id} data={item} />;
-                                        })}
-                                </ul>
                             </Box>
                         </>
                     ) : null}
