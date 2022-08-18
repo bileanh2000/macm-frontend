@@ -305,11 +305,11 @@ function CreateTournament({
                       .max(Yup.ref('startDate'), ({ min }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`)
                       .min(min, 'Vui lòng không nhập ngày trong quá khứ')
                       .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy HH:mm')
-                      .required('Vui lòng không để trống trường này')
-                      .test('same_dates_test', 'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu', function (value) {
-                          const { startDate } = this.parent;
-                          return value.getDate() !== startDate.getDate();
-                      }),
+                      .required('Vui lòng không để trống trường này'),
+                  //   .test('same_dates_test', 'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu', function (value) {
+                  //       const { startDate } = this.parent;
+                  //       return value.getDate() !== startDate.getDate();
+                  //   }),
 
                   //   startDate: Yup.date().typeError('Vui lòng không để trống trường này'),
                   //   finishDate: Yup.date()

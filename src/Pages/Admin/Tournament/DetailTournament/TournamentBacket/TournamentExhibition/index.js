@@ -12,7 +12,6 @@ import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
 function TournamentExhibition({ reload, result, type, endDate }) {
-    console.log(type);
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
 
     let { tournamentId } = useParams();
@@ -24,9 +23,9 @@ function TournamentExhibition({ reload, result, type, endDate }) {
     const [tournamentStatus, setTournamentStatus] = useState();
     const [areaList, setAreaList] = useState();
     const [isRender, setIsRender] = useState(true);
+    const [isRenderTotal, setIsRenderTotal] = useState(true);
 
     const handleChangeExhibitionType = (event) => {
-        console.log(event.target.value);
         if (result && result.length > 0) {
             const _result = result.find((subResult) =>
                 subResult.data.length > 0
@@ -42,8 +41,7 @@ function TournamentExhibition({ reload, result, type, endDate }) {
         } else {
             exType = listExhibitionType.find((type) => type.id === event.target.value);
         }
-        console.log(exType);
-        getExhibitionResult(exType.id, nowDate);
+        getExhibitionResult(exType.id);
     };
 
     // const fetchExhibitionTeam = async (exhibitionType) => {
@@ -55,10 +53,9 @@ function TournamentExhibition({ reload, result, type, endDate }) {
     //     }
     // };
 
-    const getExhibitionResult = async (exhibitionType, date) => {
+    const getExhibitionResult = async (exhibitionType) => {
         try {
-            const response = await adminTournament.getExhibitionResult({ date, exhibitionType });
-            console.log(response.data);
+            const response = await adminTournament.getExhibitionResult({ nowDate, exhibitionType });
             setExhibitionTeam(response.data);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
@@ -85,14 +82,33 @@ function TournamentExhibition({ reload, result, type, endDate }) {
     };
 
     useEffect(() => {
+        const getExhibitionResult = async (exhibitionType) => {
+            try {
+                const response = await adminTournament.getExhibitionResult({ nowDate, exhibitionType });
+                setExhibitionTeam(response.data);
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
+        isRender && getExhibitionResult(exhibitionType);
+        setIsRender(false);
+    }, [isRender, exhibitionType, exhibitionTeam, nowDate]);
+
+    useEffect(() => {
+        const getExhibitionResult = async (exhibitionType) => {
+            try {
+                const response = await adminTournament.getExhibitionResult({ nowDate, exhibitionType });
+                setExhibitionTeam(response.data);
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
         const fetchExhibitionType = async (tournamentId) => {
             try {
                 const response = await adminTournament.getListExhibitionType(tournamentId);
-                console.log(response);
                 setTournamentStatus(response.data[0].status);
                 setListExhibitionType(response.data);
                 type == 0 && setExhibitionType(response.data[0].id);
-                console.log(response.data[0].id, result);
                 const _result = result.find((subResult) =>
                     subResult.data.length > 0
                         ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
@@ -100,47 +116,22 @@ function TournamentExhibition({ reload, result, type, endDate }) {
                 );
 
                 setTournamentResult(_result ? _result.data[0].listResult : null);
-                console.log('result', _result);
-                console.log(response.data[0].id, nowDate);
-                getExhibitionResult(response.data[0].id, nowDate);
-                setIsRender(false);
+                getExhibitionResult(response.data[0].id);
+                setIsRenderTotal(false);
             } catch (error) {
                 console.log('Failed to fetch user list: ', error);
             }
         };
-        isRender && fetchExhibitionType(tournamentId);
-        getExhibitionResult(exhibitionType, nowDate);
+        isRenderTotal && fetchExhibitionType(tournamentId);
         getAllArea();
-    }, [tournamentId, exhibitionType, nowDate, isRender, result, type]);
-
-    const handleDialogCreate = () => {
-        if (exhibitionType == 0) {
-            let varian = 'error';
-            enqueueSnackbar('Vui lòng chọn hạng cân trước khi tạo bảng đấu', { varian });
-            return;
-        }
-        if (exhibitionTeam && exhibitionTeam.length == 0) {
-            console.log('loz3');
-            spawnTimeAndArea(exhibitionType);
-        }
-    };
-    const handleDialogUpdateTime = () => {
-        //spawnTimeAndArea();
-    };
+    }, [tournamentId, exhibitionType, nowDate, isRenderTotal, result, type]);
 
     const UpdateResultHandler = () => {
         setIsRender(true);
-        // getExhibitionResult(exhibitionType, nowDate);
     };
 
     return (
         <Fragment>
-            {/* <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                    Bảng đấu biểu diễn
-                </Typography>
-            </Box> */}
-
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
                 <FormControl size="small">
                     <Typography variant="caption">Thể thức thi đấu</Typography>
@@ -210,13 +201,6 @@ function TournamentExhibition({ reload, result, type, endDate }) {
                     </Box>
                 )
             ) : (
-                // ) : tournamentStatus == 1 ? (
-                //     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                //         <Typography variant="body1">Thể thức thi đấu đang chưa có lịch thi đấu</Typography>
-                //         <Button variant="outlined" onClick={handleDialogCreate} sx={{ mr: 2, float: 'right' }}>
-                //             Tạo bảng đấu
-                //         </Button>
-                //     </Box>
                 <LoadingProgress />
             )}
         </Fragment>

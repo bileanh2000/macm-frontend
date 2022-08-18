@@ -42,6 +42,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { vi } from 'date-fns/locale';
 import { useSnackbar } from 'notistack';
 import UpdateTimeAndArea from './UpdateTimeAndArea';
+import UpdateScoreTournament from './UpdateScore';
 
 const cx = classNames.bind(styles);
 
@@ -66,8 +67,6 @@ function CustomMatchBracket(params) {
     const [open, setOpen] = useState(false);
     const [openUpdateTime, setOpenUpdateTime] = useState(false);
     const [match, setMatch] = useState();
-    const [score1, setScore1] = useState(-1);
-    const [score2, setScore2] = useState(-1);
     const [isEdit, setEdit] = useState(false);
     const [areaName, setAreaId] = useState();
     const [winner, setWinner] = useState();
@@ -78,45 +77,9 @@ function CustomMatchBracket(params) {
         setValue(newValue);
     };
 
-    const handleChangeAreaName = (event) => {
-        setAreaId(event.target.value);
-    };
-
     useEffect(() => {
         setMatches(__matches);
     }, [params.matches]);
-
-    const validationSchema = Yup.object().shape({
-        ...(value === 1 && {
-            score1: Yup.number()
-                .required('Không được để trống trường này')
-                .typeError('Vui lòng nhập số')
-                .min(0, 'Vui lòng nhập giá trị lớn hơn hoặc bằng 0')
-                .max(10, 'Điếm số không được vượt quá 10'),
-        }),
-        ...(value === 1 && {
-            score2: Yup.number()
-                .required('Không được để trống trường này')
-                .typeError('Vui lòng nhập số')
-                .min(0, 'Vui lòng nhập giá trị lớn hơn hoặc bằng 0')
-                .max(10, 'Điếm số không được vượt quá 10'),
-        }),
-        // ...(value === 0 && { date: Yup.string().nullable().required('Không được để trống trường này') }),
-        // ...(value === 0 && { startTime: Yup.string().nullable().required('Không được để trống trường này') }),
-    });
-
-    const {
-        register,
-        handleSubmit,
-        control,
-        formState: { errors },
-        reset,
-        setFocus,
-        setError,
-    } = useForm({
-        resolver: yupResolver(validationSchema),
-        mode: 'onChange',
-    });
 
     const onDragStart = (e, match, index, round, isFirst) => {
         if (params.status !== 0) {
@@ -193,9 +156,6 @@ function CustomMatchBracket(params) {
             console.log('Khong the update', error);
         }
     };
-    const handleCreateMatches = () => {
-        params.onCreateMatches();
-    };
 
     const handleUpdateMatches = () => {
         var merged = [].concat.apply([], __matches);
@@ -218,13 +178,9 @@ function CustomMatchBracket(params) {
         if (data.firstPlayer == null || data.secondPlayer == null) {
             setMatch(data);
             setValue(0);
-            // return;
         } else {
-            // setMatch(data);
-            // setValue(1);
             if (data.firstPlayer.point == null && data.secondPlayer.point == null) {
                 setMatch(data);
-                // setValue(1);
             } else {
                 return;
             }
@@ -239,25 +195,10 @@ function CustomMatchBracket(params) {
 
     const handleClose = () => {
         setOpen(false);
-        // reset({
-        //     score1: '',
-        //     score2: '',
-        // });
         setMatch();
         setWinnerTemp();
         setWinner();
         handleCloseUpdateTime();
-    };
-    const updateResult = async (match) => {
-        try {
-            const res = await adminTournament.updateResultMatch(match);
-            params.onChangeData && params.onChangeData();
-            let variant = 'success';
-            enqueueSnackbar(res.message, { variant });
-        } catch (error) {
-            let variant = 'error';
-            enqueueSnackbar('khong the cap nhat ket quá', { variant });
-        }
     };
 
     const updateTimeAndPlace = async (matchId, match) => {
@@ -283,34 +224,6 @@ function CustomMatchBracket(params) {
         handleClose();
     };
 
-    const handleUpdate = (data) => {
-        if (data.score1 == data.score2) {
-            setError('score1', {
-                message: 'Điểm 2 người chơi không được bằng nhau',
-            });
-            setError('score2', {
-                message: 'Điểm 2 người chơi không được bằng nhau',
-            });
-        } else {
-            match.firstPlayer.point = data.score1;
-            match.secondPlayer.point = data.score2;
-            // setMatch(match);
-            updateResult(match);
-            var merged = [].concat.apply([], __matches);
-            params.onUpdateResult(merged);
-            handleClose();
-        }
-    };
-
-    const handleChange = (score, event) => {
-        score == 1 ? setScore1(Number(event)) : setScore2(Number(event));
-        if (score == 1) {
-            Number(event) > score2 ? setWinnerTemp(match.firstPlayer) : setWinnerTemp(match.secondPlayer);
-        } else {
-            Number(event) > score1 ? setWinnerTemp(match.secondPlayer) : setWinnerTemp(match.firstPlayer);
-        }
-    };
-
     const UpdateScore = ({ value, index }) => {
         return (
             <Box
@@ -320,142 +233,15 @@ function CustomMatchBracket(params) {
                 aria-labelledby={`simple-tab-${index}`}
             >
                 {match && match.firstPlayer && match.secondPlayer ? (
-                    <>
-                        {winner && (
-                            <Typography variant="body1">
-                                Xác nhận{' '}
-                                <strong>
-                                    {winner.studentName} - {winner.studentId}
-                                </strong>{' '}
-                                là người chiến thắng. Vui lòng nhập tỉ số
-                            </Typography>
-                        )}
-                        <TableContainer sx={{ maxHeight: 440 }}>
-                            <Table stickyHeader aria-label="sticky table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell align="center">Tên vận động viên</TableCell>
-                                        <TableCell align="center">Điểm số</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell>
-                                            {match.firstPlayer.studentName} - {match.firstPlayer.studentId}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Controller
-                                                name="score1"
-                                                variant="outlined"
-                                                defaultValue={
-                                                    match.firstPlayer.point !== null ? match.firstPlayer.point : ''
-                                                }
-                                                control={control}
-                                                render={({
-                                                    field: { onChange, value, onBlur },
-                                                    fieldState: { error, invalid },
-                                                }) => (
-                                                    <NumberFormat
-                                                        name="score1"
-                                                        customInput={TextField}
-                                                        label="Điểm số"
-                                                        variant="outlined"
-                                                        defaultValue=""
-                                                        value={value}
-                                                        onValueChange={(v) => {
-                                                            onChange(Number(v.value));
-                                                        }}
-                                                        onBlur={(v) => handleChange(1, v.target.value)}
-                                                        error={invalid}
-                                                        helperText={invalid ? error.message : null}
-                                                        fullWidth
-                                                    />
-                                                )}
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell>
-                                            {match.secondPlayer.studentName} - {match.secondPlayer.studentId}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Controller
-                                                name="score2"
-                                                variant="outlined"
-                                                defaultValue={
-                                                    match.secondPlayer.point !== null ? match.secondPlayer.point : ''
-                                                }
-                                                control={control}
-                                                render={({
-                                                    field: { onChange, value, onBlur },
-                                                    fieldState: { error, invalid },
-                                                }) => (
-                                                    <NumberFormat
-                                                        name="score2"
-                                                        customInput={TextField}
-                                                        label="Điểm số"
-                                                        variant="outlined"
-                                                        defaultValue=""
-                                                        value={value}
-                                                        onValueChange={(v) => {
-                                                            onChange(Number(v.value));
-                                                        }}
-                                                        onBlur={(v) => handleChange(2, v.target.value)}
-                                                        error={invalid}
-                                                        helperText={invalid ? error.message : null}
-                                                        fullWidth
-                                                    />
-                                                )}
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <Box>
-                            {/* <FormControl>
-                                <FormLabel id="demo-form-control-label-placement">Xác nhận người chiến thắng</FormLabel>
-                                <RadioGroup
-                                    row
-                                    aria-labelledby="demo-form-control-label-placement"
-                                    name="position"
-                                    defaultValue="top"
-                                    value={winnerTemp}
-                                    // onChange={handleChangeWinner}
-                                >
-                                    <FormControlLabel
-                                        value={match.firstPlayer.studentId}
-                                        control={<Radio />}
-                                        label={match.firstPlayer.studentName}
-                                        labelPlacement="start"
-                                        sx={{ mr: 1 }}
-                                    />
-                                    <FormControlLabel
-                                        value={match.secondPlayer.studentId}
-                                        control={<Radio />}
-                                        label={match.secondPlayer.studentName}
-                                        sx={{ ml: 1 }}
-                                    />
-                                </RadioGroup>
-                            </FormControl> */}
-                            {winner && winnerTemp && winnerTemp.studentId !== winner.studentId && (
-                                <Typography variant="body1" sx={{ color: 'red' }}>
-                                    <strong>
-                                        {winnerTemp.studentName} - {winnerTemp.studentId}
-                                    </strong>
-                                    là người chiến thắng. Bạn xác nhận có đúng không?
-                                </Typography>
-                            )}
-                            <Box sx={{ float: 'right' }}>
-                                <Button variant="outlined" onClick={handleClose} sx={{ mr: 2 }}>
-                                    Hủy bỏ
-                                </Button>
-                                <Button variant="contained" onClick={handleSubmit(handleUpdate)}>
-                                    Đồng ý
-                                </Button>
-                            </Box>
-                        </Box>
-                    </>
+                    <UpdateScoreTournament
+                        match={match}
+                        winner={winner}
+                        handleClose={handleClose}
+                        WinnerTemp={winnerTemp}
+                        onChangeData={() => {
+                            params.onChangeData && params.onChangeData();
+                        }}
+                    />
                 ) : (
                     <Typography variant="body1">Trận đấu chưa đủ vận động viên để có thể xác nhận điểm số</Typography>
                 )}

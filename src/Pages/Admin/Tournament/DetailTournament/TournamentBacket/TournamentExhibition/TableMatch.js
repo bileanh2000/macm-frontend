@@ -33,7 +33,6 @@ import adminTournament from 'src/api/adminTournamentAPI';
 import UpdateTimeAndArea from './UpdateTimeAndArea';
 
 function TableMatch(params) {
-    console.log(params.matches);
     const [matches, setMatches] = useState(params.matches);
     const [match, setMatch] = useState();
     const [open, setOpen] = useState(false);
@@ -88,7 +87,6 @@ function TableMatch(params) {
     });
 
     const handleClickResult = (data) => {
-        console.log(data);
         setMatch(data);
         setOpen(true);
     };
@@ -108,7 +106,6 @@ function TableMatch(params) {
     };
 
     const handleUpdate = (data) => {
-        console.log(data, match);
         updateResult(match.team.id, data.score);
         const newMatches = matches.map((m) => {
             return m.team.id == match.team.id ? { ...m, score: data.score } : m;
@@ -119,7 +116,6 @@ function TableMatch(params) {
     };
 
     const handleUpdateTime = (data) => {
-        console.log(data, match.team.id);
         updateTimeAndPlace(match.team.id, data);
         // var merged = [].concat.apply([], __matches);
         // params.onUpdateResult(merged);

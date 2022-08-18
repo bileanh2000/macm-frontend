@@ -106,7 +106,6 @@ function DetailTournament() {
     const getTournamentById = async (tournamentId) => {
         try {
             const response = await adminTournamentAPI.getTournamentById(tournamentId);
-            console.log(response.data);
             setTournament(response.data[0]);
 
             setIsRender(false);
@@ -118,7 +117,6 @@ function DetailTournament() {
     const fetchTournamentSchedule = async (params) => {
         try {
             const response = await adminTournamentAPI.getTournamentSchedule(params);
-            console.log('Thanh cong roi: ', response);
             setScheduleList(response.data);
         } catch (error) {
             console.log('That bai roi huhu ', error);
@@ -141,7 +139,6 @@ function DetailTournament() {
         container['backgroundColor'] = '#5ba8f5';
         return container;
     });
-    console.log(tournament);
 
     const checkUpdate = () => {
         const nowDate = new Date();
@@ -171,8 +168,6 @@ function DetailTournament() {
             handleCloseDialog();
             setTimeout(() => {
                 adminTournamentAPI.deleteTournament(id).then((res) => {
-                    console.log('delete', res);
-                    console.log('delete', res.data);
                     navigate(-1);
                 });
             });

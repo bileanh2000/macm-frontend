@@ -585,7 +585,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
             )}
             {exhibitionTeam && (
                 <UpdateExhibitionTeam
-                    title="Đăng kí tham gia biểu diễn"
+                    title="Chỉnh sửa đội biểu diễn"
                     isOpen={openDialogExhibition}
                     exhibitionTeam={exhibitionTeam}
                     handleClose={() => {

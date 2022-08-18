@@ -43,17 +43,15 @@ function TabPanel(props) {
 }
 
 function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDate }) {
-    console.log(valueTab);
     let isDisplay = false;
     if (tournament.competitiveTypes.length > 0 || tournament.exhibitionTypes.length > 0) {
         const competitiveStatus = tournament.competitiveTypes.map((competitive) => competitive.status);
         const exhibitionStatus = tournament.exhibitionTypes.map((exhibition) => exhibition.status);
         isDisplay =
-            competitiveStatus.findIndex((status) => status == 2) >= 0 ||
-            exhibitionStatus.findIndex((status) => status == 2) >= 0;
+            competitiveStatus.findIndex((status) => status == 3) >= 0 ||
+            exhibitionStatus.findIndex((status) => status == 3) >= 0;
         console.log(isDisplay);
     }
-    console.log(isDisplay);
     const { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [value, setValue] = useState(valueTab);
