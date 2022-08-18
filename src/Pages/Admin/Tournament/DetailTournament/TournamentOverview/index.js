@@ -70,6 +70,7 @@ function TournamentOverview({ tournament, onUpdateTournament, value, index, star
                             {user.role.name === 'ROLE_HeadClub' ||
                             user.role.name === 'ROLE_HeadTechnique' ||
                             user.role.name === 'ROLE_ViceHeadTechnique' ||
+                            user.role.name === 'ROLE_ViceHeadClub' ||
                             isUpdate ? (
                                 <Button
                                     variant="outlined"

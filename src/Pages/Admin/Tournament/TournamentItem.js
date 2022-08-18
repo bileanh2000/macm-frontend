@@ -153,7 +153,8 @@ function TournamentItem({ data, onSuccess }) {
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     {user.role.name === 'ROLE_HeadClub' ||
                                     user.role.name === 'ROLE_HeadTechnique' ||
-                                    user.role.name === 'ROLE_ViceHeadTechnique' ? (
+                                    user.role.name === 'ROLE_ViceHeadTechnique' ||
+                                    user.role.name === 'ROLE_ViceHeadClub' ? (
                                         <Tooltip title="Xóa giải đấu">
                                             <IconButton
                                                 aria-label="delete"

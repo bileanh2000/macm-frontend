@@ -139,7 +139,6 @@ function Tournament() {
         container['title'] = item.tournament.name;
         container['display'] = 'background';
         container['type'] = item.type;
-
         container['backgroundColor'] = '#ccffe6';
 
         return container;
@@ -226,7 +225,13 @@ function Tournament() {
         //                 setOpenDialogCreate(true);
         //             }}
         <IfAnyGranted
-            expected={['ROLE_HeadTechnique', 'ROLE_HeadClub', 'ROLE_ViceHeadTechnique', 'ROLE_Treasurer']}
+            expected={[
+                'ROLE_HeadTechnique',
+                'ROLE_HeadClub',
+                'ROLE_ViceHeadTechnique',
+                'ROLE_Treasurer',
+                'ROLE_ViceHeadClub',
+            ]}
             actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
             unauthorized={<Navigate to="/forbidden" />}
         >
@@ -280,7 +285,8 @@ function Tournament() {
                     </Typography>
                     {user.role.name === 'ROLE_HeadClub' ||
                     user.role.name === 'ROLE_HeadTechnique' ||
-                    user.role.name === 'ROLE_ViceHeadTechnique' ? (
+                    user.role.name === 'ROLE_ViceHeadTechnique' ||
+                    user.role.name === 'ROLE_ViceHeadClub' ? (
                         <Button
                             variant="outlined"
                             sx={{ maxHeight: '50px', minHeight: '50px' }}

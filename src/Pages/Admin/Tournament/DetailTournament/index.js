@@ -184,7 +184,13 @@ function DetailTournament() {
     }, []);
     return (
         <IfAnyGranted
-            expected={['ROLE_HeadTechnique', 'ROLE_HeadClub', 'ROLE_ViceHeadTechnique', 'ROLE_Treasurer']}
+            expected={[
+                'ROLE_HeadTechnique',
+                'ROLE_HeadClub',
+                'ROLE_ViceHeadTechnique',
+                'ROLE_Treasurer',
+                'ROLE_ViceHeadClub',
+            ]}
             actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
             unauthorized={<Navigate to="/forbidden" />}
         >
@@ -255,7 +261,8 @@ function DetailTournament() {
                                         </Tabs>
                                     ) : user.role.name === 'ROLE_HeadClub' ||
                                       user.role.name === 'ROLE_HeadTechnique' ||
-                                      user.role.name === 'ROLE_ViceHeadTechnique' ? (
+                                      user.role.name === 'ROLE_ViceHeadTechnique' ||
+                                      user.role.name === 'ROLE_ViceHeadClub' ? (
                                         <Tabs
                                             value={value}
                                             onChange={handleChange}
@@ -298,7 +305,8 @@ function DetailTournament() {
                             <TabPanel value={value} index={1}>
                                 {user.role.name === 'ROLE_HeadClub' ||
                                 user.role.name === 'ROLE_HeadTechnique' ||
-                                user.role.name === 'ROLE_ViceHeadTechnique' ? (
+                                user.role.name === 'ROLE_ViceHeadTechnique' ||
+                                user.role.name === 'ROLE_ViceHeadClub' ? (
                                     <TournamentSchedule isUpdate={isUpdate} />
                                 ) : (
                                     <Preview />
