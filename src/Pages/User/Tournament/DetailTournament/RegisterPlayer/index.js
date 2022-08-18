@@ -478,7 +478,7 @@ function RegisterPlayer({
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" onClick={handleCloseDialog}>
-                    Hủy bỏ
+                    Hủy
                 </Button>
                 <Button
                     variant="contained"
@@ -490,7 +490,7 @@ function RegisterPlayer({
                     }
                 >
                     {/* <Button onClick={handleSubmit(onSubmit)} autoFocus> */}
-                    Đồng ý
+                    Xác nhận
                 </Button>
             </DialogActions>
         </Dialog>

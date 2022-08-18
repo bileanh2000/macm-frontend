@@ -130,7 +130,7 @@ class App extends Component {
             <SnackbarProvider
                 maxSnack={4}
                 autoHideDuration={5000}
-                preventDuplicate
+                preventDuplicate={false}
                 anchorOrigin={{
                     vertical: 'top',
                     horizontal: 'right',

@@ -59,7 +59,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user }) {
         // const params = { userId: player[0].id, competitiveTypeId: weightRange, weight: data.weight, tournamentId };
         if (admin.length === 0) {
             let variant = 'error';
-            enqueueSnackbar('Vui lòng chọn thông tin người chơi', { variant });
+            enqueueSnackbar('Vui lòng chọn thông tin vận động viên', { variant });
             return;
         }
 
@@ -299,9 +299,9 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user }) {
                 </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
+                <Button onClick={handleCloseDialog}>Hủy</Button>
                 <Button onClick={handleRegister} autoFocus>
-                    Đồng ý
+                    Xác nhận
                 </Button>
             </DialogActions>
         </Dialog>

@@ -123,9 +123,9 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
                 </DialogContent>
                 <DialogActions>
                     <Button autoFocus onClick={handleCancel}>
-                        Hủy bỏ
+                        Hủy
                     </Button>
-                    <Button onClick={handleOk}>Đồng ý</Button>
+                    <Button onClick={handleOk}>Xác nhận</Button>
                 </DialogActions>
             </Dialog>
             {tournamentResult && (

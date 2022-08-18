@@ -314,9 +314,9 @@ function EditEvent() {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
+                    <Button onClick={handleCloseDialog}>Hủy</Button>
                     <Button onClick={handleDelete(id)} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog> */}
@@ -356,7 +356,7 @@ function EditEvent() {
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose}>Quay lại</Button>
-                            <Button onClick={handleCreate}>Đồng ý</Button>
+                            <Button onClick={handleCreate}>Xác nhận</Button>
                         </DialogActions>
                     </Dialog>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>

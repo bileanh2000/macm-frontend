@@ -136,7 +136,7 @@ function TournamentOverview({ tournament, value, index, schedule, onChangeTab })
                                                     <li>
                                                         <strong>Deadline đăng ký tham gia: </strong>
                                                         <br />
-                                                        {moment(tournament.registrationMemberDeadline).format(
+                                                        {moment(tournament.registrationPlayerDeadline).format(
                                                             'HH:mm - DD/MM/yyyy',
                                                         )}
                                                     </li>

@@ -1208,7 +1208,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                             }}
                             sx={{ mr: 1 }}
                         >
-                            Hủy bỏ
+                            Hủy
                         </Button>
                     ) : (
                         <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>

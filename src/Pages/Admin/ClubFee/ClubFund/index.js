@@ -121,7 +121,7 @@ function ClubFund() {
         amount: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(1, 'Vui lòng nhập giá trị lớn hơn 0')
+            .min(1000, 'Vui không nhập giá trị nhỏ hơn 1000')
             .max(999999999, 'Vui lòng không nhập số quá lớn (dưới 1 tỷ)'),
     });
 
@@ -251,7 +251,7 @@ function ClubFund() {
             unauthorized={<Navigate to="/forbidden" />}
         >
             <Box sx={{ m: 1, p: 1 }}>
-                <Dialog fullWidth open={open}>
+                <Dialog fullWidth open={open} onClose={handleClose}>
                     <DialogTitle>
                         {type === 1 ? 'Thêm tiền vào quỹ câu lạc bộ' : 'Rút tiền khỏi quỹ câu lạc bộ'}
                     </DialogTitle>
@@ -276,7 +276,7 @@ function ClubFund() {
                                             defaultValue=""
                                             value={value}
                                             InputProps={{
-                                                endAdornment: <InputAdornment position="end">vnđ</InputAdornment>,
+                                                endAdornment: <InputAdornment position="end">VND</InputAdornment>,
                                             }}
                                             error={invalid}
                                             helperText={invalid ? error.message : null}
@@ -303,7 +303,7 @@ function ClubFund() {
 
                     <DialogActions>
                         <Button onClick={handleClose}>Hủy</Button>
-                        <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
+                        <Button onClick={handleSubmit(handleUpdate)}>Xác nhận</Button>
                     </DialogActions>
                 </Dialog>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>

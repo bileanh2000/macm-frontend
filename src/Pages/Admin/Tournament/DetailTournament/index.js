@@ -184,7 +184,7 @@ function DetailTournament() {
     }, []);
     return (
         <IfAnyGranted
-            expected={['ROLE_HeadTechnique', 'ROLE_HeadClub', 'ROLE_ViceHeadTechnique']}
+            expected={['ROLE_HeadTechnique', 'ROLE_HeadClub', 'ROLE_ViceHeadTechnique', 'ROLE_Treasurer']}
             actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
             unauthorized={<Navigate to="/forbidden" />}
         >
@@ -202,9 +202,9 @@ function DetailTournament() {
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleCloseDialog}>Hủy bỏ</Button>
+                        <Button onClick={handleCloseDialog}>Hủy</Button>
                         <Button onClick={handleDelete(tournamentId)} autoFocus>
-                            Đồng ý
+                            Xác nhận
                         </Button>
                     </DialogActions>
                 </Dialog>

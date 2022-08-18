@@ -143,7 +143,7 @@ function ListTournament() {
                                                 </div>
                                                 <div className={cx('tournament-title')}>
                                                     <div>
-                                                        Chi phí người chơi phải đóng:{' '}
+                                                        Chi phí vận động viên phải đóng:{' '}
                                                         {tournament.feePlayerPay.toLocaleString('vi-VN', {
                                                             style: 'currency',
                                                             currency: 'VND',

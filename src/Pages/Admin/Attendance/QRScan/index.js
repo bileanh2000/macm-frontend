@@ -159,7 +159,7 @@ function QRScanner({ activityData, activityType }) {
                     });
                 }
             } catch (error) {
-                enqueueSnackbar('Mã QR không hợp lệ error', {
+                enqueueSnackbar('Mã QR không hợp lệ', {
                     variant: 'warning',
                 });
                 console.log(error);

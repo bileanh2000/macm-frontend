@@ -709,8 +709,8 @@ function MemberAndCollaborator() {
                         <input type="file" accept=".xlsx" {...register('file')} />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose}>Từ chối</Button>
-                        <Button type="submit">Đồng ý</Button>
+                        <Button onClick={handleClose}>Hủy</Button>
+                        <Button type="submit">Xác nhận</Button>
                     </DialogActions>
                 </Box>
             </Dialog>

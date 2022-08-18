@@ -8,11 +8,11 @@ const eventApi = {
         return axiosClient.get(url);
     },
     getEventBySemester: (month, page, semester) => {
-        const url = `/event/geteventsbysemester?month=${month}&pageNo=${page}&pageSize=5&semester=${semester}`;
+        const url = `/event/geteventsbysemester?month=${month}&pageNo=${page}&pageSize=10&semester=${semester}`;
         return axiosClient.get(url);
     },
     getEventBySemesterAndStudentId: (studentId, month, page, semester) => {
-        const url = `/event/geteventsbysemesterandstudentid/${studentId}?month=${month}&pageNo=${page}&pageSize=5&semester=${semester}`;
+        const url = `/event/geteventsbysemesterandstudentid/${studentId}?month=${month}&pageNo=${page}&pageSize=100&semester=${semester}`;
         return axiosClient.get(url);
     },
 
@@ -76,7 +76,7 @@ const eventApi = {
         return axiosClient.get(url);
     },
     getAllMemberCancel: (params) => {
-        const url = `/event/headculture/getallmembercanceljoinevent/${params}?pageNo=0&pageSize=1000&sortBy=id`;
+        const url = `/event/headculture/getallmembercanceljoinevent/${params}?pageNo=0&pageSize=10&sortBy=id`;
         return axiosClient.get(url);
     },
     updateRoleEvent: (params) => {

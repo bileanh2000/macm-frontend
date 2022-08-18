@@ -263,10 +263,10 @@ function TableMatch(params) {
                         </DialogContent>
                         <DialogActions>
                             <Button variant="outlined" onClick={handleClose}>
-                                Hủy bỏ
+                                Hủy
                             </Button>
                             <Button variant="contained" onClick={handleSubmit(handleUpdate)}>
-                                Đồng ý
+                                Xác nhận
                             </Button>
                         </DialogActions>
                     </div>
@@ -289,7 +289,7 @@ function TableMatch(params) {
                         </DialogContent>
                         {/* <DialogActions>
                             <Button onClick={handleClose}>Quay lại</Button>
-                            <Button onClick={handleSubmit(handleUpdate)}>Đồng ý</Button>
+                            <Button onClick={handleSubmit(handleUpdate)}>Xác nhận</Button>
                         </DialogActions> */}
                     </div>
                 )}

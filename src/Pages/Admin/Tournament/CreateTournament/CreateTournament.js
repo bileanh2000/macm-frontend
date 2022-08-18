@@ -696,7 +696,7 @@ function CreateTournament({
                                                                 component="span"
                                                                 sx={{ fontSize: '16px', fontWeight: '700' }}
                                                             >
-                                                                Yêu cầu người chơi đóng tiền:{' '}
+                                                                Yêu cầu vận động viên đóng tiền:{' '}
                                                             </Typography>
                                                             {skipped.has(2) ? (
                                                                 <span>Không</span>
@@ -1375,7 +1375,7 @@ function CreateTournament({
                                                         fieldState: { error, invalid },
                                                     }) => (
                                                         <DateTimePicker
-                                                            label="Hạn đăng kí cho người chơi"
+                                                            label="Hạn đăng kí cho vận động viên"
                                                             disablePast
                                                             ampm={false}
                                                             value={value}
@@ -1456,7 +1456,7 @@ function CreateTournament({
                                 }}
                                 sx={{ mr: 1 }}
                             >
-                                Hủy bỏ
+                                Hủy
                             </Button>
                         ) : (
                             <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>

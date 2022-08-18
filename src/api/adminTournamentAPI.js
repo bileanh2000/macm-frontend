@@ -300,7 +300,7 @@ const adminTournament = {
     },
 
     updateTimeAndPlaceTeam: (teamId, params) => {
-        const url = `/tournament/headclub/updatetimeandplacematch/${teamId}`;
+        const url = `/tournament/headclub/updatetimeandplaceteam/${teamId}`;
         return axiosClient.put(url, params);
     },
 

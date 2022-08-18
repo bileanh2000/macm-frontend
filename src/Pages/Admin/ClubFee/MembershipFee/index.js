@@ -262,8 +262,10 @@ function MembershipFee() {
         try {
             const res = await adminClubFeeAPI.updateMembership(id, user.studentId);
             console.log(res.message);
-            enqueueSnackbar(res.message, { variant: 'success' });
+            enqueueSnackbar('Cập nhật trạng thái đóng tiền thành công', { variant: 'success' });
         } catch (error) {
+            // enqueueSnackbar(error.message, { variant: 'error' });
+
             console.log('Không thể chỉnh sửa tiền phí, error: ', error);
         }
     };
@@ -489,7 +491,7 @@ function MembershipFee() {
 
                 <Dialog
                     fullWidth
-                    maxWidth="md"
+                    maxWidth="xs"
                     open={openConfirm}
                     onClose={handleCloseConfirm}
                     aria-labelledby="alert-dialog-title"
@@ -502,7 +504,7 @@ function MembershipFee() {
                     <DialogActions>
                         <Button onClick={handleCloseConfirm}>Hủy</Button>
                         <Button onClick={handleOpenConfirm} autoFocus>
-                            Đồng ý
+                            Xác nhận
                         </Button>
                     </DialogActions>
                 </Dialog>

@@ -44,7 +44,7 @@ function EditRule({ rule, isOpen, handleClose, onSucess }) {
                 description: data.description,
             });
             onSucess && onSucess();
-            enqueueSnackbar(response.message, { variant: 'success' });
+            enqueueSnackbar('Sửa nội quy thành công', { variant: 'success' });
         } catch (error) {}
     };
 
@@ -91,7 +91,7 @@ function EditRule({ rule, isOpen, handleClose, onSucess }) {
                 </DialogContent>
                 <DialogActions>
                     <Button variant="outlined" onClick={handleClose}>
-                        Hủy bỏ
+                        Hủy
                     </Button>
                     <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
                         Xác nhận

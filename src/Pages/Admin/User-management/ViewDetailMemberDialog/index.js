@@ -513,7 +513,7 @@ const ViewDetailMemberDialog = ({ title, selectedStudent, isOpen, handleClose, o
                 <DialogActions>
                     {isEditable ? (
                         <>
-                            <Button onClick={handleClose}>Hủy bỏ</Button>
+                            <Button onClick={handleClose}>Hủy</Button>
                             <Button onClick={handleSubmit(onSubmit)} autoFocus>
                                 Xác nhận
                             </Button>

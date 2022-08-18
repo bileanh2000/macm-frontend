@@ -337,7 +337,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 {isEdit && (
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Button variant="outlined" onClick={handleOpenDialogCancel} sx={{ m: 1 }} disabled={!isEdit}>
-                            Hủy bỏ
+                            Hủy
                         </Button>
                         <Button variant="contained" onClick={handleOpenDialogSave} sx={{ m: 1 }} disabled={!isEdit}>
                             Lưu lại
@@ -380,7 +380,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                             Hủy
                         </Button>
                         <Button variant="contained" onClick={handleConfirmDelete} autoFocus>
-                            Đồng ý
+                            Xác nhận
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -443,10 +443,10 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                 </DialogContent>
                 <DialogActions>
                     <Button variant="outlined" onClick={handleCloseDialogSave}>
-                        Hủy bỏ
+                        Hủy
                     </Button>
                     <Button variant="contained" onClick={handleUpdate} autoFocus>
-                        Đồng ý
+                        Xác nhận
                     </Button>
                 </DialogActions>
             </Dialog>
