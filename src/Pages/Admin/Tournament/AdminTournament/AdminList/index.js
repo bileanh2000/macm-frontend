@@ -289,7 +289,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             sx={{
                 height: '70vh',
                 width: '100%',
-                mt: '1rem',
+                mt: '0.5em',
                 display: 'flex',
                 flexDirection: 'column',
                 // '& .role-edit::after': {
@@ -330,16 +330,26 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
         >
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 {!isUpdate && (
-                    <Button variant="outlined" sx={{ m: 1 }} onClick={() => setOpenDialogEdit(true)}>
+                    <Button variant="outlined" sx={{ m: 1, mt: 0 }} onClick={() => setOpenDialogEdit(true)}>
                         Chỉnh sửa vai trò của giải đấu
                     </Button>
                 )}
                 {isEdit && (
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <Button variant="outlined" onClick={handleOpenDialogCancel} sx={{ m: 1 }} disabled={!isEdit}>
+                        <Button
+                            variant="outlined"
+                            onClick={handleOpenDialogCancel}
+                            sx={{ m: 1, mt: 0 }}
+                            disabled={!isEdit}
+                        >
                             Hủy
                         </Button>
-                        <Button variant="contained" onClick={handleOpenDialogSave} sx={{ m: 1 }} disabled={!isEdit}>
+                        <Button
+                            variant="contained"
+                            onClick={handleOpenDialogSave}
+                            sx={{ m: 1, mt: 0 }}
+                            disabled={!isEdit}
+                        >
                             Lưu lại
                         </Button>
                     </Box>

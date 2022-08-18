@@ -178,7 +178,7 @@ function Rules() {
                             setCreateDialogOpen(false);
                         }}
                         onSucess={() => {
-                            setPage(1);
+                            setPage(total);
                             setIsRender(true);
                         }}
                     />
@@ -192,7 +192,7 @@ function Rules() {
                                 setEditDialogOpen(false);
                             }}
                             onSucess={() => {
-                                setPage(1);
+                                setPage(page);
                                 setIsRender(true);
                             }}
                         />

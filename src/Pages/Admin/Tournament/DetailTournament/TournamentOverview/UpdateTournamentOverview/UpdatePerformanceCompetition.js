@@ -139,7 +139,7 @@ function PerformanceCompetition(props) {
                                                     // handleOpenDialog();
                                                     handleEdit(data);
                                                 }}
-                                                disabled={isEdit || isChecked}
+                                                disabled={isEdit || isChecked || data.exhibitionTeams > 0}
                                             >
                                                 <Edit />
                                             </IconButton>
@@ -151,6 +151,7 @@ function PerformanceCompetition(props) {
                                                     // handleOpenDialog();
                                                     handleDelete(data.id);
                                                 }}
+                                                disabled={isEdit || isChecked || data.exhibitionTeams > 0}
                                             >
                                                 <Delete />
                                             </IconButton>

@@ -146,7 +146,7 @@ function TournamentSchedule({ isUpdate, tournamentStage }) {
         isRender && fetchTournamentSchedule(tournamentId);
         isRender && fetchCommonScheduleBySemester();
         setIsRender(false);
-    }, [scheduleList, commonList, isRender]);
+    }, [scheduleList, commonList, isRender, tournamentId]);
 
     const totalSchedule =
         commonList.length > 0 &&

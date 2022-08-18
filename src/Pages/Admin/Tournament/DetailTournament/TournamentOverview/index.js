@@ -73,17 +73,19 @@ function TournamentOverview({
                             {user.role.name === 'ROLE_HeadClub' ||
                             user.role.name === 'ROLE_HeadTechnique' ||
                             user.role.name === 'ROLE_ViceHeadTechnique' ||
-                            user.role.name === 'ROLE_ViceHeadClub' ||
-                            tournamentStage == 0 ? (
-                                <Button
-                                    variant="outlined"
-                                    startIcon={<Edit />}
-                                    sx={{ float: 'right' }}
-                                    onClick={() => setOpenEditDialog(true)}
-                                >
-                                    Chỉnh sửa
-                                </Button>
-                            ) : null}
+                            user.role.name === 'ROLE_ViceHeadClub'
+                                ? tournamentStage === 0 && (
+                                      <Button
+                                          variant="outlined"
+                                          startIcon={<Edit />}
+                                          sx={{ float: 'right' }}
+                                          onClick={() => setOpenEditDialog(true)}
+                                          disabled={tournamentStage !== 0}
+                                      >
+                                          Chỉnh sửa
+                                      </Button>
+                                  )
+                                : null}
 
                             {openEditDialog && (
                                 <UpdateTournamentOverview
@@ -228,14 +230,14 @@ function TournamentOverview({
                             </Typography>
                         </Grid> */}
 
-                        <Grid container columns={12} sx={{ mb: 2, ml: -4 }} spacing={6}>
+                        <Grid container columns={12} sx={{ mb: 2, ml: -4, mt: 0 }} spacing={6}>
                             <Grid item xs={12} md={4}>
+                                <Typography variant="body1">
+                                    <strong>Thi đấu đối kháng </strong>
+                                </Typography>
                                 <Paper elevation={3}>
                                     {tournament.competitiveTypes.length > 0 && (
                                         <TableContainer sx={{ maxHeight: 440 }}>
-                                            <Typography variant="body1">
-                                                <strong>Thi đấu đối kháng </strong>
-                                            </Typography>
                                             <Table stickyHeader aria-label="sticky table">
                                                 <TableHead>
                                                     <TableRow>
@@ -266,12 +268,12 @@ function TournamentOverview({
                                 </Paper>
                             </Grid>
                             <Grid item xs={12} md={8}>
+                                <Typography variant="body1">
+                                    <strong>Thi đấu biểu diễn </strong>
+                                </Typography>
                                 <Paper elevation={3}>
                                     {tournament.exhibitionTypes.length > 0 && (
                                         <TableContainer sx={{ maxHeight: 440 }}>
-                                            <Typography variant="body1">
-                                                <strong>Thi đấu biểu diễn </strong>
-                                            </Typography>
                                             <Table aria-label="sticky table">
                                                 <TableHead>
                                                     <TableRow>

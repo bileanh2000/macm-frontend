@@ -19,7 +19,7 @@ function AdminTournament({ isUpdate, user }) {
     let { tournamentId } = useParams();
     const [adminList, setAdminList] = useState([]);
     const [active, setActive] = useState(-1);
-    const [total, setTotal] = useState(-1);
+    const [total, setTotal] = useState(0);
     const [isRender, SetIsRender] = useState(true);
     const [value, setValue] = React.useState(0);
 
