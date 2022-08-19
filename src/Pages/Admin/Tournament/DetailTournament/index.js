@@ -38,6 +38,7 @@ import TournamentFee from './TournamentFee';
 import TournamentBacket from './TournamentBacket';
 import Preview from './TournamentSchedule/preview';
 import { IfAnyGranted } from 'react-authorization';
+import userTournamentAPI from 'src/api/userTournamentAPI';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -79,6 +80,7 @@ function DetailTournament() {
     const [isRender, setIsRender] = useState(true);
     const [valueTab, SetValueTabs] = useState(0);
     const [type, SetType] = useState(0);
+    const [roleInTournament, setRoleInTournament] = useState([]);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -122,6 +124,17 @@ function DetailTournament() {
             console.log('That bai roi huhu ', error);
         }
     };
+
+    const getRoleInTournament = async () => {
+        try {
+            const response = await userTournamentAPI.getAllOrginizingCommitteeRole(tournamentId);
+            setRoleInTournament(response.data);
+        } catch (error) {
+            console.log('Khong the lay duoc role', error);
+        }
+    };
+
+    isRender && getRoleInTournament();
 
     useEffect(() => {
         isRender && getTournamentById(tournamentId);
@@ -296,8 +309,11 @@ function DetailTournament() {
                             <TournamentOverview
                                 tournament={tournament}
                                 onUpdateTournament={handleUpdateTournament}
+                                tournamentStage={tournament.stage}
                                 value={value}
                                 index={0}
+                                roleInTournament={roleInTournament}
+                                schedule={scheduleList}
                                 startTime={scheduleList[0].date}
                                 isUpdate={isUpdate}
                                 onChangeTab={handleChangeTab}
@@ -307,7 +323,7 @@ function DetailTournament() {
                                 user.role.name === 'ROLE_HeadTechnique' ||
                                 user.role.name === 'ROLE_ViceHeadTechnique' ||
                                 user.role.name === 'ROLE_ViceHeadClub' ? (
-                                    <TournamentSchedule isUpdate={isUpdate} />
+                                    <TournamentSchedule isUpdate={isUpdate} tournamentStage={tournament.stage} />
                                 ) : (
                                     <Preview />
                                 )}
@@ -316,6 +332,7 @@ function DetailTournament() {
                                 <TournamentFee
                                     tournament={tournament}
                                     tournamentStatus={tournament.status}
+                                    tournamentStage={tournament.stage}
                                     isFinish={isFinish}
                                 />
                             </TabPanel>
@@ -326,6 +343,7 @@ function DetailTournament() {
                                 <MemberTournament
                                     tournament={tournament}
                                     tournamentStatus={tournament.status}
+                                    tournamentStage={tournament.stage}
                                     isUpdate={isUpdate}
                                 />
                             </TabPanel>
@@ -333,11 +351,13 @@ function DetailTournament() {
                                 <TournamentBacket
                                     tournament={tournament}
                                     tournamentStatus={tournament.status}
+                                    tournamentStage={tournament.stage}
                                     valueTab={valueTab}
                                     type={type}
                                     endDate={
                                         scheduleList.length > 0 && new Date(scheduleList[scheduleList.length - 1].date)
                                     }
+                                    changeData={() => setIsRender(true)}
                                 />
                             </TabPanel>
                         </Paper>

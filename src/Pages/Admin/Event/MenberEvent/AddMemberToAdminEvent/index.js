@@ -9,10 +9,11 @@ import {
     DialogTitle,
     Snackbar,
     TextField,
+    Tooltip,
     Typography,
 } from '@mui/material';
 import clsx from 'clsx';
-import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { Box } from '@mui/system';
 import { renderSelectEditCell } from './RenderSelectEditCell';
 import { useForm } from 'react-hook-form';
@@ -20,6 +21,7 @@ import eventApi from 'src/api/eventApi';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { Edit } from '@mui/icons-material';
 
 function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdate, user, Success }) {
     const [pageSize, setPageSize] = useState(30);
@@ -102,6 +104,16 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
             type: 'singleSelect',
             valueOptions: formatRoles.map((role) => role.roleName),
             // valueOptions: roleValueOptions,
+            renderCell: (params) => (
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>{params.value}</span>
+                    <Tooltip title="DoubleClick để chỉnh sửa vai trò">
+                        <span>
+                            <GridActionsCellItem icon={<Edit />} label="Edit" sx={{ ml: 2 }} />
+                        </span>
+                    </Tooltip>
+                </Box>
+            ),
             cellClassName: (params) => {
                 if (params.value == null) {
                     return '';
@@ -210,11 +222,12 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
                 sx={{
                     height: '70vh',
                     width: '100%',
-                    '& .role-edit::before': {
-                        // backgroundColor: 'red !important',
-                        content: "'\\270E'",
-                        // color: 'red',
-                        fontSize: '1.2rem',
+                    '& .role-edit:hover': {
+                        // backgroundColor: '#655151 !important',
+                        border: '1px dashed #655151',
+                        // content: "'\\270E'",
+                        // // color: 'red',
+                        // fontSize: '1.2rem',
                     },
                 }}
             >

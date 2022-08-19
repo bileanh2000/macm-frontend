@@ -189,7 +189,7 @@ function UpdateScoreTournament({ winner, match, handleClose, WinnerTemp, onChang
                     <Typography variant="body1" sx={{ color: 'red' }}>
                         <strong>
                             {winnerTemp.studentName} - {winnerTemp.studentId}
-                        </strong>
+                        </strong>{' '}
                         là người chiến thắng. Bạn xác nhận có đúng không?
                     </Typography>
                 )}

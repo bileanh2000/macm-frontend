@@ -268,7 +268,7 @@ function DetailTournament() {
     return (
         <Box sx={{ m: 1, p: 1 }}>
             <RegisterPlayer
-                title="Đăng kí tham gia thi đấu"
+                title="Đăng ký tham gia thi đấu"
                 userInformation={user}
                 isOpen={openDialog}
                 handleClose={() => {
@@ -284,11 +284,11 @@ function DetailTournament() {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Đăng kí tham gia ban tổ chức</DialogTitle>
+                <DialogTitle id="alert-dialog-title">Đăng ký tham gia ban tổ chức</DialogTitle>
                 {roleInTournament.length > 0 ? (
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            <Typography variant="caption">Bạn muốn đăng kí vào ban nào?</Typography>
+                            <Typography variant="caption">Bạn muốn đăng ký vào ban nào?</Typography>
                         </DialogContentText>
                         <form onSubmit={handleSubmit}>
                             <FormControl sx={{ m: 3 }} error={error} variant="standard">
@@ -318,7 +318,7 @@ function DetailTournament() {
                                         variant="contained"
                                         disabled={valueRadio == 0}
                                     >
-                                        Đăng kí
+                                        Đăng ký
                                     </Button>
                                     <Button sx={{ mt: 1, mr: 1 }} onClick={handleCloseDialogAdmin} variant="outlined">
                                         Hủy
@@ -398,7 +398,7 @@ function DetailTournament() {
                                                         sx={{ mr: 2, float: 'right' }}
                                                     >
                                                         {handleRegisterDeadline(0)
-                                                            ? 'Đăng kí thi đấu'
+                                                            ? 'Đăng ký thi đấu'
                                                             : 'Hết hạn đăng ký thi đấu'}
                                                     </Button>
                                                 )}
@@ -420,7 +420,7 @@ function DetailTournament() {
                                                         {isJoinAdmin.message.includes(
                                                             'Bạn chưa tham gia ban tổ chức giải đấu',
                                                         )
-                                                            ? 'Đăng kí vào ban tổ chức'
+                                                            ? 'Đăng ký vào ban tổ chức'
                                                             : isJoinAdmin.message + 'vào ban tổ chức'}
                                                     </Button>
                                                 )}
@@ -460,7 +460,11 @@ function DetailTournament() {
                             <AdminTournament />
                         </TabPanel>
                         <TabPanel value={value} index={3}>
-                            <MemberTournament competitive={isJoinCompetitive} exhibition={isJoinExhibition} />
+                            <MemberTournament
+                                tournament={tournament}
+                                competitive={isJoinCompetitive}
+                                exhibition={isJoinExhibition}
+                            />
                         </TabPanel>
                         <TabPanel value={value} index={4}>
                             <TournamentBracket

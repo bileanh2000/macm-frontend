@@ -82,7 +82,10 @@ function CustomMatchBracket(params) {
     }, [params.matches]);
 
     const onDragStart = (e, match, index, round, isFirst) => {
-        if (params.status !== 0) {
+        // if (params.status !== 0) {
+        //     return;
+        // }
+        if (params.stage > 2) {
             return;
         }
         if ((isFirst == 0 && match.firstPlayer == null) || (isFirst == 1 && match.secondPlayer == null)) {
@@ -95,7 +98,10 @@ function CustomMatchBracket(params) {
     };
 
     const onDragOver = (e) => {
-        if (params.status !== 0) {
+        // if (params.status !== 0) {
+        //     return;
+        // }
+        if (params.stage > 2) {
             return;
         }
         e.preventDefault();
@@ -104,14 +110,20 @@ function CustomMatchBracket(params) {
     };
 
     const onDragEnd = () => {
-        if (params.status !== 0) {
+        // if (params.status !== 0) {
+        //     return;
+        // }
+        if (params.stage > 2) {
             return;
         }
         setDragItem(null);
         setDragOverItem(null);
     };
     const onDragDrop = (e, match, index, round, isFirst) => {
-        if (params.status !== 0) {
+        // if (params.status !== 0) {
+        //     return;
+        // }
+        if (params.stage > 2) {
             return;
         }
         if ((isFirst == 0 && match.firstPlayer == null) || (isFirst == 1 && match.secondPlayer == null)) {
@@ -172,7 +184,7 @@ function CustomMatchBracket(params) {
     };
 
     const handleClickResult = (e, data) => {
-        if (params.status < 2) {
+        if (params.stage < 2) {
             return;
         }
         if (data.firstPlayer == null || data.secondPlayer == null) {
@@ -318,13 +330,13 @@ function CustomMatchBracket(params) {
                     </DialogActions> */}
                 </div>
             </Dialog>
-            {params.status === 3 && <Typography variant="caption">*Chọn vào 1 cặp trận để cập nhật tỉ số</Typography>}
-            {params.status === 2 && params.matches[params.matches.length - 1].area && (
+            {params.stage === 3 && <Typography variant="caption">*Chọn vào 1 cặp trận để cập nhật tỉ số</Typography>}
+            {params.stage >= 2 && params.matches[params.matches.length - 1].area && (
                 <Typography variant="caption">
-                    *Chọn vào 1 cặp trận để cập nhật thời gian và địa điểm thi đấu
+                    *Chọn vào 1 cặp trận để cập nhật thời gian, địa điểm thi đấu và tỉ số
                 </Typography>
             )}
-            {params.status < 2 ? (
+            {params.stage < 2 ? (
                 // !params.isCreate ? (
                 <Paper sx={{ p: 2 }}>
                     <Typography variant="caption">
@@ -421,7 +433,7 @@ function CustomMatchBracket(params) {
 
                                                     <Tooltip
                                                         title={
-                                                            params.status < 2
+                                                            params.stage < 2
                                                                 ? `${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`
                                                                 : match.firstPlayer?.point
                                                                 ? `${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`
@@ -473,7 +485,7 @@ function CustomMatchBracket(params) {
                                                     </Tooltip>
                                                     <Tooltip
                                                         title={
-                                                            params.status < 2
+                                                            params.stage < 2
                                                                 ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`
                                                                 : match.secondPlayer?.point
                                                                 ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`
@@ -562,7 +574,7 @@ function CustomMatchBracket(params) {
                                                     </div>
                                                     <Tooltip
                                                         title={
-                                                            params.status < 2
+                                                            params.stage < 2
                                                                 ? `${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`
                                                                 : match.firstPlayer?.point
                                                                 ? `${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`
@@ -592,7 +604,7 @@ function CustomMatchBracket(params) {
                                                     </Tooltip>
                                                     <Tooltip
                                                         title={
-                                                            params.status < 2
+                                                            params.stage < 2
                                                                 ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`
                                                                 : match.secondPlayer?.point
                                                                 ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`

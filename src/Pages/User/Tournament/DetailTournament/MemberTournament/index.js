@@ -52,6 +52,7 @@ function MemberTournament(props) {
         try {
             const response = await adminTournamentAPI.getAllExhibitionType(tournamentId);
             setListExhibitionType(response.data);
+            setExhibitionType(response.data[0].id);
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -108,8 +109,8 @@ function MemberTournament(props) {
                     Danh sách thành viên tham gia
                 </Typography>
             </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                <FormControl size="small">
+            <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 2 }}>
+                <FormControl size="small" sx={{ mr: 2 }}>
                     <Typography variant="caption">Nội dung thi đấu</Typography>
                     <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
                         <MenuItem value={1}>Đối kháng</MenuItem>
@@ -117,25 +118,34 @@ function MemberTournament(props) {
                     </Select>
                 </FormControl>
                 {type === 1 ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                        <FormControl size="small">
-                            <Typography variant="caption">Hạng cân</Typography>
-                            <Select
-                                id="demo-simple-select"
-                                value={weightRange}
-                                displayEmpty
-                                onChange={handleChangeWeight}
-                            >
-                                {listWeightRange &&
-                                    listWeightRange.map((range) => (
-                                        <MenuItem value={range.id} key={range.id}>
-                                            {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
-                                        </MenuItem>
-                                    ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-                ) : (
+                    props.tournament.competitiveTypes.length > 0 ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
+                            <FormControl size="small">
+                                <Typography variant="caption">Hạng cân</Typography>
+                                <Select
+                                    id="demo-simple-select"
+                                    value={weightRange}
+                                    displayEmpty
+                                    onChange={handleChangeWeight}
+                                >
+                                    {listWeightRange &&
+                                        listWeightRange.map((range) => (
+                                            <MenuItem value={range.id} key={range.id}>
+                                                {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax}{' '}
+                                                Kg
+                                            </MenuItem>
+                                        ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    ) : (
+                        <Box sx={{ display: 'flex' }}>
+                            <Typography variant="body1" sx={{ m: 'auto' }}>
+                                Giải đấu không tổ chức thi đấu đối kháng
+                            </Typography>
+                        </Box>
+                    )
+                ) : props.tournament.exhibitionTypes.length > 0 ? (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
                         <FormControl size="small">
                             <Typography variant="caption">Thể thức thi đấu</Typography>
@@ -145,9 +155,6 @@ function MemberTournament(props) {
                                 displayEmpty
                                 onChange={handleChangeExhibitionType}
                             >
-                                <MenuItem value={0}>
-                                    <em>Tất cả</em>
-                                </MenuItem>
                                 {listExhibitionType &&
                                     listExhibitionType.map((type) => (
                                         <MenuItem value={type.id} key={type.id}>
@@ -156,6 +163,12 @@ function MemberTournament(props) {
                                     ))}
                             </Select>
                         </FormControl>
+                    </Box>
+                ) : (
+                    <Box sx={{ display: 'flex' }}>
+                        <Typography variant="body1" sx={{ m: 'auto' }}>
+                            Giải đấu không tổ chức thi đấu biểu diễn
+                        </Typography>
                     </Box>
                 )}
             </Box>

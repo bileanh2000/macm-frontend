@@ -129,8 +129,7 @@ function RegisterPlayer({
     };
     const getAllMember = async () => {
         try {
-            const response = await userApi.getAllMember();
-            console.log(response.data);
+            const response = await adminTournament.listUserNotJoinExhibition(exhibitionType);
             setAllMember(response.data);
         } catch (error) {
             console.log('khong the lay data');
@@ -394,7 +393,7 @@ function RegisterPlayer({
                                             {dataMale.map((data, index) => (
                                                 <TableRow key={index}>
                                                     <TableCell align="center">{data.studentId}</TableCell>
-                                                    <TableCell align="center">{data.studentName}</TableCell>
+                                                    <TableCell align="center">{data.name}</TableCell>
                                                     <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
                                                     <TableCell>
                                                         {data.studentId === userInformation.studentId ? (
@@ -449,7 +448,7 @@ function RegisterPlayer({
                                             {dataFemale.map((data, index) => (
                                                 <TableRow key={index}>
                                                     <TableCell align="center">{data.studentId}</TableCell>
-                                                    <TableCell align="center">{data.studentName}</TableCell>
+                                                    <TableCell align="center">{data.name}</TableCell>
                                                     <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
                                                     <TableCell>
                                                         {data.studentId === userInformation.studentId ? (

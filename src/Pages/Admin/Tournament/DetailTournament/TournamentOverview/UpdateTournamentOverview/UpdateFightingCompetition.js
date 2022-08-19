@@ -274,7 +274,7 @@ function UpdateFightingCompetition(props) {
                                                     // handleOpenDialog();
                                                     handleEdit(data);
                                                 }}
-                                                disabled={isEdit || isChecked}
+                                                disabled={isEdit || isChecked || !data.canDelete}
                                             >
                                                 <Edit />
                                             </IconButton>
@@ -286,6 +286,7 @@ function UpdateFightingCompetition(props) {
                                                     // handleOpenDialog();
                                                     handleDelete(data.id);
                                                 }}
+                                                disabled={isEdit || isChecked || !data.canDelete}
                                             >
                                                 <Delete />
                                             </IconButton>

@@ -49,6 +49,7 @@ function Tournament() {
 
     const handleChangeStatus = (event) => {
         setStatus(event.target.value);
+        setIsRender(true);
     };
 
     const calendarFilter = (date) => {
@@ -147,6 +148,7 @@ function Tournament() {
     useEffect(() => {
         isRender && getListTournamentBySemester(semester, status);
         // fetchCommonScheduleBySemester();
+        isRender && getAllTournamentSchedule();
         setIsRender(false);
     }, [semester, status, tournaments, isRender]);
 
@@ -175,7 +177,7 @@ function Tournament() {
         //         fullWidth
         //         maxWidth="md"
         //     >
-        //         <DialogTitle id="alert-dialog-title">Sự kiện đã kết thúc</DialogTitle>
+        //         <DialogTitle id="alert-dialog-title">giải đấu đã kết thúc</DialogTitle>
         //         <DialogContent>
         //             {tournaments && tournaments.filter((t) => t.status === 1).length > 0 ? (
         //                 tournaments
@@ -188,7 +190,7 @@ function Tournament() {
         //                         />
         //                     ))
         //             ) : (
-        //                 <DialogContentText>Không có sự kiện đã kết thúc</DialogContentText>
+        //                 <DialogContentText>Không có giải đấu đã kết thúc</DialogContentText>
         //             )}
         //         </DialogContent>
         //         <DialogActions>
@@ -241,10 +243,10 @@ function Tournament() {
                     onClose={handleCloseDialogTournament}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
-                    fullWidth
-                    maxWidth="md"
+                    // fullWidth
+                    // maxWidth="md"
                 >
-                    <DialogTitle id="alert-dialog-title">Sự kiện đã kết thúc</DialogTitle>
+                    <DialogTitle id="alert-dialog-title">Giải đấu đã kết thúc</DialogTitle>
                     <DialogContent>
                         {tournaments && tournaments.filter((t) => t.status === 1).length > 0 ? (
                             tournaments
@@ -257,7 +259,7 @@ function Tournament() {
                                     />
                                 ))
                         ) : (
-                            <DialogContentText>Không có sự kiện đã kết thúc</DialogContentText>
+                            <DialogContentText>Không có giải đấu đã kết thúc</DialogContentText>
                         )}
                     </DialogContent>
                     <DialogActions>
@@ -374,8 +376,10 @@ function Tournament() {
                         {tournaments ? (
                             <Box>
                                 {tournaments.filter((t) => t.status === 2).length > 0 ? (
-                                    <Paper elevation={1} sx={{ backgroundColor: '#fcfeff', p: 2 }}>
-                                        <Typography variant="body1">Giải đấu đang diễn ra</Typography>
+                                    <Box>
+                                        <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                            Giải đấu đang diễn ra
+                                        </Typography>
                                         <Divider />
                                         {tournaments
                                             .filter((t) => t.status === 2)
@@ -387,14 +391,16 @@ function Tournament() {
                                                     onSuccess={() => setIsRender(true)}
                                                 />
                                             ))}
-                                    </Paper>
+                                    </Box>
                                 ) : (
                                     ''
                                 )}
 
                                 {tournaments.filter((t) => t.status === 3).length > 0 ? (
-                                    <Paper elevation={1} sx={{ backgroundColor: '#fcfeff', p: 2 }}>
-                                        <Typography variant="body1">Giải đấu sắp tới</Typography>
+                                    <Box>
+                                        <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                            Giải đấu sắp tới
+                                        </Typography>
                                         <Divider />
                                         {tournaments
                                             .filter((t) => t.status === 3)
@@ -406,7 +412,7 @@ function Tournament() {
                                                     onSuccess={() => setIsRender(true)}
                                                 />
                                             ))}
-                                    </Paper>
+                                    </Box>
                                 ) : (
                                     ''
                                 )}

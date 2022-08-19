@@ -8,7 +8,7 @@ import MemberList from './MemberList';
 import RegisterExhibition from './RegisterExhibition';
 import RegisterPlayer from './RegisterPlayer';
 
-function MemberTournament({ tournament, isUpdate }) {
+function MemberTournament({ tournament, isUpdate, tournamentStage }) {
     let { tournamentId } = useParams();
     const [type, setType] = useState(1);
     const { enqueueSnackbar } = useSnackbar();
@@ -88,6 +88,7 @@ function MemberTournament({ tournament, isUpdate }) {
         try {
             const response = await adminTournamentAPI.getListPlayerBracket(weightRange);
             if (response.data.length > 0) {
+                console.log(response.data);
                 setCompetitivePlayer(response.data[0].listPlayers);
                 setIsCreate(response.data[0].changed);
                 setTournamentStatus(response.data[0].status);
@@ -100,7 +101,6 @@ function MemberTournament({ tournament, isUpdate }) {
     const fetchExhibitionTeam = async (params, exhibitionType) => {
         try {
             const response = await adminTournamentAPI.getAllExhibitionTeam(params, exhibitionType);
-            console.log('fetchExhibitionTeam', response);
             setExhibitionTeam(response.data);
             setIsRender(false);
         } catch (error) {
@@ -123,78 +123,58 @@ function MemberTournament({ tournament, isUpdate }) {
 
     return (
         <Fragment>
-            {competitivePlayer && exhibitionTeam && (
-                <Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <FormControl size="small">
-                            <Typography variant="caption">Nội dung thi đấu</Typography>
-                            <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
-                                <MenuItem value={1}>Đối kháng</MenuItem>
-                                <MenuItem value={2}>Biểu diễn</MenuItem>
-                            </Select>
-                        </FormControl>
-                        {type === 1 ? (
-                            tournament.competitiveTypes.length > 0 ? (
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                                    {!isUpdate && tournamentStatus < 2 && (
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'flex-end',
-                                            }}
-                                        >
-                                            <Button
-                                                variant="outlined"
-                                                sx={{ mr: 2 }}
-                                                onClick={() => handleOpenDialog(true)}
-                                            >
-                                                Thêm vận động viên thi đấu đối kháng
-                                            </Button>
-                                            {/* <Button
-                                                variant="outlined"
-                                                sx={{ mr: 2 }}
-                                                onClick={() => handleCreateMatches()}
-                                                disabled={!isCreate}
-                                            >
-                                                Tạo bảng thi đấu
-                                            </Button> */}
-                                        </Box>
-                                    )}
-                                    {/* <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialog(true)}>
+            <Box sx={{ minHeight: '60vh' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <FormControl size="small" sx={{ mr: 2, minWidth: '10rem' }}>
+                        <Typography variant="caption">Nội dung thi đấu</Typography>
+                        <Select
+                            id="demo-simple-select"
+                            value={type}
+                            displayEmpty
+                            onChange={handleChangeType}
+                            sx={{ minWidth: '10rem' }}
+                        >
+                            <MenuItem value={1}>Đối kháng</MenuItem>
+                            <MenuItem value={2}>Biểu diễn</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {type === 1 ? (
+                        tournament.competitiveTypes.length > 0 ? (
+                            <Box
+                                sx={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'flex-end',
+                                }}
+                            >
+                                {/* <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialog(true)}>
                                         Thêm vận động viên thi đấu đối kháng
                                     </Button> */}
-                                    <FormControl size="small">
-                                        <Typography variant="caption">Hạng cân</Typography>
-                                        <Select
-                                            id="demo-simple-select"
-                                            value={weightRange}
-                                            displayEmpty
-                                            onChange={handleChangeWeight}
-                                        >
-                                            {/* <MenuItem value={0}>
+                                <FormControl size="small">
+                                    <Typography variant="caption">Hạng cân</Typography>
+                                    <Select
+                                        id="demo-simple-select"
+                                        value={weightRange}
+                                        displayEmpty
+                                        onChange={handleChangeWeight}
+                                    >
+                                        {/* <MenuItem value={0}>
                                         <em>Tất cả</em>
                                     </MenuItem> */}
-                                            {listWeightRange &&
-                                                listWeightRange.map((range) => (
-                                                    <MenuItem value={range.id} key={range.id}>
-                                                        {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} -{' '}
-                                                        {range.weightMax} Kg
-                                                    </MenuItem>
-                                                ))}
-                                        </Select>
-                                    </FormControl>
-                                </Box>
-                            ) : (
-                                <Box>
-                                    <Typography variant="h5">Không tổ chức thi đấu đối kháng</Typography>
-                                </Box>
-                            )
-                        ) : tournament.exhibitionTypes.length > 0 ? (
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                                {!isUpdate && tournamentStatus < 2 && (
+                                        {listWeightRange &&
+                                            listWeightRange.map((range) => (
+                                                <MenuItem value={range.id} key={range.id}>
+                                                    {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} -{' '}
+                                                    {range.weightMax} Kg
+                                                </MenuItem>
+                                            ))}
+                                    </Select>
+                                </FormControl>
+                                {!isUpdate && tournamentStage == 0 && (
                                     <Box
                                         sx={{
+                                            // width: '100%',
                                             display: 'flex',
                                             justifyContent: 'space-between',
                                             alignItems: 'flex-end',
@@ -203,66 +183,113 @@ function MemberTournament({ tournament, isUpdate }) {
                                         <Button
                                             variant="outlined"
                                             sx={{ mr: 2 }}
-                                            onClick={() => handleOpenDialogExhibition(true)}
+                                            onClick={() => handleOpenDialog(true)}
                                         >
-                                            Thêm vận động viên thi đấu biểu diễn
+                                            Thêm vận động viên thi đấu đối kháng
                                         </Button>
                                         {/* <Button
+                                                variant="outlined"
+                                                sx={{ mr: 2 }}
+                                                onClick={() => handleCreateMatches()}
+                                                disabled={!isCreate}
+                                            >
+                                                Tạo bảng thi đấu
+                                            </Button> */}
+                                    </Box>
+                                )}
+                            </Box>
+                        ) : (
+                            <Box sx={{ display: 'flex' }}>
+                                <Typography variant="body1" sx={{ m: 'auto' }}>
+                                    Giải đấu không tổ chức thi đấu đối kháng
+                                </Typography>
+                            </Box>
+                        )
+                    ) : tournament.exhibitionTypes.length > 0 ? (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-end',
+                                width: '100%',
+                            }}
+                        >
+                            <FormControl size="small">
+                                <Typography variant="caption">Thể thức thi đấu</Typography>
+                                <Select
+                                    id="demo-simple-select"
+                                    value={exhibitionType}
+                                    displayEmpty
+                                    onChange={handleChangeExhibitionType}
+                                >
+                                    {listExhibitionType &&
+                                        listExhibitionType.map((type) => (
+                                            <MenuItem value={type.id} key={type.id}>
+                                                {type.name}
+                                            </MenuItem>
+                                        ))}
+                                </Select>
+                            </FormControl>
+                            {!isUpdate && tournamentStage == 0 && (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'flex-end',
+                                    }}
+                                >
+                                    <Button
+                                        variant="outlined"
+                                        sx={{ mr: 2 }}
+                                        onClick={() => handleOpenDialogExhibition(true)}
+                                    >
+                                        Thêm vận động viên thi đấu biểu diễn
+                                    </Button>
+                                    {/* <Button
                                     variant="outlined"
                                     sx={{ mr: 2 }}
                                     // onClick={() => handleOpenDialogExhibition(true)}
                                 >
                                     Tạo bảng thi đấu
                                 </Button> */}
-                                    </Box>
-                                )}
-                                <FormControl size="small">
-                                    <Typography variant="caption">Thể thức thi đấu</Typography>
-                                    <Select
-                                        id="demo-simple-select"
-                                        value={exhibitionType}
-                                        displayEmpty
-                                        onChange={handleChangeExhibitionType}
-                                    >
-                                        {listExhibitionType &&
-                                            listExhibitionType.map((type) => (
-                                                <MenuItem value={type.id} key={type.id}>
-                                                    {type.name}
-                                                </MenuItem>
-                                            ))}
-                                    </Select>
-                                </FormControl>
-                            </Box>
-                        ) : (
-                            <Box>
-                                <Typography variant="h5">Không tổ chức thi đấu biểu diễn</Typography>
-                            </Box>
-                        )}
-                    </Box>
-                    {type == 1 && tournament.competitiveTypes.length > 0 && competitivePlayer && (
-                        <MemberList
-                            data={competitivePlayer}
-                            type={type}
-                            onChange={() => {
-                                return setIsRenderCompe(true);
-                            }}
-                            isUpdate={isUpdate}
-                            tournamentStatus={tournamentStatus}
-                            listExhibitionType={listExhibitionType}
-                        />
+                                </Box>
+                            )}
+                        </Box>
+                    ) : (
+                        <Box sx={{ display: 'flex' }}>
+                            <Typography variant="body1" sx={{ m: 'auto' }}>
+                                Giải đấu không tổ chức thi đấu biểu diễn
+                            </Typography>
+                        </Box>
                     )}
-                    {type == 2 && tournament.exhibitionTypes.length > 0 > 0 && exhibitionTeam && (
-                        <MemberList
-                            data={exhibitionTeam}
-                            type={type}
-                            onChange={() => {
-                                return setIsRender(true);
-                            }}
-                            isUpdate={isUpdate}
-                            tournamentStatus={tournamentStatus}
-                            listExhibitionType={listExhibitionType}
-                        />
-                    )}
+                </Box>
+                {type == 1 && tournament.competitiveTypes.length > 0 && competitivePlayer && (
+                    <MemberList
+                        data={competitivePlayer}
+                        type={type}
+                        onChange={() => {
+                            return setIsRenderCompe(true);
+                        }}
+                        isUpdate={isUpdate}
+                        tournamentStatus={tournamentStatus}
+                        tournamentStage={tournamentStage}
+                        listExhibitionType={listExhibitionType}
+                    />
+                )}
+                {type == 2 && tournament.exhibitionTypes.length > 0 && exhibitionTeam && (
+                    <MemberList
+                        data={exhibitionTeam}
+                        type={type}
+                        onChange={() => {
+                            return setIsRender(true);
+                        }}
+                        isUpdate={isUpdate}
+                        tournamentStage={tournamentStage}
+                        tournamentStatus={tournamentStatus}
+                        listExhibitionType={listExhibitionType}
+                    />
+                )}
+                {tournament.competitiveTypes.length > 0 && competitivePlayer && (
                     <RegisterPlayer
                         title="Đăng kí tham gia thi đấu"
                         isOpen={openDialog}
@@ -282,6 +309,8 @@ function MemberTournament({ tournament, isUpdate }) {
                             return setIsRenderCompe(true);
                         }}
                     />
+                )}
+                {tournament.exhibitionTypes.length > 0 && exhibitionTeam && (
                     <RegisterExhibition
                         title="Đăng kí tham gia biểu diễn"
                         isOpen={openDialogExhibition}
@@ -297,8 +326,8 @@ function MemberTournament({ tournament, isUpdate }) {
                             return setIsRender(true);
                         }}
                     />
-                </Box>
-            )}
+                )}
+            </Box>
         </Fragment>
     );
 }

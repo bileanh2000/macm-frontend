@@ -44,7 +44,7 @@ import { useSnackbar } from 'notistack';
 import adminTournament from 'src/api/adminTournamentAPI';
 import UpdateExhibitionTeam from './UpdateExhibitionTeam';
 
-function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhibitionType }) {
+function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhibitionType, tournamentStage }) {
     const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
     const [openDelete, setOpenDelete] = useState(false);
@@ -92,7 +92,6 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
     };
 
     const deleteUser = (competitivePlayerId) => {
-        console.log(competitivePlayerId);
         setCompetitivePlayerId(competitivePlayerId);
         setOpenDelete(true);
     };
@@ -107,7 +106,6 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
     };
 
     const updateWeight = (competitivePlayerId) => {
-        console.log(competitivePlayerId);
         setCompetitivePlayerId(competitivePlayerId);
         setOpenUpdate(true);
     };
@@ -133,7 +131,6 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                 return { name: m.playerName, gender: m.playerGender, studentId: m.playerStudentId };
             }),
         };
-        console.log(newData);
         setExhibitionTeam(newData);
         setOpenDialogExhibition(true);
     };
@@ -203,18 +200,18 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                 type: 'actions',
                 flex: 0.8,
                 getActions: (params) => [
-                    <Tooltip title={!isUpdate && tournamentStatus < 2 ? 'Cập nhật cân nặng' : 'Quá thời gian cập nhật'}>
+                    <Tooltip title={!isUpdate && tournamentStage < 2 ? 'Cập nhật cân nặng' : 'Quá thời gian cập nhật'}>
                         <GridActionsCellItem
                             icon={<Edit />}
                             label="Edit weight"
                             onClick={() => updateWeight(params.row)}
                             // showInMenu
-                            disabled={isUpdate || tournamentStatus > 2}
+                            disabled={isUpdate || tournamentStage >= 2}
                         />
                     </Tooltip>,
                     <Tooltip
                         title={
-                            !isUpdate && tournamentStatus < 2
+                            !isUpdate && tournamentStatus < 1
                                 ? 'Xóa người vận động viên khỏi bảng đấu'
                                 : 'Quá thời gian cập nhật'
                         }
@@ -223,7 +220,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                             icon={<Delete />}
                             label="Delete"
                             onClick={() => deleteUser(params.row)}
-                            disabled={isUpdate || tournamentStatus > 2}
+                            disabled={isUpdate || tournamentStage >= 1}
                         />
                     </Tooltip>,
                 ],
@@ -258,7 +255,9 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     <GridToolbarQuickFilter />
                 </Box>
                 <Box>
-                    <Typography>Số lượng vận động viên: {data.length}</Typography>
+                    <Typography>
+                        Số lượng vận động viên: {data.length} <small>(cần tối thiểu 4 người)</small>
+                    </Typography>
                 </Box>
             </GridToolbarContainer>
         );
@@ -340,7 +339,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
     });
 
     function Row(props) {
-        const { row, status, index } = props;
+        const { row, status, stage, index } = props;
         const [open, setOpen] = React.useState(false);
 
         return (
@@ -364,7 +363,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     </TableCell>
                     <TableCell align="left">{row.teamName}</TableCell>
                     <TableCell align="left">{row.exhibitionTypeName}</TableCell>
-                    {status <= 2 && (
+                    {stage < 1 && (
                         <TableCell align="left">
                             <Tooltip title="Chỉnh sửa thông tin đội tham gia">
                                 <Chip
@@ -418,50 +417,59 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
     return (
         <Box
             sx={{
-                height: '70vh',
+                minHeight: '70vh',
                 width: '100%',
-                '& .status-rows': {
-                    justifyContent: 'center !important',
-                    minHeight: '0px !important',
-                    maxHeight: '35px !important',
-                    borderRadius: '100px',
-                    position: 'relative',
-                    top: '9px',
-                },
-                '& .status-rows.active': {
-                    backgroundColor: '#56f000',
-                    color: '#fff',
-                    fontWeight: '600',
-                    textAlign: 'center',
-                    // minWidth: '80px !important',
-                },
-                '& .status-rows.deactive': {
-                    backgroundColor: '#ff3838',
-                    color: '#fff',
-                    fontWeight: '600',
-                    // minWidth: '80px !important',
-                },
             }}
         >
             {type === 1 ? (
-                <DataGrid
-                    // loading={data.length === 0}
-                    disableSelectionOnClick={true}
-                    rows={rowsPlayer}
-                    columns={columns}
-                    pageSize={pageSize}
-                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                    rowsPerPageOptions={[10, 20, 30]}
-                    components={{
-                        Toolbar: CustomToolbar,
-                        NoRowsOverlay: CustomNoRowsOverlay,
+                <Box
+                    sx={{
+                        height: '70vh',
+                        width: '100%',
+                        '& .status-rows': {
+                            justifyContent: 'center !important',
+                            minHeight: '0px !important',
+                            maxHeight: '35px !important',
+                            borderRadius: '100px',
+                            position: 'relative',
+                            top: '9px',
+                        },
+                        '& .status-rows.active': {
+                            backgroundColor: '#56f000',
+                            color: '#fff',
+                            fontWeight: '600',
+                            textAlign: 'center',
+                            // minWidth: '80px !important',
+                        },
+                        '& .status-rows.deactive': {
+                            backgroundColor: '#ff3838',
+                            color: '#fff',
+                            fontWeight: '600',
+                            // minWidth: '80px !important',
+                        },
                     }}
-                />
+                >
+                    <DataGrid
+                        // loading={data.length === 0}
+                        disableSelectionOnClick={true}
+                        rows={rowsPlayer}
+                        columns={columns}
+                        pageSize={pageSize}
+                        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                        rowsPerPageOptions={[10, 20, 30]}
+                        components={{
+                            Toolbar: CustomToolbar,
+                            NoRowsOverlay: CustomNoRowsOverlay,
+                        }}
+                    />
+                </Box>
             ) : (
                 <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 650 }} aria-label="caption table">
                         <caption>
-                            <Typography>Số lượng đội thi đấu: {data.length}</Typography>
+                            <Typography>
+                                Số lượng đội thi đấu: {data.length} <small>(cần tối thiểu 3 đội)</small>
+                            </Typography>
                         </caption>
                         <TableHead>
                             <TableRow>
@@ -479,7 +487,13 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                                 ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 : data
                             ).map((row, index) => (
-                                <Row key={row.id} row={row} status={tournamentStatus} index={index} />
+                                <Row
+                                    key={row.id}
+                                    row={row}
+                                    status={tournamentStatus}
+                                    stage={tournamentStage}
+                                    index={index}
+                                />
                             ))}
                             {emptyRows > 0 && (
                                 <TableRow style={{ height: 53 * emptyRows }}>

@@ -35,7 +35,6 @@ import { useSnackbar } from 'notistack';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
 function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhibitionId }) {
-    console.log(exhibitionId);
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [exhibitionType, setExhibitionType] = useState(exhibitionId);
@@ -72,7 +71,6 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
     });
 
     const handleChangeExhibitionType = (event) => {
-        console.log(event.target.value);
         setExhibitionType(event.target.value);
         let exType;
         if (event.target.value === 0) {
@@ -141,12 +139,10 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
 
     const handleDelete = (data) => {
         let newData;
-        console.log(data, dataMale, dataFemale);
         if (data.gender) {
             newData = dataMale.filter((d) => {
                 return d.studentId !== data.studentId;
             });
-            console.log(newData);
             setDataMale(newData);
         } else {
             newData = dataFemale.filter((d) => {

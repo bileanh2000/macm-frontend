@@ -123,9 +123,8 @@ function TableMatch(params) {
     };
 
     function Row(props) {
-        const { row, status, index } = props;
+        const { row, status, stage, index } = props;
         const [open, setOpen] = React.useState(false);
-
         return (
             <React.Fragment>
                 <TableRow>
@@ -149,7 +148,7 @@ function TableMatch(params) {
                     <TableCell align="left">{moment(row.time).format('HH:mm  -  DD/MM')}</TableCell>
                     <TableCell align="left">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
                     {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
-                    {status >= 2 && (
+                    {(stage >= 3 || stage >= 2) && (
                         <TableCell align="left">
                             <Chip
                                 icon={<Update />}
@@ -159,7 +158,7 @@ function TableMatch(params) {
                             />
                         </TableCell>
                     )}
-                    {status >= 2 && (
+                    {(stage >= 3 || stage >= 2) && (
                         <TableCell align="left">
                             <Chip
                                 icon={<SportsScore />}
@@ -306,13 +305,13 @@ function TableMatch(params) {
                             <TableCell align="left">Thời gian thi đấu</TableCell>
                             <TableCell align="left">Điểm số</TableCell>
                             {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
-                            {params.status === 3 && <TableCell align="left"></TableCell>}
-                            {params.status === 3 && <TableCell align="left"></TableCell>}
+                            {(params.stage === 2 || params.stage === 3) && <TableCell align="left"></TableCell>}
+                            {(params.stage === 2 || params.stage === 3) && <TableCell align="left"></TableCell>}
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {params.matches.map((row, index) => (
-                            <Row key={row.id} row={row} status={params.status} index={index} />
+                            <Row key={row.id} row={row} status={params.status} stage={params.stage} index={index} />
                         ))}
                     </TableBody>
                 </Table>

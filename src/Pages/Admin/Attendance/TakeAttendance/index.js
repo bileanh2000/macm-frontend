@@ -17,6 +17,7 @@ function TakeAttendance() {
     const [scheduleId, setScheduleId] = useState(0);
     const history = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
+    const [title, setTitle] = useState('');
 
     const _type = location.state?.type;
     const _trainingScheduleId = location.state?.id;
@@ -25,8 +26,6 @@ function TakeAttendance() {
     let attendance = userList.reduce((attendaceCount, user) => {
         return user.status == 1 ? attendaceCount + 1 : attendaceCount;
     }, 0);
-
-    console.log(moment(new Date(_nowDate)).format('DD/MM/yyyy'), _nowDate);
 
     const getAttendanceByStudentId = async () => {
         try {
@@ -44,7 +43,7 @@ function TakeAttendance() {
             let response;
             if (_type == 0) {
                 adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
-                    console.log(res);
+                    setTitle('buổi tập');
                     setScheduleId(res.data[0].id);
                     adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
                         setUserList(res.data);
@@ -53,6 +52,7 @@ function TakeAttendance() {
             }
             if (_type == 1) {
                 adminAttendanceAPI.getEventSessionByDate(_nowDate).then((res) => {
+                    setTitle(res.data[0].event.name);
                     setEventId(res.data[0].event.id);
                     adminAttendanceAPI.getAttendanceByEventId(res.data[0].event.id).then((res) => {
                         setUserList(res.data);
@@ -226,7 +226,7 @@ function TakeAttendance() {
                     <GridToolbarQuickFilter />
                 </Box>
                 <Typography variant="body1">
-                    Số người tham gia hôm nay {attendance}/{userList.length}
+                    Số người tham gia điểm danh {attendance}/{userList.length}
                 </Typography>
             </GridToolbarContainer>
         );
@@ -293,7 +293,7 @@ function TakeAttendance() {
     return (
         <Box sx={{ m: 1, p: 1 }}>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                Điểm danh ngày: {_nowDate}
+                Điểm danh {_type == 0 ? title : 'sự kiện ' + title} ngày: {_nowDate}
             </Typography>
             <Divider sx={{ mb: 2 }} />
             <Box component="form" onSubmit={handleSubmit(onSubmit)}>

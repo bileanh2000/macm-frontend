@@ -7,21 +7,22 @@ import AdminList from './AdminList';
 function AdminTournament() {
     let { tournamentId } = useParams();
     const [adminList, setAdminList] = useState([]);
+    const [isRender, SetIsRender] = useState(true);
 
     const fetchAdminInTournament = async (params) => {
         try {
             const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
             console.log(response);
-            const newUser = response.data.filter((user) => user.registerStatus === 'Đã chấp nhận');
-            setAdminList(newUser);
+            setAdminList(response.data);
         } catch (error) {
             console.log('Failed to fetch admin list: ', error);
         }
     };
 
     useEffect(() => {
-        fetchAdminInTournament(tournamentId);
-    }, []);
+        isRender && fetchAdminInTournament(tournamentId);
+        SetIsRender(false);
+    }, [tournamentId, adminList, isRender]);
 
     return <AdminList data={adminList} />;
 }

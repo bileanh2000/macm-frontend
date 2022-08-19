@@ -86,7 +86,7 @@ export const CustomTrainingSchedule = styled.div`
     width: 70%;
 `;
 
-function TournamentSchedule({ isUpdate }) {
+function TournamentSchedule({ isUpdate, tournamentStage }) {
     const calendarComponentRef = useRef(null);
     const nowDate = new Date();
     let { tournamentId } = useParams();
@@ -146,7 +146,7 @@ function TournamentSchedule({ isUpdate }) {
         isRender && fetchTournamentSchedule(tournamentId);
         isRender && fetchCommonScheduleBySemester();
         setIsRender(false);
-    }, [scheduleList, commonList, isRender]);
+    }, [scheduleList, commonList, isRender, tournamentId]);
 
     const totalSchedule =
         commonList.length > 0 &&
@@ -259,7 +259,7 @@ function TournamentSchedule({ isUpdate }) {
     };
 
     const navigateToUpdate = (params, date) => {
-        if (isUpdate) {
+        if (isUpdate || tournamentStage != 0) {
             return;
         }
         console.log(params);
@@ -281,7 +281,7 @@ function TournamentSchedule({ isUpdate }) {
     };
 
     const navigateToCreate = (date) => {
-        if (isUpdate) {
+        if (isUpdate || tournamentStage != 0) {
             return;
         }
         console.log(date);

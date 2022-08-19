@@ -25,7 +25,6 @@ import adminRuleAPI from 'src/api/adminRuleAPI';
 import CreateRule from './CreateRule/CreateRule';
 import EditRule from './EditRule/EditRule';
 
-import ListRule from '../Rules/ViewRule/ListRule';
 import { IfAnyGranted } from 'react-authorization';
 
 function Rules() {
@@ -57,6 +56,7 @@ function Rules() {
 
     const handleChange = (event, value) => {
         setPage(value);
+        setIsRender(true);
     };
 
     const getListRules = async (pageNo) => {
@@ -65,6 +65,7 @@ function Rules() {
             setRules(response.data);
             setTotal(response.totalPage);
             setPageSize(response.pageSize);
+            setIsRender(false);
         } catch (error) {
             console.log('Lấy dữ liệu rule thất bại', error);
         }
@@ -74,7 +75,6 @@ function Rules() {
     useEffect(() => {
         isRender && getListRules(page - 1);
         window.scrollTo({ behavior: 'smooth', top: '0px' });
-        setIsRender(false);
     }, [page, isRender, rules]);
 
     const deleteRule = async (id) => {
@@ -178,6 +178,7 @@ function Rules() {
                             setCreateDialogOpen(false);
                         }}
                         onSucess={() => {
+                            setPage(total);
                             setIsRender(true);
                         }}
                     />
@@ -191,6 +192,7 @@ function Rules() {
                                 setEditDialogOpen(false);
                             }}
                             onSucess={() => {
+                                setPage(page);
                                 setIsRender(true);
                             }}
                         />

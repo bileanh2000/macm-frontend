@@ -42,7 +42,7 @@ function TabPanel(props) {
     );
 }
 
-function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDate }) {
+function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDate, changeData, tournamentStage }) {
     let isDisplay = false;
     if (tournament.competitiveTypes.length > 0 || tournament.exhibitionTypes.length > 0) {
         const competitiveStatus = tournament.competitiveTypes.map((competitive) => competitive.status);
@@ -78,6 +78,7 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
             const response = await adminTournament.spawnTimeAndArea(tournamentId);
             enqueueSnackbar(response.message, { variant: 'success' });
             setIsRender(true);
+            changeData && changeData();
         } catch (error) {
             console.warn('Failed to spawn time and area');
         }
@@ -152,15 +153,16 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
                             variant="outlined"
                             onClick={handleDialogConfirmMatch}
                             sx={{ mb: 2, float: 'right' }}
-                            disabled={isDisplay}
+                            disabled={isDisplay || tournamentStage > 1}
                         >
-                            Cập nhật thời gian thi đấu cho giải đấu
+                            Xếp lịch thi đấu cho giải đấu
                         </Button>
                     </Box>
 
                     <TabPanel value={value} index={0}>
                         <TournamentCompetitive
                             tournamentStatus={tournamentStatus}
+                            tournamentStage={tournamentStage}
                             reload={isRender}
                             result={tournamentResult.listCompetitiveResult}
                             type={valueTab == 0 ? type : 0}
@@ -170,6 +172,7 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
                     <TabPanel value={value} index={1}>
                         <TournamentExhibition
                             tournamentStatus={tournamentStatus}
+                            tournamentStage={tournamentStage}
                             reload={isRender}
                             result={tournamentResult.listExhibitionResult}
                             type={valueTab == 1 ? type : 0}

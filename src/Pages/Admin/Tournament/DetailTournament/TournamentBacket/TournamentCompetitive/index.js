@@ -25,7 +25,7 @@ import Trophy from 'src/Components/Common/Material/Trophy';
 import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function TournamentCompetitive({ reload, result, type, endDate }) {
+function TournamentCompetitive({ reload, result, type, endDate, tournamentStage }) {
     // console.log(result, type);
     let { tournamentId } = useParams();
     const [tournamentResult, setTournamentResult] = useState();
@@ -33,7 +33,7 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
     const { enqueueSnackbar } = useSnackbar();
     const [competitiveId, setCompetitiveId] = useState(type);
     const [listWeightRange, setListWeightRange] = useState([]);
-    const [listPlayer, setListPlayer] = useState([]);
+    const [listPlayer, setListPlayer] = useState();
     const [rounds, setRounds] = useState();
     const [areaList, setAreaList] = useState();
     const [open, setOpen] = useState(false);
@@ -237,11 +237,11 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
                             ))}
                     </Select>
                 </FormControl>
-                {tournamentStatus == 0 && listPlayer.length > 0 && (
+                {/* {tournamentStatus == 0 && listPlayer.length > 0 && (
                     <Button variant="outlined" onClick={handleDialogConfirmMatch} sx={{ mr: 2, float: 'right' }}>
                         Xác nhận bảng thi đấu
                     </Button>
-                )}
+                )} */}
             </Box>
 
             {tournamentResult != null && (
@@ -279,6 +279,7 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
                         competitiveId={competitiveId}
                         rounds={rounds}
                         status={tournamentStatus}
+                        stage={tournamentStage}
                         areaList={areaList}
                         onUpdateResult={UpdateResultHandler}
                         // isCreate={isCreate}
@@ -292,7 +293,7 @@ function TournamentCompetitive({ reload, result, type, endDate }) {
                 ) : (
                     <Box sx={{ display: 'flex' }}>
                         <Typography variant="body1" sx={{ m: 'auto' }}>
-                            Thể thức này chưa tổ chức
+                            Thể thức này chưa có thời gian và địa điểm thi đấu
                         </Typography>
                     </Box>
                 )

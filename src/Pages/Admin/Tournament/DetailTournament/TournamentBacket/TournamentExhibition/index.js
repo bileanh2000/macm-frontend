@@ -11,14 +11,14 @@ import Sliver from 'src/Components/Common/Material/Sliver';
 import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function TournamentExhibition({ reload, result, type, endDate }) {
+function TournamentExhibition({ reload, result, type, endDate, tournamentStage }) {
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
 
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [tournamentResult, setTournamentResult] = useState();
     const [exhibitionType, setExhibitionType] = useState(type);
-    const [exhibitionTeam, setExhibitionTeam] = useState([]);
+    const [exhibitionTeam, setExhibitionTeam] = useState();
     const [listExhibitionType, setListExhibitionType] = useState([]);
     const [tournamentStatus, setTournamentStatus] = useState();
     const [areaList, setAreaList] = useState();
@@ -190,13 +190,14 @@ function TournamentExhibition({ reload, result, type, endDate }) {
                         matches={exhibitionTeam}
                         status={tournamentStatus}
                         areaList={areaList}
+                        stage={tournamentStage}
                         onUpdateResult={UpdateResultHandler}
                         endDate={endDate}
                     />
                 ) : (
                     <Box sx={{ display: 'flex' }}>
                         <Typography variant="body1" sx={{ m: 'auto' }}>
-                            Thể thức này chưa tổ chức
+                            Thể thức này chưa có thời gian và địa điểm thi đấu
                         </Typography>
                     </Box>
                 )

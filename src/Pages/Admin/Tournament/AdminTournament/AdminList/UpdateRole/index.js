@@ -114,7 +114,15 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
             return;
         }
 
-        const newData = [...datas, { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity }];
+        const newData = [
+            ...datas,
+            {
+                id: Math.random(),
+                name: data.roleName,
+                maxQuantity: data.maxQuantity,
+                availableQuantity: data.maxQuantity,
+            },
+        ];
         setDatas(newData);
 
         /**
@@ -181,13 +189,16 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
                                     <TableCell align="center">Số lượng thành viên</TableCell>
                                     <TableCell align="center"></TableCell>
                                     <TableCell align="center"></TableCell>
+                                    <TableCell align="center"></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {datas.map((data) => (
                                     <TableRow key={data.id}>
                                         <TableCell align="center">{data.name}</TableCell>
-                                        <TableCell align="center">{data.maxQuantity}</TableCell>
+                                        <TableCell align="center">
+                                            {data.maxQuantity - data.availableQuantity + '/' + data.maxQuantity}
+                                        </TableCell>
                                         <TableCell>
                                             <IconButton
                                                 aria-label="edit"
@@ -207,7 +218,11 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
                                                     // handleOpenDialog();
                                                     handleDelete(data.id);
                                                 }}
-                                                disabled={isEdit || data.availableQuantity != data.maxQuantity}
+                                                disabled={
+                                                    isEdit ||
+                                                    (data.availableQuantity &&
+                                                        data.availableQuantity != data.maxQuantity)
+                                                }
                                             >
                                                 <Delete />
                                             </IconButton>

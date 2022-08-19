@@ -50,7 +50,6 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
         } else {
             range = listWeightRange.find((weight) => weight.id === event.target.value);
             setGender(range.gender);
-            console.log(range);
             setMinWeight(range.weightMin);
             setMaxWeight(range.weightMax);
         }
@@ -60,7 +59,6 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
     const getAllMember = async (weightRange) => {
         try {
             const response = await adminTournament.listUserNotJoinCompetitive(weightRange);
-            console.log(response.data);
             setAllMember(response.data);
             // setIsRender(true);
         } catch (error) {
@@ -83,11 +81,9 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
 
     const handleDelete = (data) => {
         let newData;
-        console.log(data);
         newData = player.filter((d) => {
             return d.studentId !== data.studentId;
         });
-        console.log(newData);
         setPlayer(newData);
     };
 
@@ -138,10 +134,8 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
         const fetchCompetitiveType = async (tournamentId) => {
             try {
                 const response = await adminTournament.getAllCompetitiveType(tournamentId);
-                console.log(response.data[0]);
                 setListWeightRange(response.data[0]);
                 // setWeightRange(response.data[0][0].id);
-                console.log('check', gender == null);
                 gender == null && setGender(response.data[0][0].gender);
                 setMinWeight(response.data[0][0].weightMin);
                 setMaxWeight(response.data[0][0].weightMax);
@@ -153,7 +147,6 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
     }, [tournamentId, gender]);
 
     useEffect(() => {
-        console.log('type', weightRange);
         isRender && getAllMember(weightRange);
         setIsRender(false);
     }, [weightRange, allMember, isRender]);

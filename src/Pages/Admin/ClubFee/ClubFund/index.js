@@ -101,7 +101,7 @@ function ClubFund() {
     const handleClose = () => {
         reset({
             note: '',
-            amount: '',
+            amount: 1000,
         });
         setOpen(false);
     };
@@ -121,8 +121,13 @@ function ClubFund() {
         amount: Yup.number()
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
-            .min(1000, 'Vui không nhập giá trị nhỏ hơn 1000')
-            .max(999999999, 'Vui lòng không nhập số quá lớn (dưới 1 tỷ)'),
+            .min(1000, 'Vui không nhập giá trị nhỏ hơn 1000 đồng')
+            .max(
+                type === 1 ? 999999999 : funClub,
+                type === 1
+                    ? 'Vui lòng không nhập số quá lớn (lớn hơn 1 tỷ đồng)'
+                    : 'Vui lòng không nhập số lớn hơn số dư CLB hiện tại',
+            ),
     });
 
     const {
@@ -273,7 +278,7 @@ function ClubFund() {
                                                 onChange(Number(v.value));
                                             }}
                                             variant="outlined"
-                                            defaultValue=""
+                                            defaultValue={1000}
                                             value={value}
                                             InputProps={{
                                                 endAdornment: <InputAdornment position="end">VND</InputAdornment>,
