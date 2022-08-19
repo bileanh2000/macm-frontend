@@ -218,7 +218,7 @@ function ReportAttendance() {
                     },
                 }}
             >
-                {attendanceList.length > 1 ? (
+                {attendanceList.length >= 1 ? (
                     <DataGrid
                         loading={!attendanceList.length}
                         disableSelectionOnClick={true}
