@@ -415,9 +415,13 @@ function MembershipFee() {
                                     </Typography>
                                     <Typography variant="h6" sx={{ color: 'red' }}>
                                         {cost.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-                                        {semesterId == currentSemester.id && semesterId && currentSemester.id > 0 && (
-                                            <Button startIcon={<Edit />} onClick={handleOpen}></Button>
-                                        )}
+                                        {semesterId == currentSemester.id &&
+                                            semesterId &&
+                                            currentSemester.id > 0 &&
+                                            userList &&
+                                            userList.length == 0 && (
+                                                <Button startIcon={<Edit />} onClick={handleOpen}></Button>
+                                            )}
                                     </Typography>
                                 </Box>
                             )}

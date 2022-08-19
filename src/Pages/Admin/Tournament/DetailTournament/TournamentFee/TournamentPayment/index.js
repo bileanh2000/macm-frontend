@@ -33,7 +33,7 @@ function TournamentPayment({ tournament, tournamentStatus, value, index, user, i
     const [type, setType] = useState(1);
     const [userPaymentStatus, setUserPaymentStatus] = useState([]);
     const [pageSize, setPageSize] = useState(10);
-    const [paymentStatus, setPaymentStatus] = useState(true);
+    const [paymentStatus, setPaymentStatus] = useState();
     const [openConfirm, setOpenConfirm] = useState(false);
     const [idMember, setIdMember] = useState();
     const [openSumUpDialog, setOpenSumUpDialog] = useState(false);
