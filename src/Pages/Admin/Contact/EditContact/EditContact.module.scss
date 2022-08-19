@@ -21,3 +21,15 @@
 .textArea {
     width: 80%;
 }
+// .upload-button {
+//     height: 32px;
+//     width: 64px;
+//     overflow: hidden;
+//     position: relative;
+//     cursor: pointer;
+//     /*Using a background color, but you can use a background image to represent a button*/
+//     background-color: #ddf;
+// }
+.upload-button input[type='file'] {
+    display: none;
+}

@@ -258,7 +258,7 @@ function Header({ onLogout }) {
                                     <ListItemText>Nội quy</ListItemText>
                                 </MenuItem>
 
-                                <MenuItem onClick={handleCloseNavMenu}>
+                                <MenuItem onClick={handleCloseNavMenu} component={Link} to="/contacts">
                                     <ListItemIcon>
                                         <ContactPageIcon />
                                     </ListItemIcon>
@@ -336,7 +336,12 @@ function Header({ onLogout }) {
                                 <ListItemText>Nội quy</ListItemText>
                             </MenuItem>
 
-                            <MenuItem onClick={handleCloseNavMenu} sx={{ height: '64px' }}>
+                            <MenuItem
+                                onClick={handleCloseNavMenu}
+                                component={Link}
+                                to="/contacts"
+                                sx={{ height: '64px' }}
+                            >
                                 <ListItemIcon>
                                     <ContactPageIcon sx={{ color: 'white' }} />
                                 </ListItemIcon>

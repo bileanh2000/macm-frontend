@@ -6,6 +6,7 @@ import adminContactAPI from 'src/api/adminContactAPI';
 
 import styles from './Slideshow.module.scss';
 import 'react-slideshow-image/dist/styles.css';
+import { Paper } from '@mui/material';
 
 const cx = classNames.bind(styles);
 
@@ -53,27 +54,28 @@ function SlideShow() {
     }, []);
 
     return (
-        <div className={cx('slide-container')} style={{ width: 1000 }}>
+        <div className={cx('slide-container')}>
             <Slide {...properties}>
                 {adminList.map((admin, index) => (
-                    <div className={cx('out')} key={index}>
+                    <Paper elevation={3} className={cx('out')} key={index}>
                         <div className={cx('card')}>
                             <img
                                 className={cx('rounded-circle')}
                                 alt={'users here'}
                                 src={admin.image == null ? url : admin.image}
-                                height={250}
-                                width={250}
+                                // height={250}
+                                width="100%"
+                                style={{ borderRadius: '5px' }}
                             />
                             <div className={cx('card-body')}>
-                                <br />
+                                <p className={cx('card-title')}>{admin.name}</p>
                                 <p className={cx('card-text')}>{admin.roleName}</p>
-                                <br />
-                                <small className={cx('card-title')}>{admin.name}</small>
-                                <br />
+                                <p className={cx('card-text')}>
+                                    <a href={'tel:' + admin.phone}>{admin.phone}</a>
+                                </p>
                             </div>
                         </div>
-                    </div>
+                    </Paper>
                 ))}
             </Slide>
         </div>

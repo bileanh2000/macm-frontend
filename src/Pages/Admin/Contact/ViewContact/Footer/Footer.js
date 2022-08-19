@@ -3,13 +3,9 @@ import { Grid } from '@mui/material';
 import { useEffect, useState } from 'react';
 import adminContactAPI from 'src/api/adminContactAPI';
 
-
 function Footer() {
-
-    const [contacts, setContacts] = useState([])
-    const [socials, setSocials] = useState([])
-
-
+    const [contacts, setContacts] = useState([]);
+    const [socials, setSocials] = useState([]);
 
     const fetchContacts = async () => {
         try {
@@ -31,12 +27,11 @@ function Footer() {
     };
 
     useEffect(() => {
-        fetchContacts()
-        fetchSocial()
+        fetchContacts();
+        fetchSocial();
     }, []);
 
     return (
-
         <Grid container spacing={2}>
             <Grid item xs={8}>
                 <Grid container spacing={0}>
@@ -67,17 +62,24 @@ function Footer() {
                     <Grid item xs={2}>
                         <p>Mạng xã hội</p>
                     </Grid>
-                    <Grid item xs={10} >
-                        <a href={socials[0]?.url}> <Facebook /></a>
-                        <a href={socials[1]?.url}> <Instagram /></a>
-                        <a href={socials[2]?.url}> <YouTube /></a>
+                    <Grid item xs={10}>
+                        <a href={socials[0]?.url}>
+                            {' '}
+                            <Facebook />
+                        </a>
+                        <a href={socials[1]?.url}>
+                            {' '}
+                            <Instagram />
+                        </a>
+                        <a href={socials[2]?.url}>
+                            {' '}
+                            <YouTube />
+                        </a>
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item xs={4}>
-            </Grid>
-        </ Grid >
-
+            <Grid item xs={4}></Grid>
+        </Grid>
     );
 }
 

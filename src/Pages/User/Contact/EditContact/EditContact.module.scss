@@ -1,0 +1,35 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container {
+    width: 80%;
+    padding: 20px 0px 50px 0px;
+    // margin-top: var(--default-layout-header-height);
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.content {
+    flex: 1;
+}
+
+.textArea {
+    width: 80%;
+}
+// .upload-button {
+//     height: 32px;
+//     width: 64px;
+//     overflow: hidden;
+//     position: relative;
+//     cursor: pointer;
+//     /*Using a background color, but you can use a background image to represent a button*/
+//     background-color: #ddf;
+// }
+.upload-button input[type='file'] {
+    display: none;
+}

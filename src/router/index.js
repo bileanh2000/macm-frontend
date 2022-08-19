@@ -86,6 +86,7 @@ import AttendanceReport from 'src/Pages/Home/AttendanceReport';
 import Rule from 'src/Pages/User/Rule';
 
 import UserEventDetails from 'src/Pages/User/Events/EventDetails';
+import Contacts from 'src/Pages/User/Contact';
 
 const adminRouters = [
     // { path: '/:userId', component: UserProfile, layout: HeaderOnly },
@@ -184,6 +185,7 @@ const userRouter = [
     { path: '/events/:id', component: UserEventDetails, layout: HeaderOnly },
     { path: '/home', component: Home, layout: HeaderOnly },
     { path: '/rule', component: Rule, layout: HeaderOnly },
+    { path: '/contacts', component: Contacts, layout: HeaderOnly },
     // { path: '/:userId', component: UserProfile, layout: HeaderOnly },
     // { path: '/:userId/edit', component: EditUserProfile, layout: HeaderOnly },
     { path: '/profile/:userId', component: UserProfile, layout: HeaderOnly },
