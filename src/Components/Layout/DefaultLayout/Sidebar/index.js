@@ -341,8 +341,8 @@ function Sidebar() {
                 button
                 component={Link}
                 to="/home"
-                selected={selectedIndex === 8}
-                onClick={(event) => handleListItemClick(event, 8)}
+                selected={selectedIndex === 20}
+                onClick={(event) => handleListItemClick(event, 20)}
             >
                 <ListItemIcon>
                     <ArrowBackIcon />
