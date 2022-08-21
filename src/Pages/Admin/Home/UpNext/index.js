@@ -47,7 +47,7 @@ function UpNext({ isAdmin }) {
     return (
         <Fragment>
             <Typography variant="h6" color="initial">
-                Hoạt động sắp tới
+                Hoạt động trong 1 tháng tới
             </Typography>
             <Box sx={{ height: '328px', overflow: 'auto' }}>
                 <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>

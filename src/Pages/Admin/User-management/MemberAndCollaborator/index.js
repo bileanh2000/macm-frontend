@@ -408,9 +408,12 @@ function MemberAndCollaborator() {
                 <GridToolbarContainer>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         {/* <GridToolbarColumnsButton /> */}
-                        <Button startIcon={<FilterListIcon />} size="small" onClick={toggleFilter} sx={{ mr: 1 }}>
-                            BỘ LỌC
-                        </Button>
+                        <ClickAwayListener onClickAway={handleClickAway}>
+                            <Button startIcon={<FilterListIcon />} size="small" onClick={toggleFilter} sx={{ mr: 1 }}>
+                                BỘ LỌC
+                            </Button>
+                        </ClickAwayListener>
+
                         <GridToolbarQuickFilter />
                     </Box>
 
