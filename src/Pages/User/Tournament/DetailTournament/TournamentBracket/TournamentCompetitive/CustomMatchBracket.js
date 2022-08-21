@@ -51,12 +51,13 @@ function CustomMatchBracket(params) {
                                             <Box
                                                 sx={{
                                                     pr: '1em',
-                                                    backgroundColor: '#0000000a',
+                                                    backgroundColor: '#1e81e2',
                                                     width: '100%',
                                                     display: 'flex',
                                                     flexDirection: 'row',
                                                     alignItems: 'center',
                                                     pl: 0,
+                                                    zIndex: 2,
                                                 }}
                                             >
                                                 <Typography variant="caption" sx={{ m: 1, width: '4em' }}>
@@ -133,12 +134,13 @@ function CustomMatchBracket(params) {
                                             <Box
                                                 sx={{
                                                     pr: '1em',
-                                                    backgroundColor: '#0000000a',
+                                                    backgroundColor: '#1e81e2',
                                                     width: '100%',
                                                     display: 'flex',
                                                     flexDirection: 'row',
                                                     alignItems: 'center',
                                                     pl: 0,
+                                                    zIndex: 2,
                                                 }}
                                             >
                                                 <Typography variant="caption" sx={{ m: 1, width: '4em' }}>

@@ -139,11 +139,11 @@ function EditAttendance() {
                                         <TableCell>
                                             {type == 0
                                                 ? moment(row.date).format('dddd')
-                                                : moment(row.date).format('dddd')}
+                                                : moment(row.startDate).format('dddd')}
                                             <br />
 
                                             {type == 0
-                                                ? moment(row.startDate).format('DD/MM/YYYY')
+                                                ? moment(row.date).format('DD/MM/YYYY')
                                                 : moment(row.startDate).format('DD/MM/YYYY')}
                                             <br />
                                         </TableCell>
