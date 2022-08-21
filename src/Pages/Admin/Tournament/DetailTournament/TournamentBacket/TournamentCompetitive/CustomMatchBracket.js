@@ -420,7 +420,10 @@ function CustomMatchBracket(params) {
                                                 }}
                                                 onClick={(e) => handleClickResult(e, match)}
                                             >
-                                                <Typography variant="caption" sx={{ m: 1, width: '4em' }}>
+                                                <Typography
+                                                    variant="caption"
+                                                    sx={{ m: 1, width: '4em', color: 'white' }}
+                                                >
                                                     Cặp {match.matchNo}
                                                 </Typography>
                                                 <Box
@@ -428,9 +431,13 @@ function CustomMatchBracket(params) {
                                                         width: '100%',
                                                     }}
                                                 >
-                                                    <div>
+                                                    <Box
+                                                        sx={{
+                                                            color: 'white',
+                                                        }}
+                                                    >
                                                         <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                                    </div>
+                                                    </Box>
 
                                                     <Tooltip
                                                         title={
@@ -537,14 +544,18 @@ function CustomMatchBracket(params) {
                                                         </div>
                                                     </Tooltip>
 
-                                                    <div>
+                                                    <Box
+                                                        sx={{
+                                                            color: 'white',
+                                                        }}
+                                                    >
                                                         <small>
                                                             {match.time
                                                                 ? 'Thời gian: ' +
                                                                   moment(match.time).format('HH:mm - DD/MM')
                                                                 : ''}
                                                         </small>
-                                                    </div>
+                                                    </Box>
                                                 </Box>
                                             </Box>
                                         </li>
@@ -563,7 +574,10 @@ function CustomMatchBracket(params) {
                                                 }}
                                                 onClick={(e) => handleClickResult(e, match)}
                                             >
-                                                <Typography variant="caption" sx={{ m: 1, width: '4em' }}>
+                                                <Typography
+                                                    variant="caption"
+                                                    sx={{ m: 1, width: '4em', color: 'white' }}
+                                                >
                                                     Cặp {match.matchNo}
                                                 </Typography>
                                                 <Box
@@ -571,9 +585,13 @@ function CustomMatchBracket(params) {
                                                         width: '100%',
                                                     }}
                                                 >
-                                                    <div>
+                                                    <Box
+                                                        sx={{
+                                                            color: 'white',
+                                                        }}
+                                                    >
                                                         <small>{match.area ? 'Địa điểm: ' + match.area : ''}</small>
-                                                    </div>
+                                                    </Box>
                                                     <Tooltip
                                                         title={
                                                             params.stage < 2
@@ -634,14 +652,18 @@ function CustomMatchBracket(params) {
                                                             </Box>
                                                         </div>
                                                     </Tooltip>
-                                                    <div>
+                                                    <Box
+                                                        sx={{
+                                                            color: 'white',
+                                                        }}
+                                                    >
                                                         <small>
                                                             {match.time
                                                                 ? 'Thời gian: ' +
                                                                   moment(match.time).format('HH:mm - DD/MM')
                                                                 : ''}
                                                         </small>
-                                                    </div>
+                                                    </Box>
                                                 </Box>
                                             </Box>
                                         </li>
