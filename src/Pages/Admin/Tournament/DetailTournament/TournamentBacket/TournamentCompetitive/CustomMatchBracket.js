@@ -1,45 +1,12 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
-import * as Yup from 'yup';
-import { Controller, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    FormControl,
-    FormControlLabel,
-    FormLabel,
-    Grid,
-    MenuItem,
-    Paper,
-    Radio,
-    RadioGroup,
-    Select,
-    Tab,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Tabs,
-    TextField,
-    Tooltip,
-    Typography,
-} from '@mui/material';
+import { Button, Dialog, DialogContent, DialogTitle, Paper, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import NumberFormat from 'react-number-format';
-import { useParams } from 'react-router-dom';
 import moment from 'moment';
 
 import adminTournament from 'src/api/adminTournamentAPI';
 import styles from './CustomMatchBracket.module.scss';
 import { Box } from '@mui/system';
-import { DatePicker, LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { vi } from 'date-fns/locale';
 import { useSnackbar } from 'notistack';
 import UpdateTimeAndArea from './UpdateTimeAndArea';
 import UpdateScoreTournament from './UpdateScore';
@@ -217,7 +184,7 @@ function CustomMatchBracket(params) {
         try {
             const res = await adminTournament.updateTimeAndPlaceMatch(matchId, match);
             params.onChangeData && params.onChangeData();
-            let variant = 'success';
+            let variant = res.message.includes('trùng') ? 'error' : 'success';
             enqueueSnackbar(res.message, { variant });
         } catch (error) {
             let variant = 'error';
@@ -253,6 +220,8 @@ function CustomMatchBracket(params) {
                         onChangeData={() => {
                             params.onChangeData && params.onChangeData();
                         }}
+                        round={params.rounds}
+                        onHaveResult={() => params.onHaveResult && params.onHaveResult()}
                     />
                 ) : (
                     <Typography variant="body1">Trận đấu chưa đủ vận động viên để có thể xác nhận điểm số</Typography>
@@ -443,7 +412,8 @@ function CustomMatchBracket(params) {
                                                         title={
                                                             params.stage < 2
                                                                 ? `${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`
-                                                                : match.firstPlayer?.point
+                                                                : match.firstPlayer?.point ||
+                                                                  match.firstPlayer?.point === 0
                                                                 ? `${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId}`
                                                                 : `Xác nhận ${match.firstPlayer?.studentName} - ${match.firstPlayer?.studentId} là người chiến thắng`
                                                         }
@@ -453,9 +423,12 @@ function CustomMatchBracket(params) {
                                                             className={cx(
                                                                 'tournament-bracket__match',
                                                                 isEdit ? 'draggable' : '',
-                                                                match.firstPlayer?.point && match.secondPlayer?.point
-                                                                    ? match.firstPlayer?.point >
-                                                                      match.secondPlayer?.point
+                                                                (match.firstPlayer?.point ||
+                                                                    match.firstPlayer?.point === 0) &&
+                                                                    (match.secondPlayer?.point ||
+                                                                        match.secondPlayer?.point === 0)
+                                                                    ? Number(match.firstPlayer?.point) >
+                                                                      Number(match.secondPlayer?.point)
                                                                         ? 'winner'
                                                                         : 'loser'
                                                                     : '',
@@ -495,7 +468,8 @@ function CustomMatchBracket(params) {
                                                         title={
                                                             params.stage < 2
                                                                 ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`
-                                                                : match.secondPlayer?.point
+                                                                : match.secondPlayer?.point ||
+                                                                  match.secondPlayer?.point === 0
                                                                 ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`
                                                                 : `Xác nhận ${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId} là người chiến thắng`
                                                         }
@@ -505,9 +479,12 @@ function CustomMatchBracket(params) {
                                                             className={cx(
                                                                 'tournament-bracket__match',
                                                                 isEdit ? 'draggable' : '',
-                                                                match.firstPlayer?.point && match.secondPlayer?.point
-                                                                    ? match.secondPlayer?.point >
-                                                                      match.firstPlayer?.point
+                                                                (match.firstPlayer?.point ||
+                                                                    match.firstPlayer?.point === 0) &&
+                                                                    (match.secondPlayer?.point ||
+                                                                        match.secondPlayer?.point === 0)
+                                                                    ? Number(match.secondPlayer?.point) >
+                                                                      Number(match.firstPlayer?.point)
                                                                         ? 'winner'
                                                                         : 'loser'
                                                                     : '',
@@ -605,9 +582,12 @@ function CustomMatchBracket(params) {
                                                         <div
                                                             className={cx(
                                                                 'tournament-bracket__match',
-                                                                match.firstPlayer?.point && match.secondPlayer?.point
-                                                                    ? match.firstPlayer?.point >
-                                                                      match.secondPlayer?.point
+                                                                (match.firstPlayer?.point ||
+                                                                    match.firstPlayer?.point === 0) &&
+                                                                    (match.secondPlayer?.point ||
+                                                                        match.secondPlayer?.point === 0)
+                                                                    ? Number(match.firstPlayer?.point) >
+                                                                      Number(match.secondPlayer?.point)
                                                                         ? 'winner'
                                                                         : 'loser'
                                                                     : '',
@@ -626,7 +606,8 @@ function CustomMatchBracket(params) {
                                                         title={
                                                             params.stage < 2
                                                                 ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`
-                                                                : match.secondPlayer?.point
+                                                                : match.secondPlayer?.point ||
+                                                                  match.secondPlayer?.point === 0
                                                                 ? `${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId}`
                                                                 : `Xác nhận ${match.secondPlayer?.studentName} - ${match.secondPlayer?.studentId} là người chiến thắng`
                                                         }
@@ -635,9 +616,12 @@ function CustomMatchBracket(params) {
                                                         <div
                                                             className={cx(
                                                                 'tournament-bracket__match',
-                                                                match.firstPlayer?.point && match.secondPlayer?.point
-                                                                    ? match.secondPlayer?.point >
-                                                                      match.firstPlayer?.point
+                                                                (match.firstPlayer?.point ||
+                                                                    match.firstPlayer?.point === 0) &&
+                                                                    (match.secondPlayer?.point ||
+                                                                        match.secondPlayer?.point === 0)
+                                                                    ? Number(match.secondPlayer?.point) >
+                                                                      Number(match.firstPlayer?.point)
                                                                         ? 'winner'
                                                                         : 'loser'
                                                                     : '',

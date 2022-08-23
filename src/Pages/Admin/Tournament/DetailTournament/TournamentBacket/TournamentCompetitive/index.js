@@ -25,8 +25,8 @@ import Trophy from 'src/Components/Common/Material/Trophy';
 import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function TournamentCompetitive({ reload, result, type, endDate, tournamentStage }) {
-    // console.log(result, type);
+function TournamentCompetitive({ reload, result, type, endDate, tournamentStage, onHaveResult }) {
+    // console.log(result);
     let { tournamentId } = useParams();
     const [tournamentResult, setTournamentResult] = useState();
     const [tournamentStatus, setTournamentStatus] = useState(0);
@@ -41,8 +41,16 @@ function TournamentCompetitive({ reload, result, type, endDate, tournamentStage 
     const [isRender, setIsRender] = useState(true);
     // const [tournamentStatus, setTournamentStatus] = useState(-1);
 
-    // console.log('ewsult', tournamentResult);
+    useEffect(() => {
+        const _result =
+            type !== 0 || competitiveId !== 0
+                ? result.find((subResult) => subResult.data.find((d) => d.competitiveType.id == competitiveId)).data[0]
+                      .listResult
+                : null;
+        setTournamentResult(_result);
+    }, [type, competitiveId, result]);
 
+    // console.log('ewsult', tournamentResult);
     const handleChangeCompetitiveId = (event) => {
         if (result && result.length > 0) {
             const _result = result.find((subResult) =>
@@ -289,6 +297,9 @@ function TournamentCompetitive({ reload, result, type, endDate, tournamentStage 
                             setIsRender(true);
                         }}
                         endDate={endDate}
+                        onHaveResult={() => {
+                            onHaveResult && onHaveResult();
+                        }}
                     />
                 ) : (
                     <Box sx={{ display: 'flex' }}>

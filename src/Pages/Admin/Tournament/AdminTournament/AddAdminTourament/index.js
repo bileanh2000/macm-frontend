@@ -16,22 +16,22 @@ import { useSnackbar } from 'notistack';
 
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 
-function AddAdminTourament({ value, index, total, active }) {
+function AddAdminTourament({ value, index, total, active, onChange }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
     const [userList, setUserList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [isApprove, setIsApprove] = useState(false);
-    const [idUpdate, setIdUpdate] = useState(0);
+    const [idUpdate, setIdUpdate] = useState();
     const [_active, setActive] = useState(active);
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
     };
-    const handleOpenDialog = (id, isApprove) => {
+    const handleOpenDialog = (data, isApprove) => {
         setIsApprove(isApprove);
-        setIdUpdate(id);
+        setIdUpdate(data);
         setOpenDialog(true);
     };
 
@@ -74,44 +74,36 @@ function AddAdminTourament({ value, index, total, active }) {
                     <Button
                         component="button"
                         label="Đã đóng"
-                        onClick={() => handleOpenDialog(params.row.id, true)}
+                        onClick={() => handleOpenDialog(params.row, true)}
                         style={{ backgroundColor: 'aquamarine' }}
                     >
                         Chấp nhận
-                    </Button>,
-                    <Button
-                        component="button"
-                        label="Đã đóng"
-                        onClick={() => handleOpenDialog(params.row.id, false)}
-                        style={{ backgroundColor: 'lightcoral' }}
-                    >
-                        Hủy
                     </Button>,
                 ];
             },
             hide: _active === 10,
         },
 
-        // {
-        //     field: 'reject',
-        //     headerName: 'hihi',
-        //     type: 'actions',
-        //     flex: 0.5,
-        //     cellClassName: 'actions',
-        //     getActions: (params) => {
-        //         return [
-        //             <Button
-        //                 component="button"
-        //                 label="Đã đóng"
-        //                 onClick={() => handleOpenDialog(params.row.id, false)}
-        //                 style={{ backgroundColor: 'lightcoral' }}
-        //             >
-        //                 Hủy
-        //             </Button>,
-        //         ];
-        //     },
-        //     // hide: _active === 10,
-        // },
+        {
+            field: 'reject',
+            headerName: 'hihi',
+            type: 'actions',
+            flex: 0.5,
+            cellClassName: 'actions',
+            getActions: (params) => {
+                return [
+                    <Button
+                        component="button"
+                        label="Đã đóng"
+                        onClick={() => handleOpenDialog(params.row, false)}
+                        style={{ backgroundColor: 'lightcoral' }}
+                    >
+                        Từ chối
+                    </Button>,
+                ];
+            },
+            // hide: _active === 10,
+        },
     ];
 
     const rowsUser = userList.map((item, index) => {
@@ -128,6 +120,7 @@ function AddAdminTourament({ value, index, total, active }) {
         try {
             const response = await adminTournamentAPI.acceptRequestToJoinOrganizingCommittee(organizingCommitteeId);
             enqueueSnackbar(response.message, { variant: 'success' });
+            onChange && onChange();
         } catch (error) {
             console.log('Khong the chap thuan yeu cau nay, loi:', error);
         }
@@ -137,6 +130,7 @@ function AddAdminTourament({ value, index, total, active }) {
         try {
             const response = await adminTournamentAPI.declineRequestToJoinOrganizingCommittee(organizingCommitteeId);
             enqueueSnackbar(response.message, { variant: 'success' });
+            onChange && onChange();
         } catch (error) {
             console.log('Khong the chap thuan yeu cau nay, loi:', error);
         }
@@ -144,10 +138,10 @@ function AddAdminTourament({ value, index, total, active }) {
     const handleUpdate = () => {
         console.log(idUpdate, isApprove);
         if (isApprove) {
-            acceptRequestToJoinOrganizingCommittee(idUpdate);
+            acceptRequestToJoinOrganizingCommittee(idUpdate.id);
             setActive((prev) => prev + 1);
         } else {
-            declineRequestToJoinOrganizingCommittee(idUpdate);
+            declineRequestToJoinOrganizingCommittee(idUpdate.id);
         }
 
         const newUser = userList.filter((user) => user.id !== idUpdate);
@@ -238,23 +232,28 @@ function AddAdminTourament({ value, index, total, active }) {
             id={`simple-tabpanel-${index}`}
             aria-labelledby={`simple-tab-${index}`}
         >
-            <Dialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">Bạn có muốn lưu các thay đổi ?</DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog}>Hủy</Button>
-                    <Button onClick={handleUpdate} autoFocus>
-                        Xác nhận
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {idUpdate && (
+                <Dialog
+                    open={openDialog}
+                    onClose={handleCloseDialog}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Bạn có muốn {setIsApprove ? 'chấp thuận' : 'từ chối'} yêu cầu tham gia ban tổ chức của{' '}
+                            {idUpdate.userName} - {idUpdate.userStudentId}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDialog}>Hủy</Button>
+                        <Button onClick={handleUpdate} autoFocus>
+                            Xác nhận
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
 
             <Box
                 sx={{

@@ -206,7 +206,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
 
                 <Box>
                     <Typography variant="button" color="initial" sx={{ marginLeft: 'auto', marginRight: '1rem' }}>
-                        Tổng thành viên Ban tổ chức: {total} người
+                        Tổng thành viên Ban tổ chức: {adminList.length} người
                     </Typography>
                     {!isUpdate && roleInTournament.length > 0 && (
                         <Button
@@ -281,186 +281,196 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
         );
     }
     return (
-        <Box
+        <div
             role="tabpanel"
             hidden={value !== index}
             id={`simple-tabpanel-${index}`}
             aria-labelledby={`simple-tab-${index}`}
-            sx={{
-                height: '70vh',
-                width: '100%',
-                mt: '0.5em',
-                display: 'flex',
-                flexDirection: 'column',
-                // '& .role-edit::after': {
-                //     // backgroundColor: 'red !important',
-                //     content: "'\\270E'",
-                //     // color: 'red',
-                //     fontSize: '1.2rem',
-                // },
-                '& .role-edit:hover': {
-                    // backgroundColor: '#655151 !important',
-                    border: '1px dashed #655151',
-                    // content: "'\\270E'",
-                    // // color: 'red',
-                    // fontSize: '1.2rem',
-                },
-                '& .status-rows': {
-                    justifyContent: 'center !important',
-                    minHeight: '0px !important',
-                    maxHeight: '35px !important',
-                    borderRadius: '100px',
-                    position: 'relative',
-                    top: '9px',
-                },
-                '& .status-rows.active': {
-                    backgroundColor: '#56f000',
-                    color: '#fff',
-                    fontWeight: '600',
-                    textAlign: 'center',
-                    // minWidth: '80px !important',
-                },
-                '& .status-rows.deactive': {
-                    backgroundColor: '#ff3838',
-                    color: '#fff',
-                    fontWeight: '600',
-                    // minWidth: '80px !important',
-                },
-            }}
         >
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                {!isUpdate && (
-                    <Button variant="outlined" sx={{ m: 1, mt: 0 }} onClick={() => setOpenDialogEdit(true)}>
-                        Chỉnh sửa vai trò của giải đấu
-                    </Button>
-                )}
-                {isEdit && (
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <Button
-                            variant="outlined"
-                            onClick={handleOpenDialogCancel}
-                            sx={{ m: 1, mt: 0 }}
-                            disabled={!isEdit}
-                        >
-                            Hủy
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick={handleOpenDialogSave}
-                            sx={{ m: 1, mt: 0 }}
-                            disabled={!isEdit}
-                        >
-                            Lưu lại
-                        </Button>
-                    </Box>
-                )}
-            </Box>
-            <DataGrid
-                // loading={data.length === 0}
-                disableSelectionOnClick={true}
-                rows={rowsUser}
-                columns={columns}
-                pageSize={pageSize}
-                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                rowsPerPageOptions={[10, 20, 30]}
-                components={{
-                    Toolbar: CustomToolbar,
-                    NoRowsOverlay: CustomNoRowsOverlay,
+            <Box
+                // role="tabpanel"
+                // hidden={value !== index}
+                // id={`simple-tabpanel-${index}`}
+                // aria-labelledby={`simple-tab-${index}`}
+                sx={{
+                    height: '70vh',
+                    width: '100%',
+                    mt: '0.5em',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    // '& .role-edit::after': {
+                    //     // backgroundColor: 'red !important',
+                    //     content: "'\\270E'",
+                    //     // color: 'red',
+                    //     fontSize: '1.2rem',
+                    // },
+                    '& .role-edit:hover': {
+                        // backgroundColor: '#655151 !important',
+                        border: '1px dashed #655151',
+                        // content: "'\\270E'",
+                        // // color: 'red',
+                        // fontSize: '1.2rem',
+                    },
+                    '& .status-rows': {
+                        justifyContent: 'center !important',
+                        minHeight: '0px !important',
+                        maxHeight: '35px !important',
+                        borderRadius: '100px',
+                        position: 'relative',
+                        top: '9px',
+                    },
+                    '& .status-rows.active': {
+                        backgroundColor: '#56f000',
+                        color: '#fff',
+                        fontWeight: '600',
+                        textAlign: 'center',
+                        // minWidth: '80px !important',
+                    },
+                    '& .status-rows.deactive': {
+                        backgroundColor: '#ff3838',
+                        color: '#fff',
+                        fontWeight: '600',
+                        // minWidth: '80px !important',
+                    },
                 }}
-                onCellEditCommit={handleRowEditCommit}
-            />
+            >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    {!isUpdate && (
+                        <Button variant="outlined" sx={{ m: 1, mt: 0 }} onClick={() => setOpenDialogEdit(true)}>
+                            Chỉnh sửa vai trò của giải đấu
+                        </Button>
+                    )}
+                    {isEdit && (
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <Button
+                                variant="outlined"
+                                onClick={handleOpenDialogCancel}
+                                sx={{ m: 1, mt: 0 }}
+                                disabled={!isEdit}
+                            >
+                                Hủy
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleOpenDialogSave}
+                                sx={{ m: 1, mt: 0 }}
+                                disabled={!isEdit}
+                            >
+                                Lưu lại
+                            </Button>
+                        </Box>
+                    )}
+                </Box>
+                <DataGrid
+                    // loading={data.length === 0}
+                    disableSelectionOnClick={true}
+                    rows={rowsUser}
+                    columns={columns}
+                    pageSize={pageSize}
+                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                    rowsPerPageOptions={[10, 20, 30]}
+                    components={{
+                        Toolbar: CustomToolbar,
+                        NoRowsOverlay: CustomNoRowsOverlay,
+                    }}
+                    onCellEditCommit={handleRowEditCommit}
+                />
 
-            {tournamentAdminId && (
+                {tournamentAdminId && (
+                    <Dialog
+                        // fullWidth
+                        // maxWidth="md"
+                        open={openDelete}
+                        onClose={handleCloseDelete}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                    >
+                        <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            Xác nhận
+                        </DialogTitle>
+                        <DialogContent>
+                            Bạn có chắc chắn muốn xóa <strong>{tournamentAdminId.studentName}</strong> ra khỏi ban tổ
+                            chức
+                        </DialogContent>
+                        <DialogActions>
+                            <Button variant="outlined" onClick={handleCloseDelete}>
+                                Hủy
+                            </Button>
+                            <Button variant="contained" onClick={handleConfirmDelete} autoFocus>
+                                Xác nhận
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                )}
+
+                {roleInTournament.length > 0 && (
+                    <UpdateRole
+                        title="Đăng kí tham gia ban tổ chức"
+                        isOpen={openDialogEdit}
+                        handleClose={() => {
+                            setOpenDialogEdit(false);
+                        }}
+                        tournamentId={tournamentId}
+                        user={user}
+                        roles={roleInTournament}
+                        onSuccess={() => {
+                            // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
+                            //     return;
+                            // }
+                            // setCompetitivePlayer([...newItem, ...competitivePlayer]);
+                            // Success && Success(newItem);
+                            setOpenDialogEdit(false);
+                        }}
+                        onChange={() => {
+                            onChange && onChange();
+                            setIsRender(true);
+                        }}
+                    />
+                )}
+                {roleInTournament.length > 0 && (
+                    <RegisterAdmin
+                        title="Đăng kí tham gia ban tổ chức"
+                        isOpen={open}
+                        handleClose={() => {
+                            setOpen(false);
+                        }}
+                        user={user}
+                        roles={roleInTournament}
+                        onSuccess={(newItem) => {
+                            // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
+                            //     return;
+                            // }
+                            // setCompetitivePlayer([...newItem, ...competitivePlayer]);
+                            Success && Success(newItem);
+                            setOpen(false);
+                        }}
+                        onChange={onChange}
+                    />
+                )}
+
                 <Dialog
-                    // fullWidth
-                    // maxWidth="md"
-                    open={openDelete}
-                    onClose={handleCloseDelete}
+                    open={openDialog}
+                    onClose={handleCloseDialogSave}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        Xác nhận
-                    </DialogTitle>
+                    <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
                     <DialogContent>
-                        Bạn có chắc chắn muốn xóa <strong>{tournamentAdminId.studentName}</strong> ra khỏi ban tổ chức
+                        <DialogContentText id="alert-dialog-description">
+                            Bạn có muốn lưu các thay đổi ?
+                        </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button variant="outlined" onClick={handleCloseDelete}>
+                        <Button variant="outlined" onClick={handleCloseDialogSave}>
                             Hủy
                         </Button>
-                        <Button variant="contained" onClick={handleConfirmDelete} autoFocus>
+                        <Button variant="contained" onClick={handleUpdate} autoFocus>
                             Xác nhận
                         </Button>
                     </DialogActions>
                 </Dialog>
-            )}
-
-            {roleInTournament.length > 0 && (
-                <UpdateRole
-                    title="Đăng kí tham gia ban tổ chức"
-                    isOpen={openDialogEdit}
-                    handleClose={() => {
-                        setOpenDialogEdit(false);
-                    }}
-                    tournamentId={tournamentId}
-                    user={user}
-                    roles={roleInTournament}
-                    onSuccess={() => {
-                        // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
-                        //     return;
-                        // }
-                        // setCompetitivePlayer([...newItem, ...competitivePlayer]);
-                        // Success && Success(newItem);
-                        setOpenDialogEdit(false);
-                    }}
-                    onChange={() => {
-                        onChange && onChange();
-                        setIsRender(true);
-                    }}
-                />
-            )}
-            {roleInTournament.length > 0 && (
-                <RegisterAdmin
-                    title="Đăng kí tham gia ban tổ chức"
-                    isOpen={open}
-                    handleClose={() => {
-                        setOpen(false);
-                    }}
-                    user={user}
-                    roles={roleInTournament}
-                    onSuccess={(newItem) => {
-                        // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
-                        //     return;
-                        // }
-                        // setCompetitivePlayer([...newItem, ...competitivePlayer]);
-                        Success && Success(newItem);
-                        setOpen(false);
-                    }}
-                    onChange={onChange}
-                />
-            )}
-
-            <Dialog
-                open={openDialog}
-                onClose={handleCloseDialogSave}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">Bạn có muốn lưu các thay đổi ?</DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button variant="outlined" onClick={handleCloseDialogSave}>
-                        Hủy
-                    </Button>
-                    <Button variant="contained" onClick={handleUpdate} autoFocus>
-                        Xác nhận
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </Box>
+            </Box>
+        </div>
     );
 }
 

@@ -55,8 +55,9 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage }
 
     const getExhibitionResult = async (exhibitionType) => {
         try {
-            const response = await adminTournament.getExhibitionResult({ nowDate, exhibitionType });
-            setExhibitionTeam(response.data);
+            const response = await adminTournament.getExhibitionResult(exhibitionType);
+            console.log('exhi', response.data[0]);
+            response.data.length > 0 ? setExhibitionTeam(response.data[0].listResult) : setExhibitionTeam();
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
@@ -74,7 +75,7 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage }
     const spawnTimeAndArea = async () => {
         try {
             const response = await adminTournament.spawnTimeAndAreaEx(tournamentId);
-            getExhibitionResult(exhibitionType, nowDate);
+            getExhibitionResult(exhibitionType);
             enqueueSnackbar(response.message, { variant: 'success' });
         } catch (error) {
             console.log('Failed to spawn time: ', error);
@@ -84,8 +85,9 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage }
     useEffect(() => {
         const getExhibitionResult = async (exhibitionType) => {
             try {
-                const response = await adminTournament.getExhibitionResult({ nowDate, exhibitionType });
-                setExhibitionTeam(response.data);
+                const response = await adminTournament.getExhibitionResult(exhibitionType);
+                console.log('exhi', response.data[0]);
+                response.data.length > 0 ? setExhibitionTeam(response.data[0].listResult) : setExhibitionTeam();
             } catch (error) {
                 console.log('Failed to fetch user list: ', error);
             }
@@ -97,8 +99,8 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage }
     useEffect(() => {
         const getExhibitionResult = async (exhibitionType) => {
             try {
-                const response = await adminTournament.getExhibitionResult({ nowDate, exhibitionType });
-                setExhibitionTeam(response.data);
+                const response = await adminTournament.getExhibitionResult(exhibitionType);
+                response.data.length > 0 ? setExhibitionTeam(response.data[0].listResult) : setExhibitionTeam();
             } catch (error) {
                 console.log('Failed to fetch user list: ', error);
             }

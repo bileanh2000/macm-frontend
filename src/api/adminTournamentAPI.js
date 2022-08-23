@@ -158,12 +158,12 @@ const adminTournament = {
     },
 
     declineRequestToJoinOrganizingCommittee: (organizingCommitteeId) => {
-        const url = `/tournament/headclub/declinerequesttojoinorganizingcommittee/${organizingCommitteeId}`;
+        const url = `/tournament/declinerequesttojointournamentorganizingcommittee/${organizingCommitteeId}`;
         return axiosClient.put(url);
     },
 
     acceptRequestToJoinOrganizingCommittee: (organizingCommitteeId) => {
-        const url = `/tournament/headclub/acceptrequesttojoinorganizingcommittee/${organizingCommitteeId}`;
+        const url = `/tournament/acceptrequesttojointournamentorganizingcommittee/${organizingCommitteeId}`;
         return axiosClient.put(url);
     },
 
@@ -315,15 +315,15 @@ const adminTournament = {
         return axiosClient.get(url);
     },
 
-    getExhibitionResult: (data) => {
-        const url = '/exhibition/getlistexhibitionresult';
-        return axiosClient.get(url, { params: { date: '', exhibitionTypeId: data.exhibitionType } });
-    },
-
-    getTeamByType: (tournamentId) => {
-        const url = `/exhibition/headclub/getteambytype/${tournamentId}`;
+    getExhibitionResult: (exhibitionTypeId) => {
+        const url = `/exhibition/getlistexhibitionresult/${exhibitionTypeId}`;
         return axiosClient.get(url);
     },
+
+    // getTeamByType: (tournamentId) => {
+    //     const url = `/exhibition/headclub/getteambytype/${tournamentId}`;
+    //     return axiosClient.get(url);
+    // },
 
     getTop3TeamByType: (exhibitionTypeId) => {
         const url = `/exhibition/headclub/gettop3teambytype/${exhibitionTypeId}`;
