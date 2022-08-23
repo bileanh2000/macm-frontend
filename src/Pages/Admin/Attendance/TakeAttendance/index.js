@@ -68,14 +68,108 @@ function TakeAttendance() {
         getAttendanceByStudentId();
     }, []);
 
+    // const columns = [
+    //     { field: 'id', headerName: 'Số thứ tự', flex: 0.5 },
+    //     { field: 'name', headerName: 'Tên', flex: 0.8 },
+    //     { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
+    //     {
+    //         field: 'status',
+    //         headerName: 'Trạng thái',
+    //         flex: 0.5,
+    //         cellClassName: (params) => {
+    //             if (params.value == null) {
+    //                 return '';
+    //             }
+
+    //             return clsx('status-rows', {
+    //                 active: params.value === 'Có mặt',
+    //                 deactive: params.value === 'Vắng mặt',
+    //                 subActive: params.value === 'Chưa điểm danh',
+    //             });
+    //         },
+    //     },
+    //     {
+    //         field: 'Attend',
+    //         type: 'actions',
+    //         headerName: 'Có mặt',
+    //         width: 50,
+    //         flex: 0.3,
+    //         cellClassName: 'actions',
+    //         getActions: (params) => {
+    //             if (params.row.status == 'Có mặt') {
+    //                 return [
+    //                     <GridActionsCellItem
+    //                         icon={<RadioButtonChecked />}
+    //                         label="Có mặt"
+    //                         onClick={() => toggleStatus(params.row.studentId, 1)}
+    //                         color="primary"
+    //                         aria-details="Có mặt"
+    //                     />,
+    //                 ];
+    //             } else if (params.row.status == 'Vắng mặt') {
+    //                 return [
+    //                     <GridActionsCellItem
+    //                         icon={<RadioButtonUnchecked />}
+    //                         label="Có mặt"
+    //                         onClick={() => toggleStatus(params.row.studentId, 1)}
+    //                     />,
+    //                 ];
+    //             }
+    //             return [
+    //                 <GridActionsCellItem
+    //                     icon={<RadioButtonUnchecked />}
+    //                     label="Có mặt"
+    //                     onClick={() => toggleStatus(params.row.studentId, 1)}
+    //                 />,
+    //             ];
+    //         },
+    //     },
+    //     {
+    //         field: 'Absent',
+    //         type: 'actions',
+    //         headerName: 'Vắng mặt',
+    //         width: 50,
+    //         flex: 0.3,
+    //         cellClassName: 'actions',
+    //         getActions: (params) => {
+    //             if (params.row.status == 'Có mặt') {
+    //                 return [
+    //                     <GridActionsCellItem
+    //                         icon={<RadioButtonUnchecked />}
+    //                         label="Vắng mặt"
+    //                         onClick={() => toggleStatus(params.row.studentId, 0)}
+    //                     />,
+    //                 ];
+    //             } else if (params.row.status == 'Vắng mặt') {
+    //                 return [
+    //                     <GridActionsCellItem
+    //                         icon={<RadioButtonChecked />}
+    //                         label="Vắng mặt"
+    //                         onClick={() => toggleStatus(params.row.studentId, 0)}
+    //                         color="primary"
+    //                     />,
+    //                 ];
+    //             }
+    //             return [
+    //                 <GridActionsCellItem
+    //                     icon={<RadioButtonUnchecked />}
+    //                     label="Vắng mặt"
+    //                     onClick={() => toggleStatus(params.row.studentId, 0)}
+    //                     color="primary"
+    //                 />,
+    //             ];
+    //         },
+    //     },
+    // ];
+
     const columns = [
-        { field: 'id', headerName: 'Số thứ tự', flex: 0.5 },
-        { field: 'name', headerName: 'Tên', flex: 0.8 },
-        { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
+        { field: 'id', headerName: 'Số thứ tự', width: 10 },
+        { field: 'name', headerName: 'Tên', width: 150 },
+        { field: 'studentId', headerName: 'Mã sinh viên', width: 150 },
         {
             field: 'status',
             headerName: 'Trạng thái',
-            flex: 0.5,
+            width: 150,
             cellClassName: (params) => {
                 if (params.value == null) {
                     return '';
@@ -93,7 +187,7 @@ function TakeAttendance() {
             type: 'actions',
             headerName: 'Có mặt',
             width: 50,
-            flex: 0.3,
+            // flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
                 if (params.row.status == 'Có mặt') {
@@ -129,7 +223,7 @@ function TakeAttendance() {
             type: 'actions',
             headerName: 'Vắng mặt',
             width: 50,
-            flex: 0.3,
+            // flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
                 if (params.row.status == 'Có mặt') {

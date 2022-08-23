@@ -15,7 +15,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import classNames from 'classnames/bind';
-import styles from 'src/Pages/Admin/Event/Event.module.scss';
+import styles from './EventItem.module.scss';
 import { Link, useNavigate } from 'react-router-dom';
 
 import moment from 'moment';
@@ -146,7 +146,14 @@ function EventItem({ data, onSuccess }) {
                                 )}
                             </Box> */}
                             <Box sx={{ ml: 2 }}>
-                                {data.join ? <div className={cx('joined')}>Đã đăng ký</div> : null}
+                                {/* {data.join ? <div className={cx('joined')}>Đã đăng ký</div> : null} */}
+                                {data.registerStatus === 'Đã chấp nhận' ? (
+                                    <div className={cx('joined')}>Đăng ký thành công</div>
+                                ) : data.registerStatus === 'Đang chờ duyệt' ? (
+                                    <div className={cx('upcoming')}>Đang chờ duyệt</div>
+                                ) : data.registerStatus === 'Đã từ chối' ? (
+                                    <div className={cx('reject')}>Đã từ chối</div>
+                                ) : null}
                             </Box>
                         </Box>
 

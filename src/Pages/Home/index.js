@@ -131,6 +131,20 @@ function Index() {
                     <Schedule />
                 </Grid>
                 <Grid item md={2} xs={12} order={{ md: 2, xs: 1 }}>
+                    <Grid item md={12} sx={{ p: 0.5 }}>
+                        <Box
+                            sx={{
+                                p: 2,
+                                mb: 2,
+                                textAlign: 'center',
+                                fontWeight: 'bold',
+                                backgroundColor: '#16ce8e',
+                                color: 'white',
+                            }}
+                        >
+                            Bạn đã được điểm danh hôm nay!
+                        </Box>
+                    </Grid>
                     <Grid item md={12}>
                         <News
                             name={JSON.parse(localStorage.getItem('currentUser')).name}

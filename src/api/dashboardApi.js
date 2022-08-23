@@ -19,8 +19,8 @@ const dashboardApi = {
         return axiosClient.get(url);
     },
 
-    getAllUpcomingActivities: () => {
-        const url = `/admin/dashboard/getallupcomingactivities`;
+    getAllUpcomingActivities: (filterType) => {
+        const url = `/admin/dashboard/getallupcomingactivities/${filterType}`;
         return axiosClient.get(url);
     },
 

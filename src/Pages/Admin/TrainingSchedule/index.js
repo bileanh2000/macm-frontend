@@ -45,6 +45,9 @@ export const CustomTrainingSchedule = styled.div`
         // bottom: 50%;
         // left: 50%;
     }
+    .fc-event-past {
+        background-color: #f9d79f !important;
+    }
     .fc-day-future:hover {
         background-color: #d0e6fb !important;
     }
@@ -176,9 +179,7 @@ function TrainingSchedule() {
         container['display'] = 'background';
         container['type'] = item.type;
 
-        // container['backgroundColor'] = '#5ba8f5';
         container['backgroundColor'] = item.type === 0 ? '#9fccf9' : item.type === 1 ? '#edf2fc' : '#edf2fc';
-
         return container;
     });
 
@@ -271,7 +272,7 @@ function TrainingSchedule() {
                 ) : (
                     <Box>
                         <Box sx={{ ml: '10px' }}>
-                            <div className={cx('event-title')} style={{ opacity: 0 }}>
+                            <div className={cx('event-title')} style={{ opacity: 1 }}>
                                 {/* {eventInfo.event.title} <br />
                                 {eventInfo.event.extendedProps.time} */}
                                 Lorem ipsum, dolor sit amet consectetur adipisicing elit. Rem cumque voluptatum nihil

@@ -187,10 +187,7 @@ function TournamentSchedule({ isUpdate }) {
             <Tooltip title={eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time} placement="top">
                 <Box>
                     <Box sx={{ mt: 3, ml: 0.5, fontWeight: '500', fontSize: '14px' }}>
-                        <div>
-                            {eventInfo.event.title} <br />
-                            {eventInfo.event.extendedProps.time}
-                        </div>
+                        <div>{eventInfo.event.extendedProps.time}</div>
                     </Box>
                 </Box>
             </Tooltip>
