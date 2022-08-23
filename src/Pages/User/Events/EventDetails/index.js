@@ -43,6 +43,7 @@ import NoValuePage from 'src/Components/NoValuePage';
 import LoadingProgress from 'src/Components/LoadingProgress';
 import RegisterEventDialog from '../RegisterEventDialog';
 import ConfirmCancel from '../ConfirmDialog';
+import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 // import AdminTournament from '../AdminTournament';
 // import MemberTournament from '../MemberTournament';
 
@@ -201,7 +202,7 @@ function UserEventDetails() {
         return <LoadingProgress />;
     }
     return (
-        <Box sx={{ m: 1, p: 1, height: '80vh' }}>
+        <Box sx={{}}>
             {/* {tournament && scheduleList[0] && (
                 
             )} */}
@@ -240,7 +241,14 @@ function UserEventDetails() {
                     />
                     <Paper elevation={3}>
                         <Container maxWidth="lg">
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    flexWrap: 'wrap',
+                                }}
+                            >
                                 <Box sx={{ display: 'flex', pt: 1 }}>
                                     <Box>
                                         <Box
@@ -256,6 +264,7 @@ function UserEventDetails() {
                                                 justifyContent: 'center',
                                                 flex: 1,
                                                 mb: 1,
+                                                flexWrap: 'wrap',
                                             }}
                                         >
                                             <CelebrationIcon fontSize="large" sx={{ color: '#0ACE70' }} />
@@ -271,7 +280,7 @@ function UserEventDetails() {
                                         </Typography>
                                     </Box>
                                 </Box>
-                                <Box>
+                                <Box sx={{ mb: 1 }}>
                                     {new Date(scheduleList[0].date) > new Date() ? (
                                         !checkEventJoined() ? (
                                             <Fragment>
@@ -289,14 +298,13 @@ function UserEventDetails() {
                                             </Fragment>
                                         ) : (
                                             <Button
+                                                startIcon={<AccessTimeFilledIcon />}
                                                 variant="outlined"
-                                                color="error"
+                                                color="warning"
                                                 onClick={() => setOpenConfirmDialog(true)}
-                                                {...(handleRegisterEventDeadline()
-                                                    ? { disabled: false }
-                                                    : { disabled: true })}
+                                                disabled
                                             >
-                                                Hủy đăng ký tham gia
+                                                Đang chờ duyệt
                                             </Button>
                                         )
                                     ) : (

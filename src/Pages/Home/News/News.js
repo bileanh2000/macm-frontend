@@ -23,7 +23,7 @@ import UpNext from 'src/Pages/Admin/Home/UpNext';
 const cx = classNames.bind(styles);
 function News({ name, studentId, roleName, email, isAdmin }) {
     const [qrCode, setQrCode] = useState('');
-    const [checked, setChecked] = React.useState(false);
+    const [checked, setChecked] = React.useState(true);
 
     const handleChange = () => {
         setChecked((prev) => !prev);

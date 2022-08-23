@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import EventItem from './EventItem';
+import MobileEventItem from './EventItem/MobileLayout';
 
 const cx = classNames.bind(styles);
 
@@ -36,7 +37,7 @@ function EventList() {
     const [pageSize, setPageSize] = useState(0);
     const [semester, setSemester] = useState('Summer2022');
     const [monthInSemester, setMonthInSemester] = useState([]);
-    const [month, setMonth] = useState(0);
+    const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [semesterList, setSemesterList] = useState([]);
     const [totalResult, setTotalResult] = useState([]);
     const theme = useTheme();
@@ -97,14 +98,16 @@ function EventList() {
         fetchSemester();
     }, []);
     useEffect(() => {
+        // let currentMonth = new Date().getMonth() + 1;
+        // setMonth(currentMonth);
         fetchMonthInSemester(semester);
-        getListEventsBySemester(JSON.parse(localStorage.getItem('currentUser')).studentId, month, page - 1, semester);
-    }, [semester, month, page]);
-
+    }, [semester]);
     useEffect(() => {
-        let currentMonth = new Date().getMonth() + 1;
-        setMonth(currentMonth);
-    }, []);
+        // let currentMonth = new Date().getMonth() + 1;
+        // setMonth(currentMonth);
+        getListEventsBySemester(JSON.parse(localStorage.getItem('currentUser')).studentId, month, page - 1, semester);
+    }, [month, semester, page]);
+
     if (!events.length && totalResult) {
         return <LoadingProgress />;
     }
@@ -162,60 +165,112 @@ function EventList() {
                             {goingOnEvents.length !== 0 ? (
                                 <Box sx={{ mb: 2 }}>
                                     {matches ? (
-                                        <Typography sx={{ fontWeight: 'bold', mb: 1, ml: 32 }}>Đang diễn ra</Typography>
+                                        <>
+                                            <Typography sx={{ fontWeight: 'bold', mb: 1, ml: 32 }}>
+                                                Đang diễn ra
+                                            </Typography>
+                                            <ul>
+                                                {goingOnEvents &&
+                                                    goingOnEvents.map((item) => {
+                                                        return <EventItem key={item.id} data={item} />;
+                                                    })}
+                                            </ul>
+                                        </>
                                     ) : (
-                                        <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Đang diễn ra</Typography>
+                                        <>
+                                            <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Đang diễn ra</Typography>
+                                            <ul>
+                                                {goingOnEvents &&
+                                                    goingOnEvents.map((item) => {
+                                                        return <MobileEventItem key={item.id} data={item} />;
+                                                    })}
+                                            </ul>
+                                        </>
                                     )}
-                                    <ul>
-                                        {goingOnEvents &&
-                                            goingOnEvents.map((item) => {
-                                                return <EventItem key={item.id} data={item} />;
-                                            })}
-                                    </ul>
                                 </Box>
                             ) : null}
 
                             {upComingEvents.length !== 0 ? (
                                 <Box>
                                     {matches ? (
-                                        <Typography sx={{ fontWeight: 'bold', mb: 1, ml: 32 }}>Sắp diễn ra</Typography>
+                                        <>
+                                            <Typography sx={{ fontWeight: 'bold', mb: 1, ml: 32 }}>
+                                                Sắp diễn ra
+                                            </Typography>
+                                            <ul>
+                                                {upComingEvents &&
+                                                    upComingEvents.map((item) => {
+                                                        return (
+                                                            <EventItem
+                                                                key={item.id}
+                                                                data={item}
+                                                                onSuccess={(deletedId) =>
+                                                                    setUpComingEvents((prev) =>
+                                                                        prev.filter((item) => item.id !== deletedId),
+                                                                    )
+                                                                }
+                                                            />
+                                                        );
+                                                    })}
+                                            </ul>
+                                        </>
                                     ) : (
-                                        <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Sắp diễn ra</Typography>
+                                        <>
+                                            <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Sắp diễn ra</Typography>
+                                            <ul>
+                                                {upComingEvents &&
+                                                    upComingEvents.map((item) => {
+                                                        return (
+                                                            <MobileEventItem
+                                                                key={item.id}
+                                                                data={item}
+                                                                onSuccess={(deletedId) =>
+                                                                    setUpComingEvents((prev) =>
+                                                                        prev.filter((item) => item.id !== deletedId),
+                                                                    )
+                                                                }
+                                                            />
+                                                        );
+                                                    })}
+                                            </ul>
+                                        </>
                                     )}
                                     {/* <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Sắp diễn ra</Typography> */}
-                                    <ul>
-                                        {upComingEvents &&
-                                            upComingEvents.map((item) => {
-                                                return (
-                                                    <EventItem
-                                                        key={item.id}
-                                                        data={item}
-                                                        onSuccess={(deletedId) =>
-                                                            setUpComingEvents((prev) =>
-                                                                prev.filter((item) => item.id !== deletedId),
-                                                            )
-                                                        }
-                                                    />
-                                                );
-                                            })}
-                                    </ul>
                                 </Box>
                             ) : null}
                             {closedEvent.length !== 0 ? (
                                 <>
                                     {matches ? (
-                                        <Typography sx={{ fontWeight: 'bold', mb: 1, ml: 32 }}>Đã kết thúc</Typography>
+                                        <>
+                                            <Typography sx={{ fontWeight: 'bold', mb: 1, ml: 32 }}>
+                                                Đã kết thúc
+                                            </Typography>
+                                            <ul>
+                                                {closedEvent &&
+                                                    closedEvent.map((item) => {
+                                                        return <EventItem key={item.id} data={item} isMember={true} />;
+                                                    })}
+                                            </ul>
+                                        </>
                                     ) : (
-                                        <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Đã kết thúc</Typography>
+                                        <>
+                                            <Typography sx={{ fontWeight: 'bold', mb: 1 }}>Đã kết thúc</Typography>
+                                            <Box sx={{ height: '40vh', overflowY: 'overlay' }}>
+                                                <ul>
+                                                    {closedEvent &&
+                                                        closedEvent.map((item) => {
+                                                            return (
+                                                                <MobileEventItem
+                                                                    key={item.id}
+                                                                    data={item}
+                                                                    isMember={true}
+                                                                />
+                                                            );
+                                                        })}
+                                                </ul>
+                                            </Box>
+                                        </>
                                     )}
-                                    <Box sx={{ height: '40vh', overflowY: 'overlay' }}>
-                                        <ul>
-                                            {closedEvent &&
-                                                closedEvent.map((item) => {
-                                                    return <EventItem key={item.id} data={item} isMember={true} />;
-                                                })}
-                                        </ul>
-                                    </Box>
                                 </>
                             ) : null}
                         </Grid>

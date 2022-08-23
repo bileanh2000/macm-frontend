@@ -96,8 +96,8 @@ const userApi = {
         return axiosClient.get(url);
     },
 
-    getAllAttendanceStatusBySemester: (studentId, semester) => {
-        const url = `/admin/headtechnique/getallattendancestatusbystudentidandsemester/${studentId}?semester=${semester}`;
+    getAllAttendanceStatusBySemester: (studentId, semester, month) => {
+        const url = `/admin/headtechnique/getallattendancestatusbystudentidandsemester/${studentId}?semester=${semester}&month=${month}`;
         return axiosClient.get(url);
     },
     getAllRole: () => {

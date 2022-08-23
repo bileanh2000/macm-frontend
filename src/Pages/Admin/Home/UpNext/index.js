@@ -1,5 +1,17 @@
-import { Fragment, useState } from 'react';
-import { Avatar, Box, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
+import { Fragment, useEffect, useState } from 'react';
+import {
+    Avatar,
+    Box,
+    Divider,
+    FormControl,
+    List,
+    ListItem,
+    ListItemAvatar,
+    ListItemText,
+    MenuItem,
+    Select,
+    Typography,
+} from '@mui/material';
 import ImageIcon from '@mui/icons-material/Image';
 import WorkIcon from '@mui/icons-material/Work';
 import BeachAccessIcon from '@mui/icons-material/BeachAccess';
@@ -13,13 +25,17 @@ import { useNavigate } from 'react-router-dom';
 
 function UpNext({ isAdmin }) {
     const [upcomingActivity, setUpcomingActivity] = useState([]);
+    const [filterType, setFilterType] = useState(0);
+    const [messages, setMessages] = useState('');
+
     let navigate = useNavigate();
 
-    const getAllUpcomingActivities = async () => {
+    const getAllUpcomingActivities = async (filterType) => {
         try {
-            const response = await dashboardApi.getAllUpcomingActivities();
+            const response = await dashboardApi.getAllUpcomingActivities(filterType);
             setUpcomingActivity(response.data);
             console.log('getAllUpcomingActivities', response);
+            setMessages(response.message);
         } catch (error) {
             console.log('failed at getAllUpcomingActivities:', error);
         }
@@ -40,15 +56,41 @@ function UpNext({ isAdmin }) {
             }
         }
     };
+    const handleChange = (event) => {
+        setFilterType(event.target.value);
+    };
 
-    useState(() => {
-        getAllUpcomingActivities();
-    }, []);
+    useEffect(() => {
+        getAllUpcomingActivities(filterType);
+    }, [filterType]);
+
+    if (messages === 'Sắp tới không có hoạt động nào') {
+        return (
+            <Box>
+                <Typography sx={{ textAlign: 'center' }}>Sắp tới không có hoạt động nào!</Typography>
+            </Box>
+        );
+    }
     return (
         <Fragment>
-            <Typography variant="h6" color="initial">
-                Hoạt động trong 1 tháng tới
-            </Typography>
+            <Box sx={{ mb: 0.5 }}>
+                <Typography variant="h6" color="initial">
+                    Hoạt động sắp tới
+                </Typography>
+                <FormControl size="small">
+                    <Select
+                        id="demo-simple-select"
+                        value={filterType}
+                        displayEmpty
+                        onChange={handleChange}
+                        variant="outlined"
+                    >
+                        <MenuItem value={0}>1 tuần</MenuItem>
+                        <MenuItem value={1}>1 tháng</MenuItem>
+                        <MenuItem value={2}>1 kỳ</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
             <Box sx={{ height: '328px', overflow: 'auto' }}>
                 <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                     {upcomingActivity.map((activity, index) => {

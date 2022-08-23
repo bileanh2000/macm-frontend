@@ -7,21 +7,42 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { Square } from '@mui/icons-material';
 import trainingSchedule from 'src/api/trainingScheduleApi';
 import styles from './Schedule.module.scss';
-import { Box, Button, FormControl, MenuItem, Paper, Select, Tooltip, Typography } from '@mui/material';
+import {
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControl,
+    MenuItem,
+    Paper,
+    Select,
+    Tooltip,
+    Typography,
+} from '@mui/material';
 import userApi from 'src/api/userApi';
 import styled from '@emotion/styled';
 import ReactDOM from 'react-dom';
 import LoadingProgress from 'src/Components/LoadingProgress';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import PendingIcon from '@mui/icons-material/Pending';
+import moment from 'moment';
 
 const cx = classNames.bind(styles);
 
 export const StyleWrapper = styled.div`
     .fc-event-past {
-        background-color: none !important;
+        background-color: #ededed !important;
     }
     // .fc-event::after {
     //     content: 'hahaah';
     // }
+    .fc-day-today a {
+        font-weight: bold;
+    }
 `;
 function Schedule() {
     const nowDate = new Date();
@@ -30,11 +51,24 @@ function Schedule() {
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
     const [calendarView, setCalendarView] = useState('dayGridWeek');
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
+    const [selectedEvent, setSelectedEvent] = useState({
+        isOpen: false,
+        eventName: '',
+        eventStartDate: '',
+        eventFinishDate: '',
+        eventFinishTime: '',
+        attendanceStatus: '',
+        description: '',
+        type: -1,
+        time: '',
+        id: '',
+        eventStartTime: '',
+    });
 
     const handleChange = (event) => {
         setType(event.target.value);
         console.log(event.target.value);
-        fetchCommonScheduleBySemester(event.target.value);
+        fetchCommonScheduleBySemester(event.target.value, studentId);
     };
 
     const getMonthInCurrentTableView = (startDate) => {
@@ -61,7 +95,7 @@ function Schedule() {
     };
     useEffect(() => {
         fetchCommonScheduleBySemester(type, studentId);
-    }, [type, studentId]);
+    }, [type]);
 
     const scheduleData = commonList.map((item) => {
         const container = {};
@@ -72,6 +106,14 @@ function Schedule() {
         container['description'] = item.title + ' ' + item.startTime.slice(0, 5) + ' - ' + item.finishTime.slice(0, 5);
         container['display'] = 'background';
         container['type'] = item.type;
+        container['description'] = item.description;
+
+        container['startTimeEvent'] = item.startTimeEvent;
+        container['endTimeEvent'] = item.endTimeEvent;
+        container['startDateEvent'] = item.startDateEvent;
+        container['endDateEvent'] = item.endDateEvent;
+        container['endTimeEvent'] = item.endTimeEvent;
+        container['startDate'] = item.date;
         container['status'] = item.status;
 
         // 0 la vang, 1 la co mat, 2 chua diem danh
@@ -84,7 +126,7 @@ function Schedule() {
     //     return <LoadingProgress />;
     // }
     const renderEventContent = (eventInfo) => {
-        // console.log(eventInfo);
+        console.log(eventInfo);
         return (
             <Tooltip title={eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time} placement="top">
                 {calendarView === 'dayGridWeek' ? (
@@ -99,26 +141,50 @@ function Schedule() {
                                 {eventInfo.event.extendedProps.time}
                             </div>
 
-                            {eventInfo.event.extendedProps.status === 0 ? (
-                                <div className={cx('absent')}>Vắng mặt</div>
+                            {eventInfo.event.extendedProps.type === 2 ? null : eventInfo.event.extendedProps.status ===
+                              0 ? (
+                                // <div className={cx('absent')}>Vắng mặt</div>
+                                <CancelIcon sx={{ color: '#fc6262' }} />
                             ) : eventInfo.event.extendedProps.status === 1 ? (
-                                <div className={cx('attend')}>Có mặt</div>
+                                // <div className={cx('attend')}>Có mặt</div>
+                                <CheckCircleIcon sx={{ color: '#56f000' }} />
                             ) : (
-                                <div className={cx('not-yet')}>Not yet</div>
+                                // <div className={cx('not-yet')}>Chưa điểm danh</div>
+                                <PendingIcon sx={{ color: '#1f67ed' }} />
                             )}
                         </Box>
                     </Box>
                 ) : (
-                    <Box>
+                    // <Box>
+                    //     <Box sx={{ ml: 0.5 }} className={cx('tooltip')}>
+                    //         <div className={cx('event-title')}>
+                    //             {eventInfo.event.title} <br />
+                    //             {eventInfo.event.extendedProps.time}
+                    //         </div>
+                    //     </Box>
+                    // </Box>
+                    <Box sx={{ height: '100%' }}>
                         <Box sx={{ ml: 0.5 }} className={cx('tooltip')}>
                             {/* <p className={cx('tooltiptext')}>
-
+ 
 </p> */}
                             {/* <b>{eventInfo.timeText}</b> */}
                             <div className={cx('event-title')}>
                                 {eventInfo.event.title} <br />
                                 {eventInfo.event.extendedProps.time}
                             </div>
+
+                            {eventInfo.event.extendedProps.type === 2 ? null : eventInfo.event.extendedProps.status ===
+                              0 ? (
+                                // <div className={cx('absent')}>Vắng mặt</div>
+                                <CancelIcon sx={{ color: '#fc6262' }} />
+                            ) : eventInfo.event.extendedProps.status === 1 ? (
+                                // <div className={cx('attend')}>Có mặt</div>
+                                <CheckCircleIcon sx={{ color: '#56f000' }} />
+                            ) : (
+                                // <div className={cx('not-yet')}>Chưa điểm danh</div>
+                                <PendingIcon sx={{ color: '#1f67ed' }} />
+                            )}
                         </Box>
                     </Box>
                 )}
@@ -128,9 +194,62 @@ function Schedule() {
 
     return (
         <StyleWrapper>
+            <Dialog
+                open={selectedEvent.isOpen}
+                onClose={() => setSelectedEvent({ isOpen: false })}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{selectedEvent.eventName}</DialogTitle>
+                <DialogContent>
+                    {selectedEvent.type == 1 ? (
+                        <Box>
+                            {selectedEvent.description}
+                            <br />
+                            {moment(selectedEvent.eventStartDate).format('DD/MM/yyyy') +
+                                ' - ' +
+                                moment(selectedEvent.eventEndDate).format('DD/MM/yyyy')}
+                            <br />
+                            {selectedEvent.eventStartTime.slice(0, 5) + ' - ' + selectedEvent.endTimeEvent.slice(0, 5)}
+                        </Box>
+                    ) : (
+                        <Box>
+                            {selectedEvent.description}
+                            <br />
+                            {moment(selectedEvent.date).format('DD/MM/yyyy')}
+                            <br />
+                            {selectedEvent.time}
+                        </Box>
+                    )}
+                    {selectedEvent.type === 2 ? null : selectedEvent.attendanceStatus === 0 ? (
+                        <div className={cx('absent')}>Vắng mặt</div>
+                    ) : selectedEvent.attendanceStatus === 1 ? (
+                        <div className={cx('attend')}>Có mặt</div>
+                    ) : (
+                        <div className={cx('not-yet')}>Chưa điểm danh</div>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setSelectedEvent({ isOpen: false })} autoFocus>
+                        Quay lại
+                    </Button>
+                    {selectedEvent.type == 1 || selectedEvent.type == 2 ? (
+                        <Button>
+                            <Link to={`/events/${selectedEvent.id}`}>Xem chi tiết</Link>
+                        </Button>
+                    ) : null}
+                </DialogActions>
+            </Dialog>
             <Paper sx={{ padding: '20px' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <Box sx={{ display: 'flex' }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        flexWrap: 'wrap',
+                    }}
+                >
+                    <Box sx={{ display: 'flex', mb: 1 }}>
                         <Typography variant="h5" sx={{ fontWeight: '500', mr: 2 }}>
                             Hoạt động
                         </Typography>
@@ -153,24 +272,39 @@ function Schedule() {
                     </Box>
                     {calendarView !== 'dayGridWeek' ? (
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                        <Square sx={{ color: '#BBBBBB', mr: 0.5 }} />
-                        <span>Lịch trong quá khứ</span>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                        <Square sx={{ color: '#5BA8F5', mr: 0.5 }} />
-                        <span>Tập luyện</span>
-                    </Box> */}
                             <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                                <Square sx={{ color: '#fc6262', mr: 0.5 }} />
+                                <CancelIcon sx={{ color: '#fc6262' }} />
                                 <span>Vắng mặt</span>
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                                <Square sx={{ color: '#56f000', mr: 0.5 }} />
+                                <CheckCircleIcon sx={{ color: '#56f000' }} />
                                 <span>Có mặt</span>
                             </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                                <PendingIcon sx={{ color: '#1f67ed' }} />
+                                <span>Chưa điểm danh</span>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                                <Square sx={{ color: '#ededed' }} />
+                                <span>Hoạt động trong quá khứ</span>
+                            </Box>
                         </Box>
-                    ) : null}
+                    ) : (
+                        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                                <CancelIcon sx={{ color: '#fc6262' }} />
+                                <span>Vắng mặt</span>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                                <CheckCircleIcon sx={{ color: '#56f000' }} />
+                                <span>Có mặt</span>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                                <PendingIcon sx={{ color: '#1f67ed' }} />
+                                <span>Chưa điểm danh</span>
+                            </Box>
+                        </Box>
+                    )}
                 </Box>
                 <div>
                     <div className={cx('schedule-container')}>
@@ -183,12 +317,25 @@ function Schedule() {
                                     plugins={[dayGridPlugin, interactionPlugin]}
                                     events={scheduleData}
                                     weekends={true}
-                                    // eventMouseEnter={(infor) => {
-                                    //     console.log('hover', infor);
-                                    // }}
-                                    // eventMouseLeave={(infor) => {
-                                    //     console.log('leave', infor);
-                                    // }}
+                                    eventClick={(args) => {
+                                        // navigateToUpdate(args.event.id, args.event.start);
+                                        // console.log(args);
+                                        // console.log(args.event._def.publicId);
+                                        setSelectedEvent({
+                                            isOpen: true,
+                                            eventName: args.event.title,
+                                            attendanceStatus: args.event.extendedProps.status,
+                                            eventStartDate: args.event.extendedProps.startDateEvent,
+                                            eventEndDate: args.event.extendedProps.endDateEvent,
+                                            eventStartTime: args.event.extendedProps.startTimeEvent,
+                                            endTimeEvent: args.event.extendedProps.endTimeEvent,
+                                            description: args.event.extendedProps.description,
+                                            time: args.event.extendedProps.time,
+                                            id: args.event._def.publicId,
+                                            type: args.event.extendedProps.type,
+                                            date: args.event.start,
+                                        });
+                                    }}
                                     eventContent={renderEventContent}
                                     headerToolbar={{
                                         left: 'title',
