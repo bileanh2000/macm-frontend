@@ -16,6 +16,7 @@ import {
     gridPageSizeSelector,
     GridFooterContainer,
     GridFooter,
+    GridLinkOperator,
 } from '@mui/x-data-grid';
 import {
     Alert,
@@ -518,7 +519,6 @@ function MemberAndCollaborator() {
                     }}
                 />
             )}
-
             {/* Filter */}
             <Grow in={checked}>
                 <Box
@@ -696,7 +696,6 @@ function MemberAndCollaborator() {
                     </Grid>
                 </Box>
             </Grow>
-
             <Snackbar
                 open={openSnackBar}
                 autoHideDuration={5000}
@@ -712,7 +711,7 @@ function MemberAndCollaborator() {
                     {customAlert.message}
                 </Alert>
             </Snackbar>
-            <TextField onChange={(e) => searchJson(e.target.value)}></TextField>
+            {/* <TextField onChange={(e) => searchJson(e.target.value)}></TextField> */}
             <Dialog open={openUploadFile} onClose={handleClose} fullWidth maxWidth="sm">
                 <DialogTitle>Tải lên file Excel</DialogTitle>
                 <Box component="form" onSubmit={handleSubmit(onSubmit)}>
@@ -742,10 +741,10 @@ function MemberAndCollaborator() {
                     </DialogActions>
                 </Box>
             </Dialog>
+
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                 Quản lý Thành viên và Cộng tác viên
             </Typography>
-
             <Box sx={{ marginBottom: 2, display: 'flex', justifyContent: 'space-between' }}>
                 <Box>
                     <TextField
@@ -787,14 +786,20 @@ function MemberAndCollaborator() {
                     </Button>
                 </Box>
             </Box>
-
+            <Button startIcon={<FilterListIcon />} size="small" onClick={toggleFilter} sx={{ mr: 1 }}>
+                BỘ LỌC
+            </Button>
             <Box
                 sx={{
                     height: '70vh',
                     width: '100%',
+                    'button.MuiButton-sizeSmall': { display: 'none !important' },
                 }}
             >
                 <DataGrid
+                    disableColumnFilter
+                    disableColumnSelector
+                    disableDensitySelector
                     checkboxSelection
                     rows={rowsUser}
                     columns={columns}
@@ -809,8 +814,22 @@ function MemberAndCollaborator() {
                         toolbarFilters: 'Bộ lọc tìm kiếm',
                     }}
                     components={{
-                        Toolbar: CustomToolbar,
+                        Toolbar: GridToolbar,
                         Footer: CustomFooter,
+                    }}
+                    // initialState={{
+                    //     filter: {
+                    //         filterModel: {
+                    //             items: [],
+                    //             quickFilterLogicOperator: GridLinkOperator.Or,
+                    //         },
+                    //     },
+                    // }}
+                    componentsProps={{
+                        toolbar: {
+                            showQuickFilter: true,
+                            quickFilterProps: { debounceMs: 500 },
+                        },
                     }}
                     disableSelectionOnClick={true}
                     onSelectionModelChange={(ids) => {
