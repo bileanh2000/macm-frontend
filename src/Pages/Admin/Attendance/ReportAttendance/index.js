@@ -18,6 +18,9 @@ import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 import clsx from 'clsx';
 import moment from 'moment';
 import LoadingProgress from 'src/Components/LoadingProgress';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+
+import * as XLSX from 'xlsx';
 
 function ReportAttendance() {
     const [semester, setSemester] = useState('Summer2022');
@@ -182,6 +185,16 @@ function ReportAttendance() {
     if (!attendanceList[0]) {
         return <LoadingProgress />;
     }
+
+    const downloadExcel = (data) => {
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        // const ws = XLSX.utils.json_to_sheet(data, { header: ['id', 'Tên', 'Mã Sinh Viên'] });
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+        //let buffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+        //XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
+        XLSX.writeFile(workbook, 'MACM_ReportAttendance.xlsx');
+    };
     return (
         <div>
             <Box sx={{ display: 'flex', position: 'absolute', top: '244px', left: '37px', zIndex: 2 }}>
@@ -210,44 +223,61 @@ function ReportAttendance() {
                         Thống kê thành viên tham gia buổi tập
                     </Typography>
                 </Grid>
-                <Grid item xs={8}>
-                    <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                        <TextField
-                            sx={{ mr: 1 }}
-                            id="outlined-select-currency"
-                            select
-                            size="small"
-                            label="Chọn kỳ"
-                            value={semester}
-                            onChange={handleChange}
+                {/* <button onClick={() => downloadExcel(selectedRows)}>Download As Excel</button> */}
+
+                <Grid item xs={12}>
+                    <Box sx={{ fontWeight: 500, marginBottom: 2, display: 'flex', justifyContent: 'space-between' }}>
+                        <Box>
+                            <TextField
+                                sx={{ mr: 1 }}
+                                id="outlined-select-currency"
+                                select
+                                size="small"
+                                label="Chọn kỳ"
+                                value={semester}
+                                onChange={handleChange}
+                            >
+                                {semesterList.map((option) => (
+                                    <MenuItem key={option.id} value={option.name}>
+                                        {option.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                            <TextField
+                                id="outlined-select-currency"
+                                select
+                                size="small"
+                                label="Chọn vai trò"
+                                value={roleId}
+                                onChange={handleChangeRoleId}
+                            >
+                                <MenuItem value={0}>Tất cả</MenuItem>
+                                <MenuItem value={-1}>Thành viên</MenuItem>
+                                <MenuItem value={-2}>Cộng tác viên</MenuItem>
+                                <MenuItem value={10}>Thành viên ban truyền thông</MenuItem>
+                                <MenuItem value={11}>Thành viên ban văn hóa</MenuItem>
+                                <MenuItem value={12}>Thành viên ban chuyên môn</MenuItem>
+                                <MenuItem value={13}>CTV ban truyền thông</MenuItem>
+                                <MenuItem value={14}>CTV ban văn hóa</MenuItem>
+                                <MenuItem value={15}>CTV ban chuyên môn</MenuItem>
+                            </TextField>
+                        </Box>
+                        <Button
+                            variant="outlined"
+                            startIcon={<FileDownloadOutlinedIcon />}
+                            onClick={() => {
+                                if (!selectedRows.length) {
+                                    downloadExcel(attendanceList);
+                                } else {
+                                    downloadExcel(selectedRows);
+                                }
+                            }}
                         >
-                            {semesterList.map((option) => (
-                                <MenuItem key={option.id} value={option.name}>
-                                    {option.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                        <TextField
-                            id="outlined-select-currency"
-                            select
-                            size="small"
-                            label="Chọn vai trò"
-                            value={roleId}
-                            onChange={handleChangeRoleId}
-                        >
-                            <MenuItem value={0}>Tất cả</MenuItem>
-                            <MenuItem value={-1}>Thành viên</MenuItem>
-                            <MenuItem value={-2}>Cộng tác viên</MenuItem>
-                            <MenuItem value={10}>Thành viên ban truyền thông</MenuItem>
-                            <MenuItem value={11}>Thành viên ban văn hóa</MenuItem>
-                            <MenuItem value={12}>Thành viên ban chuyên môn</MenuItem>
-                            <MenuItem value={13}>CTV ban truyền thông</MenuItem>
-                            <MenuItem value={14}>CTV ban văn hóa</MenuItem>
-                            <MenuItem value={15}>CTV ban chuyên môn</MenuItem>
-                        </TextField>
-                    </Typography>
+                            Xuất Excel{' '}
+                            {selectedRows.length > 0 ? `đã chọn (${selectedRows.length})` : `toàn bộ danh sách`}
+                        </Button>
+                    </Box>
                 </Grid>
-                <Grid item xs={4}></Grid>
             </Grid>
             <Box
                 sx={{
