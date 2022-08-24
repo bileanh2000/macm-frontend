@@ -83,6 +83,7 @@ function MemberAndCollaborator() {
     const [isUpdate, setIsUpdate] = useState(false);
     const [errorList, setErrorList] = useState([]);
     const [searchResult, setSearchResult] = useState([]);
+
     // const [filter, setFilter] = useState({
     //     generation: -1,
     //     gender: -1,
@@ -162,10 +163,12 @@ function MemberAndCollaborator() {
         // resolver: yupResolver(validationSchema),
         // mode: 'onBlur',
     });
-    const handleUpdateStatus = (id) => {
-        console.log(id);
+    const handleUpdateStatus = (id, name) => {
+        console.log(id, name);
         const params = { semester: semester, studentId: id };
         userApi.updateUserStatus(params).then((res) => {
+            let status = res.data[0].active === false ? 'Deactive' : 'Active';
+            enqueueSnackbar(`Cập nhật trạng thái cho ${id} - ${name} thành công: ${status}`, { variant: 'success' });
             setUserList((oldUserList) => {
                 return oldUserList.map((user) => {
                     if (user.studentId === id) {
@@ -232,7 +235,7 @@ function MemberAndCollaborator() {
                         variant="contained"
                         color="primary"
                         onClick={(event) => {
-                            handleUpdateStatus(cellValues.row.studentId);
+                            handleUpdateStatus(cellValues.row.studentId, cellValues.row.name);
                         }}
                         // onClick={(event) => {
                         //     toggleStatus(cellValues.row.studentId);
@@ -678,7 +681,7 @@ function MemberAndCollaborator() {
                                     variant="outlined"
                                     sx={{ mr: 1 }}
                                     onClick={() => {
-                                        // reset({ endDate: '' });
+                                        reset({ endDate: null, startDate: null });
                                         console.log('heheh');
                                         setGender(-1);
                                         setGeneration(-1);

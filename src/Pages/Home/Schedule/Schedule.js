@@ -35,13 +35,17 @@ const cx = classNames.bind(styles);
 
 export const StyleWrapper = styled.div`
     .fc-event-past {
-        background-color: #ededed !important;
+        background-color: #f5f5f5 !important;
+    }
+    .fc-day-past {
+        background-color: #f5f5f5 !important;
     }
     // .fc-event::after {
     //     content: 'hahaah';
     // }
     .fc-day-today a {
         font-weight: bold;
+        text-decoration: underline !important;
     }
 `;
 function Schedule() {
@@ -130,7 +134,7 @@ function Schedule() {
         return (
             <Tooltip title={eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time} placement="top">
                 {calendarView === 'dayGridWeek' ? (
-                    <Box sx={{ backgroundColor: '#fff', height: '100%' }}>
+                    <Box sx={{ height: '100%' }}>
                         <Box sx={{ ml: 0.5 }} className={cx('tooltip')}>
                             {/* <p className={cx('tooltiptext')}>
      
@@ -284,10 +288,10 @@ function Schedule() {
                                 <PendingIcon sx={{ color: '#1f67ed' }} />
                                 <span>Chưa điểm danh</span>
                             </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                            {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
                                 <Square sx={{ color: '#ededed' }} />
                                 <span>Hoạt động trong quá khứ</span>
-                            </Box>
+                            </Box> */}
                         </Box>
                     ) : (
                         <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>

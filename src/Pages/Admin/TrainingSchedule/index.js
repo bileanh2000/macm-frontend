@@ -20,6 +20,7 @@ import EditSession from './editSession';
 import AddSchedule from './addSchedule';
 import { IfAllGranted, IfAuthorized, IfAnyGranted, IfNoneGranted } from 'react-authorization';
 import ForbiddenPage from 'src/Pages/ForbiddenPage';
+import ViewSession from './viewSession';
 
 const cx = classNames.bind(styles);
 
@@ -35,6 +36,9 @@ export const CustomTrainingSchedule = styled.div`
     .fc-event {
         cursor: pointer;
     }
+    // .fc-event-today {
+    //     background: none !important;
+    // }
     .fc-day-future:hover:after {
         content: 'Tạo buổi tập';
         position: absolute;
@@ -45,9 +49,9 @@ export const CustomTrainingSchedule = styled.div`
         // bottom: 50%;
         // left: 50%;
     }
-    .fc-event-past {
-        background-color: #f9d79f !important;
-    }
+    // .fc-event-past {
+    //     background-color: #f0f0f0 !important;
+    // }
     .fc-day-future:hover {
         background-color: #d0e6fb !important;
     }
@@ -62,6 +66,14 @@ export const CustomTrainingSchedule = styled.div`
         // text-align: center;
         font-weight: bold;
     }
+    // .fc-day-today:hover:after {
+    //     // content: 'Không buổi tập';
+    //     position: absolute;
+    //     margin-top: -8vh;
+    //     margin-left: 6px;
+    //     font-weight: bold;
+    //     font-size: 0.8rem;
+    // }
     .fc-daygrid-day-number {
         margin: 7px;
     }
@@ -88,8 +100,10 @@ function TrainingSchedule() {
     const [isOpenAddSessionDialog, setIsOpenAddSessionDialog] = useState(false);
     const [isOpenAddScheduleDialog, setIsOpenAddScheduleDialog] = useState(false);
     const [isOpenEditSessionDialog, setIsOpenEditSessionDialog] = useState(false);
+    const [isOpenViewSessionDialog, setIsOpenViewSessionDialog] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
+    const [trainingId, setTrainingId] = useState();
 
     const calendarComponentRef = useRef(null);
 
@@ -129,15 +143,6 @@ function TrainingSchedule() {
             console.log('That bai roi huhu, semester: ', error);
         }
     };
-    // const getCurrentSemester = async () => {
-    //     try {
-    //         const response = await semesterApi.getCurrentSemester();
-    //         console.log('thanh cong roi, currentSemester:', response);
-    //         setCurrentSemester(response.data);
-    //     } catch (error) {
-    //         console.log('failed in get current semester', error);
-    //     }
-    // };
     const goToSemester = (date) => {
         let calApi = calendarComponentRef.current.getApi();
         calApi.gotoDate(date);
@@ -179,16 +184,18 @@ function TrainingSchedule() {
         container['display'] = 'background';
         container['type'] = item.type;
 
-        container['backgroundColor'] = item.type === 0 ? '#9fccf9' : item.type === 1 ? '#edf2fc' : '#edf2fc';
+        // container['backgroundColor'] = item.type === 0 ? '#9fccf9' : item.type === 1 ? '#edf2fc' : '#edf2fc';
+        // container['backgroundColor'] = item.type === 0 ? '#fff' : item.type === 1 ? '#fff' : '#fff';
         return container;
     });
 
     const handleEventAdd = () => {
         console.log('selected');
     };
-    let navigate = useNavigate();
     const navigateToUpdate = (params, date) => {
         // console.log(date, nowDate);
+        setSelectedDate(date);
+        setTrainingId(params);
         const filterEventClicked = commonList.filter((item) => item.date === moment(date).format('YYYY-MM-DD'));
         console.log('filter event clicked', filterEventClicked);
         if (filterEventClicked[0].type !== 0) {
@@ -202,23 +209,37 @@ function TrainingSchedule() {
             new Date(date) < new Date()
         ) {
             console.log('lịch tập quá khứ');
-            navigate(
-                { pathname: '../admin/attendance' },
-                { state: { date: moment(date).format('DD/MM/YYYY'), id: params } },
-            );
+            setIsOpenViewSessionDialog(true);
+            // navigate(
+            //     { pathname: '../admin/attendance' },
+            //     { state: { date: moment(date).format('DD/MM/YYYY'), id: params } },
+            // );
         } else {
             console.log('lich tap tuong lai, update');
-            setSelectedDate(date);
             setIsOpenEditSessionDialog(true);
         }
     };
     const navigateToCreate = (date) => {
-        console.log(date);
+        // console.log(date);
+
+        nowDate.setHours(0, 0, 0, 0);
+        let selectedDate = new Date(date);
+        selectedDate.setHours(0, 0, 0, 0);
+
+        console.log(nowDate - selectedDate);
+
         const existSession = commonList.filter((item) => item.date === date).length; //length = 0 (false) is not exist
         // const scheduleDateList = scheduleList.
-        if (new Date(date) < nowDate) {
+        if (selectedDate < nowDate) {
             return;
         }
+        if (selectedDate - nowDate === 0) {
+            console.log('aaa');
+            return;
+        }
+        // if (new Date(date) === nowDate) {
+        //     console.log('123123');
+        // }
         if (!existSession) {
             setIsDisabled(true);
             setSelectedDate(date);
@@ -230,54 +251,114 @@ function TrainingSchedule() {
         }
     };
     const renderEventContent = (eventInfo) => {
-        // console.log(eventInfo.event.start);
         let eventDate = new Date(eventInfo.event.start);
         let current = new Date();
+        current.setHours(0, 0, 0, 0);
+        // console.log(current);
 
         return (
+            // <Tooltip
+            //     title={
+            //         // eventInfo.event.extendedProps.type === 0
+            //         //     ? eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time
+            //         //     : 'Không thể tạo lịch tập (trùng hoạt động khác)'
+            //         // eventDate < current ? 'Xem thông tin điểm danh' : 'Cập nhật thời gian'?eventInfo.event.extendedProps.type === 0?'Không thể tạo lịch tập (trùng hoạt động khác)':''
+            //         eventInfo.event.extendedProps.type === 0
+            //             ? eventDate < current
+            //                 ? 'Xem thông tin điểm danh'
+            //                 : 'Cập nhật thời gian'
+            //             : `Không thể tạo lịch tập (trùng với ${eventInfo.event.title})`
+            //     }
+            //     placement="top"
+            // >
+            //     {eventInfo.event.extendedProps.type === 0 ? (
+            //         <Box sx={{ height: '100%' }}>
+            //             <Box sx={{ ml: '10px' }}>
+            //                 <div className={cx('event-title')}>
+            //                     {eventDate === current ? (
+            //                         <>
+            //                             <strong>
+            //                                 {eventInfo.event.title} <br />
+            //                                 {eventInfo.event.extendedProps.time}
+            //                             </strong>
+            //                         </>
+            //                     ) : (
+            //                         <>
+            //                             {eventInfo.event.title} <br />
+            //                             {eventInfo.event.extendedProps.time}
+            //                         </>
+            //                     )}
+            //                 </div>
+            //             </Box>
+            //         </Box>
+            //     ) : (
+            //         <Box sx={{ height: '100%', backgroundColor: 'red' }}>
+            //             <Box sx={{ ml: '10px' }}>
+            //                 <div className={cx('event-title')} style={{ opacity: 1 }}>
+            //                     {/* {eventInfo.event.title} <br />
+            //                     {eventInfo.event.extendedProps.time} */}
+            //                     Lorem ipsum, dolor sit amet consectetur adipisicing elit. Rem cumque voluptatum nihil
+            //                     magni sint cum veritatis voluptas consequuntur delectus, facere magnam quisquam
+            //                     architecto illum officiis ratione, nobis est nesciunt autem!
+            //                 </div>
+            //             </Box>
+            //         </Box>
+            //     )}
+            // </Tooltip>
             <Tooltip
                 title={
                     // eventInfo.event.extendedProps.type === 0
-                    //     ? eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time
-                    //     : 'Không thể tạo lịch tập (trùng hoạt động khác)'
-                    // eventDate < current ? 'Xem thông tin điểm danh' : 'Cập nhật thời gian'?eventInfo.event.extendedProps.type === 0?'Không thể tạo lịch tập (trùng hoạt động khác)':''
-                    eventInfo.event.extendedProps.type === 0
-                        ? eventDate < current
-                            ? 'Xem thông tin điểm danh'
-                            : 'Cập nhật thời gian'
+                    //     ? eventDate < current
+                    //         ? 'Xem thông tin điểm danh'
+                    //         : 'Cập nhật thời gian'
+                    //     : `Không thể tạo lịch tập (trùng với ${eventInfo.event.title})`
+                    eventDate < current
+                        ? eventInfo.event.extendedProps.type !== 0
+                            ? ''
+                            : 'Xem thông tin'
+                        : eventInfo.event.extendedProps.type === 0
+                        ? 'Xem thông tin'
                         : `Không thể tạo lịch tập (trùng với ${eventInfo.event.title})`
                 }
                 placement="top"
             >
-                {eventInfo.event.extendedProps.type === 0 ? (
-                    <Box>
-                        <Box sx={{ ml: '10px' }}>
+                {eventDate < current ? (
+                    eventInfo.event.extendedProps.type !== 0 ? (
+                        <Box
+                            sx={{
+                                height: '100%',
+                                backgroundColor: '#fff',
+                                // display: 'none',
+                                cursor: 'default !important',
+                            }}
+                        >
+                            <Box sx={{ ml: 0.5 }} className={cx('tooltip')}></Box>
+                        </Box>
+                    ) : (
+                        <Box sx={{ height: '100%', backgroundColor: '#edf2fc' }}>
+                            <Box sx={{ ml: 0.5 }} className={cx('tooltip')}>
+                                <div className={cx('event-title')}>
+                                    {eventInfo.event.title} <br />
+                                    {eventInfo.event.extendedProps.time}
+                                </div>
+                            </Box>
+                        </Box>
+                    )
+                ) : eventInfo.event.extendedProps.type === 0 ? (
+                    <Box sx={{ height: '100%', backgroundColor: '#9fccf9' }}>
+                        <Box sx={{ ml: 0.5 }} className={cx('tooltip')}>
                             <div className={cx('event-title')}>
-                                {eventDate === current ? (
-                                    <>
-                                        <strong>
-                                            {eventInfo.event.title} <br />
-                                            {eventInfo.event.extendedProps.time}
-                                        </strong>
-                                    </>
-                                ) : (
-                                    <>
-                                        {eventInfo.event.title} <br />
-                                        {eventInfo.event.extendedProps.time}
-                                    </>
-                                )}
+                                {eventInfo.event.title} <br />
+                                {eventInfo.event.extendedProps.time}
                             </div>
                         </Box>
                     </Box>
                 ) : (
-                    <Box>
-                        <Box sx={{ ml: '10px' }}>
-                            <div className={cx('event-title')} style={{ opacity: 1 }}>
-                                {/* {eventInfo.event.title} <br />
-                                {eventInfo.event.extendedProps.time} */}
-                                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Rem cumque voluptatum nihil
-                                magni sint cum veritatis voluptas consequuntur delectus, facere magnam quisquam
-                                architecto illum officiis ratione, nobis est nesciunt autem!
+                    <Box sx={{ height: '100%', backgroundColor: '#f0f0f0' }}>
+                        <Box sx={{ ml: 0.5 }} className={cx('tooltip')}>
+                            <div className={cx('event-title')} style={{ opacity: 0 }}>
+                                {eventInfo.event.title} <br />
+                                {eventInfo.event.extendedProps.time}
                             </div>
                         </Box>
                     </Box>
@@ -293,6 +374,19 @@ function TrainingSchedule() {
             unauthorized={<Navigate to="/forbidden" />}
         >
             <Fragment>
+                {isOpenViewSessionDialog && (
+                    <ViewSession
+                        title="Thông tin buổi tập"
+                        isOpen={isOpenViewSessionDialog}
+                        date={selectedDate}
+                        handleClose={() => {
+                            setIsOpenViewSessionDialog(false);
+                            setSelectedDate(null);
+                            setTrainingId(null);
+                        }}
+                        trainingId={trainingId}
+                    />
+                )}
                 {isOpenAddSessionDialog && (
                     <AddSession
                         title="Tạo buổi tập"
@@ -310,7 +404,7 @@ function TrainingSchedule() {
                 )}
                 {isOpenEditSessionDialog && (
                     <EditSession
-                        title="Cập nhật thời gian buổi tập"
+                        title="Thông tin buổi tập"
                         isOpen={isOpenEditSessionDialog}
                         handleClose={() => {
                             setIsOpenEditSessionDialog(false);
@@ -385,12 +479,16 @@ function TrainingSchedule() {
                         ))}
                     </TextField>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        {/* <Typography>Bấm vào ngày trống trong tương lai để tạo lịch tập</Typography>
-                    <Typography>Bấm vào lịch tập cũ để xem trạng thái điểm danh</Typography> */}
+                        <Box>
+                            <Typography>Bấm vào ngày trống trong tương lai để tạo lịch tập</Typography>
+                        </Box>
+                        <Box>
+                            <Typography>Bấm vào lịch tập trong quá khứ để xem trạng thái điểm danh</Typography>
+                        </Box>
                         {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                        <SquareIcon sx={{ color: '#BBBBBB', mr: 0.5 }} />
-                        <span>Lịch trong quá khứ</span>
-                    </Box> */}
+                            <SquareIcon sx={{ color: '#edf2fc', mr: 0.5, border: '1px solid black' }} />
+                            <span>Lịch tập trong quá khứ (bấm vào để xem thông tin điểm danh)</span>
+                        </Box> */}
                         {/* <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
                         <SquareIcon sx={{ color: '#9fccf9', mr: 0.5 }} />
                         <span>Tập luyện</span>
