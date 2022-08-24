@@ -190,7 +190,7 @@ function DetailTournament() {
         const getAllOrginizingCommitteeRole = async () => {
             try {
                 const response = await userTournamentAPI.getAllUserOrganizingCommittee(tournamentId, user.studentId);
-                console.log(response);
+                console.log('admin', response);
                 setIsJoinAdmin(response);
             } catch (error) {
                 console.log('Loi roi', error);

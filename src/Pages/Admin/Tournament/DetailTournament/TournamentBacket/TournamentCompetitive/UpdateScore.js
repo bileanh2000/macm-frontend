@@ -13,21 +13,18 @@ import {
     TableCell,
     Button,
 } from '@mui/material';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { vi } from 'date-fns/locale';
 import * as Yup from 'yup';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import moment from 'moment';
 import NumberFormat from 'react-number-format';
 import { useSnackbar } from 'notistack';
 
 import adminTournament from 'src/api/adminTournamentAPI';
 
-function UpdateScoreTournament({ winner, match, handleClose, WinnerTemp, onChangeData }) {
+function UpdateScoreTournament({ winner, match, handleClose, WinnerTemp, onChangeData, round, onHaveResult }) {
     const { enqueueSnackbar } = useSnackbar();
-    const [score1, setScore1] = useState(1);
-    const [score2, setScore2] = useState(0);
+    const [score1, setScore1] = useState();
+    const [score2, setScore2] = useState();
     const [winnerTemp, setWinnerTemp] = useState(WinnerTemp);
 
     const validationSchema = Yup.object().shape({
@@ -78,6 +75,7 @@ function UpdateScoreTournament({ winner, match, handleClose, WinnerTemp, onChang
         try {
             const res = await adminTournament.updateResultMatch(match);
             onChangeData && onChangeData();
+            match.round = round ? onHaveResult && onHaveResult() : null;
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
         } catch (error) {
@@ -89,9 +87,17 @@ function UpdateScoreTournament({ winner, match, handleClose, WinnerTemp, onChang
     const handleChange = (score, event) => {
         score == 1 ? setScore1(Number(event)) : setScore2(Number(event));
         if (score == 1) {
-            Number(event) > score2 ? setWinnerTemp(match.firstPlayer) : setWinnerTemp(match.secondPlayer);
+            typeof score2 == 'number'
+                ? Number(event) > score2
+                    ? setWinnerTemp(match.firstPlayer)
+                    : setWinnerTemp(match.secondPlayer)
+                : console.log();
         } else {
-            Number(event) > score1 ? setWinnerTemp(match.secondPlayer) : setWinnerTemp(match.firstPlayer);
+            typeof score1 == 'number'
+                ? Number(event) > score1
+                    ? setWinnerTemp(match.secondPlayer)
+                    : setWinnerTemp(match.firstPlayer)
+                : console.log();
         }
     };
 
@@ -139,7 +145,7 @@ function UpdateScoreTournament({ winner, match, handleClose, WinnerTemp, onChang
                                             onValueChange={(v) => {
                                                 onChange(Number(v.value));
                                             }}
-                                            onBlur={(v) => handleChange(1, v.target.value)}
+                                            onChange={(v) => handleChange(1, v.target.value)}
                                             error={invalid}
                                             helperText={invalid ? error.message : null}
                                             fullWidth
@@ -172,7 +178,7 @@ function UpdateScoreTournament({ winner, match, handleClose, WinnerTemp, onChang
                                             onValueChange={(v) => {
                                                 onChange(Number(v.value));
                                             }}
-                                            onBlur={(v) => handleChange(2, v.target.value)}
+                                            onChange={(v) => handleChange(2, v.target.value)}
                                             error={invalid}
                                             helperText={invalid ? error.message : null}
                                             fullWidth

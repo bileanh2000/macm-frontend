@@ -33,6 +33,7 @@ import adminTournament from 'src/api/adminTournamentAPI';
 import UpdateTimeAndArea from './UpdateTimeAndArea';
 
 function TableMatch(params) {
+    console.log(params.matches);
     const [matches, setMatches] = useState(params.matches);
     const [match, setMatch] = useState();
     const [open, setOpen] = useState(false);
@@ -59,7 +60,7 @@ function TableMatch(params) {
     const updateTimeAndPlace = async (matchId, match) => {
         try {
             const res = await adminTournament.updateTimeAndPlaceTeam(matchId, match);
-            let variant = 'success';
+            let variant = res.message.includes('trùng') ? 'error' : 'success';
             enqueueSnackbar(res.message, { variant });
             params.onUpdateResult && params.onUpdateResult();
         } catch (error) {
@@ -87,13 +88,19 @@ function TableMatch(params) {
     });
 
     const handleClickResult = (data) => {
+        if (data.score != null) {
+            return;
+        }
         setMatch(data);
         setOpen(true);
     };
 
     const handleClickUpdate = (data) => {
+        if (data.score != null) {
+            return;
+        }
         setMatch(data);
-        setAreaId(data.area.name);
+        setAreaId(data.areaName);
         setOpenUpdate(true);
     };
 
@@ -106,9 +113,9 @@ function TableMatch(params) {
     };
 
     const handleUpdate = (data) => {
-        updateResult(match.team.id, data.score);
+        updateResult(match.id, data.score);
         const newMatches = matches.map((m) => {
-            return m.team.id == match.team.id ? { ...m, score: data.score } : m;
+            return m.id == match.id ? { ...m, score: data.score } : m;
         });
         setMatches(newMatches);
         // params.onUpdateResult();
@@ -144,8 +151,10 @@ function TableMatch(params) {
                     <TableCell component="th" scope="row">
                         {index + 1}
                     </TableCell>
-                    <TableCell align="left">{row.team.teamName}</TableCell>
-                    <TableCell align="left">{moment(row.time).format('HH:mm  -  DD/MM')}</TableCell>
+                    <TableCell align="left">{row.teamName}</TableCell>
+                    <TableCell align="left">
+                        {row.time == null ? 'Chưa có thời gian thi đấu' : moment(row.time).format('HH:mm  -  DD/MM')}
+                    </TableCell>
                     <TableCell align="left">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
                     {/* {params.status === 2 && <TableCell align="left"></TableCell>} */}
                     {(stage >= 3 || stage >= 2) && (
@@ -153,7 +162,6 @@ function TableMatch(params) {
                             <Chip
                                 icon={<Update />}
                                 label={row.score == null ? 'Cập nhật thời gian thi đấu' : 'Đã quá thời gian cập nhật'}
-                                clickable={row.score == null ? true : false}
                                 onClick={() => handleClickUpdate(row)}
                             />
                         </TableCell>
@@ -163,7 +171,6 @@ function TableMatch(params) {
                             <Chip
                                 icon={<SportsScore />}
                                 label={row.score == null ? 'Cập nhật điểm số' : 'Đã cập nhật'}
-                                clickable={row.score == null ? true : false}
                                 onClick={() => handleClickResult(row)}
                             />
                         </TableCell>
@@ -186,15 +193,13 @@ function TableMatch(params) {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {row.team.exhibitionPlayers.map((player) => (
+                                        {row.exhibitionPlayersDto.map((player) => (
                                             <TableRow key={player.id}>
                                                 <TableCell component="th" scope="row">
-                                                    {player.tournamentPlayer.user.name}
+                                                    {player.playerName}
                                                 </TableCell>
-                                                <TableCell>{player.tournamentPlayer.user.studentId}</TableCell>
-                                                <TableCell align="left">
-                                                    {player.tournamentPlayer.user.gender ? 'Nam' : 'Nữ'}
-                                                </TableCell>
+                                                <TableCell>{player.playerStudentId}</TableCell>
+                                                <TableCell align="left">{player.playerGender ? 'Nam' : 'Nữ'}</TableCell>
                                                 <TableCell align="left">
                                                     {player.roleInTeam ? 'Trưởng nhóm' : ''}
                                                 </TableCell>
@@ -227,7 +232,7 @@ function TableMatch(params) {
                                     </TableHead>
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell align="center">{match.team.teamName}</TableCell>
+                                            <TableCell align="center">{match.teamName}</TableCell>
                                             <TableCell>
                                                 <Controller
                                                     name="score"
@@ -296,7 +301,7 @@ function TableMatch(params) {
 
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="caption table">
-                    <caption>Địa điểm thi đấu: {params.matches[0].area.name}</caption>
+                    <caption>Địa điểm thi đấu: {params.matches[0].areaName}</caption>
                     <TableHead>
                         <TableRow>
                             <TableCell></TableCell>

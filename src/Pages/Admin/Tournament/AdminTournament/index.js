@@ -15,7 +15,7 @@ function a11yProps(index) {
     };
 }
 
-function AdminTournament({ isUpdate, user }) {
+function AdminTournament({ isUpdate, user, onChange }) {
     let { tournamentId } = useParams();
     const [adminList, setAdminList] = useState([]);
     const [active, setActive] = useState(-1);
@@ -31,8 +31,8 @@ function AdminTournament({ isUpdate, user }) {
         try {
             const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
             console.log(response);
-            // const newUser = response.data.filter((user) => user.registerStatus === 'Đã chấp nhận');
-            setAdminList(response.data);
+            const newUser = response.data.filter((user) => user.registerStatus === 'Đã chấp nhận');
+            setAdminList(newUser);
             setActive(response.totalActive);
             setTotal(response.totalResult);
         } catch (error) {
@@ -48,7 +48,7 @@ function AdminTournament({ isUpdate, user }) {
     return (
         <Fragment>
             <Box sx={{ width: '100%' }}>
-                {/* <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs
                         value={value}
                         onChange={handleChange}
@@ -56,16 +56,16 @@ function AdminTournament({ isUpdate, user }) {
                         scrollButtons="auto"
                         aria-label="basic tabs example"
                     >
-                        <Tab label="Danh sách ban tổ chức" {...a11yProps(0)} />
-                        {/* <Tab label="Cập nhật vai trò" {...a11yProps(1)} /> 
-                        {/* <Tab label="Xét duyệt yêu cầu tham gia" {...a11yProps(2)} /> 
+                        <Tab label="Danh sách ban tổ chức" {...a11yProps(0)} value={0} />
+                        {/* <Tab label="Cập nhật vai trò" {...a11yProps(1)} /> */}
+                        <Tab label="Xét duyệt yêu cầu tham gia" {...a11yProps(1)} value={1} />
                     </Tabs>
                     {/* {!isUpdate && (
                         <Button variant="outlined" sx={{ mr: 2 }} onClick={() => handleOpenDialogExhibition(true)}>
                             Thêm vận động viên thi đấu biểu diễn
                         </Button>
-                    )} 
-                </Box> */}
+                    )} */}
+                </Box>
 
                 <AdminList
                     adminList={adminList}
@@ -83,7 +83,10 @@ function AdminTournament({ isUpdate, user }) {
                         SetIsRender(true);
                     }}
                     tournamentId={tournamentId}
-                    onChange={() => SetIsRender(true)}
+                    onChange={() => {
+                        SetIsRender(true);
+                        onChange && onChange();
+                    }}
                 />
                 {/* <UpdateAdminTournament
                     value={value}
@@ -92,7 +95,18 @@ function AdminTournament({ isUpdate, user }) {
                     index={1}
                     onChange={() => SetIsRender(true)}
                 /> */}
-                {/* <AddAdminTourament value={value} active={active} total={total} index={2} /> */}
+                {value == 1 && (
+                    <AddAdminTourament
+                        value={value}
+                        active={active}
+                        total={total}
+                        index={1}
+                        onChange={() => {
+                            SetIsRender(true);
+                            // onChange && onChange();
+                        }}
+                    />
+                )}
             </Box>
         </Fragment>
     );

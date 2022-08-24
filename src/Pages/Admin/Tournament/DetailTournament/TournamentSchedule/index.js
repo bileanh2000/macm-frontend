@@ -259,7 +259,7 @@ function TournamentSchedule({ isUpdate, tournamentStage }) {
     };
 
     const navigateToUpdate = (params, date) => {
-        if (isUpdate || tournamentStage != 0) {
+        if (isUpdate || tournamentStage > 2) {
             return;
         }
         console.log(params);
@@ -281,7 +281,7 @@ function TournamentSchedule({ isUpdate, tournamentStage }) {
     };
 
     const navigateToCreate = (date) => {
-        if (isUpdate || tournamentStage != 0) {
+        if (isUpdate || tournamentStage > 2) {
             return;
         }
         console.log(date);

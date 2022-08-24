@@ -344,7 +344,7 @@ function DetailTournament() {
                                 />
                             </TabPanel>
                             <TabPanel value={value} index={3}>
-                                <AdminTournament isUpdate={isUpdate} user={user} />
+                                <AdminTournament isUpdate={isUpdate} user={user} onChange={() => setIsRender(true)} />
                             </TabPanel>
                             <TabPanel value={value} index={4}>
                                 <MemberTournament

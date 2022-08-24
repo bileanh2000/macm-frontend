@@ -58,6 +58,7 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
     const [open, setOpen] = useState(false);
     const [tournamentResult, setTournamentResult] = useState();
     const [isRender, setIsRender] = useState(false);
+    const [renderResult, setRenderResult] = useState(true);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -90,12 +91,13 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
                 const response = await adminTournament.getTournamentResult(tournamentId);
                 console.log('result', response.data);
                 setTournamentResult(response.data[0]);
+                setRenderResult(false);
             } catch (error) {
                 console.warn('Failed to get tournament result', error);
             }
         };
-        getTournamentResult();
-    }, [tournamentId]);
+        renderResult && getTournamentResult();
+    }, [tournamentId, renderResult, tournamentResult]);
 
     const handleDialogConfirmMatch = () => {
         setOpen(true);
@@ -167,6 +169,7 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
                             result={tournamentResult.listCompetitiveResult}
                             type={valueTab == 0 ? type : 0}
                             endDate={endDate}
+                            onHaveResult={() => setRenderResult(true)}
                         />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
@@ -177,6 +180,7 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
                             result={tournamentResult.listExhibitionResult}
                             type={valueTab == 1 ? type : 0}
                             endDate={endDate}
+                            onHaveResult={() => setRenderResult(true)}
                         />
                     </TabPanel>
                 </Box>

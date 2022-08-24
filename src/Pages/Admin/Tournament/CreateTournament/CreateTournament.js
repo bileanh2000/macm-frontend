@@ -1268,7 +1268,7 @@ function CreateTournament({
                                                     }) => (
                                                         <DatePicker
                                                             label="Ngày kết thúc"
-                                                            minDate={startDate}
+                                                            // minDate={startDate}
                                                             disablePast
                                                             ampm={false}
                                                             inputFormat="dd/MM/yyyy"

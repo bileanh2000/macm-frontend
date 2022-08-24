@@ -166,7 +166,7 @@ function PerformanceCompetition(props) {
             <Paper elevation={3}>
                 <Collapse in={isChecked}>
                     {!isEdit ? (
-                        <Box sx={{ padding: 2, margin: 2 }}>
+                        <Box sx={{ padding: 1 }}>
                             <TextField
                                 id="outlined-error-helper-text fullWidth"
                                 label="Tên nội dung"

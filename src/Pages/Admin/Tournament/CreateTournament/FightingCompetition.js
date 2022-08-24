@@ -256,7 +256,7 @@ function FightingCompetition(props) {
         <Box>
             <Paper elevation={3}>
                 {props.data.length > 0 && (
-                    <TableContainer sx={{ maxHeight: 350, m: 1, p: 1, mb: 2 }}>
+                    <TableContainer sx={{ maxHeight: 350, m: 1, mr: 0, p: 1, mb: 2 }}>
                         <Table stickyHeader aria-label="sticky table">
                             <TableHead>
                                 <TableRow>

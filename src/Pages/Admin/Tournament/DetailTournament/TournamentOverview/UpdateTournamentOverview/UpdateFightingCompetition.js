@@ -140,7 +140,10 @@ function UpdateFightingCompetition(props) {
         } else {
             if (checkWeight(gender, data.weightMin, data.weightMax)) {
                 console.log('female', weightRangeFemale, 'male', weightRangeMale);
-                const newData = [...datas, { ...data, gender: gender == 1 ? true : false, id: Math.random() }];
+                const newData = [
+                    ...datas,
+                    { ...data, gender: gender == 1 ? true : false, id: Math.random(), canDelete: true },
+                ];
                 setDatas(newData);
                 props.onAddFightingCompetition(newData);
                 console.log(newData);
@@ -301,7 +304,7 @@ function UpdateFightingCompetition(props) {
             <Paper elevation={3}>
                 <Collapse in={isChecked}>
                     {!isEdit ? (
-                        <>
+                        <Box sx={{ padding: 1 }}>
                             <InputLabel id="demo-simple-select-label">Giới tính</InputLabel>
                             <Select
                                 labelId="demo-simple-select-label"
@@ -344,7 +347,7 @@ function UpdateFightingCompetition(props) {
                             <Button variant="contained" color="warning" onClick={handleCancel}>
                                 Hủy
                             </Button>
-                        </>
+                        </Box>
                     ) : (
                         dataEdit && (
                             <EditCompetitive
