@@ -69,7 +69,7 @@ function Header({ onLogout }) {
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
     const [notiStatus, setNotiStatus] = React.useState(0);
     const [notificationMessage, setNotificationMessage] = React.useState('');
-    const [totalNotification] = useGlobalState('totalNotification');
+    const [totalNotification, setTotalNotification] = useGlobalState('totalNotification');
 
     moment().locale('vi');
     const [page, setPage] = React.useState(1);
@@ -85,6 +85,7 @@ function Header({ onLogout }) {
             const response = await notificationApi.getAllNotification(studentId, pageNo);
             console.log('fetch list notifications', response);
             setTotalUnRead(response.totalDeactive);
+            setTotalNotification(response.totalDeactive);
             setNews(response.data);
             setTotal(response.totalPage);
         } catch (error) {
@@ -109,7 +110,7 @@ function Header({ onLogout }) {
         } else {
             fetchNewsList(studentId, page - 1);
         }
-    }, [notiStatus, page]);
+    }, [notiStatus, page, totalNotification, studentId]);
 
     const handleClickAway = () => {
         setChecked(false);
@@ -148,6 +149,7 @@ function Header({ onLogout }) {
             });
         });
         setTotalUnRead(0);
+        setTotalNotification(0);
         notificationApi.markAllNotificationAsRead(studentId).then((response) => {
             console.log('mark all notification', response);
         });
@@ -155,7 +157,8 @@ function Header({ onLogout }) {
 
     const onClickNotification = (news) => {
         if (!news.read) {
-            setTotalUnRead((prev) => prev - 1);
+            // setTotalUnRead((prev) => prev - 1);
+            setTotalNotification((prev) => prev - 1);
         }
         notificationApi.markNotificationAsRead(news.id, studentId).then((response) => {
             console.log('mark notification', response);
@@ -363,7 +366,7 @@ function Header({ onLogout }) {
                                                     backgroundColor: '#FF4444',
                                                 },
                                             }}
-                                            badgeContent={totalUnRead}
+                                            badgeContent={totalNotification}
                                         >
                                             <NotificationsIcon />
                                         </Badge>
@@ -376,7 +379,7 @@ function Header({ onLogout }) {
                                         component={Link}
                                         to="/notifications"
                                     >
-                                        {totalNotification !== 0 ? (
+                                        {totalNotification > -1 ? (
                                             <Badge
                                                 sx={{
                                                     '& .MuiBadge-badge': {
@@ -394,7 +397,7 @@ function Header({ onLogout }) {
                                                         backgroundColor: '#FF4444',
                                                     },
                                                 }}
-                                                badgeContent={totalUnRead}
+                                                badgeContent={totalNotification}
                                             >
                                                 <NotificationsIcon />
                                             </Badge>

@@ -39,6 +39,7 @@ import TournamentBacket from './TournamentBacket';
 import Preview from './TournamentSchedule/preview';
 import { IfAnyGranted } from 'react-authorization';
 import userTournamentAPI from 'src/api/userTournamentAPI';
+import NoValuePage from 'src/Components/NoValuePage';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -81,6 +82,7 @@ function DetailTournament() {
     const [valueTab, SetValueTabs] = useState(0);
     const [type, SetType] = useState(0);
     const [roleInTournament, setRoleInTournament] = useState([]);
+    const [message, setMessage] = useState('');
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -111,6 +113,7 @@ function DetailTournament() {
             setTournament(response.data[0]);
 
             setIsRender(false);
+            setMessage(response.message);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
@@ -195,6 +198,10 @@ function DetailTournament() {
             setValue(2);
         }
     }, []);
+
+    if (message === 'Giải đấu này đã hủy' || message === 'Không có giải đấu này') {
+        return <NoValuePage message="Giải đấu này không tồn tại hoặc đã bị hủy" />;
+    }
     return (
         <IfAnyGranted
             expected={[

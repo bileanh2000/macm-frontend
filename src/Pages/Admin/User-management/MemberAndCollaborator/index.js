@@ -69,7 +69,6 @@ function MemberAndCollaborator() {
     const [semester, setSemester] = useState('Summer2022');
     const [editable, setEditable] = useState(false);
     const [checked, setChecked] = useState(false);
-    const [gender, setGender] = useState('');
     const [userData, setUserData] = useState([]);
     const [selectionModel, setSelectionModel] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
@@ -82,6 +81,19 @@ function MemberAndCollaborator() {
     const [isEditDialog, setIsEditDialog] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [errorList, setErrorList] = useState([]);
+    const [searchResult, setSearchResult] = useState([]);
+    // const [filter, setFilter] = useState({
+    //     generation: -1,
+    //     gender: -1,
+    //     status: -1,
+    //     isActive: -1,
+    //     roleId: -1,
+    // });
+    const [generation, setGeneration] = useState(-1);
+    const [gender, setGender] = useState(-1);
+    const [status, setStatus] = useState(-1);
+    const [isActive, setIsActive] = useState(-1);
+    const [roleId, setRoleId] = useState(-1);
 
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const styles = (theme) => ({
@@ -340,10 +352,10 @@ function MemberAndCollaborator() {
         const dataFormat = {
             dateFrom: data.startDate === null ? '' : moment(new Date(data.startDate)).format('yyyy-MM-DD'),
             dateTo: data.endDate === null ? '' : moment(new Date(data.endDate)).format('yyyy-MM-DD'),
-            gender: data.gender,
-            generation: data.generation,
-            isActive: data.isActive,
-            roleId: data.roleId,
+            gender: gender === -1 ? '' : gender,
+            generation: generation === -1 ? '' : generation,
+            isActive: isActive === -1 ? '' : isActive,
+            roleId: roleId === -1 ? '' : roleId,
         };
 
         userApi
@@ -358,6 +370,25 @@ function MemberAndCollaborator() {
                 console.error('failed when filter', error.response);
             });
         console.log(dataFormat);
+    };
+
+    const searchJson = (searchTerm) => {
+        rowsUser
+            .filter((val) => {
+                if (searchTerm == '') {
+                    return val;
+                } else if (
+                    val.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    val.studentId.toLowerCase().includes(searchTerm.toLowerCase())
+                ) {
+                    return val;
+                }
+            })
+            .map((val, key) => {
+                console.log('3', val);
+                setSearchResult(val);
+                return <div>{val.first_name} </div>;
+            });
     };
 
     const exportExcel = () => {
@@ -408,11 +439,9 @@ function MemberAndCollaborator() {
                 <GridToolbarContainer>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         {/* <GridToolbarColumnsButton /> */}
-                        <ClickAwayListener onClickAway={handleClickAway}>
-                            <Button startIcon={<FilterListIcon />} size="small" onClick={toggleFilter} sx={{ mr: 1 }}>
-                                BỘ LỌC
-                            </Button>
-                        </ClickAwayListener>
+                        <Button startIcon={<FilterListIcon />} size="small" onClick={toggleFilter} sx={{ mr: 1 }}>
+                            BỘ LỌC
+                        </Button>
 
                         <GridToolbarQuickFilter />
                     </Box>
@@ -511,21 +540,16 @@ function MemberAndCollaborator() {
                     <Grid container spacing={3}>
                         <Grid item xs={6}>
                             <TextField
+                                id="outlined-select-currency"
                                 fullWidth
-                                id="standard-select-currency"
                                 select
-                                label="Gen"
-                                // onChange={handleChangeGender}
-                                defaultValue=""
                                 variant="standard"
                                 size="small"
-                                {...register('generation')}
-                                // onChange={(e) => {
-                                //     onChangeSearch.generation = e.target.value;
-                                //     // console.log(onChangeSearch);
-                                // }}
+                                label="Gen"
+                                value={generation}
+                                onChange={(event) => setGeneration(event.target.value)}
                             >
-                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value={-1}>Tất cả</MenuItem>
                                 <MenuItem value="1">1</MenuItem>
                                 <MenuItem value="2">2</MenuItem>
                                 <MenuItem value="3">3</MenuItem>
@@ -534,21 +558,16 @@ function MemberAndCollaborator() {
                             </TextField>
 
                             <TextField
+                                id="outlined-select-currency"
                                 fullWidth
-                                id="standard-select-currency"
                                 select
-                                label="Trạng thái"
-                                // onChange={handleChangeGender}
-                                defaultValue=""
                                 variant="standard"
                                 size="small"
-                                {...register('isActive')}
-                                // onChange={(e) => {
-                                //     onChangeSearch.isActive = e.target.value;
-                                //     // console.log(onChangeSearch);
-                                // }}
+                                label="Trạng thái"
+                                value={isActive}
+                                onChange={(event) => setIsActive(event.target.value)}
                             >
-                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value={-1}>Tất cả</MenuItem>
                                 <MenuItem value="true">Active</MenuItem>
                                 <MenuItem value="false">Deactive</MenuItem>
                             </TextField>
@@ -592,30 +611,31 @@ function MemberAndCollaborator() {
                         </Grid>
                         <Grid item xs={6}>
                             <TextField
+                                id="outlined-select-currency"
                                 fullWidth
-                                id="standard-select-currency"
                                 select
-                                label="Giới tính"
-                                defaultValue=""
                                 variant="standard"
                                 size="small"
-                                {...register('gender')}
+                                label="Giới tính"
+                                value={gender}
+                                onChange={(event) => setGender(event.target.value)}
                             >
-                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value={-1}>Tất cả</MenuItem>
                                 <MenuItem value="true">Nam</MenuItem>
                                 <MenuItem value="false">Nữ</MenuItem>
                             </TextField>
+
                             <TextField
+                                id="outlined-select-currency"
                                 fullWidth
-                                id="standard-select-currency"
                                 select
-                                label="Vai trò"
-                                defaultValue=""
                                 variant="standard"
                                 size="small"
-                                {...register('roleId')}
+                                label="Vai trò"
+                                value={roleId}
+                                onChange={(event) => setRoleId(event.target.value)}
                             >
-                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value={-1}>Tất cả</MenuItem>
                                 <MenuItem value={10}>Ban truyền thông</MenuItem>
                                 <MenuItem value={11}>Ban văn hóa</MenuItem>
                                 <MenuItem value={12}>Ban chuyên môn</MenuItem>
@@ -658,8 +678,12 @@ function MemberAndCollaborator() {
                                     variant="outlined"
                                     sx={{ mr: 1 }}
                                     onClick={() => {
-                                        reset({ gender: '', roleId: '' });
+                                        // reset({ endDate: '' });
                                         console.log('heheh');
+                                        setGender(-1);
+                                        setGeneration(-1);
+                                        setIsActive(-1);
+                                        setRoleId(-1);
                                     }}
                                 >
                                     Reset
@@ -688,6 +712,7 @@ function MemberAndCollaborator() {
                     {customAlert.message}
                 </Alert>
             </Snackbar>
+            <TextField onChange={(e) => searchJson(e.target.value)}></TextField>
             <Dialog open={openUploadFile} onClose={handleClose} fullWidth maxWidth="sm">
                 <DialogTitle>Tải lên file Excel</DialogTitle>
                 <Box component="form" onSubmit={handleSubmit(onSubmit)}>

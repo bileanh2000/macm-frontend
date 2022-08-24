@@ -83,7 +83,7 @@ function UpNext({ isAdmin }) {
                         value={filterType}
                         displayEmpty
                         onChange={handleChange}
-                        variant="outlined"
+                        variant="standard"
                     >
                         <MenuItem value={0}>1 tuần</MenuItem>
                         <MenuItem value={1}>1 tháng</MenuItem>
@@ -91,7 +91,7 @@ function UpNext({ isAdmin }) {
                     </Select>
                 </FormControl>
             </Box>
-            <Box sx={{ height: '328px', overflow: 'auto' }}>
+            <Box sx={{ height: '296px', overflow: 'auto' }}>
                 <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                     {upcomingActivity.map((activity, index) => {
                         return (

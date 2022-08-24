@@ -46,7 +46,7 @@ function Event() {
     const [semester, setSemester] = useState('Summer2022');
     const [monthInSemester, setMonthInSemester] = useState([]);
     const [suggestionRole, setSuggestionRole] = useState([]);
-    const [month, setMonth] = useState(0);
+    const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [semesterList, setSemesterList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [commonList, setCommonList] = useState([]);
@@ -165,7 +165,7 @@ function Event() {
 
     useEffect(() => {
         fetchMonthInSemester(semester);
-        setMonth(new Date().getMonth() + 1);
+        // setMonth(new Date().getMonth() + 1);
     }, [semester]);
     useEffect(() => {
         getStartDateBySemesterName(semester);

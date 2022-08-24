@@ -277,7 +277,7 @@ function HeadClubDashboard() {
                     <Grid container spacing={2} sx={{ mt: 0.5 }}>
                         <Grid item xs={12} md={9} order={{ xs: 2, md: 1 }}>
                             <Paper elevation={2} sx={{ padding: '16px' }}>
-                                <MemberChart />
+                                <Attendance />
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={3} order={{ xs: 1, md: 2 }}>
@@ -289,7 +289,7 @@ function HeadClubDashboard() {
                     <Grid container spacing={2} sx={{ mt: 0.5 }}>
                         <Grid item xs={12} md={6}>
                             <Paper elevation={2} sx={{ padding: '16px' }}>
-                                <Attendance />
+                                <MemberChart />
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={6}>
