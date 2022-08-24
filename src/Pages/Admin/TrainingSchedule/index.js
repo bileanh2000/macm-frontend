@@ -104,6 +104,7 @@ function TrainingSchedule() {
     const [isUpdate, setIsUpdate] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
     const [trainingId, setTrainingId] = useState();
+    const ROLE = JSON.parse(localStorage.getItem('currentUser')).role.name;
 
     const calendarComponentRef = useRef(null);
 
@@ -202,12 +203,7 @@ function TrainingSchedule() {
             console.log('ko phai lich tap');
             return;
         }
-        if (
-            // date.getMonth() === nowDate.getMonth() &&
-            // date.getFullYear() === nowDate.getFullYear() &&
-            // date.getDate() === nowDate.getDate()
-            new Date(date) < new Date()
-        ) {
+        if (new Date(date) < new Date()) {
             console.log('lịch tập quá khứ');
             setIsOpenViewSessionDialog(true);
             // navigate(
@@ -452,15 +448,29 @@ function TrainingSchedule() {
                         >
                             Thêm buổi tập
                         </Button>
-                        <Button
-                            // component={Link}
-                            // to="/admin/trainingschedules/add"
-                            onClick={() => setIsOpenAddScheduleDialog(true)}
-                            startIcon={<AddCircleIcon />}
-                            variant="outlined"
-                        >
-                            Thêm lịch tập
-                        </Button>
+                        {/* <IfNoneGranted
+                            expected={[
+                                'ROLE_Treasurer, ROLE_HeadCulture,ROLE_ViceHeadCulture,ROLE_HeadCommunication,ROLE_ViceHeadCommunication',
+                            ]}
+                            actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
+                            unauthorized={<Navigate to="/forbidden" />}
+                        > */}
+
+                        {/* </IfNoneGranted> */}
+                        {ROLE === 'ROLE_HeadClub' ||
+                        ROLE === 'ROLE_ViceHeadClub' ||
+                        ROLE === 'ROLE_HeadTechnique' ||
+                        ROLE === 'ROLE_ViceHeadTechnique' ? (
+                            <Button
+                                // component={Link}
+                                // to="/admin/trainingschedules/add"
+                                onClick={() => setIsOpenAddScheduleDialog(true)}
+                                startIcon={<AddCircleIcon />}
+                                variant="outlined"
+                            >
+                                Thêm lịch tập
+                            </Button>
+                        ) : null}
                     </Box>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
@@ -468,7 +478,7 @@ function TrainingSchedule() {
                         id="outlined-select-currency"
                         size="small"
                         select
-                        label="Select"
+                        label="Chọn kỳ"
                         value={semester}
                         onChange={handleChange}
                     >
@@ -478,7 +488,7 @@ function TrainingSchedule() {
                             </MenuItem>
                         ))}
                     </TextField>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-end', flexDirection: 'column' }}>
                         <Box>
                             <Typography>Bấm vào ngày trống trong tương lai để tạo lịch tập</Typography>
                         </Box>

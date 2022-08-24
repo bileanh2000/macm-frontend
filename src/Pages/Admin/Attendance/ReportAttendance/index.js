@@ -1,6 +1,17 @@
-import { Grid, MenuItem, TextField, Typography } from '@mui/material';
+import { Button, createSvgIcon, Grid, MenuItem, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import {
+    DataGrid,
+    GridFooter,
+    GridFooterContainer,
+    gridPaginatedVisibleSortedGridRowIdsSelector,
+    gridSortedRowIdsSelector,
+    GridToolbar,
+    GridToolbarContainer,
+    GridToolbarQuickFilter,
+    gridVisibleSortedRowIdsSelector,
+    useGridApiContext,
+} from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import semesterApi from 'src/api/semesterApi';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
@@ -15,6 +26,9 @@ function ReportAttendance() {
     const [attendanceList, setAttendanceList] = useState([]);
     const [columns, setColumns] = useState([]);
     const [pageSize, setPageSize] = useState(30);
+    const [emailList, setEmailList] = useState([]);
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [selectionModel, setSelectionModel] = useState([]);
 
     const handleChange = (event) => {
         setSemester(event.target.value);
@@ -38,9 +52,9 @@ function ReportAttendance() {
         try {
             const response = await adminAttendanceAPI.getAttendanceTrainingStatistic(semester, id);
             console.log('fetchAttendanceReportBySemester: ', response);
-            setAttendanceList(response.data);
+            // setAttendanceList(response.data);
             let header = Object.keys(response.data[0]);
-            let columns = header.map((i) => {
+            let columns = header.map((i, index) => {
                 return {
                     field: i,
                     headerName:
@@ -74,11 +88,44 @@ function ReportAttendance() {
                         : i === 'studentId'
                         ? { width: 100 }
                         : i === 'percentAbsent'
-                        ? { width: 100 }
+                        ? {
+                              type: 'number',
+                              width: 100,
+                              valueFormatter: (params) => {
+                                  if (params.value == null) {
+                                      return '';
+                                  }
+
+                                  const valueFormatted = Number(params.value).toLocaleString();
+                                  return `${valueFormatted} %`;
+                              },
+                          }
                         : i === 'totalSession'
-                        ? { width: 100 }
+                        ? {
+                              type: 'number',
+                              width: 100,
+                              valueFormatter: (params) => {
+                                  if (params.value == null) {
+                                      return '';
+                                  }
+
+                                  const valueFormatted = Number(params.value).toLocaleString();
+                                  return `${valueFormatted}`;
+                              },
+                          }
                         : i === 'totalAbsent'
-                        ? { width: 100 }
+                        ? {
+                              type: 'number',
+                              width: 100,
+                              valueFormatter: (params) => {
+                                  if (params.value == null) {
+                                      return '';
+                                  }
+
+                                  const valueFormatted = Number(params.value).toLocaleString();
+                                  return `${valueFormatted}`;
+                              },
+                          }
                         : i === 'id'
                         ? { hide: true }
                         : i === 'roleName'
@@ -93,6 +140,14 @@ function ReportAttendance() {
 
                 return false;
             });
+
+            const rows = response.data;
+            rows.map((i, j) => {
+                return (i.roll = j + 1);
+            });
+            setAttendanceList(rows);
+            results.unshift({ field: 'roll', headerName: 'STT', width: 50 });
+            console.log(results);
             setColumns(results);
         } catch (error) {
             console.log('failed when fetchAttendanceReportBySemester: ', error);
@@ -103,46 +158,52 @@ function ReportAttendance() {
         fetchSemester();
         fetchAttendanceReportBySemester(semester, roleId);
     }, [semester, roleId]);
+    useEffect(() => {
+        let emails = selectedRows.map((item) => item.name);
+        console.info('email', emails);
+        setEmailList(emails);
+    }, [selectedRows]);
 
-    function CustomToolbar() {
+    const CustomFooter = () => {
         return (
-            <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-                <Box
+            <GridFooterContainer>
+                {/* <a href="http://">Gửi email cho ({selectedRows.length}) người đã chọn</a> */}
+                <a href={`mailto:` + emailList.toString()} style={{ marginLeft: '10px' }}>
+                    {selectedRows.length > 0 ? `Gửi email cho (${selectedRows.length}) người đã chọn` : ''}
+                </a>
+                <GridFooter
                     sx={{
-                        p: 0.5,
-                        pb: 0,
+                        border: 'none', // To delete double border.
                     }}
-                >
-                    <GridToolbarQuickFilter />
-                </Box>
-                <Box sx={{ display: 'flex' }}>
-                    <Box sx={{ ml: 1 }}>
-                        <span>
-                            <strong style={{ color: 'green' }}>V</strong>:
-                        </span>
-                        <span> Có mặt </span>
-                    </Box>
-                    <Box sx={{ ml: 1 }}>
-                        <span>
-                            <strong style={{ color: 'red' }}>X</strong>:
-                        </span>
-                        <span> Vắng mặt</span>
-                    </Box>
-                    <Box sx={{ ml: 1 }}>
-                        <span>
-                            <strong style={{ color: 'blue' }}>╺</strong>:
-                        </span>
-                        <span> Chưa điểm danh</span>
-                    </Box>
-                </Box>
-            </GridToolbarContainer>
+                />
+            </GridFooterContainer>
         );
-    }
+    };
     if (!attendanceList[0]) {
         return <LoadingProgress />;
     }
     return (
         <div>
+            <Box sx={{ display: 'flex', position: 'absolute', top: '244px', left: '37px', zIndex: 2 }}>
+                <Box sx={{ ml: 1 }}>
+                    <span>
+                        <strong style={{ color: 'green' }}>V</strong>:
+                    </span>
+                    <span> Có mặt </span>
+                </Box>
+                <Box sx={{ ml: 1 }}>
+                    <span>
+                        <strong style={{ color: 'red' }}>X</strong>:
+                    </span>
+                    <span> Vắng mặt</span>
+                </Box>
+                <Box sx={{ ml: 1 }}>
+                    <span>
+                        <strong style={{ color: 'blue' }}>╺</strong>:
+                    </span>
+                    <span> Chưa điểm danh</span>
+                </Box>
+            </Box>
             <Grid container spacing={4}>
                 <Grid item xs={12}>
                     <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
@@ -216,10 +277,15 @@ function ReportAttendance() {
                         fontWeight: '600',
                         textAlign: 'center',
                     },
+                    'button.MuiButton-sizeSmall': { display: 'none !important' },
                 }}
             >
                 {attendanceList.length >= 1 ? (
                     <DataGrid
+                        disableColumnFilter
+                        disableColumnSelector
+                        disableDensitySelector
+                        checkboxSelection
                         loading={!attendanceList.length}
                         disableSelectionOnClick={true}
                         rows={attendanceList}
@@ -228,11 +294,24 @@ function ReportAttendance() {
                         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                         rowsPerPageOptions={[30, 50, 70]}
                         components={{
-                            Toolbar: CustomToolbar,
+                            Toolbar: GridToolbar,
+                            Footer: CustomFooter,
                         }}
-                        // initialState={{ pinnedColumns: { left: ['name'] } }}
-                        initialState={{
-                            pinnedColumns: { left: ['name'] },
+                        componentsProps={{
+                            toolbar: {
+                                showQuickFilter: true,
+                                quickFilterProps: { debounceMs: 500 },
+                            },
+                        }}
+                        onSelectionModelChange={(ids) => {
+                            console.log(ids);
+                            setSelectionModel(ids);
+                            const selectedIDs = new Set(ids);
+                            const selectedRows =
+                                attendanceList && attendanceList.filter((row) => selectedIDs.has(row.id));
+                            setSelectedRows(selectedRows);
+                            // console.log(selectedRows);
+                            console.log('selected', selectedRows);
                         }}
                     />
                 ) : (
