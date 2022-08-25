@@ -60,6 +60,7 @@ function RegisterPlayer({
     const [minWeight, setMinWeight] = useState();
     const [maxWeight, setMaxWeight] = useState();
     const [allMember, setAllMember] = useState();
+    const [isRender, setIsRender] = useState(true);
 
     const AddMaleHandler = (data) => {
         setDataMale(data);
@@ -126,10 +127,12 @@ function RegisterPlayer({
             setNumberFemale(exType.numberFemale);
         }
         console.log(exType);
+        getAllMember(event.target.value);
     };
-    const getAllMember = async () => {
+    const getAllMember = async (exhibitionType) => {
         try {
             const response = await adminTournament.listUserNotJoinExhibition(exhibitionType);
+            console.log('getAllMember', response.data);
             setAllMember(response.data);
         } catch (error) {
             console.log('khong the lay data');
@@ -143,7 +146,10 @@ function RegisterPlayer({
                 studentId,
                 params,
             );
-            enqueueSnackbar(response.message, { variant: 'success' });
+            setIsRender(true);
+            enqueueSnackbar(response.message, {
+                variant: response.message.toLowerCase().includes('thành công') ? 'success' : 'error',
+            });
             onRegister && onRegister();
         } catch (error) {
             let variant = 'error';
@@ -158,7 +164,10 @@ function RegisterPlayer({
                 studentId,
                 params,
             );
-            enqueueSnackbar(response.message, { variant: 'success' });
+            enqueueSnackbar(response.message, {
+                variant: response.message.toLowerCase().includes('thành công') ? 'success' : 'error',
+            });
+            setIsRender(true);
             onRegister && onRegister();
         } catch (error) {
             let variant = 'error';
@@ -231,7 +240,8 @@ function RegisterPlayer({
                     userInformation.gender ? exhibitionType.numberMale > 0 : exhibitionType.numberFemale > 0,
                 );
                 setListExhibitionType(exhibitionType);
-                exhibitionType.length > 0 && setExhibitionType(exhibitionType[0].id);
+                setExhibitionType(exhibitionType[0].id);
+                getAllMember(exhibitionType[0].id);
                 setNumberMale(exhibitionType[0].numberMale);
                 setNumberFemale(exhibitionType[0].numberFemale);
             } catch (error) {
@@ -240,12 +250,21 @@ function RegisterPlayer({
         };
         fetchCompetitiveType(tournamentId);
         fetchExhibitionType(tournamentId);
-        // getAllMember();
     }, [tournamentId, userInformation.gender]);
 
     useEffect(() => {
-        getAllMember();
-    }, []);
+        const getAllMember = async () => {
+            try {
+                const response = await adminTournament.listUserNotJoinExhibition(exhibitionType);
+                console.log('getAllMember', response.data);
+                setAllMember(response.data);
+                setIsRender(false);
+            } catch (error) {
+                console.log('khong the lay data');
+            }
+        };
+        isRender && getAllMember();
+    }, [isRender, allMember, exhibitionType]);
 
     return (
         <Dialog
@@ -279,28 +298,37 @@ function RegisterPlayer({
                         </Select>
                     </FormControl>
                     {type === 1 ? (
-                        isJoinCompetitive.length == 0 && listWeightRange.length > 0 ? (
-                            <Box
-                                sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}
-                            >
-                                <FormControl size="small">
-                                    <Typography variant="caption">Hạng cân</Typography>
-                                    <Select
-                                        id="demo-simple-select"
-                                        value={weightRange}
-                                        displayEmpty
-                                        onChange={handleChangeWeight}
-                                    >
-                                        {listWeightRange &&
-                                            listWeightRange.map((range) => (
-                                                <MenuItem value={range.id} key={range.id}>
-                                                    {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} -{' '}
-                                                    {range.weightMax} Kg
-                                                </MenuItem>
-                                            ))}
-                                    </Select>
-                                </FormControl>
-                            </Box>
+                        isJoinCompetitive.data.length == 0 && listWeightRange.length > 0 ? (
+                            isJoinCompetitive.message.includes(' đang chờ duyệt') ? (
+                                <Typography variant="caption">{isJoinCompetitive.message}</Typography>
+                            ) : (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'flex-end',
+                                        mb: 2,
+                                    }}
+                                >
+                                    <FormControl size="small">
+                                        <Typography variant="caption">Hạng cân</Typography>
+                                        <Select
+                                            id="demo-simple-select"
+                                            value={weightRange}
+                                            displayEmpty
+                                            onChange={handleChangeWeight}
+                                        >
+                                            {listWeightRange &&
+                                                listWeightRange.map((range) => (
+                                                    <MenuItem value={range.id} key={range.id}>
+                                                        {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} -{' '}
+                                                        {range.weightMax} Kg
+                                                    </MenuItem>
+                                                ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+                            )
                         ) : (
                             <Typography variant="caption">Bạn đã đăng kí tham gia thi đấu rồi</Typography>
                         )
@@ -327,153 +355,165 @@ function RegisterPlayer({
                         <Typography variant="caption">Không có thể thức thi đấu phù hợp với bạn!!!</Typography>
                     )}
                 </Box>
-                {type == 1 && isJoinCompetitive.length == 0 && listWeightRange.length > 0 && (
-                    <Grid container spacing={2}>
-                        <Grid item xs={5}>
-                            <Typography sx={{ m: 1 }}>
-                                <strong>Nhập số cân của bạn: </strong>{' '}
-                            </Typography>
+                {type == 1 &&
+                    isJoinCompetitive.data.length == 0 &&
+                    listWeightRange.length > 0 &&
+                    !isJoinCompetitive.message.includes('đang chờ duyệt') && (
+                        <Grid container spacing={2}>
+                            <Grid item xs={5}>
+                                <Typography sx={{ m: 1 }}>
+                                    <strong>Nhập số cân của bạn: </strong>{' '}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={7}>
+                                <TextField
+                                    fullWidth
+                                    type="number"
+                                    id="outlined-basic"
+                                    label="Cân nặng"
+                                    variant="outlined"
+                                    {...register('weight')}
+                                    onChange={checkValidWeight}
+                                    error={errors.weight ? true : false}
+                                    helperText={errors.weight?.message}
+                                    required
+                                />
+                            </Grid>
                         </Grid>
-                        <Grid item xs={7}>
+                    )}
+                {type == 2 &&
+                    listExhibitionType.length > 0 &&
+                    (isJoinExhibition.data.length > 0 &&
+                    isJoinExhibition.data.filter((exhibition) => exhibition.id === exhibitionType).length == 0 ? (
+                        <Box>
                             <TextField
                                 fullWidth
-                                type="number"
                                 id="outlined-basic"
-                                label="Cân nặng"
+                                label="Tên đội"
                                 variant="outlined"
-                                {...register('weight')}
-                                onChange={checkValidWeight}
-                                error={errors.weight ? true : false}
-                                helperText={errors.weight?.message}
+                                {...register('teamName')}
+                                error={errors.teamName ? true : false}
+                                helperText={errors.teamName?.message}
                                 required
                             />
-                        </Grid>
-                    </Grid>
-                )}
-                {type == 2 && listExhibitionType.length > 0 && (
-                    <Box>
-                        <TextField
-                            fullWidth
-                            id="outlined-basic"
-                            label="Tên đội"
-                            variant="outlined"
-                            {...register('teamName')}
-                            error={errors.teamName ? true : false}
-                            helperText={errors.teamName?.message}
-                            required
-                        />
-                        <Box>
-                            <Typography sx={{ m: 1 }}>
-                                <strong>Số lượng nam: </strong> {numberMale}
-                            </Typography>
-                            {dataMale.length < numberMale && (
-                                <AddMember
-                                    data={dataMale}
-                                    onAddMale={AddMaleHandler}
-                                    numberMale={numberMale}
-                                    gender={0}
-                                    allMember={allMember.filter((male) => male.gender === true)}
-                                    fixedOptions={userInfo.gender ? userInfo : null}
-                                />
-                            )}
-                        </Box>
-                        <Paper elevation={3} sx={{ width: '100%', mt: 2 }}>
-                            {dataMale.length > 0 && (
-                                <TableContainer sx={{ maxHeight: 440 }}>
-                                    <Table stickyHeader aria-label="sticky table">
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell align="center">Mã sinh viên</TableCell>
-                                                <TableCell align="center">Tên sinh viên</TableCell>
-                                                <TableCell align="center">Giới tính</TableCell>
-                                                <TableCell align="center"></TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {dataMale.map((data, index) => (
-                                                <TableRow key={index}>
-                                                    <TableCell align="center">{data.studentId}</TableCell>
-                                                    <TableCell align="center">{data.name}</TableCell>
-                                                    <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
-                                                    <TableCell>
-                                                        {data.studentId === userInformation.studentId ? (
-                                                            ''
-                                                        ) : (
-                                                            <IconButton
-                                                                aria-label="delete"
-                                                                onClick={() => {
-                                                                    // handleOpenDialog();
-                                                                    handleDelete(data);
-                                                                }}
-                                                            >
-                                                                <Delete />
-                                                            </IconButton>
-                                                        )}
-                                                    </TableCell>
+                            <Box>
+                                <Typography sx={{ m: 1 }}>
+                                    <strong>Số lượng nam: </strong> {numberMale}
+                                </Typography>
+                                {dataMale.length < numberMale && (
+                                    <AddMember
+                                        data={dataMale}
+                                        onAddMale={AddMaleHandler}
+                                        numberMale={numberMale}
+                                        gender={0}
+                                        allMember={allMember.filter((male) => male.gender === true)}
+                                        fixedOptions={userInfo.gender ? userInfo : null}
+                                    />
+                                )}
+                            </Box>
+                            <Paper elevation={3} sx={{ width: '100%', mt: 2 }}>
+                                {dataMale.length > 0 && (
+                                    <TableContainer sx={{ maxHeight: 440 }}>
+                                        <Table stickyHeader aria-label="sticky table">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell align="center">Mã sinh viên</TableCell>
+                                                    <TableCell align="center">Tên sinh viên</TableCell>
+                                                    <TableCell align="center">Giới tính</TableCell>
+                                                    <TableCell align="center"></TableCell>
                                                 </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            )}
-                        </Paper>
-                        <Box>
-                            <Typography sx={{ m: 1 }}>
-                                <strong>Số lượng nữ: </strong> {numberFemale}
-                            </Typography>
-                            {dataFemale.length < numberFemale && (
-                                <AddMember
-                                    data={dataFemale}
-                                    onAddFemale={AddFemaleHandler}
-                                    numberFemale={numberFemale}
-                                    gender={1}
-                                    allMember={allMember.filter((male) => male.gender === false)}
-                                    fixedOptions={userInfo.gender ? null : userInfo}
-                                />
-                            )}
-                        </Box>
-                        <Paper elevation={3} sx={{ width: '100%', mt: 2 }}>
-                            {dataFemale.length > 0 && (
-                                <TableContainer sx={{ maxHeight: 440 }}>
-                                    <Table stickyHeader aria-label="sticky table">
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell align="center">Mã sinh viên</TableCell>
-                                                <TableCell align="center">Tên sinh viên</TableCell>
-                                                <TableCell align="center">Giới tính</TableCell>
-                                                <TableCell align="center"></TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {dataFemale.map((data, index) => (
-                                                <TableRow key={index}>
-                                                    <TableCell align="center">{data.studentId}</TableCell>
-                                                    <TableCell align="center">{data.name}</TableCell>
-                                                    <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
-                                                    <TableCell>
-                                                        {data.studentId === userInformation.studentId ? (
-                                                            ''
-                                                        ) : (
-                                                            <IconButton
-                                                                aria-label="delete"
-                                                                onClick={() => {
-                                                                    // handleOpenDialog();
-                                                                    handleDelete(data);
-                                                                }}
-                                                            >
-                                                                <Delete />
-                                                            </IconButton>
-                                                        )}
-                                                    </TableCell>
+                                            </TableHead>
+                                            <TableBody>
+                                                {dataMale.map((data, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell align="center">{data.studentId}</TableCell>
+                                                        <TableCell align="center">{data.name}</TableCell>
+                                                        <TableCell align="center">
+                                                            {data.gender ? 'Nam' : 'Nữ'}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {data.studentId === userInformation.studentId ? (
+                                                                ''
+                                                            ) : (
+                                                                <IconButton
+                                                                    aria-label="delete"
+                                                                    onClick={() => {
+                                                                        // handleOpenDialog();
+                                                                        handleDelete(data);
+                                                                    }}
+                                                                >
+                                                                    <Delete />
+                                                                </IconButton>
+                                                            )}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                )}
+                            </Paper>
+                            <Box>
+                                <Typography sx={{ m: 1 }}>
+                                    <strong>Số lượng nữ: </strong> {numberFemale}
+                                </Typography>
+                                {dataFemale.length < numberFemale && (
+                                    <AddMember
+                                        data={dataFemale}
+                                        onAddFemale={AddFemaleHandler}
+                                        numberFemale={numberFemale}
+                                        gender={1}
+                                        allMember={allMember.filter((male) => male.gender === false)}
+                                        fixedOptions={userInfo.gender ? null : userInfo}
+                                    />
+                                )}
+                            </Box>
+                            <Paper elevation={3} sx={{ width: '100%', mt: 2 }}>
+                                {dataFemale.length > 0 && (
+                                    <TableContainer sx={{ maxHeight: 440 }}>
+                                        <Table stickyHeader aria-label="sticky table">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell align="center">Mã sinh viên</TableCell>
+                                                    <TableCell align="center">Tên sinh viên</TableCell>
+                                                    <TableCell align="center">Giới tính</TableCell>
+                                                    <TableCell align="center"></TableCell>
                                                 </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            )}
-                        </Paper>
-                    </Box>
-                )}
+                                            </TableHead>
+                                            <TableBody>
+                                                {dataFemale.map((data, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell align="center">{data.studentId}</TableCell>
+                                                        <TableCell align="center">{data.name}</TableCell>
+                                                        <TableCell align="center">
+                                                            {data.gender ? 'Nam' : 'Nữ'}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {data.studentId === userInformation.studentId ? (
+                                                                ''
+                                                            ) : (
+                                                                <IconButton
+                                                                    aria-label="delete"
+                                                                    onClick={() => {
+                                                                        // handleOpenDialog();
+                                                                        handleDelete(data);
+                                                                    }}
+                                                                >
+                                                                    <Delete />
+                                                                </IconButton>
+                                                            )}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                )}
+                            </Paper>
+                        </Box>
+                    ) : (
+                        <Typography variant="caption">{isJoinExhibition.message}</Typography>
+                    ))}
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" onClick={handleCloseDialog}>
@@ -485,7 +525,7 @@ function RegisterPlayer({
                     autoFocus
                     disabled={
                         (type == 2 && (dataFemale.length != numberFemale || dataMale.length != numberMale)) ||
-                        (type == 1 && !(isJoinCompetitive.length == 0 && listWeightRange.length > 0))
+                        (type == 1 && !(isJoinCompetitive.data.length == 0 && listWeightRange.length > 0))
                     }
                 >
                     {/* <Button onClick={handleSubmit(onSubmit)} autoFocus> */}

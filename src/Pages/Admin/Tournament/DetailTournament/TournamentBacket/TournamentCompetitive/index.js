@@ -56,7 +56,6 @@ function TournamentCompetitive({ reload, result, type, endDate, tournamentStage,
     // console.log('ewsult', tournamentResult);
     const handleChangeCompetitiveId = (event) => {
         if (result && result.length > 0) {
-            console.log('result', result[0].data.length);
             const _result =
                 result.find((subResult) =>
                     subResult.data.length > 0
@@ -222,17 +221,13 @@ function TournamentCompetitive({ reload, result, type, endDate, tournamentStage,
                     type == 0 && setCompetitiveId(response.data[0][0].id);
                     const _result =
                         result.find((subResult) =>
-                            subResult.length > 0
-                                ? subResult.data.length > 0
-                                    ? subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id)
-                                    : null
+                            subResult.data.length > 0
+                                ? subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id)
                                 : null,
                         ) != null
                             ? result.find((subResult) =>
-                                  subResult.length > 0
-                                      ? subResult.data.length > 0
-                                          ? subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id)
-                                          : null
+                                  subResult.data.length > 0
+                                      ? subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id)
                                       : null,
                               ).data[0].listResult
                             : null;

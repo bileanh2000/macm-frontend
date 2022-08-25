@@ -82,8 +82,8 @@ function DetailTournament() {
     const [error, setError] = useState(false);
     const [roleInTournament, setRoleInTournament] = useState([]);
     const [helperText, setHelperText] = useState('Vui lòng chọn vai trò');
-    const [isJoinCompetitive, setIsJoinCompetitive] = useState([]);
-    const [isJoinExhibition, setIsJoinExhibition] = useState([]);
+    const [isJoinCompetitive, setIsJoinCompetitive] = useState();
+    const [isJoinExhibition, setIsJoinExhibition] = useState();
     const [isJoinAdmin, setIsJoinAdmin] = useState();
     const [message, setMessage] = useState('');
     const [valueTab, SetValueTabs] = useState(0);
@@ -199,8 +199,8 @@ function DetailTournament() {
         const getAllUserCompetitivePlayer = async () => {
             try {
                 const response = await userTournamentAPI.getAllUserCompetitivePlayer(tournamentId, user.studentId);
-                // console.log(response.data);
-                setIsJoinCompetitive(response.data);
+                console.log('getAllUserCompetitivePlayer', response);
+                setIsJoinCompetitive(response);
             } catch (error) {
                 console.log('Loi roi', error);
             }
@@ -208,8 +208,8 @@ function DetailTournament() {
         const getAllUserExhibitionPlayer = async () => {
             try {
                 const response = await userTournamentAPI.getAllUserExhibitionPlayer(tournamentId, user.studentId);
-                console.log(response.data);
-                setIsJoinExhibition(response.data);
+                console.log('getAllUserExhibitionPlayer', response);
+                setIsJoinExhibition(response);
             } catch (error) {
                 console.log('Loi roi', error);
             }
@@ -267,17 +267,19 @@ function DetailTournament() {
 
     return (
         <Box sx={{ m: 1, p: 1 }}>
-            <RegisterPlayer
-                title="Đăng ký tham gia thi đấu"
-                userInformation={user}
-                isOpen={openDialog}
-                handleClose={() => {
-                    setOpenDialog(false);
-                }}
-                isJoinCompetitive={isJoinCompetitive}
-                isJoinExhibition={isJoinExhibition}
-                onRegister={() => setIsRender(true)}
-            />
+            {isJoinCompetitive && isJoinExhibition && (
+                <RegisterPlayer
+                    title="Đăng ký tham gia thi đấu"
+                    userInformation={user}
+                    isOpen={openDialog}
+                    handleClose={() => {
+                        setOpenDialog(false);
+                    }}
+                    isJoinCompetitive={isJoinCompetitive}
+                    isJoinExhibition={isJoinExhibition}
+                    onRegister={() => setIsRender(true)}
+                />
+            )}
             <Dialog
                 open={openDialogAdmin}
                 onClose={handleCloseDialogAdmin}
@@ -407,28 +409,39 @@ function DetailTournament() {
                                                             : 'Hết hạn đăng ký thi đấu'}
                                                     </Button>
                                                 )}
-                                                {isJoinCompetitive.length === 0 && isJoinExhibition.length === 0 && (
-                                                    <Button
-                                                        variant="outlined"
-                                                        // startIcon={<Edit />}
-                                                        onClick={() => handleOpenDialogAdmin(true)}
-                                                        {...(handleRegisterDeadline(1)
-                                                            ? { disabled: false }
-                                                            : { disabled: true })}
-                                                        {...(isJoinAdmin.message.includes(
-                                                            'Bạn chưa tham gia ban tổ chức giải đấu',
-                                                        )
-                                                            ? { disabled: false }
-                                                            : { disabled: true })}
-                                                        sx={{ float: 'right' }}
-                                                    >
-                                                        {isJoinAdmin.message.includes(
-                                                            'Bạn chưa tham gia ban tổ chức giải đấu',
-                                                        )
-                                                            ? 'Đăng ký vào ban tổ chức'
-                                                            : isJoinAdmin.message}
-                                                    </Button>
-                                                )}
+                                                {isJoinCompetitive.data.length === 0 &&
+                                                    isJoinExhibition.data.length === 0 && (
+                                                        <Button
+                                                            variant="outlined"
+                                                            // startIcon={<Edit />}
+                                                            onClick={() => handleOpenDialogAdmin(true)}
+                                                            {...(handleRegisterDeadline(1)
+                                                                ? { disabled: false }
+                                                                : { disabled: true })}
+                                                            {...(isJoinAdmin.message.includes(
+                                                                'Bạn chưa tham gia ban tổ chức giải đấu',
+                                                            )
+                                                                ? { disabled: false }
+                                                                : { disabled: true })}
+                                                            {...(isJoinCompetitive.message.includes(
+                                                                'Bạn chưa đăng ký tham gia thi đấu đối kháng',
+                                                            )
+                                                                ? { disabled: false }
+                                                                : { disabled: true })}
+                                                            {...(isJoinExhibition.message.includes(
+                                                                'Bạn chưa đăng ký tham gia thi đấu biểu diễn',
+                                                            )
+                                                                ? { disabled: false }
+                                                                : { disabled: true })}
+                                                            sx={{ float: 'right' }}
+                                                        >
+                                                            {isJoinAdmin.message.includes(
+                                                                'Bạn chưa tham gia ban tổ chức giải đấu',
+                                                            )
+                                                                ? 'Đăng ký vào ban tổ chức'
+                                                                : isJoinAdmin.message}
+                                                        </Button>
+                                                    )}
                                             </Box>
                                         ) : (
                                             <Typography variant="h6">Bạn là thành viên ban tổ chức</Typography>

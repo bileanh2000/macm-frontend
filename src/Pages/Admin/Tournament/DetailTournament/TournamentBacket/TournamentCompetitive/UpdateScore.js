@@ -29,12 +29,14 @@ function UpdateScoreTournament({ winner, match, handleClose, WinnerTemp, onChang
 
     const validationSchema = Yup.object().shape({
         score1: Yup.number()
+            .integer('Vui lòng nhập số nguyên')
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
             .min(0, 'Vui lòng nhập giá trị lớn hơn hoặc bằng 0')
             .max(10, 'Điếm số không được vượt quá 10'),
 
         score2: Yup.number()
+            .integer('Vui lòng nhập số nguyên')
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
             .min(0, 'Vui lòng nhập giá trị lớn hơn hoặc bằng 0')
@@ -80,7 +82,7 @@ function UpdateScoreTournament({ winner, match, handleClose, WinnerTemp, onChang
             enqueueSnackbar(res.message, { variant });
         } catch (error) {
             let variant = 'error';
-            enqueueSnackbar('khong the cap nhat ket quá', { variant });
+            enqueueSnackbar(error, { variant });
         }
     };
 

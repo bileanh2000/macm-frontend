@@ -40,7 +40,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
             ? roles.map((role) =>
                   roleInTournament.filter((ro) => ro.name.includes(role.name)).length > 0
                       ? roleInTournament.filter((ro) => ro.name.includes(role.name))[0]
-                      : role,
+                      : { ...role, id: Math.floor(Math.random() * 1000) + 100 },
               )
             : roles;
 
@@ -66,7 +66,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
                 ? roles.map((role) =>
                       roleInTournament.filter((ro) => ro.name.includes(role.name)).length > 0
                           ? roleInTournament.filter((ro) => ro.name.includes(role.name))[0]
-                          : role,
+                          : { ...role, id: Math.floor(Math.random() * 1000) + 100 },
                   )
                 : roles;
         setDatas(newData);
@@ -132,7 +132,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
         setIsChecked(!isChecked);
     };
     const handleAddEventRoles = (data) => {
-        if (datas.findIndex((d) => d.name.includes(data.roleName)) >= 0) {
+        if (datas.findIndex((d) => d.name.toLowerCase().includes(data.roleName.toLowerCase())) >= 0) {
             setError('roleName', {
                 message: 'Vai trò này đã tồn tại, vui lòng chọn vai trò khác',
             });
@@ -162,6 +162,12 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
     };
 
     const handleEditEventRoles = (data) => {
+        // if (datas.findIndex((d) => d.name.toLowerCase().includes(data.roleName.toLowerCase())) >= 0) {
+        //     setError('roleName', {
+        //         message: `Vai trò ${data.roleName} này đã tồn tại, vui lòng chọn vai trò khác`,
+        //     });
+        //     return;
+        // }
         if (
             datas.findIndex((d) => d.name.includes(data.roleName)) >= 0 &&
             datas.findIndex((d) => d.maxQuantity == data.maxQuantity) >= 0
