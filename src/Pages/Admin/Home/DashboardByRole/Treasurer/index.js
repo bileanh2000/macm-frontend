@@ -114,10 +114,15 @@ function TreasurerDashboard() {
         fetchPaymentNotification(studentId);
         // getPersentMemberSinceLastSemester();
         let visited = localStorage['toShowPopup'] !== 'true';
-        if (!visited && paymentMessage !== 'Không có khoản nào phải đóng') {
+        if (!visited) {
             handleOpenNotificationDialog();
         }
     }, []);
+    useEffect(() => {
+        if (paymentMessage === 'Không có khoản nào phải đóng') {
+            handleCloseNotificationDialog();
+        }
+    }, [paymentMessage]);
 
     // useEffect(() => {
     //     console.log(balanceInCurrentMonth);

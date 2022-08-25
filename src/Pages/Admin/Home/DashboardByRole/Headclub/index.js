@@ -114,13 +114,16 @@ function HeadClubDashboard() {
         fetchPaymentNotification(studentId);
         let visited = localStorage['toShowPopup'] !== 'true';
 
-        if (!visited && paymentMessage !== 'Không có khoản nào phải đóng') {
+        if (!visited) {
             handleOpenNotificationDialog();
         }
     }, [studentId]);
-    // useEffect(() => {
-    //     console.log(balanceInCurrentMonth);
-    // }, [balanceInCurrentMonth]);
+
+    useEffect(() => {
+        if (paymentMessage === 'Không có khoản nào phải đóng') {
+            handleCloseNotificationDialog();
+        }
+    }, [paymentMessage]);
 
     const getPersentMemberSinceLastSemester = () => {
         let memberPersent =
