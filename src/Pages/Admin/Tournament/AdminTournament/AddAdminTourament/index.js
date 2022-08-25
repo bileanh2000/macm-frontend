@@ -110,7 +110,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
         container['id'] = item.id;
         container['studentName'] = item.userName;
         container['studentId'] = item.userStudentId;
-        container['roleInTournament'] = item.roleTournamentDto.name;
+        container['roleInTournament'] = item.tournamentRoleDto.name;
         container['registerStatus'] = item.registerStatus;
         return container;
     });

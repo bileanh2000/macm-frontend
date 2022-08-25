@@ -197,7 +197,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
         handleClose && handleClose();
     };
     const handleCloseDialog = () => {
-        setDatas(roleInTournament);
+        setDatas(datas);
         handleClose && handleClose();
     };
     return (

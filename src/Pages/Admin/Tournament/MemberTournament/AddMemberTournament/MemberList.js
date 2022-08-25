@@ -44,6 +44,7 @@ import { useSnackbar } from 'notistack';
 import adminTournament from 'src/api/adminTournamentAPI';
 
 function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhibitionType, tournamentStage }) {
+    console.log(data);
     const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
     const [openDelete, setOpenDelete] = useState(false);
@@ -159,38 +160,6 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
     };
 
     if (type === 1) {
-        columns = [
-            { field: 'id', headerName: 'ID', flex: 0.8, hide: true },
-            { field: 'teamName', headerName: 'Tên nhóm', flex: 0.8 },
-            { field: 'playerName', headerName: 'Tên thành viên', flex: 0.8 },
-            {
-                field: 'studentId',
-                headerName: 'Mã sinh viên',
-                width: 150,
-                flex: 0.6,
-            },
-            { field: 'playerGender', headerName: 'Giới tính', width: 150, flex: 1 },
-            { field: 'role', headerName: 'Vai trò', width: 150, flex: 1 },
-            { field: 'exhibitionTypeName', headerName: 'Nội dung biểu diến', width: 150, flex: 1 },
-        ];
-
-        const newRowsPlayer =
-            data &&
-            data.map((item, index) => {
-                return item.exhibitionPlayersDto.map((i) => {
-                    const container = {};
-                    container['id'] = i.id;
-                    container['teamName'] = item.teamName;
-                    container['playerName'] = i.playerName;
-                    container['studentId'] = i.playerStudentId;
-                    container['playerGender'] = i.playerGender ? 'Nam' : 'Nữ';
-                    container['role'] = i.roleInTeam ? 'Trưởng nhóm' : 'Thành viên';
-                    container['exhibitionTypeName'] = item.exhibitionTypeName;
-                    return container;
-                });
-            });
-        rowsPlayer = [].concat(...newRowsPlayer);
-    } else {
         columns = [
             { field: 'studentName', headerName: 'Tên', flex: 1 },
             {
