@@ -80,7 +80,7 @@ function AdminTournament({ isUpdate, user, onChange }) {
                     )} */}
                 </Box>
 
-                {roles && (
+                {roles && value == 0 && (
                     <AdminList
                         adminList={adminList}
                         isUpdate={isUpdate}

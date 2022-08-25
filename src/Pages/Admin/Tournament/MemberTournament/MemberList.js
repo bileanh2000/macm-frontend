@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/system';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { styled } from '@mui/material/styles';
@@ -54,6 +54,8 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
     const [exhibitionTeam, setExhibitionTeam] = useState();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+
+    useEffect(() => {}, [data]);
 
     let columns;
     let rowsPlayer;

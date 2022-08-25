@@ -29,11 +29,18 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage, 
 
     const handleChangeExhibitionType = (event) => {
         if (result && result.length > 0) {
-            const _result = result.find((subResult) =>
-                subResult.data.length > 0
-                    ? subResult.data.find((d) => d.exhibitionType.id == event.target.value)
-                    : null,
-            );
+            const _result =
+                result.find((subResult) =>
+                    subResult.data.length > 0
+                        ? subResult.data.find((d) => d.exhibitionType.id == event.target.value)
+                        : null,
+                ) != null
+                    ? result.find((subResult) =>
+                          subResult.data.length > 0
+                              ? subResult.data.find((d) => d.exhibitionType.id == event.target.value)
+                              : null,
+                      )
+                    : null;
             setTournamentResult(_result ? _result.data[0].listResult : null);
         }
         setExhibitionType(event.target.value);
@@ -115,12 +122,18 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage, 
                     setListExhibitionType(response.data);
                     getExhibitionResult(response.data[0].id);
                     type == 0 && setExhibitionType(response.data[0].id);
-                    const _result = result.find((subResult) =>
-                        subResult.data.length > 0
-                            ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
-                            : null,
-                    );
-
+                    const _result =
+                        result.find((subResult) =>
+                            subResult.data.length > 0
+                                ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
+                                : null,
+                        ) != null
+                            ? result.find((subResult) =>
+                                  subResult.data.length > 0
+                                      ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
+                                      : null,
+                              )
+                            : null;
                     setTournamentResult(_result ? _result.data[0].listResult : null);
                     setIsRenderTotal(false);
                 } else {

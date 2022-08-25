@@ -71,6 +71,7 @@ function TableMatch(params) {
 
     const validationSchema = Yup.object().shape({
         score: Yup.number()
+            .integer('Vui lòng nhập số nguyên')
             .required('Không được để trống trường này')
             .typeError('Vui lòng nhập số')
             .min(1, 'Vui lòng nhập giá trị lớn hơn 0')
