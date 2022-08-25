@@ -133,6 +133,8 @@ function ReportAttendance() {
                         ? { hide: true }
                         : i === 'roleName'
                         ? { width: 200 }
+                        : i === 'email'
+                        ? { hide: true }
                         : { flex: 1 }),
                 };
             });
@@ -162,7 +164,7 @@ function ReportAttendance() {
         fetchAttendanceReportBySemester(semester, roleId);
     }, [semester, roleId]);
     useEffect(() => {
-        let emails = selectedRows.map((item) => item.name);
+        let emails = selectedRows.map((item) => item.email);
         console.info('email', emails);
         setEmailList(emails);
     }, [selectedRows]);

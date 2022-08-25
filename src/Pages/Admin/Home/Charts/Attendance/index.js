@@ -27,9 +27,9 @@ function AttendanceChart() {
             console.log('That bai roi huhu, semester: ', error);
         }
     };
-    const fetchAttendanceReportBySemester = async (semester) => {
+    const fetchAttendanceReportBySemester = async (semester, month) => {
         try {
-            const response = await dashboardApi.getAttendanceReportBySemester(semester);
+            const response = await dashboardApi.getAttendanceReportBySemester(semester, month);
             console.log('fetchAttendanceReportBySemester:', response.data);
             setAttendanceReportList(response.data);
         } catch (error) {
@@ -48,7 +48,7 @@ function AttendanceChart() {
     };
     useEffect(() => {
         fetchSemester();
-        fetchAttendanceReportBySemester(semester);
+        fetchAttendanceReportBySemester(semester, month);
         fetchMonthInSemester(semester);
     }, [semester, month]);
     return (

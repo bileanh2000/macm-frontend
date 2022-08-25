@@ -794,7 +794,14 @@ function MemberAndCollaborator() {
             <Typography
                 variant="button"
                 color="initial"
-                sx={{ marginLeft: 'auto', marginRight: '1rem', position: 'absolute', top: '262px', left: '38px' }}
+                sx={{
+                    marginLeft: 'auto',
+                    marginRight: '1rem',
+                    position: 'absolute',
+                    top: '262px',
+                    left: '38px',
+                    zIndex: 2,
+                }}
             >
                 Tổng thành viên Active: {countActive}/{userList.length}
             </Typography>
