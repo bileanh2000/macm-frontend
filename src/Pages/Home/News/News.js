@@ -21,7 +21,7 @@ import userApi from 'src/api/userApi';
 import UpNext from 'src/Pages/Admin/Home/UpNext';
 
 const cx = classNames.bind(styles);
-function News({ name, studentId, roleName, email, isAdmin }) {
+function News({ name, studentId, roleName, email, isAdmin, isActive }) {
     const [qrCode, setQrCode] = useState('');
     const [checked, setChecked] = React.useState(true);
 
@@ -74,6 +74,33 @@ function News({ name, studentId, roleName, email, isAdmin }) {
                     <Typography>
                         <strong>{name}</strong>
                     </Typography>
+                    {isActive === true ? (
+                        <Box
+                            sx={{
+                                backgroundColor: '#56f000',
+                                color: '#fff',
+                                fontSize: '0.9rem',
+                                padding: '5px',
+                                borderRadius: '8px',
+                                fontWeight: 500,
+                            }}
+                        >
+                            Active
+                        </Box>
+                    ) : (
+                        <Box
+                            sx={{
+                                backgroundColor: '#fc6262',
+                                color: '#fff',
+                                fontSize: '0.9rem',
+                                padding: '5px',
+                                borderRadius: '8px',
+                                fontWeight: 500,
+                            }}
+                        >
+                            Deactive
+                        </Box>
+                    )}
 
                     {isAdmin ? (
                         <>

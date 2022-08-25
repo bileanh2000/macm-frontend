@@ -211,7 +211,7 @@ function QRScanner({ activityData, activityType }) {
                         onResult={(result, error) => {
                             onQrSuccess(result, error);
                         }}
-                        style={{ width: '100%' }}
+                        style={{ width: '50%' }}
                     />
                 ) : (
                     <Typography variant="h5" color="initial">

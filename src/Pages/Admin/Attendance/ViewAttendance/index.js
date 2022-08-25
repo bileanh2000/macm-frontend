@@ -6,13 +6,17 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useLocation } from 'react-router-dom';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 function ViewAttendance({ data }) {
     const [userList, setUserList] = useState([]);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(30);
     const [totalActive, setTotalActive] = useState();
     const [totalResult, setTotalResult] = useState();
     const location = useLocation();
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up('md'));
 
     let _type = location.state?.type;
     if (!_type) _type = data.type;
@@ -62,6 +66,27 @@ function ViewAttendance({ data }) {
             field: 'status',
             headerName: 'Trạng thái',
             flex: 0.5,
+            cellClassName: (params) => {
+                if (params.value == null) {
+                    return '';
+                }
+                return clsx('status-rows', {
+                    active: params.value === 'Có mặt',
+                    deactive: params.value === 'Vắng mặt',
+                    subActive: params.value === 'Chưa điểm danh',
+                });
+            },
+        },
+    ];
+    const MobileColumns = [
+        { field: 'id', headerName: 'STT', width: 5 },
+        { field: 'name', headerName: 'Tên', width: 150 },
+        { field: 'studentId', headerName: 'Mã sinh viên', width: 100 },
+        {
+            field: 'status',
+            headerName: 'Trạng thái',
+            // flex: 0.5,
+            width: 150,
             cellClassName: (params) => {
                 if (params.value == null) {
                     return '';
@@ -206,10 +231,11 @@ function ViewAttendance({ data }) {
                     // loading={!userList.length}
                     disableSelectionOnClick={true}
                     rows={rowsUser}
-                    columns={columns}
+                    // columns={columns}
+                    columns={matches ? columns : MobileColumns}
                     pageSize={pageSize}
                     onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                    rowsPerPageOptions={[10, 20, 30]}
+                    rowsPerPageOptions={[30, 40, 80]}
                     components={{
                         Toolbar: CustomToolbar,
                         NoRowsOverlay: CustomNoRowsOverlay,
