@@ -24,6 +24,7 @@ import UpNext from '../Admin/Home/UpNext';
 import notificationApi from 'src/api/notificationApi';
 import semesterApi from 'src/api/semesterApi';
 import ActiveRegister from './ActiveRegister';
+import userApi from 'src/api/userApi';
 
 function Index() {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -32,7 +33,7 @@ function Index() {
     const [paymentMessage, setPaymentMessage] = useState([]);
     const [startDateOfCurrentSemester, setStartDateOfCurrentSemester] = useState([]);
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
-
+    const [currentSemesterName, setCurrentSemesterName] = useState('');
     const roleId = JSON.parse(localStorage.getItem('currentUser')).role.id;
 
     const handleOpenNotificationDialog = () => {
@@ -52,6 +53,7 @@ function Index() {
             const response = await semesterApi.getCurrentSemester();
             console.log('getCurrentSemester', response);
             setStartDateOfCurrentSemester(response.data[0].startDate);
+            setCurrentSemesterName(response.data[0].name);
         } catch (error) {
             console.log('failed when getCurrentSemester', error);
         }
@@ -62,6 +64,20 @@ function Index() {
             const response = await notificationApi.checkPaymentStatus(studentId);
             console.log('fetchPaymentNotification', response);
             setPaymentMessage(response.message);
+        } catch (error) {
+            console.log('failed when fetchPaymentNotification', error);
+        }
+    };
+    const getStatusWhenStartSemester = async (studentId) => {
+        try {
+            const response = await userApi.getStatusWhenStartSemester(studentId);
+            console.log('fetchPaymentNotification', response);
+            // let isClicked = response.data[0].clicked === true;
+            if (!response.data[0].clicked) {
+                handleOpenActiveRegisterDialog();
+            }
+
+            // setPaymentMessage(response.message);
         } catch (error) {
             console.log('failed when fetchPaymentNotification', error);
         }
@@ -81,6 +97,8 @@ function Index() {
             roleId === 9
         ) {
             setIsAdmin(true);
+        } else {
+            getStatusWhenStartSemester(studentId);
         }
         fetchPaymentNotification(studentId);
 
@@ -96,15 +114,16 @@ function Index() {
     }, [paymentMessage]);
 
     // useEffect(() => {
-    //     let startDateParse = new Date('2022-08-25').setHours(0, 0, 0, 0);
-    //     let currentDateParse = new Date().setHours(0, 0, 0, 0);
-    //     if (startDateParse - currentDateParse === 0) {
-    //         console.log('hien thong bao nao babe');
-    //         handleOpenActiveRegisterDialog();
-    //     } else {
-    //         console.log(`chwa den ngay ${startDateParse}`);
-    //     }
-    //     console.log(startDateParse - currentDateParse);
+    //     // let startDateParse = new Date('2022-08-25').setHours(0, 0, 0, 0);
+    //     // let currentDateParse = new Date().setHours(0, 0, 0, 0);
+    //     // if (startDateParse - currentDateParse === 0) {
+    //     //     console.log('hien thong bao nao babe');
+    //     //     handleOpenActiveRegisterDialog();
+    //     // } else {
+    //     //     console.log(`chwa den ngay ${startDateParse}`);
+    //     // }
+    //     // console.log(startDateParse - currentDateParse);
+    //     handleOpenActiveRegisterDialog();
     // }, []);
 
     return (
@@ -112,6 +131,8 @@ function Index() {
             <ActiveRegister
                 isOpen={isOpenActiveRegisterDialog}
                 handleClose={() => setIsOpenActiveRegisterDialog(false)}
+                semester={currentSemesterName}
+                studentId={JSON.parse(localStorage.getItem('currentUser')).studentId}
             />
             <Dialog
                 open={openNotificationDialog}
@@ -160,6 +181,7 @@ function Index() {
                             roleName={JSON.parse(localStorage.getItem('currentUser')).role.name}
                             email={JSON.parse(localStorage.getItem('currentUser')).email}
                             isAdmin={isAdmin}
+                            isActive={JSON.parse(localStorage.getItem('currentUser')).active}
                         />
                     </Grid>
                     <Grid item md={12}>

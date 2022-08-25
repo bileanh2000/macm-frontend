@@ -45,7 +45,7 @@ function Attendance() {
     }, [_trainingScheduleId]);
 
     return (
-        <Box sx={{ m: 1, p: 1 }}>
+        <Box sx={{}}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 {trainingScheduleId ? (
                     <Container maxWidth="xl">

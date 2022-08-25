@@ -482,7 +482,9 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
 
     return (
         <Fragment>
-            <PreviewCommonSchedule isOpen={isOpenPreviewDialog} handleClose={() => setIsOpenPreviewDialog(false)} />
+            {isOpenPreviewDialog && (
+                <PreviewCommonSchedule isOpen={isOpenPreviewDialog} handleClose={() => setIsOpenPreviewDialog(false)} />
+            )}
 
             {isEditableSchedule && (
                 <EditableSchedule
@@ -1047,7 +1049,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                             render={({ field: { onChange, value }, fieldState: { error } }) => (
                                                 <DateTimePicker
                                                     label="Thời gian bắt đầu"
-                                                    disablePast
+                                                    // disablePast
+                                                    minDate={tomorrow}
                                                     ampm={false}
                                                     value={value}
                                                     onChange={(value) => {
@@ -1085,7 +1088,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                             render={({ field: { onChange, value }, fieldState: { error } }) => (
                                                 <DateTimePicker
                                                     label="Thời gian kết thúc"
-                                                    disablePast
+                                                    minDate={tomorrow}
                                                     ampm={false}
                                                     value={value}
                                                     onChange={(value) => {
@@ -1126,7 +1129,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                             render={({ field: { onChange, value }, fieldState: { error } }) => (
                                                 <DateTimePicker
                                                     label="Deadline đăng ký tham gia"
-                                                    disablePast
+                                                    minDate={tomorrow}
                                                     ampm={false}
                                                     value={value}
                                                     onChange={(value) => onChange(value)}
@@ -1163,7 +1166,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                             }) => (
                                                 <DateTimePicker
                                                     label="Deadline đăng ký ban tổ chức"
-                                                    disablePast
+                                                    minDate={tomorrow}
                                                     disabled={skipped.has(1)}
                                                     ampm={false}
                                                     value={value}

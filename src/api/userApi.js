@@ -108,5 +108,14 @@ const userApi = {
         const url = `/admin/hr/getallgen`;
         return axiosClient.get(url);
     },
+
+    updateStatusByUser: (params) => {
+        const url = `/admin/hr/updatestatusbymember`;
+        return axiosClient.put(url, null, { params });
+    },
+    getStatusWhenStartSemester: (studentId) => {
+        const url = `/admin/hr/membersemesterinfor?studentId=${studentId}`;
+        return axiosClient.get(url);
+    },
 };
 export default userApi;
