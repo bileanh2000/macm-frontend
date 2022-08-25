@@ -39,6 +39,7 @@ import TournamentBacket from './TournamentBacket';
 import Preview from './TournamentSchedule/preview';
 import { IfAnyGranted } from 'react-authorization';
 import userTournamentAPI from 'src/api/userTournamentAPI';
+import moment from 'moment';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -255,7 +256,8 @@ function DetailTournament() {
                                             {tournament.name}
                                         </Typography>
                                         <Typography variant="caption" sx={{ fontSize: 'bold' }}>
-                                            {scheduleData[0].date} - {scheduleData[scheduleData.length - 1].date}
+                                            {moment(scheduleData[0].date).format('DD/MM/yyyy')} -{' '}
+                                            {moment(scheduleData[scheduleData.length - 1].date).format('DD/MM/yyyy')}
                                         </Typography>
                                     </Box>
                                 </Box>

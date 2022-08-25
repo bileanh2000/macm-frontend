@@ -421,7 +421,7 @@ function DetailTournament() {
                                                             'Bạn chưa tham gia ban tổ chức giải đấu',
                                                         )
                                                             ? 'Đăng ký vào ban tổ chức'
-                                                            : isJoinAdmin.message + 'vào ban tổ chức'}
+                                                            : isJoinAdmin.message}
                                                     </Button>
                                                 )}
                                             </Box>

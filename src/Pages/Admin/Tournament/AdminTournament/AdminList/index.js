@@ -21,7 +21,7 @@ import userTournamentAPI from 'src/api/userTournamentAPI';
 import adminTournament from 'src/api/adminTournamentAPI';
 import UpdateRole from './UpdateRole';
 
-function AdminList({ adminList, value, index, active, total, isUpdate, user, Success, tournamentId, onChange }) {
+function AdminList({ adminList, value, index, active, total, isUpdate, user, Success, tournamentId, onChange, roles }) {
     const { enqueueSnackbar } = useSnackbar();
     const [data, setData] = useState(adminList);
     const [pageSize, setPageSize] = useState(10);
@@ -101,7 +101,10 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             try {
                 const response = await userTournamentAPI.getAllOrginizingCommitteeRole(tournamentId);
                 console.log('role', response);
-                setRoleInTournament(response.data);
+                const newRole = response.data.map((role) => {
+                    return { ...role, selected: true };
+                });
+                setRoleInTournament(newRole);
                 setIsRender(false);
             } catch (error) {
                 console.log('Khong the lay duoc role', error);
@@ -403,16 +406,17 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
                     </Dialog>
                 )}
 
-                {roleInTournament.length > 0 && (
+                {roles.length > 0 && (
                     <UpdateRole
-                        title="Đăng kí tham gia ban tổ chức"
+                        title="Chỉnh sửa vai trò ban tổ chức"
                         isOpen={openDialogEdit}
                         handleClose={() => {
                             setOpenDialogEdit(false);
                         }}
                         tournamentId={tournamentId}
                         user={user}
-                        roles={roleInTournament}
+                        roleInTournament={roleInTournament}
+                        roles={roles}
                         onSuccess={() => {
                             // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
                             //     return;

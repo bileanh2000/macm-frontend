@@ -31,7 +31,7 @@ function MyTeam({ competitive, exhibition }) {
                                         </TableCell>
                                         <TableCell align="left">{row.playerName}</TableCell>
                                         <TableCell align="left">{row.playerStudentId}</TableCell>
-                                        <TableCell align="left">{row.playerGender == 0 ? 'Nam' : 'Nữ'}</TableCell>
+                                        <TableCell align="left">{row.playerGender ? 'Nam' : 'Nữ'}</TableCell>
                                         <TableCell align="left">{row.roleInTeam == 0 ? '' : 'Nhóm trưởng'}</TableCell>
                                     </TableRow>
                                 ))}

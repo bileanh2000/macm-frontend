@@ -98,6 +98,7 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
             setListExhibitionType(response.data);
             // setExhibitionType(response.data[0].id);
             const type = response.data.filter((type) => type.id == exhibitionId);
+            console.log('type 101', type);
             setNumberMale(type[0].numberMale);
             setNumberFemale(type[0].numberFemale);
         } catch (error) {
@@ -153,6 +154,18 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
     };
 
     useEffect(() => {
+        const fetchExhibitionType = async (tournamentId) => {
+            try {
+                const response = await adminTournament.getAllExhibitionType(tournamentId);
+                setListExhibitionType(response.data);
+                // setExhibitionType(response.data[0].id);
+                const type = response.data.filter((type) => type.id == exhibitionId);
+                setNumberMale(type[0].numberMale);
+                setNumberFemale(type[0].numberFemale);
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
         fetchExhibitionType(tournamentId);
     }, [tournamentId, exhibitionId]);
 

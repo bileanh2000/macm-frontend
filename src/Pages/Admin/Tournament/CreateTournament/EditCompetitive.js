@@ -53,7 +53,7 @@ function EditCompetitive({ dataEdit, onEdit, onCancel, weightRange }) {
             });
         } else {
             if (checkWeight(gender, data.weightMin, data.weightMax)) {
-                const newData = { ...data, gender: dataEdit.gender, id: dataEdit.id };
+                const newData = { ...data, gender: dataEdit.gender, id: dataEdit.id, selected: dataEdit.selected };
                 console.log(newData);
                 onEdit && onEdit(newData);
             } else {

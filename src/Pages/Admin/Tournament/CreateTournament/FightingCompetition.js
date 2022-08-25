@@ -1,5 +1,6 @@
 import {
     Button,
+    Checkbox,
     Collapse,
     Fab,
     Grid,
@@ -26,6 +27,7 @@ import { Box } from '@mui/system';
 import EditCompetitive from './EditCompetitive';
 
 function FightingCompetition(props) {
+    console.log('data', props.data);
     const [datas, setDatas] = useState(props.data);
     const [isChecked, setIsChecked] = useState(false);
     const [gender, setGender] = useState(1);
@@ -122,6 +124,11 @@ function FightingCompetition(props) {
         handleCancel();
     };
 
+    const handleSelectCompetitve = (data) => {
+        props.onAddFightingCompetition(datas.map((d) => (d.id === data.id ? { ...d, selected: !d.selected } : d)));
+        setDatas(datas.map((d) => (d.id === data.id ? { ...d, selected: !d.selected } : d)));
+    };
+
     const handleAddCompetition = (data) => {
         if (data.weightMax < data.weightMin) {
             setFocus('weightMax', { shouldSelect: true });
@@ -145,7 +152,12 @@ function FightingCompetition(props) {
             if (checkWeight(gender, data.weightMin, data.weightMax)) {
                 const newData = [
                     ...datas,
-                    { ...data, gender: gender == 1 ? true : false, id: Math.floor(Math.random() * 1000) + 100 },
+                    {
+                        ...data,
+                        gender: gender == 1 ? true : false,
+                        id: Math.floor(Math.random() * 1000) + 100,
+                        selected: true,
+                    },
                 ];
                 // console.log('newData', newData);
                 setDatas(newData);
@@ -174,6 +186,7 @@ function FightingCompetition(props) {
         // const data = datas.filter((item) => item.id !== role.id);
         // const dataEdit = datas.filter((item) => item.id === role.id);
         // setDataTemp(data);
+        console.log(data);
 
         let i;
         let newWeightRange = [];
@@ -260,15 +273,22 @@ function FightingCompetition(props) {
                         <Table stickyHeader aria-label="sticky table">
                             <TableHead>
                                 <TableRow>
+                                    <TableCell align="center"></TableCell>
                                     <TableCell align="center">Giới tính</TableCell>
                                     <TableCell align="center">Hạng cân</TableCell>
                                     <TableCell align="center"></TableCell>
-                                    <TableCell align="center"></TableCell>
+                                    {/* <TableCell align="center"></TableCell> */}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {datas.map((data) => (
                                     <TableRow key={data.id}>
+                                        <TableCell>
+                                            <Checkbox
+                                                checked={data.selected}
+                                                onChange={() => handleSelectCompetitve(data)}
+                                            />
+                                        </TableCell>
                                         <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
                                         <TableCell align="center">
                                             {data.weightMin} - {data.weightMax} Kg
@@ -285,7 +305,7 @@ function FightingCompetition(props) {
                                                 <Edit />
                                             </IconButton>
                                         </TableCell>
-                                        <TableCell>
+                                        {/* <TableCell>
                                             <IconButton
                                                 aria-label="delete"
                                                 onClick={() => {
@@ -296,7 +316,7 @@ function FightingCompetition(props) {
                                             >
                                                 <Delete />
                                             </IconButton>
-                                        </TableCell>
+                                        </TableCell> */}
                                     </TableRow>
                                 ))}
                             </TableBody>

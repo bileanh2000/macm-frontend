@@ -25,8 +25,8 @@ import Trophy from 'src/Components/Common/Material/Trophy';
 import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function TournamentCompetitive({ reload, result, type, endDate, tournamentStage, onHaveResult }) {
-    // console.log(result);
+function TournamentCompetitive({ reload, result, type, endDate, tournamentStage, onHaveResult, isUnorganized }) {
+    console.log(result);
     let { tournamentId } = useParams();
     const [tournamentResult, setTournamentResult] = useState();
     const [tournamentStatus, setTournamentStatus] = useState(0);
@@ -41,14 +41,18 @@ function TournamentCompetitive({ reload, result, type, endDate, tournamentStage,
     const [isRender, setIsRender] = useState(true);
     // const [tournamentStatus, setTournamentStatus] = useState(-1);
 
-    useEffect(() => {
-        const _result =
-            type !== 0 || competitiveId !== 0
-                ? result.find((subResult) => subResult.data.find((d) => d.competitiveType.id == competitiveId)).data[0]
-                      .listResult
-                : null;
-        setTournamentResult(_result);
-    }, [type, competitiveId, result]);
+    // useEffect(() => {
+    //     console.log(competitiveId);
+    //     if (result && result.length > 0) {
+    //         const _result =
+    //             type !== 0 || competitiveId !== 0
+    //                 ? result.find((subResult) => subResult.data.find((d) => d.competitiveType.id == competitiveId))
+    //                       .data[0].listResult
+    //                 : null;
+    //         console.log(_result);
+    //         setTournamentResult(_result);
+    //     }
+    // }, [type, competitiveId, result]);
 
     // console.log('ewsult', tournamentResult);
     const handleChangeCompetitiveId = (event) => {
@@ -56,6 +60,7 @@ function TournamentCompetitive({ reload, result, type, endDate, tournamentStage,
             const _result = result.find((subResult) =>
                 subResult.data.find((d) => d.competitiveType.id == event.target.value),
             ).data[0].listResult;
+            console.log(_result);
             setTournamentResult(_result);
             // console.log('result', _result);
         }
@@ -190,6 +195,7 @@ function TournamentCompetitive({ reload, result, type, endDate, tournamentStage,
                     const _result = result.find((subResult) =>
                         subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id),
                     ).data[0].listResult;
+                    console.log(_result);
                     setTournamentResult(_result);
                     getListPlayerByCompetitiveID(response.data[0][0].id);
                 }
@@ -204,112 +210,122 @@ function TournamentCompetitive({ reload, result, type, endDate, tournamentStage,
 
     return (
         <Fragment>
-            <Dialog maxWidth="xs" open={open}>
-                <DialogTitle>Xác nhận</DialogTitle>
-                <DialogContent dividers>
-                    <DialogContentText>
-                        Bạn có chắc chắn muốn sử dụng thứ tự thi đấu này và cập nhật thời gian?
-                    </DialogContentText>
-                    <Typography variant="caption">
-                        Sau khi xác nhận sẽ không thay đổi vị trí thi đấu của các tuyển thủ nữa!
-                    </Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button variant="outline" autoFocus onClick={handleCancel}>
-                        Hủy
-                    </Button>
-                    <Button variant="contained" onClick={handleOk}>
-                        Xác nhận
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            {/* <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            {!isUnorganized ? (
+                <>
+                    <Dialog maxWidth="xs" open={open}>
+                        <DialogTitle>Xác nhận</DialogTitle>
+                        <DialogContent dividers>
+                            <DialogContentText>
+                                Bạn có chắc chắn muốn sử dụng thứ tự thi đấu này và cập nhật thời gian?
+                            </DialogContentText>
+                            <Typography variant="caption">
+                                Sau khi xác nhận sẽ không thay đổi vị trí thi đấu của các tuyển thủ nữa!
+                            </Typography>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button variant="outline" autoFocus onClick={handleCancel}>
+                                Hủy
+                            </Button>
+                            <Button variant="contained" onClick={handleOk}>
+                                Xác nhận
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    {/* <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                     Bảng đấu
                 </Typography>
             </Box> */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                <FormControl size="small">
-                    <Typography variant="caption">Hạng cân</Typography>
-                    <Select
-                        id="demo-simple-select"
-                        value={competitiveId}
-                        displayEmpty
-                        onChange={handleChangeCompetitiveId}
-                    >
-                        {listWeightRange &&
-                            listWeightRange.map((range) => (
-                                <MenuItem value={range.id} key={range.id}>
-                                    {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
-                                </MenuItem>
-                            ))}
-                    </Select>
-                </FormControl>
-                {/* {tournamentStatus == 0 && listPlayer.length > 0 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
+                        <FormControl size="small">
+                            <Typography variant="caption">Hạng cân</Typography>
+                            <Select
+                                id="demo-simple-select"
+                                value={competitiveId}
+                                displayEmpty
+                                onChange={handleChangeCompetitiveId}
+                            >
+                                {listWeightRange &&
+                                    listWeightRange.map((range) => (
+                                        <MenuItem value={range.id} key={range.id}>
+                                            {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
+                                        </MenuItem>
+                                    ))}
+                            </Select>
+                        </FormControl>
+                        {/* {tournamentStatus == 0 && listPlayer.length > 0 && (
                     <Button variant="outlined" onClick={handleDialogConfirmMatch} sx={{ mr: 2, float: 'right' }}>
                         Xác nhận bảng thi đấu
                     </Button>
                 )} */}
-            </Box>
-
-            {tournamentResult != null && (
-                <Paper elevation={3} sx={{ m: 2, p: 2 }}>
-                    <Typography variant="h6">Kết quả bảng đấu</Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Tooltip title="Huy chương vàng">
-                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <Gold />
-
-                                <Typography variant="body1">{tournamentResult[0].name}</Typography>
-                            </Box>
-                        </Tooltip>
-                        <Tooltip title="Huy chương bạc">
-                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <Sliver />
-
-                                <Typography variant="body1">{tournamentResult[1].name}</Typography>
-                            </Box>
-                        </Tooltip>
-                        <Tooltip title="Huy chương đồng">
-                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <Brone />
-
-                                <Typography variant="body1">{tournamentResult[2].name}</Typography>
-                            </Box>
-                        </Tooltip>
                     </Box>
-                </Paper>
-            )}
-            {listPlayer && areaList ? (
-                listPlayer.length > 0 ? (
-                    <CustomMatchBracket
-                        matches={listPlayer}
-                        competitiveId={competitiveId}
-                        rounds={rounds}
-                        status={tournamentStatus}
-                        stage={tournamentStage}
-                        areaList={areaList}
-                        onUpdateResult={UpdateResultHandler}
-                        // isCreate={isCreate}
-                        onCreateMatches={handleDialogCreate}
-                        onChangeData={() => {
-                            // console.log('render data bracket');
-                            setIsRender(true);
-                        }}
-                        endDate={endDate}
-                        onHaveResult={() => {
-                            onHaveResult && onHaveResult();
-                        }}
-                    />
-                ) : (
-                    <Box sx={{ display: 'flex' }}>
-                        <Typography variant="body1" sx={{ m: 'auto' }}>
-                            Thể thức này chưa có thời gian và địa điểm thi đấu
-                        </Typography>
-                    </Box>
-                )
+
+                    {tournamentResult != null && (
+                        <Paper elevation={3} sx={{ m: 2, p: 2 }}>
+                            <Typography variant="h6">Kết quả bảng đấu</Typography>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Tooltip title="Huy chương vàng">
+                                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                        <Gold />
+
+                                        <Typography variant="body1">{tournamentResult[0].name}</Typography>
+                                    </Box>
+                                </Tooltip>
+                                <Tooltip title="Huy chương bạc">
+                                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                        <Sliver />
+
+                                        <Typography variant="body1">{tournamentResult[1].name}</Typography>
+                                    </Box>
+                                </Tooltip>
+                                <Tooltip title="Huy chương đồng">
+                                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                        <Brone />
+
+                                        <Typography variant="body1">{tournamentResult[2].name}</Typography>
+                                    </Box>
+                                </Tooltip>
+                            </Box>
+                        </Paper>
+                    )}
+                    {listPlayer && areaList ? (
+                        listPlayer.length > 0 ? (
+                            <CustomMatchBracket
+                                matches={listPlayer}
+                                competitiveId={competitiveId}
+                                rounds={rounds}
+                                status={tournamentStatus}
+                                stage={tournamentStage}
+                                areaList={areaList}
+                                onUpdateResult={UpdateResultHandler}
+                                // isCreate={isCreate}
+                                onCreateMatches={handleDialogCreate}
+                                onChangeData={() => {
+                                    // console.log('render data bracket');
+                                    setIsRender(true);
+                                }}
+                                endDate={endDate}
+                                onHaveResult={() => {
+                                    onHaveResult && onHaveResult();
+                                }}
+                            />
+                        ) : (
+                            <Box sx={{ display: 'flex' }}>
+                                <Typography variant="body1" sx={{ m: 'auto' }}>
+                                    Thể thức này chưa có thời gian và địa điểm thi đấu
+                                </Typography>
+                            </Box>
+                        )
+                    ) : (
+                        <LoadingProgress />
+                    )}
+                </>
             ) : (
-                <LoadingProgress />
+                <Box sx={{ display: 'flex' }}>
+                    <Typography variant="body1" sx={{ m: 'auto' }}>
+                        Giải đấu không tổ chức thi đấu đối kháng
+                    </Typography>
+                </Box>
             )}
         </Fragment>
     );

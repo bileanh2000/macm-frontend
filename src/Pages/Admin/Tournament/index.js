@@ -1,5 +1,6 @@
 import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import {
+    Backdrop,
     Box,
     Button,
     Dialog,
@@ -12,10 +13,20 @@ import {
     IconButton,
     MenuItem,
     Paper,
+    SpeedDial,
+    SpeedDialAction,
     TextField,
     Typography,
 } from '@mui/material';
-import { AddCircle } from '@mui/icons-material';
+import {
+    AddCircle,
+    AdminPanelSettings,
+    MapTwoTone,
+    Settings,
+    SettingsOutlined,
+    SportsGymnastics,
+    SportsKabaddi,
+} from '@mui/icons-material';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -28,6 +39,11 @@ import TournamentItem from './TournamentItem';
 import trainingScheduleApi from 'src/api/trainingScheduleApi';
 import CreateTournament from './CreateTournament/CreateTournament';
 import { IfAllGranted, IfAuthorized, IfAnyGranted } from 'react-authorization';
+import AreaSetting from './SettingTournament/Area/AreaSetting';
+import RolesSetting from './SettingTournament/Role/RolesSetting';
+import ExhibitionSetting from './SettingTournament/Exhibition/ExhibitionSetting';
+import CompetitiveSetting from './SettingTournament/Competitive/CompetitiveSetting';
+
 function Tournament() {
     const [tournaments, setTournaments] = useState();
     const [semester, setSemester] = useState('Summer2022');
@@ -40,6 +56,11 @@ function Tournament() {
     const [suggestionRole, setSuggestionRole] = useState([]);
     const [isRender, setIsRender] = useState(true);
     const [suggestType, setSuggestType] = useState([]);
+    const [openSettingRole, setOpenSettingRole] = useState(false);
+    const [openSettingArea, setOpenSettingArea] = useState(false);
+    const [openSettingCompetitive, setOpenSettingCompetitive] = useState(false);
+    const [openSettingExhibition, setOpenSettingExhibition] = useState(false);
+
     const user = JSON.parse(localStorage.getItem('currentUser'));
     let navigate = useNavigate();
 
@@ -59,9 +80,9 @@ function Tournament() {
 
     const getAllSuggestionRole = async () => {
         try {
-            const response = await adminTournamentAPI.getAllSuggestionRole();
+            const response = await adminTournamentAPI.getAllRoleTournament();
             const roles = response.data.map((role) => {
-                return { ...role, maxQuantity: 5 };
+                return { ...role, maxQuantity: 5, selected: true };
             });
             console.log('suggestion role: ', roles);
             setSuggestionRole(roles);
@@ -168,64 +189,6 @@ function Tournament() {
     };
 
     return (
-        // <Box sx={{ m: 1, p: 1 }}>
-        //     <Dialog
-        //         open={openClosedTournament}
-        //         onClose={handleCloseDialogTournament}
-        //         aria-labelledby="alert-dialog-title"
-        //         aria-describedby="alert-dialog-description"
-        //         fullWidth
-        //         maxWidth="md"
-        //     >
-        //         <DialogTitle id="alert-dialog-title">giải đấu đã kết thúc</DialogTitle>
-        //         <DialogContent>
-        //             {tournaments && tournaments.filter((t) => t.status === 1).length > 0 ? (
-        //                 tournaments
-        //                     .filter((t) => t.status === 1)
-        //                     .map((tournament) => (
-        //                         <TournamentItem
-        //                             key={tournament.id}
-        //                             data={tournament}
-        //                             onSuccess={() => setIsRender(true)}
-        //                         />
-        //                     ))
-        //             ) : (
-        //                 <DialogContentText>Không có giải đấu đã kết thúc</DialogContentText>
-        //             )}
-        //         </DialogContent>
-        //         <DialogActions>
-        //             <Button onClick={handleCloseDialogTournament} autoFocus>
-        //                 Đóng
-        //             </Button>
-        //         </DialogActions>
-        //     </Dialog>
-        //     {suggestionRole && suggestType && (
-        //         <CreateTournament
-        //             title="Tạo giải đấu"
-        //             roles={suggestionRole}
-        //             competitiveType={suggestType.competitiveTypeSamples}
-        //             exhibitionType={suggestType.exhibitionTypeSamples}
-        //             isOpen={openDialogCreate}
-        //             handleClose={() => {
-        //                 setOpenDialogCreate(false);
-        //             }}
-        //             user={user}
-        //         />
-        //     )}
-        //     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        //         <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
-        //             Danh sách giải đấu
-        //         </Typography>
-
-        //         <Button
-        //             variant="outlined"
-        //             sx={{ maxHeight: '50px', minHeight: '50px' }}
-        //             // component={Link}
-        //             // to={'./create'}
-        //             startIcon={<AddCircle />}
-        //             onClick={() => {
-        //                 setOpenDialogCreate(true);
-        //             }}
         <IfAnyGranted
             expected={[
                 'ROLE_HeadTechnique',
@@ -237,7 +200,7 @@ function Tournament() {
             actual={JSON.parse(localStorage.getItem('currentUser')).role.name}
             unauthorized={<Navigate to="/forbidden" />}
         >
-            <Box sx={{ m: 1, p: 1 }}>
+            <Box sx={{ m: 1, p: 1, position: 'relative' }}>
                 <Dialog
                     open={openClosedTournament}
                     onClose={handleCloseDialogTournament}
@@ -272,8 +235,18 @@ function Tournament() {
                     <CreateTournament
                         title="Tạo giải đấu"
                         roles={suggestionRole}
-                        competitiveType={suggestType.competitiveTypeSamples}
-                        exhibitionType={suggestType.exhibitionTypeSamples}
+                        competitiveType={
+                            suggestType.competitiveTypeSamples &&
+                            suggestType.competitiveTypeSamples.map((competitive) => {
+                                return { ...competitive, selected: true };
+                            })
+                        }
+                        exhibitionType={
+                            suggestType.exhibitionTypeSamples &&
+                            suggestType.exhibitionTypeSamples.map((exhibition) => {
+                                return { ...exhibition, selected: true };
+                            })
+                        }
                         isOpen={openDialogCreate}
                         handleClose={() => {
                             setOpenDialogCreate(false);
@@ -281,6 +254,34 @@ function Tournament() {
                         user={user}
                     />
                 )}
+                <AreaSetting
+                    title="Chỉnh sửa thông tin sân thi đấu"
+                    isOpen={openSettingArea}
+                    handleClose={() => {
+                        setOpenSettingArea(false);
+                    }}
+                />
+                <RolesSetting
+                    title="Chỉnh sửa gợi ý vai trò ban tổ chức "
+                    isOpen={openSettingRole}
+                    handleClose={() => {
+                        setOpenSettingRole(false);
+                    }}
+                />
+                <CompetitiveSetting
+                    title="Chỉnh sửa đề xuất thể thức thi đấu đối kháng"
+                    isOpen={openSettingCompetitive}
+                    handleClose={() => {
+                        setOpenSettingCompetitive(false);
+                    }}
+                />
+                <ExhibitionSetting
+                    title="Chỉnh sửa đề xuất thể thức thi đấu biểu diễn"
+                    isOpen={openSettingExhibition}
+                    handleClose={() => {
+                        setOpenSettingExhibition(false);
+                    }}
+                />
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500 }}>
                         Danh sách giải đấu
@@ -289,52 +290,117 @@ function Tournament() {
                     user.role.name === 'ROLE_HeadTechnique' ||
                     user.role.name === 'ROLE_ViceHeadTechnique' ||
                     user.role.name === 'ROLE_ViceHeadClub' ? (
-                        <Button
-                            variant="outlined"
-                            sx={{ maxHeight: '50px', minHeight: '50px' }}
-                            // component={Link}
-                            // to={'./create'}
-                            startIcon={<AddCircle />}
-                            onClick={() => {
-                                setOpenDialogCreate(true);
-                            }}
-                        >
-                            Tạo giải đấu
-                        </Button>
+                        <Box>
+                            <Button
+                                variant="outlined"
+                                sx={{ maxHeight: '50px', minHeight: '50px' }}
+                                // component={Link}
+                                // to={'./create'}
+                                startIcon={<AddCircle />}
+                                onClick={() => {
+                                    setOpenDialogCreate(true);
+                                }}
+                            >
+                                Tạo giải đấu
+                            </Button>
+                            {/* <Box sx={{ transform: 'translateZ(0px)', flexGrow: 1 }}>
+                                <SpeedDial
+                                    ariaLabel="SpeedDial openIcon example"
+                                    sx={{ position: 'absolute', right: 16 }}
+                                    icon={<Settings openIcon={<SettingsOutlined />} />}
+                                    direction={'down'}
+                                >
+                                    <SpeedDialAction
+                                        key={'area'}
+                                        icon={<MapTwoTone />}
+                                        tooltipTitle={'Chỉnh sửa thông tin sân thi đấu'}
+                                    />
+                                    <SpeedDialAction
+                                        key={'role'}
+                                        icon={<AdminPanelSettings />}
+                                        tooltipTitle={'Chỉnh sửa thông tin ban tổ chức'}
+                                    />
+                                    <SpeedDialAction
+                                        key={'competitive'}
+                                        icon={<SportsGymnastics />}
+                                        tooltipTitle={'Chỉnh sửa thông tin thể thức thi đấu đối kháng'}
+                                    />
+                                    <SpeedDialAction
+                                        key={'exhibition'}
+                                        icon={<SportsKabaddi />}
+                                        tooltipTitle={'Chỉnh sửa thông tin thể thức thi đấu biểu diễn'}
+                                    />
+                                </SpeedDial>
+                            </Box> */}
+                        </Box>
                     ) : null}
                 </Box>
                 <Divider />
-                <Box sx={{ m: 2 }}>
-                    <TextField
-                        id="outlined-select-currency"
-                        select
-                        size="small"
-                        label="Chọn kỳ"
-                        value={semester}
-                        onChange={handleChange}
-                        sx={{ mr: 2 }}
+                <Box sx={{ m: 2, display: 'flex', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex' }}>
+                        <TextField
+                            id="outlined-select-currency"
+                            select
+                            size="small"
+                            label="Chọn kỳ"
+                            value={semester}
+                            onChange={handleChange}
+                            sx={{ mr: 2 }}
+                        >
+                            {semesterList.map((option) => (
+                                <MenuItem key={option.id} value={option.name}>
+                                    {option.name}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                        <TextField
+                            id="outlined-select-currency"
+                            select
+                            size="small"
+                            label="Trạng thái giải đấu"
+                            value={status}
+                            onChange={handleChangeStatus}
+                            sx={{ minWidth: '10rem' }}
+                        >
+                            <MenuItem value={0}>Tất cả</MenuItem>
+                            <MenuItem value={2}>Đang diễn ra</MenuItem>
+                            <MenuItem value={3}>Sắp diễn ra</MenuItem>
+                        </TextField>
+                    </Box>
+                    {/* <Box sx={{ transform: 'translateZ(0px)', flexGrow: 1 }}> */}
+                    <SpeedDial
+                        ariaLabel="SpeedDial openIcon example"
+                        sx={{ transform: 'translateZ(0px)', flexGrow: 1, position: 'absolute', right: 16 }}
+                        icon={<Settings />}
+                        direction={'left'}
                     >
-                        {semesterList.map((option) => (
-                            <MenuItem key={option.id} value={option.name}>
-                                {option.name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                    <TextField
-                        id="outlined-select-currency"
-                        select
-                        size="small"
-                        label="Trạng thái giải đấu"
-                        value={status}
-                        onChange={handleChangeStatus}
-                        sx={{ minWidth: '10rem' }}
-                    >
-                        <MenuItem value={0}>Tất cả</MenuItem>
-                        <MenuItem value={2}>Đang diễn ra</MenuItem>
-                        <MenuItem value={3}>Sắp diễn ra</MenuItem>
-                    </TextField>
+                        <SpeedDialAction
+                            key={'area'}
+                            icon={<MapTwoTone />}
+                            tooltipTitle={'Chỉnh sửa thông tin sân thi đấu'}
+                            onClick={() => setOpenSettingArea(true)}
+                        />
+                        <SpeedDialAction
+                            key={'role'}
+                            icon={<AdminPanelSettings />}
+                            tooltipTitle={'Chỉnh sửa thông tin ban tổ chức'}
+                            onClick={() => setOpenSettingRole(true)}
+                        />
+                        <SpeedDialAction
+                            key={'competitive'}
+                            icon={<SportsGymnastics />}
+                            tooltipTitle={'Chỉnh sửa đề xuất thể thức thi đấu đối kháng'}
+                            onClick={() => setOpenSettingCompetitive(true)}
+                        />
+                        <SpeedDialAction
+                            key={'exhibition'}
+                            icon={<SportsKabaddi />}
+                            tooltipTitle={'Chỉnh sửa đề xuất thể thức thi đấu biểu diễn'}
+                            onClick={() => setOpenSettingExhibition(true)}
+                        />
+                    </SpeedDial>
+                    {/* </Box> */}
                 </Box>
-
                 {/* <Grid container spacing={4}>
                 <Grid item xs={12} md={4}>
                     {tournaments && tournaments.length === 0 ? (
@@ -426,6 +492,7 @@ function Tournament() {
                             <Typography sx={{ textAlign: 'center' }}>Hiện đang không có giải đấu nào</Typography>
                         )}
                     </Grid>
+
                     <Grid item xs={12} md={8}>
                         <Paper elevation={1} sx={{ height: '80vh', p: 1 }}>
                             <FullCalendar

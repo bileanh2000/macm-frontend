@@ -22,6 +22,7 @@ function AdminTournament({ isUpdate, user, onChange }) {
     const [total, setTotal] = useState(0);
     const [isRender, SetIsRender] = useState(true);
     const [value, setValue] = React.useState(0);
+    const [roles, setRoles] = useState();
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -30,7 +31,7 @@ function AdminTournament({ isUpdate, user, onChange }) {
     const fetchAdminInTournament = async (params) => {
         try {
             const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
-            console.log(response);
+            console.log('admin', response);
             const newUser = response.data.filter((user) => user.registerStatus === 'Đã chấp nhận');
             setAdminList(newUser);
             setActive(response.totalActive);
@@ -40,10 +41,22 @@ function AdminTournament({ isUpdate, user, onChange }) {
         }
     };
 
+    const getAllRoleTournament = async () => {
+        try {
+            const response = await adminTournamentAPI.getAllRoleTournament();
+            console.log('getAllRoleTournament', response.data);
+            const newRole = response.data.map((role) => {
+                return { ...role, selected: false, maxQuantity: 5, availableQuantity: 5 };
+            });
+            setRoles(newRole);
+        } catch (error) {}
+    };
+
     useEffect(() => {
         isRender && fetchAdminInTournament(tournamentId);
+        isRender && getAllRoleTournament();
         SetIsRender(false);
-    }, [tournamentId, adminList, isRender]);
+    }, [tournamentId, adminList, isRender, roles]);
 
     return (
         <Fragment>
@@ -67,27 +80,30 @@ function AdminTournament({ isUpdate, user, onChange }) {
                     )} */}
                 </Box>
 
-                <AdminList
-                    adminList={adminList}
-                    isUpdate={isUpdate}
-                    user={user}
-                    active={active}
-                    total={total}
-                    value={value}
-                    index={0}
-                    Success={(newItem) => {
-                        // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
-                        //     return;
-                        // }
-                        // setAdminList([...newItem, ...adminList]);
-                        SetIsRender(true);
-                    }}
-                    tournamentId={tournamentId}
-                    onChange={() => {
-                        SetIsRender(true);
-                        onChange && onChange();
-                    }}
-                />
+                {roles && (
+                    <AdminList
+                        adminList={adminList}
+                        isUpdate={isUpdate}
+                        user={user}
+                        active={active}
+                        total={total}
+                        value={value}
+                        index={0}
+                        Success={(newItem) => {
+                            // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
+                            //     return;
+                            // }
+                            // setAdminList([...newItem, ...adminList]);
+                            SetIsRender(true);
+                        }}
+                        tournamentId={tournamentId}
+                        onChange={() => {
+                            SetIsRender(true);
+                            onChange && onChange();
+                        }}
+                        roles={roles}
+                    />
+                )}
                 {/* <UpdateAdminTournament
                     value={value}
                     active={active}

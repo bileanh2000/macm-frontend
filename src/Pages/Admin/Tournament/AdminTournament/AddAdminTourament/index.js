@@ -53,21 +53,21 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
     }, [tournamentId]);
 
     const columns = [
-        { field: 'studentName', headerName: 'Tên', flex: 0.3 },
+        { field: 'studentName', headerName: 'Tên', flex: 0.6 },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
             flex: 0.3,
         },
-        // {
-        //     field: 'roleInTournament',
-        //     headerName: 'Vai trò mong muốn',
-        //     flex: 0.3,
-        // },
+        {
+            field: 'roleInTournament',
+            headerName: 'Vai trò mong muốn',
+            flex: 0.6,
+        },
         {
             field: 'approve',
             type: 'actions',
-            flex: 0.5,
+            flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
                 return [
@@ -81,14 +81,13 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
                     </Button>,
                 ];
             },
-            hide: _active === 10,
+            // hide: _active === 10,
         },
 
         {
             field: 'reject',
-            headerName: 'hihi',
             type: 'actions',
-            flex: 0.5,
+            flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
                 return [

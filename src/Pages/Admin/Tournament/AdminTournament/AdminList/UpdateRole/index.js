@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
     Box,
     Button,
+    Checkbox,
     Collapse,
     Dialog,
     DialogActions,
@@ -33,9 +34,18 @@ import EditRole from './EditRole';
 import adminTournament from 'src/api/adminTournamentAPI';
 import { useSnackbar } from 'notistack';
 
-function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onChange }) {
+function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, tournamentId, onChange }) {
+    const newData =
+        roleInTournament.length > 0
+            ? roles.map((role) =>
+                  roleInTournament.filter((ro) => ro.name.includes(role.name)).length > 0
+                      ? roleInTournament.filter((ro) => ro.name.includes(role.name))[0]
+                      : role,
+              )
+            : roles;
+
     const { enqueueSnackbar } = useSnackbar();
-    const [datas, setDatas] = useState(roles);
+    const [datas, setDatas] = useState(newData);
     const [dataEdit, setDataEdit] = useState();
     const [isEdit, setIsEdit] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
@@ -50,12 +60,24 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
         }
     };
 
+    useEffect(() => {
+        const newData =
+            roleInTournament.length > 0
+                ? roles.map((role) =>
+                      roleInTournament.filter((ro) => ro.name.includes(role.name)).length > 0
+                          ? roleInTournament.filter((ro) => ro.name.includes(role.name))[0]
+                          : role,
+                  )
+                : roles;
+        setDatas(newData);
+    }, [roleInTournament, roles]);
+
     const validationSchema = Yup.object().shape({
         roleName: Yup.string()
             .trim()
             .nullable()
             .required('Không được để trống trường này')
-            .test('len', 'Không hợp lệ', (val) => val.length > 1)
+            .test('len', 'Không hợp lệ', (val) => val && val.length > 1)
             .matches(
                 /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ ]+$/,
                 'Không hợp lệ: vui lòng nhập chữ',
@@ -88,6 +110,10 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
         resetField('maxQuantity', { keepError: true });
     };
 
+    const handleSelectRole = (data) => {
+        setDatas(datas.map((d) => (d.id === data.id ? { ...d, selected: !d.selected } : d)));
+    };
+
     const handleDelete = (id) => {
         // datas.map((data) => {
         //     return data.id === id;
@@ -106,7 +132,6 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
         setIsChecked(!isChecked);
     };
     const handleAddEventRoles = (data) => {
-        console.log(data);
         if (datas.findIndex((d) => d.name.includes(data.roleName)) >= 0) {
             setError('roleName', {
                 message: 'Vai trò này đã tồn tại, vui lòng chọn vai trò khác',
@@ -121,6 +146,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
                 name: data.roleName,
                 maxQuantity: data.maxQuantity,
                 availableQuantity: data.maxQuantity,
+                selected: true,
             },
         ];
         setDatas(newData);
@@ -136,7 +162,6 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
     };
 
     const handleEditEventRoles = (data) => {
-        console.log(data);
         if (
             datas.findIndex((d) => d.name.includes(data.roleName)) >= 0 &&
             datas.findIndex((d) => d.maxQuantity == data.maxQuantity) >= 0
@@ -161,11 +186,18 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
         setIsChecked(!isChecked);
     };
     const handleRegister = (data) => {
-        editRoleTournament(tournamentId, datas);
+        const newData = datas.filter((data) => data.selected);
+        const submitData =
+            newData.length > 0
+                ? newData.map((data) => {
+                      return { name: data.name, maxQuantity: data.maxQuantity };
+                  })
+                : [];
+        editRoleTournament(tournamentId, submitData);
         handleClose && handleClose();
     };
     const handleCloseDialog = () => {
-        setDatas(roles);
+        setDatas(roleInTournament);
         handleClose && handleClose();
     };
     return (
@@ -185,9 +217,9 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
                             <caption style={{ captionSide: 'top' }}>Số lượng vai trò hiện tại : {datas.length}</caption>
                             <TableHead>
                                 <TableRow>
+                                    <TableCell align="center"></TableCell>
                                     <TableCell align="center">Tên vai trò</TableCell>
                                     <TableCell align="center">Số lượng thành viên</TableCell>
-                                    <TableCell align="center"></TableCell>
                                     <TableCell align="center"></TableCell>
                                     <TableCell align="center"></TableCell>
                                 </TableRow>
@@ -195,9 +227,14 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
                             <TableBody>
                                 {datas.map((data) => (
                                     <TableRow key={data.id}>
+                                        <TableCell align="center">
+                                            <Checkbox checked={data.selected} onChange={() => handleSelectRole(data)} />
+                                        </TableCell>
                                         <TableCell align="center">{data.name}</TableCell>
                                         <TableCell align="center">
-                                            {data.maxQuantity - data.availableQuantity + '/' + data.maxQuantity}
+                                            {data.selected
+                                                ? data.maxQuantity - data.availableQuantity + '/' + data.maxQuantity
+                                                : ''}
                                         </TableCell>
                                         <TableCell>
                                             <IconButton
@@ -211,7 +248,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
                                                 <Edit />
                                             </IconButton>
                                         </TableCell>
-                                        <TableCell>
+                                        {/* <TableCell>
                                             <IconButton
                                                 aria-label="delete"
                                                 onClick={() => {
@@ -226,7 +263,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roles, tournamentId, onCha
                                             >
                                                 <Delete />
                                             </IconButton>
-                                        </TableCell>
+                                        </TableCell> */}
                                     </TableRow>
                                 ))}
                             </TableBody>

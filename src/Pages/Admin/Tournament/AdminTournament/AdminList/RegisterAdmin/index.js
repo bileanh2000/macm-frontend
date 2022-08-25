@@ -34,8 +34,10 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [admin, setAdmin] = useState([]);
+    const [selectionModel, setSelectionModel] = useState([]);
     const [allMember, setAllMember] = useState();
     const [pageSize, setPageSize] = useState(5);
+    const [selectedRows, setSelectedRows] = useState([]);
     // const [roleInTournament, setRoleInTournament] = useState([]);
 
     const AddPlayerHandler = (data) => {
@@ -52,7 +54,11 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
 
     const addListOrganizingCommittee = async () => {
         try {
-            const response = await adminTournament.addListOrganizingCommittee(user.studentId, tournamentId, admin);
+            const response = await adminTournament.addListOrganizingCommittee(
+                user.studentId,
+                tournamentId,
+                selectedRows,
+            );
             enqueueSnackbar(response.message, { variant: response.data ? 'success' : 'error' });
             onChange && onChange();
         } catch (error) {}
@@ -67,7 +73,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
         }
 
         addListOrganizingCommittee();
-        const newPlayer = admin.map((p) => {
+        const newPlayer = selectedRows.map((p) => {
             return {
                 id: p.user.id,
                 userName: p.user.name,
@@ -108,6 +114,13 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
     );
 
     const columns = [
+        {
+            field: 'select',
+            headerName: '',
+            type: 'boolean',
+            width: 140,
+            editable: true,
+        },
         { field: 'studentName', headerName: 'Tên', flex: 0.8 },
         {
             field: 'studentId',
@@ -125,6 +138,11 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
             valueOptions: roles.map((role) => {
                 return { label: role.name, value: role.name };
             }),
+            preProcessEditCellProps: (params) => {
+                const isPaidProps = params.otherFieldsProps.isPaid;
+                const hasError = isPaidProps.value && !params.props.value;
+                return { ...params.props, error: hasError };
+            },
             renderCell: (params) => (
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>{params.value}</span>
@@ -260,18 +278,8 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
         >
             <DialogTitle id="alert-dialog-title">Thêm thành viên vào ban tổ chức</DialogTitle>
             <DialogContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', m: 2 }}>
+                {/* <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', m: 2 }}>
                     {allMember && <AddAdmin data={admin} onAddPlayer={AddPlayerHandler} allMember={allMember} />}
-                    {/* <FormControl size="small">
-                        <Select id="demo-simple-select" value={weightRange} displayEmpty onChange={handleChangeWeight}>
-                            {listWeightRange &&
-                                listWeightRange.map((range) => (
-                                    <MenuItem value={range.id} key={range.id}>
-                                        {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
-                                    </MenuItem>
-                                ))}
-                        </Select>
-                    </FormControl> */}
                 </Box>
 
                 <Grid container spacing={2}>
@@ -309,13 +317,36 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
                             )}
                         </Paper>
                     </Grid>
-                </Grid>
+                </Grid> */}
+                <Box sx={{ height: '500px' }}>
+                    <DataGrid
+                        rows={rowsUser}
+                        // checkboxSelection
+                        onSelectionModelChange={(ids) => {
+                            setSelectionModel(ids);
+                            const selectedIDs = new Set(ids);
+                            const selectedRows = allMember && allMember.filter((row) => selectedIDs.has(row.userId));
+                            setSelectedRows(selectedRows);
+                            console.log(selectedRows);
+                            console.log('addMemberToEvent', selectedRows);
+                        }}
+                        disableSelectionOnClick={true}
+                        columns={columns}
+                        pageSize={pageSize}
+                        rowsPerPageOptions={[30, 40, 50]}
+                        components={{
+                            Toolbar: CustomToolbar,
+                            NoRowsOverlay: CustomNoRowsOverlay,
+                        }}
+                        onCellEditCommit={handleRowEditCommit}
+                    />
+                </Box>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" onClick={handleCloseDialog}>
                     Hủy
                 </Button>
-                <Button variant="contained" onClick={handleRegister} autoFocus disabled={admin.length === 0}>
+                <Button variant="contained" onClick={handleRegister} autoFocus disabled={selectionModel.length === 0}>
                     Xác nhận
                 </Button>
             </DialogActions>
