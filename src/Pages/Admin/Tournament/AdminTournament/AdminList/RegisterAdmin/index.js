@@ -135,11 +135,11 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
             renderCell: (params) => (
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>{params.value}</span>
-                    <Tooltip title="DoubleClick để chỉnh sửa vai trò">
+                    {/* <Tooltip title="DoubleClick để chỉnh sửa vai trò">
                         <span>
                             <GridActionsCellItem icon={<Edit />} label="Edit" sx={{ ml: 2 }} />
                         </span>
-                    </Tooltip>
+                    </Tooltip> */}
                 </Box>
             ),
             cellClassName: (params) => {
@@ -173,6 +173,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
                         return { roleId: roles[0].id, user: data };
                     });
                     setAllMember(newAllMemberWithRole);
+                    setPageSize(response.data.length);
                 } else {
                     setAllMember([]);
                 }
@@ -323,7 +324,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
                             }}
                             disableSelectionOnClick={true}
                             columns={columns}
-                            pageSize={pageSize}
+                            pageSize={allMember && allMember.length}
                             rowsPerPageOptions={[30, 40, 50]}
                             components={{
                                 Toolbar: CustomToolbar,

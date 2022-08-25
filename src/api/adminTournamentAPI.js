@@ -179,8 +179,8 @@ const adminTournament = {
         return axiosClient.put(url, params);
     },
 
-    deleteTournamentOrganizingCommittee: (tournamentOrganizingCommitteeId) => {
-        const url = `/tournament/headclub/deletetournamentorganizingcommittee/${tournamentOrganizingCommitteeId}`;
+    deleteTournamentOrganizingCommittee: (tournamentOrganizingCommitteeId, studentId) => {
+        const url = `/tournament/headclub/deletetournamentorganizingcommittee/${tournamentOrganizingCommitteeId}/${studentId}`;
         return axiosClient.put(url);
     },
 
@@ -204,8 +204,8 @@ const adminTournament = {
         return axiosClient.put(url, null, { params: { weight: weight } });
     },
 
-    deleteCompetitivePlayer: (competitivePlayerId) => {
-        const url = `/competitive/headclub/deletecompetitiveplayer/${competitivePlayerId}`;
+    deleteCompetitivePlayer: (competitivePlayerId, studentId) => {
+        const url = `/competitive/headclub/deletecompetitiveplayer/${studentId}/${competitivePlayerId}`;
         return axiosClient.put(url);
     },
 
@@ -396,8 +396,8 @@ const adminTournament = {
     //     return axiosClient.post(url);
     // },
 
-    updateExhibitionTeam: (exhibitionTeamId, params) => {
-        const url = `/exhibition/headclub/updateteam/${exhibitionTeamId}`;
+    updateExhibitionTeam: (exhibitionTeamId, params, studentId) => {
+        const url = `/exhibition/headclub/updateteam/${studentId}/${exhibitionTeamId}`;
         return axiosClient.put(url, params);
     },
     updateExhibitionResult: (exhibitionTeamId, score) => {

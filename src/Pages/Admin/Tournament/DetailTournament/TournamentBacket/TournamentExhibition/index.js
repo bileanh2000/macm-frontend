@@ -12,6 +12,8 @@ import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
 function TournamentExhibition({ reload, result, type, endDate, tournamentStage, isUnorganized }) {
+    console.log(result);
+
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
 
     let { tournamentId } = useParams();

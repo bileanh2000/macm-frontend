@@ -354,6 +354,7 @@ function DetailTournament() {
                                     tournamentStatus={tournament.status}
                                     tournamentStage={tournament.stage}
                                     isUpdate={isUpdate}
+                                    user={user}
                                 />
                             </TabPanel>
                             <TabPanel value={value} index={5}>

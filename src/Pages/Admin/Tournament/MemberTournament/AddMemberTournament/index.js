@@ -6,7 +6,7 @@ import { Link, useParams } from 'react-router-dom';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 import MemberList from './MemberList';
 
-function AddMemberTourament({ tournament, isUpdate, tournamentStage }) {
+function AddMemberTourament({ tournament, isUpdate, tournamentStage, onChange }) {
     let { tournamentId } = useParams();
     const [type, setType] = useState(1);
     const { enqueueSnackbar } = useSnackbar();
@@ -85,7 +85,9 @@ function AddMemberTourament({ tournament, isUpdate, tournamentStage }) {
                     data={competitivePlayer}
                     type={type}
                     onChange={() => {
-                        return setIsRenderCompe(true);
+                        onChange && onChange();
+                        setIsRender(true);
+                        setIsRenderCompe(true);
                     }}
                     isUpdate={isUpdate}
                     tournamentStatus={tournamentStatus}
@@ -98,6 +100,7 @@ function AddMemberTourament({ tournament, isUpdate, tournamentStage }) {
                     data={exhibitionTeam}
                     type={type}
                     onChange={() => {
+                        onChange && onChange();
                         setIsRender(true);
                         setIsRenderCompe(true);
                     }}

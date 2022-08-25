@@ -16,7 +16,7 @@ function a11yProps(index) {
     };
 }
 
-function MemberTournament({ tournament, isUpdate, tournamentStage }) {
+function MemberTournament({ tournament, isUpdate, tournamentStage, user }) {
     let { tournamentId } = useParams();
     const [type, setType] = useState(1);
     const { enqueueSnackbar } = useSnackbar();
@@ -144,7 +144,7 @@ function MemberTournament({ tournament, isUpdate, tournamentStage }) {
                     scrollButtons="auto"
                     aria-label="basic tabs example"
                 >
-                    <Tab label="Danh sách vận đông viên" {...a11yProps(0)} value={0} />
+                    <Tab label="Danh sách vận động viên" {...a11yProps(0)} value={0} />
                     {/* <Tab label="Cập nhật vai trò" {...a11yProps(1)} /> */}
                     <Tab label="Xét duyệt yêu cầu tham gia" {...a11yProps(1)} value={1} />
                 </Tabs>
@@ -203,23 +203,26 @@ function MemberTournament({ tournament, isUpdate, tournamentStage }) {
                                                 ))}
                                         </Select>
                                     </FormControl>
-                                    {!isUpdate && tournamentStage == 0 && (
-                                        <Box
-                                            sx={{
-                                                // width: '100%',
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'flex-end',
-                                            }}
-                                        >
-                                            <Button
-                                                variant="outlined"
-                                                sx={{ mr: 2 }}
-                                                onClick={() => handleOpenDialog(true)}
+                                    {!isUpdate &&
+                                        tournamentStage == 0 &&
+                                        tournament.competitiveTypes.length > 0 &&
+                                        competitivePlayer && (
+                                            <Box
+                                                sx={{
+                                                    // width: '100%',
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'flex-end',
+                                                }}
                                             >
-                                                Thêm vận động viên thi đấu đối kháng
-                                            </Button>
-                                            {/* <Button
+                                                <Button
+                                                    variant="outlined"
+                                                    sx={{ mr: 2 }}
+                                                    onClick={() => handleOpenDialog(true)}
+                                                >
+                                                    Thêm vận động viên thi đấu đối kháng
+                                                </Button>
+                                                {/* <Button
                                                 variant="outlined"
                                                 sx={{ mr: 2 }}
                                                 onClick={() => handleCreateMatches()}
@@ -227,8 +230,8 @@ function MemberTournament({ tournament, isUpdate, tournamentStage }) {
                                             >
                                                 Tạo bảng thi đấu
                                             </Button> */}
-                                        </Box>
-                                    )}
+                                            </Box>
+                                        )}
                                 </Box>
                             ) : (
                                 <Box sx={{ display: 'flex' }}>
@@ -262,30 +265,33 @@ function MemberTournament({ tournament, isUpdate, tournamentStage }) {
                                             ))}
                                     </Select>
                                 </FormControl>
-                                {!isUpdate && tournamentStage == 0 && (
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'flex-end',
-                                        }}
-                                    >
-                                        <Button
-                                            variant="outlined"
-                                            sx={{ mr: 2 }}
-                                            onClick={() => handleOpenDialogExhibition(true)}
+                                {!isUpdate &&
+                                    tournamentStage == 0 &&
+                                    tournament.exhibitionTypes.length > 0 &&
+                                    exhibitionTeam && (
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'flex-end',
+                                            }}
                                         >
-                                            Thêm vận động viên thi đấu biểu diễn
-                                        </Button>
-                                        {/* <Button
+                                            <Button
+                                                variant="outlined"
+                                                sx={{ mr: 2 }}
+                                                onClick={() => handleOpenDialogExhibition(true)}
+                                            >
+                                                Thêm vận động viên thi đấu biểu diễn
+                                            </Button>
+                                            {/* <Button
                                     variant="outlined"
                                     sx={{ mr: 2 }}
                                     // onClick={() => handleOpenDialogExhibition(true)}
                                 >
                                     Tạo bảng thi đấu
                                 </Button> */}
-                                    </Box>
-                                )}
+                                        </Box>
+                                    )}
                             </Box>
                         ) : (
                             <Box sx={{ display: 'flex' }}>
@@ -302,6 +308,7 @@ function MemberTournament({ tournament, isUpdate, tournamentStage }) {
                             onChange={() => {
                                 return setIsRenderCompe(true);
                             }}
+                            user={user}
                             isUpdate={isUpdate}
                             tournamentStatus={tournamentStatus}
                             tournamentStage={tournamentStage}
@@ -312,6 +319,7 @@ function MemberTournament({ tournament, isUpdate, tournamentStage }) {
                         <MemberList
                             data={exhibitionTeam}
                             type={type}
+                            user={user}
                             onChange={() => {
                                 return setIsRender(true);
                             }}

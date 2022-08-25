@@ -47,7 +47,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             console.log(newRole);
             console.log(data);
             const newAdminList = data.map((member) =>
-                member.id === id ? { ...member, roleTournamentDto: newRole } : member,
+                member.id === id ? { ...member, tournamentRoleDto: newRole } : member,
             );
             setData(newAdminList);
             setIsEdit(true);
@@ -86,10 +86,13 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
 
     const deleteTournamentOrganizingCommittee = async (tournamentAdminId) => {
         try {
-            const response = await adminTournament.deleteTournamentOrganizingCommittee(tournamentAdminId);
+            const response = await adminTournament.deleteTournamentOrganizingCommittee(
+                tournamentAdminId,
+                user.studentId,
+            );
             onChange && onChange();
             enqueueSnackbar(response.message, {
-                variant: response.message.includes('Không thể xóa') ? 'error' : 'success',
+                variant: response.message.toLowerCase().includes('không thể xóa') ? 'error' : 'success',
             });
         } catch (error) {
             console.warn('Failed to delete competitive player');
@@ -120,6 +123,12 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             headerName: 'Mã sinh viên',
             width: 150,
             flex: 0.3,
+        },
+        {
+            field: 'email',
+            headerName: 'Email',
+            width: 150,
+            flex: 0.6,
         },
         {
             field: 'role',
@@ -177,7 +186,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             container['studentName'] = item.userName;
             container['studentId'] = item.userStudentId;
             container['role'] = item.tournamentRoleDto.name;
-            container['registerStatus'] = item.registerStatus;
+            container['email'] = item.userEmail;
             container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
             return container;
         });

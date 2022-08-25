@@ -36,7 +36,7 @@ function UpdateAdminTournament({ value, index, onChange }) {
             console.log(newRole);
             console.log(adminList);
             const newAdminList = adminList.map((member) =>
-                member.id === id ? { ...member, roleTournamentDto: newRole } : member,
+                member.id === id ? { ...member, tournamentRoleDto: newRole } : member,
             );
             setAdminList(newAdminList);
         },
@@ -120,7 +120,7 @@ function UpdateAdminTournament({ value, index, onChange }) {
         container['id'] = item.id;
         container['studentName'] = item.userName;
         container['studentId'] = item.userStudentId;
-        container['role'] = item.roleTournamentDto.name;
+        container['role'] = item.tournamentRoleDto.name;
         return container;
     });
 

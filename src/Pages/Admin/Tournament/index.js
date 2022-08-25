@@ -66,6 +66,7 @@ function Tournament() {
 
     const handleChange = (event) => {
         setSemester(event.target.value);
+        getListTournamentBySemester(event.target.value, 0);
     };
 
     const handleChangeStatus = (event) => {

@@ -61,6 +61,12 @@ function EditExhibitionTournament({ isOpen, handleClose, onSucess, datas, exhibi
     };
 
     const handleEditExhibiton = (data) => {
+        if (datas.findIndex((d) => d.name.toLowerCase().includes(data.name.toLowerCase())) >= 0) {
+            setError('name', {
+                message: `Thể thức ${data.name} này đã tồn tại, vui lòng chọn thể thức khác`,
+            });
+            return;
+        }
         if (data.numberMale == 0 && data.numberFemale == 0) {
             setFocus('numberMale', { shouldSelect: true });
             setError('numberMale', { message: 'Số lượng nam và nữ không được bằng 0' });
@@ -101,9 +107,6 @@ function EditExhibitionTournament({ isOpen, handleClose, onSucess, datas, exhibi
                                 helperText={errors.name?.message}
                                 required
                                 fullWidth
-                                InputProps={{
-                                    readOnly: true,
-                                }}
                             />
                         </Grid>
                         <Grid item xs={12} container spacing={2}>
@@ -128,7 +131,7 @@ function EditExhibitionTournament({ isOpen, handleClose, onSucess, datas, exhibi
                                     variant="outlined"
                                     defaultValue={exhibition.numberFemale}
                                     {...register('numberFemale')}
-                                    error={errors.numberMale ? true : false}
+                                    error={errors.numberFemale ? true : false}
                                     helperText={errors.numberFemale?.message}
                                     fullWidth
                                 />

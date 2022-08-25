@@ -246,7 +246,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
                             Bạn có muốn {setIsApprove ? 'chấp thuận' : 'từ chối'} yêu cầu tham gia ban tổ chức của{' '}
-                            {idUpdate.userName} - {idUpdate.userStudentId}
+                            {idUpdate.studentName} - {idUpdate.studentId}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>

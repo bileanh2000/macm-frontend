@@ -138,45 +138,47 @@ function EditCompetitiveTournament({ isOpen, competitive, handleClose, onSucess,
                         Validate
                         autoComplete="off"
                     >
-                        <Grid item xs={4}>
-                            {/* <InputLabel id="demo-simple-select-label">Giới tính</InputLabel> */}
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="gender"
-                                value={gender}
-                                onChange={handleChange}
-                                readOnly={true}
-                            >
-                                <MenuItem value={1}>Nam</MenuItem>
-                                <MenuItem value={0}>Nữ</MenuItem>
-                            </Select>
-                        </Grid>
-                        <Grid item xs={4}>
-                            {/* <InputLabel>Hạng cân</InputLabel> */}
-                            <TextField
-                                fullWidth
-                                type="number"
-                                id="outlined-basic"
-                                label="Hạng cân tối thiểu"
-                                variant="outlined"
-                                defaultValue={competitive.weightMin}
-                                {...register('weightMin')}
-                                error={errors.weightMin ? true : false}
-                                helperText={errors.weightMin?.message}
-                            />
-                        </Grid>
-                        <Grid item xs={4}>
-                            <TextField
-                                type="number"
-                                id="outlined-basic"
-                                label="Hạng cân tối đa"
-                                variant="outlined"
-                                defaultValue={competitive.weightMax}
-                                {...register('weightMax')}
-                                error={errors.weightMax ? true : false}
-                                helperText={errors.weightMax?.message}
-                                fullWidth
-                            />
+                        <Grid container spacing={2} sx={{ p: 1, alignItems: 'center' }}>
+                            <Grid item xs={2}>
+                                {/* <InputLabel id="demo-simple-select-label">Giới tính</InputLabel> */}
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="gender"
+                                    value={gender}
+                                    onChange={handleChange}
+                                    readOnly={true}
+                                >
+                                    <MenuItem value={1}>Nam</MenuItem>
+                                    <MenuItem value={0}>Nữ</MenuItem>
+                                </Select>
+                            </Grid>
+                            <Grid item xs={5}>
+                                {/* <InputLabel>Hạng cân</InputLabel> */}
+                                <TextField
+                                    fullWidth
+                                    type="number"
+                                    id="outlined-basic"
+                                    label="Hạng cân tối thiểu"
+                                    variant="outlined"
+                                    defaultValue={competitive.weightMin}
+                                    {...register('weightMin')}
+                                    error={errors.weightMin ? true : false}
+                                    helperText={errors.weightMin?.message}
+                                />
+                            </Grid>
+                            <Grid item xs={5}>
+                                <TextField
+                                    type="number"
+                                    id="outlined-basic"
+                                    label="Hạng cân tối đa"
+                                    variant="outlined"
+                                    defaultValue={competitive.weightMax}
+                                    {...register('weightMax')}
+                                    error={errors.weightMax ? true : false}
+                                    helperText={errors.weightMax?.message}
+                                    fullWidth
+                                />
+                            </Grid>
                         </Grid>
                     </Box>
                 </DialogContent>

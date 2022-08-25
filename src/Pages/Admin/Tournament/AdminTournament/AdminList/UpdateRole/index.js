@@ -228,7 +228,15 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
                                 {datas.map((data) => (
                                     <TableRow key={data.id}>
                                         <TableCell align="center">
-                                            <Checkbox checked={data.selected} onChange={() => handleSelectRole(data)} />
+                                            <Checkbox
+                                                checked={data.selected}
+                                                onChange={() => handleSelectRole(data)}
+                                                disabled={
+                                                    isEdit ||
+                                                    (data.availableQuantity &&
+                                                        data.availableQuantity != data.maxQuantity)
+                                                }
+                                            />
                                         </TableCell>
                                         <TableCell align="center">{data.name}</TableCell>
                                         <TableCell align="center">

@@ -48,7 +48,7 @@ function EditRoleTournament({ role, isOpen, handleClose, onSucess }) {
 
     const updateRule = async (data) => {
         try {
-            const response = await adminTournament.updateRoleEventName(role.id, data.roleName);
+            const response = await adminTournament.updateRoleEventName(role.id, data);
             onSucess && onSucess();
             enqueueSnackbar(response.message, {
                 variant: response.message.includes('thành công') ? 'success' : 'error',

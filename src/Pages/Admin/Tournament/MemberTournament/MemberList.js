@@ -44,7 +44,7 @@ import { useSnackbar } from 'notistack';
 import adminTournament from 'src/api/adminTournamentAPI';
 import UpdateExhibitionTeam from './UpdateExhibitionTeam';
 
-function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhibitionType, tournamentStage }) {
+function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhibitionType, tournamentStage, user }) {
     const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
     const [openDelete, setOpenDelete] = useState(false);
@@ -71,7 +71,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
 
     const deleteCompetitivePlayer = async (competitivePlayerId) => {
         try {
-            const response = await adminTournament.deleteCompetitivePlayer(competitivePlayerId);
+            const response = await adminTournament.deleteCompetitivePlayer(competitivePlayerId, user.studentId);
             onChange && onChange();
             enqueueSnackbar(response.message, {
                 variant: response.message.includes('Không thể xóa') ? 'error' : 'success',
@@ -602,6 +602,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     title="Chỉnh sửa đội biểu diễn"
                     isOpen={openDialogExhibition}
                     exhibitionTeam={exhibitionTeam}
+                    user={user}
                     handleClose={() => {
                         handleClickCloseUpdate(false);
                     }}
