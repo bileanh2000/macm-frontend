@@ -19,6 +19,7 @@ import LoadingProgress from 'src/Components/LoadingProgress';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import PaymentNotification from 'src/Pages/Home/PaymentNotification';
 import notificationApi from 'src/api/notificationApi';
+import adminFunAPi from 'src/api/adminFunAPi';
 
 export const CustomPersentStatus = ({ persent }) => {
     let bgColor = '#ccf5e7';
@@ -56,9 +57,20 @@ function HeadClubDashboard() {
     const [currentSemester, setCurrentSemester] = useState([]);
     const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
     const [paymentMessage, setPaymentMessage] = useState([]);
+    const [totalFund, setTotalFund] = useState([]);
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
     const currentMonth = new Date().getMonth() + 1;
+
+    const fetchTotalFund = async () => {
+        try {
+            const response = await adminFunAPi.getClubFund();
+            console.log('fetchTotalFund', response);
+            setTotalFund(response.data[0].fundAmount);
+        } catch (error) {
+            console.log('failed when fetchTotalFund', error);
+        }
+    };
 
     const fetchFeeInCurrentSemester = async () => {
         try {
@@ -124,6 +136,10 @@ function HeadClubDashboard() {
             handleCloseNotificationDialog();
         }
     }, [paymentMessage]);
+
+    useEffect(() => {
+        fetchTotalFund();
+    }, []);
 
     const getPersentMemberSinceLastSemester = () => {
         let memberPersent =
@@ -248,8 +264,8 @@ function HeadClubDashboard() {
                                         Tổng tiền quỹ
                                     </Typography>
                                     <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                        {balanceInCurrentMonth[0] && balanceInCurrentMonth[0].balance.toLocaleString()}{' '}
-                                        VND
+                                        {/* {balanceInCurrentMonth[0] && balanceInCurrentMonth[0].balance.toLocaleString()}{' '} */}
+                                        {totalFund.toLocaleString()} VND
                                     </Typography>
                                     {/* {balanceInLastMonth[0] && balanceInLastMonth[0].balance === 0 ? null : (
                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
