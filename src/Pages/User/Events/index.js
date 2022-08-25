@@ -12,7 +12,7 @@ import {
     Pagination,
     Stack,
     TextField,
-    Typography,
+    Typography, 
 } from '@mui/material';
 import styles from 'src/Pages/Admin/Event/Event.module.scss';
 import classNames from 'classnames/bind';
