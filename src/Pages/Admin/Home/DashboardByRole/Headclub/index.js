@@ -106,7 +106,7 @@ function HeadClubDashboard() {
             let reverseList = response.data.sort((a, b) => b.id - a.id);
             // let filterByMonth = response.data.filter((item) => item.month === currentMonth);
             // setBalanceInCurrentMonth(filterByMonth);
-            setMemberReport(reverseList);
+            setMemberReport(response.data[0]);
         } catch (error) {
             console.log('Failed when fetch member report', error);
         }
@@ -122,7 +122,7 @@ function HeadClubDashboard() {
     useEffect(() => {
         fetchFeeInCurrentSemester();
         fetchMemberReport();
-        getPersentMemberSinceLastSemester();
+        // getPersentMemberSinceLastSemester();
         fetchPaymentNotification(studentId);
         let visited = localStorage['toShowPopup'] !== 'true';
 
@@ -141,12 +141,12 @@ function HeadClubDashboard() {
         fetchTotalFund();
     }, []);
 
-    const getPersentMemberSinceLastSemester = () => {
-        let memberPersent =
-            memberReport[0] &&
-            Math.floor((memberReport[0].totalNumberUserInSemester / memberReport[1].totalNumberUserInSemester) * 100);
-        console.log(memberPersent);
-    };
+    // const getPersentMemberSinceLastSemester = () => {
+    //     let memberPersent =
+    //         memberReport &&
+    //         Math.floor((memberReport.totalNumberUserInSemester / memberReport[1].totalNumberUserInSemester) * 100);
+    //     console.log(memberPersent);
+    // };
     const gridContainer = {
         display: 'grid',
         gridTemplateColumns: 'repeat(5, 1fr)',
@@ -176,7 +176,7 @@ function HeadClubDashboard() {
                     </Button>
                 </DialogActions>
             </Dialog>
-            {memberReport[0] ? (
+            {memberReport ? (
                 <Fragment>
                     <Typography variant="h4" color="initial" sx={{ fontWeight: 500, mb: 2 }}>
                         Tổng Quan
@@ -189,30 +189,17 @@ function HeadClubDashboard() {
                                         Tổng số thành viên
                                     </Typography>
                                     <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                        {memberReport[0] && memberReport[0].totalNumberUserInSemester}
+                                        {/* {memberReport && memberReport.totalNumberUserInSemester} */}
+                                        {memberReport.totalUser}
                                     </Typography>
 
-                                    {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {memberReport[1] === undefined ? (
-                                            <CustomPersentStatus persent={0} />
-                                        ) : (
-                                            <CustomPersentStatus
-                                                persent={
-                                                    memberReport[1] &&
-                                                    Math.floor(
-                                                        (memberReport[0].totalNumberUserInSemester /
-                                                            memberReport[1].totalNumberUserInSemester) *
-                                                            100 -
-                                                            100,
-                                                    )
-                                                }
-                                            />
-                                        )}
-                                        
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <CustomPersentStatus persent={memberReport.percentTotalUser} />
+
                                         <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
                                             so với kỳ trước
                                         </Typography>
-                                    </Box> */}
+                                    </Box>
                                 </Box>
                                 <Avatar sx={{ bgcolor: '#ff569b', width: 48, height: 48 }}>
                                     <PeopleIcon sx={{ fontSize: '2rem' }} />
@@ -226,31 +213,15 @@ function HeadClubDashboard() {
                                         Số thành viên active
                                     </Typography>
                                     <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                        {memberReport[0] &&
-                                            memberReport[0].numberActiveInSemester +
-                                                `/` +
-                                                memberReport[0].totalNumberUserInSemester}
+                                        {memberReport.totalActive}/ {memberReport.totalUser}
                                     </Typography>
 
-                                    {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <CustomPersentStatus
-                                            persent={
-                                                memberReport[0] &&
-                                                memberReport[1] &&
-                                                Math.floor(
-                                                    (memberReport[0].numberActiveInSemester /
-                                                        memberReport[0].totalNumberUserInSemester /
-                                                        (memberReport[1].numberActiveInSemester /
-                                                            memberReport[1].totalNumberUserInSemester)) *
-                                                        100 -
-                                                        100,
-                                                )
-                                            }
-                                        />
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <CustomPersentStatus persent={memberReport.percentActive} />
                                         <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
                                             so với kỳ trước
                                         </Typography>
-                                    </Box> */}
+                                    </Box>
                                 </Box>
                                 <Avatar sx={{ bgcolor: '#35C0DE', width: 48, height: 48 }}>
                                     <HowToRegRoundedIcon sx={{ fontSize: '2rem' }} />
@@ -267,25 +238,14 @@ function HeadClubDashboard() {
                                         {/* {balanceInCurrentMonth[0] && balanceInCurrentMonth[0].balance.toLocaleString()}{' '} */}
                                         {totalFund.toLocaleString()} VND
                                     </Typography>
-                                    {/* {balanceInLastMonth[0] && balanceInLastMonth[0].balance === 0 ? null : (
-                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            <CustomPersentStatus
-                                                persent={
-                                                    balanceInLastMonth[0] &&
-                                                    balanceInCurrentMonth[0] &&
-                                                    Math.floor(
-                                                        (balanceInCurrentMonth[0].balance /
-                                                            balanceInLastMonth[0].balance) *
-                                                            100 -
-                                                            100,
-                                                    )
-                                                }
-                                            />
-                                            <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
-                                                so với tháng trước
-                                            </Typography>
-                                        </Box>
-                                    )} */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <CustomPersentStatus
+                                            persent={feeReport[0] && feeReport[0].totalBalancePercent.toLocaleString()}
+                                        />
+                                        <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
+                                            so với tháng trước
+                                        </Typography>
+                                    </Box>
                                 </Box>
                                 <Avatar sx={{ bgcolor: '#16ce8e', width: 48, height: 48 }}>
                                     <AttachMoneyRoundedIcon sx={{ fontSize: '2rem' }} />

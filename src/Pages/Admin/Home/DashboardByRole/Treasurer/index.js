@@ -213,7 +213,11 @@ function TreasurerDashboard() {
                                     </Typography>
                                     {balanceInLastMonth[0] && balanceInLastMonth[0].balance === 0 ? null : (
                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            <CustomPersentStatus persent={0} />
+                                            <CustomPersentStatus
+                                                persent={
+                                                    feeReport[0] && feeReport[0].totalBalancePercent.toLocaleString()
+                                                }
+                                            />
                                             <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
                                                 so với tháng trước
                                             </Typography>
@@ -237,7 +241,7 @@ function TreasurerDashboard() {
 
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <CustomPersentStatus
-                                            persent={feeReport[0] && feeReport[0].totalBalancePercent.toLocaleString()}
+                                            persent={feeReport[0] && feeReport[0].totalIncomePercent.toLocaleString()}
                                         />
 
                                         <Typography variant="caption" color="initial" sx={{ ml: 1 }}>

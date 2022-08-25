@@ -95,14 +95,17 @@ function Index() {
         }
     }, [paymentMessage]);
 
-    useEffect(() => {
-        if (new Date(startDateOfCurrentSemester) - new Date() === 0) {
-            console.log('hien thong bao nao babe');
-            handleOpenActiveRegisterDialog();
-        } else {
-            console.log(`chwa den ngay ${new Date(startDateOfCurrentSemester)}`);
-        }
-    }, []);
+    // useEffect(() => {
+    //     let startDateParse = new Date('2022-08-25').setHours(0, 0, 0, 0);
+    //     let currentDateParse = new Date().setHours(0, 0, 0, 0);
+    //     if (startDateParse - currentDateParse === 0) {
+    //         console.log('hien thong bao nao babe');
+    //         handleOpenActiveRegisterDialog();
+    //     } else {
+    //         console.log(`chwa den ngay ${startDateParse}`);
+    //     }
+    //     console.log(startDateParse - currentDateParse);
+    // }, []);
 
     return (
         <Fragment>
