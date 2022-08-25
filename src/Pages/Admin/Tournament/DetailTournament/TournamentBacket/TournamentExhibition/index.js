@@ -111,6 +111,7 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage, 
                 if (response.data.length > 0) {
                     setTournamentStatus(response.data[0].status);
                     setListExhibitionType(response.data);
+                    getExhibitionResult(response.data[0].id);
                     type == 0 && setExhibitionType(response.data[0].id);
                     const _result = result.find((subResult) =>
                         subResult.data.length > 0
@@ -119,7 +120,6 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage, 
                     );
 
                     setTournamentResult(_result ? _result.data[0].listResult : null);
-                    getExhibitionResult(response.data[0].id);
                     setIsRenderTotal(false);
                 } else {
                 }

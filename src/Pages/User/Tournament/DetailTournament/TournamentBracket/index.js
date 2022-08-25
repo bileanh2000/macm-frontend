@@ -44,7 +44,7 @@ function TournamentBracket({ tournament, competitive, exhibition, valueTab, type
     }
     console.log(isDisplay);
     const { tournamentId } = useParams();
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState(valueTab);
     const [tournamentResult, setTournamentResult] = useState();
     const [isRender, setIsRender] = useState(false);
 

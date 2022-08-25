@@ -522,7 +522,7 @@ function CreateTournament({
                           totalAmountFromClubEstimate: temp > 0 ? temp : 0,
                       }),
             },
-            rolesEventDto: datas.filter((data) => data.selected),
+            tournamentRolesDto: datas.filter((data) => data.selected),
             listPreview: previewSchedule,
         };
         adminTournament.createTournament(createTournamentData, user.studentId).then((response) => {

@@ -38,7 +38,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
     const [allMember, setAllMember] = useState([]);
     const [pageSize, setPageSize] = useState(5);
     const [selectedRows, setSelectedRows] = useState([]);
-    // const [roleInTournament, setRoleInTournament] = useState([]);
+    const [isRender, setIsRender] = useState(true);
 
     const AddPlayerHandler = (data) => {
         setAdmin(data);
@@ -61,6 +61,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
             );
             enqueueSnackbar(response.message, { variant: response.data ? 'success' : 'error' });
             onChange && onChange();
+            setIsRender(true);
         } catch (error) {}
     };
 
@@ -103,14 +104,14 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
             console.log(id, key, value, params);
             const newRole = roles.find((role) => role.name == value);
             console.log(newRole);
-            console.log('old', admin);
-            const newAdminList = admin.map((member) =>
+            console.log('old', allMember);
+            const newAdminList = allMember.map((member) =>
                 member.user.id === id ? { ...member, roleId: newRole.id } : member,
             );
             console.log('new', newAdminList);
-            setAdmin(newAdminList);
+            setAllMember(newAdminList);
         },
-        [admin, roles],
+        [allMember, roles],
     );
 
     const columns = [
@@ -131,11 +132,6 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
             valueOptions: roles.map((role) => {
                 return { label: role.name, value: role.name };
             }),
-            preProcessEditCellProps: (params) => {
-                const isPaidProps = params.otherFieldsProps.isPaid;
-                const hasError = isPaidProps.value && !params.props.value;
-                return { ...params.props, error: hasError };
-            },
             renderCell: (params) => (
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>{params.value}</span>
@@ -157,7 +153,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
     ];
 
     const rowsUser =
-        allMember.length > 0 &&
+        allMember &&
         allMember.map((item, index) => {
             const container = {};
             container['id'] = item.user.id;
@@ -171,7 +167,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
         const getAllMember = async (tournamentId) => {
             try {
                 const response = await adminTournament.getAllUserNotJoinTournament(tournamentId);
-                console.log(response.data);
+                console.log('getAllMember', response);
                 if (response.data.length > 0) {
                     const newAllMemberWithRole = response.data.map((data) => {
                         return { roleId: roles[0].id, user: data };
@@ -180,12 +176,13 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
                 } else {
                     setAllMember([]);
                 }
+                setIsRender(false);
             } catch (error) {
                 console.log('khong the lay data');
             }
         };
-        getAllMember(tournamentId);
-    }, [tournamentId, roles]);
+        isRender && getAllMember(tournamentId);
+    }, [tournamentId, roles, isRender]);
 
     const CustomToolbar = () => {
         return (
@@ -311,39 +308,37 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
                         </Paper>
                     </Grid>
                 </Grid> */}
-                <Box sx={{ height: '500px' }}>
-                    <DataGrid
-                        rows={rowsUser}
-                        checkboxSelection
-                        onSelectionModelChange={(ids) => {
-                            setSelectionModel(ids);
-                            const selectedIDs = new Set(ids);
-                            const selectedRows =
-                                allMember &&
-                                allMember.filter((row) => {
-                                    selectedIDs.has(row.id);
-                                });
-                            setSelectedRows(selectedRows);
-                            console.log(selectedRows);
-                            console.log('addMemberToEvent', selectedRows);
-                        }}
-                        disableSelectionOnClick={true}
-                        columns={columns}
-                        pageSize={pageSize}
-                        rowsPerPageOptions={[30, 40, 50]}
-                        components={{
-                            Toolbar: CustomToolbar,
-                            NoRowsOverlay: CustomNoRowsOverlay,
-                        }}
-                        onCellEditCommit={handleRowEditCommit}
-                    />
-                </Box>
+                {allMember && (
+                    <Box sx={{ height: '500px' }}>
+                        <DataGrid
+                            rows={rowsUser}
+                            checkboxSelection
+                            onSelectionModelChange={(ids) => {
+                                setSelectionModel(ids);
+                                const selectedIDs = new Set(ids);
+                                const selectedRows =
+                                    allMember && allMember.filter((row) => selectedIDs.has(row.user.id));
+                                setSelectedRows(selectedRows);
+                                console.log('addMemberToEvent', selectedRows);
+                            }}
+                            disableSelectionOnClick={true}
+                            columns={columns}
+                            pageSize={pageSize}
+                            rowsPerPageOptions={[30, 40, 50]}
+                            components={{
+                                Toolbar: CustomToolbar,
+                                NoRowsOverlay: CustomNoRowsOverlay,
+                            }}
+                            onCellEditCommit={handleRowEditCommit}
+                        />
+                    </Box>
+                )}
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" onClick={handleCloseDialog}>
                     Hủy
                 </Button>
-                <Button variant="contained" onClick={handleRegister} autoFocus disabled={selectionModel.length === 0}>
+                <Button variant="contained" onClick={handleRegister} autoFocus disabled={selectedRows.length === 0}>
                     Xác nhận
                 </Button>
             </DialogActions>

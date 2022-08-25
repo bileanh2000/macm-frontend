@@ -9,9 +9,9 @@ import Sliver from 'src/Components/Common/Material/Sliver';
 import LoadingProgress from 'src/Components/LoadingProgress';
 import CustomMatchBracket from './CustomMatchBracket';
 
-function TournamentCompetitive({ competitive, result }) {
+function TournamentCompetitive({ competitive, result, type }) {
     let { tournamentId } = useParams();
-    const [competitiveId, setCompetitiveId] = useState(0);
+    const [competitiveId, setCompetitiveId] = useState(type);
     const [listWeightRange, setListWeightRange] = useState([]);
     const [listPlayer, setListPlayer] = useState();
     const [rounds, setRounds] = useState();
@@ -50,7 +50,7 @@ function TournamentCompetitive({ competitive, result }) {
             const response = await adminTournament.getAllCompetitiveType(tournamentId);
             if (response.data.length > 0) {
                 setListWeightRange(response.data[0]);
-                setCompetitiveId(response.data[0][0].id);
+                type == 0 && setCompetitiveId(response.data[0][0].id);
                 console.log(response.data[0][0].id, result);
                 const _result = result.find((subResult) =>
                     subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id),
@@ -71,10 +71,12 @@ function TournamentCompetitive({ competitive, result }) {
                 const response = await adminTournament.getAllCompetitiveType(tournamentId);
                 if (response.data.length > 0) {
                     setListWeightRange(response.data[0]);
-                    setCompetitiveId(response.data[0][0].id);
+                    type == 0 && setCompetitiveId(response.data[0][0].id);
                     console.log(response.data[0][0].id, result);
                     const _result = result.find((subResult) =>
-                        subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id),
+                        subResult.data.length > 0
+                            ? subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id)
+                            : null,
                     ).data[0].listResult;
                     setTournamentResult(_result);
                     console.log('result', _result);
@@ -86,7 +88,7 @@ function TournamentCompetitive({ competitive, result }) {
             }
         };
         fetchTournamentById(tournamentId);
-    }, [tournamentId, result]);
+    }, [tournamentId, result, type]);
 
     return (
         <Fragment>

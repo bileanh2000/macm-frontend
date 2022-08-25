@@ -43,8 +43,10 @@ function TableMatch(params) {
                     <TableCell component="th" scope="row">
                         {index + 1}
                     </TableCell>
-                    <TableCell align="left">{row.team.teamName}</TableCell>
-                    <TableCell align="left">{moment(row.time).format('hh:mm  -  DD/MM')}</TableCell>
+                    <TableCell align="left">{row.teamName}</TableCell>
+                    <TableCell align="left">
+                        {row.time == null ? 'Chưa có thời gian thi đấu' : moment(row.time).format('HH:mm  -  DD/MM')}
+                    </TableCell>
                     <TableCell align="left">{row.score == null ? 'Chưa thi đấu' : row.score}</TableCell>
                 </TableRow>
                 <TableRow>
@@ -64,15 +66,13 @@ function TableMatch(params) {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {row.team.exhibitionPlayers.map((player) => (
+                                        {row.exhibitionPlayersDto.map((player) => (
                                             <TableRow key={player.id}>
                                                 <TableCell component="th" scope="row">
-                                                    {player.tournamentPlayer.user.name}
+                                                    {player.playerName}
                                                 </TableCell>
-                                                <TableCell>{player.tournamentPlayer.user.studentId}</TableCell>
-                                                <TableCell align="left">
-                                                    {player.tournamentPlayer.user.gender ? 'Nam' : 'Nữ'}
-                                                </TableCell>
+                                                <TableCell>{player.playerStudentId}</TableCell>
+                                                <TableCell align="left">{player.playerGender ? 'Nam' : 'Nữ'}</TableCell>
                                                 <TableCell align="left">
                                                     {player.roleInTeam ? 'Trưởng nhóm' : ''}
                                                 </TableCell>
@@ -90,7 +90,7 @@ function TableMatch(params) {
     return (
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="caption table">
-                <caption>Địa điểm thi đấu: {params.matches[0].area.name}</caption>
+                <caption>Địa điểm thi đấu: {params.matches[0].areaName}</caption>
                 <TableHead>
                     <TableRow>
                         <TableCell></TableCell>
