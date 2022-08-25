@@ -46,6 +46,7 @@ import { useSnackbar } from 'notistack';
 import EventFee from './EventFee';
 import EventAttendance from './EventAttendance';
 import useEnhancedEffect from '@mui/material/utils/useEnhancedEffect';
+import NoValuePage from 'src/Components/NoValuePage';
 // import AdminTournament from '../AdminTournament';
 // import MemberTournament from '../MemberTournament';
 
@@ -90,6 +91,7 @@ function EventDetails() {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [isUpdateEvent, setIsUpdateEvent] = useState(false);
     const [isRender, setIsRender] = useState(true);
+    const [message, setMessage] = useState('');
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -105,6 +107,7 @@ function EventDetails() {
             const response = await eventApi.getEventById(id);
             console.log(response.data);
             setTournament(response.data[0]);
+            setMessage(response.message);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
         }
@@ -190,6 +193,10 @@ function EventDetails() {
             setValue(4);
         }
     }, []);
+
+    if (message === 'Không có sự kiện này') {
+        return <NoValuePage message="Sự kiện này không tồn tại hoặc đã bị hủy" />;
+    }
     return (
         <Box sx={{ m: 1, p: 1, height: '80vh' }}>
             {tournament && scheduleList[0] && (

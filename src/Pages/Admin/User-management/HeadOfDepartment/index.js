@@ -254,7 +254,13 @@ function HeadOfDepartment() {
                 <MenuItem value="Summer2022">Summer 2022</MenuItem>
                 <MenuItem value="Spring2022">Spring 2022</MenuItem>
             </TextField>
-            <div style={{ height: '80vh', width: '100%' }}>
+            <Box
+                sx={{
+                    height: '80vh',
+                    width: '100%',
+                    ...(user.role.name === 'ROLE_ViceHeadClub' ? { '.headOfClub button': { display: 'none' } } : null),
+                }}
+            >
                 <DataGrid
                     // loading={!userList.length}
                     disableSelectionOnClick={true}
@@ -272,8 +278,18 @@ function HeadOfDepartment() {
                     components={{
                         Toolbar: CustomToolbar,
                     }}
+                    // getCellClassName={(params) => {
+                    //     if (params.value == null) {
+                    //         return '';
+                    //     }
+                    //     return params.value === 'Chủ nhiệm' ? 'headOfCLub' : null;
+                    // }}
+                    getRowClassName={
+                        (params) => (params.row.role === 'Chủ nhiệm' ? 'headOfClub' : 'notHeadOfClub')
+                        // console.log(params)
+                    }
                 />
-            </div>
+            </Box>
         </Fragment>
     );
 }

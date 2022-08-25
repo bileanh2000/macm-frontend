@@ -19,6 +19,9 @@ import LoadingProgress from 'src/Components/LoadingProgress';
 import MoneyOffIcon from '@mui/icons-material/MoneyOff';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import notificationApi from 'src/api/notificationApi';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import PaymentNotification from 'src/Pages/Home/PaymentNotification';
+import adminFunAPi from 'src/api/adminFunAPi';
 
 export const CustomPersentStatus = ({ persent }) => {
     let bgColor = '#ccf5e7';
@@ -57,8 +60,21 @@ function TreasurerDashboard() {
     const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
     const [paymentMessage, setPaymentMessage] = useState([]);
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
+    const [totalFund, setTotalFund] = useState([]);
 
     const currentMonth = new Date().getMonth() + 1;
+    useEffect(() => {
+        const fetchTotalFund = async () => {
+            try {
+                const response = await adminFunAPi.getClubFund();
+                console.log('fetchTotalFund', response);
+                setTotalFund(response.data[0].fundAmount);
+            } catch (error) {
+                console.log('failed when fetchTotalFund', error);
+            }
+        };
+        fetchTotalFund();
+    }, []);
 
     const fetchPaymentNotification = async (studentId) => {
         try {
@@ -84,12 +100,6 @@ function TreasurerDashboard() {
             console.log('Current Semester', semester.data);
             const fee = await dashboardApi.getFeeReportBySemester(semester.data[0].name);
             console.log('fee in currentmonth', fee.data);
-            let fillerFeeByCurrentMonth = fee.data.filter((semester) => semester.month === currentMonth);
-            let fillerFeeByLastMonth = fee.data.filter((semester) => semester.month === currentMonth - 1);
-            setBalanceInCurrentMonth(fillerFeeByCurrentMonth);
-            setBalanceInLastMonth(fillerFeeByLastMonth);
-            console.log('fillerFeeByCurrentMonth', fillerFeeByCurrentMonth);
-            console.log('fillerFeeByLastMonth', fillerFeeByLastMonth);
             setFeeReport(fee.data);
         } catch (error) {
             console.log('Failed when fetch Current Semester', error);
@@ -108,16 +118,42 @@ function TreasurerDashboard() {
             console.log('Failed when fetch member report', error);
         }
     };
+    // useEffect(() => {
+    //     fetchFeeInCurrentSemester();
+    //     fetchMemberReport();
+    //     fetchPaymentNotification(studentId);
+    //     // getPersentMemberSinceLastSemester();
+    //     let visited = localStorage['toShowPopup'] !== 'true';
+    //     if (!visited) {
+    //         handleOpenNotificationDialog();
+    //     }
+    // }, [studentId]);
+    // useEffect(() => {
+    //     if (paymentMessage === 'Không có khoản nào phải đóng') {
+    //         handleCloseNotificationDialog();
+    //     }
+    // }, [paymentMessage]);
     useEffect(() => {
         fetchFeeInCurrentSemester();
         fetchMemberReport();
         fetchPaymentNotification(studentId);
-        // getPersentMemberSinceLastSemester();
         let visited = localStorage['toShowPopup'] !== 'true';
-        if (!visited && paymentMessage !== 'Không có khoản nào phải đóng') {
+
+        if (!visited) {
             handleOpenNotificationDialog();
         }
-    }, []);
+    }, [studentId]);
+
+    useEffect(() => {
+        if (paymentMessage === 'Không có khoản nào phải đóng') {
+            handleCloseNotificationDialog();
+        }
+    }, [paymentMessage]);
+    useEffect(() => {
+        if (paymentMessage === 'Không có khoản nào phải đóng') {
+            handleCloseNotificationDialog();
+        }
+    }, [paymentMessage]);
 
     // useEffect(() => {
     //     console.log(balanceInCurrentMonth);
@@ -140,6 +176,24 @@ function TreasurerDashboard() {
 
     return (
         <Fragment>
+            <Dialog
+                open={openNotificationDialog}
+                onClose={handleCloseNotificationDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
+                <DialogContent>
+                    {/* <DialogContentText id="alert-dialog-description"></DialogContentText> */}
+                    <PaymentNotification />
+                </DialogContent>
+                <DialogActions>
+                    {/* <Button onClick={handleCloseNotificationDialog}>Disagree</Button> */}
+                    <Button onClick={handleCloseNotificationDialog} autoFocus>
+                        Thoát
+                    </Button>
+                </DialogActions>
+            </Dialog>
             {memberReport[0] ? (
                 <Fragment>
                     <Typography variant="h4" color="initial" sx={{ fontWeight: 500, mb: 2 }}>
@@ -153,28 +207,18 @@ function TreasurerDashboard() {
                                         Tổng tiền quỹ
                                     </Typography>
                                     <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                        {balanceInCurrentMonth[0] && balanceInCurrentMonth[0].balance.toLocaleString()}{' '}
+                                        {totalFund.toLocaleString()}
+                                        {/* {balanceInCurrentMonth[0] && balanceInCurrentMonth[0].balance.toLocaleString()}{' '} */}{' '}
                                         VND
                                     </Typography>
-                                    {/* {balanceInLastMonth[0] && balanceInLastMonth[0].balance === 0 ? null : (
+                                    {balanceInLastMonth[0] && balanceInLastMonth[0].balance === 0 ? null : (
                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            <CustomPersentStatus
-                                                persent={
-                                                    balanceInLastMonth[0] &&
-                                                    balanceInCurrentMonth[0] &&
-                                                    Math.floor(
-                                                        (balanceInCurrentMonth[0].balance /
-                                                            balanceInLastMonth[0].balance) *
-                                                            100 -
-                                                            100,
-                                                    )
-                                                }
-                                            />
+                                            <CustomPersentStatus persent={0} />
                                             <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
                                                 so với tháng trước
                                             </Typography>
                                         </Box>
-                                    )} */}
+                                    )}
                                 </Box>
                                 <Avatar sx={{ bgcolor: '#16ce8e', width: 48, height: 48 }}>
                                     <AttachMoneyRoundedIcon sx={{ fontSize: '2rem' }} />
@@ -188,30 +232,18 @@ function TreasurerDashboard() {
                                         Tổng thu trong kỳ
                                     </Typography>
                                     <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                        131,181,663 VND
+                                        {feeReport[0] && feeReport[0].totalIncome.toLocaleString()} VND
                                     </Typography>
 
-                                    {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {memberReport[1] === undefined ? (
-                                            <CustomPersentStatus persent={0} />
-                                        ) : (
-                                            <CustomPersentStatus
-                                                persent={
-                                                    memberReport[1] &&
-                                                    Math.floor(
-                                                        (memberReport[0].totalNumberUserInSemester /
-                                                            memberReport[1].totalNumberUserInSemester) *
-                                                            100 -
-                                                            100,
-                                                    )
-                                                }
-                                            />
-                                        )}
-                                        
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <CustomPersentStatus
+                                            persent={feeReport[0] && feeReport[0].totalBalancePercent.toLocaleString()}
+                                        />
+
                                         <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
-                                            so với kỳ trước
+                                            so với tháng trước
                                         </Typography>
-                                    </Box> */}
+                                    </Box>
                                 </Box>
                                 <Avatar sx={{ bgcolor: '#35C0DE', width: 48, height: 48 }}>
                                     <AddBusinessIcon sx={{ fontSize: '2rem' }} />
@@ -225,28 +257,17 @@ function TreasurerDashboard() {
                                         Tổng chi trong kỳ
                                     </Typography>
                                     <Typography variant="h5" color="initial" sx={{ fontWeight: 500, mb: 1 }}>
-                                        90,716,330 VND
+                                        {feeReport[0] && feeReport[0].totalSpend.toLocaleString()} VND
                                     </Typography>
 
-                                    {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <CustomPersentStatus
-                                            persent={
-                                                memberReport[0] &&
-                                                memberReport[1] &&
-                                                Math.floor(
-                                                    (memberReport[0].numberActiveInSemester /
-                                                        memberReport[0].totalNumberUserInSemester /
-                                                        (memberReport[1].numberActiveInSemester /
-                                                            memberReport[1].totalNumberUserInSemester)) *
-                                                        100 -
-                                                        100,
-                                                )
-                                            }
+                                            persent={feeReport[0] && feeReport[0].totalSpendPercent.toLocaleString()}
                                         />
                                         <Typography variant="caption" color="initial" sx={{ ml: 1 }}>
-                                            so với kỳ trước
+                                            so với tháng trước
                                         </Typography>
-                                    </Box> */}
+                                    </Box>
                                 </Box>
                                 <Avatar sx={{ bgcolor: '#ff569b', width: 48, height: 48 }}>
                                     <MoneyOffIcon sx={{ fontSize: '2rem' }} />

@@ -261,7 +261,7 @@ function DetailTournament() {
         }
     };
 
-    if (message === 'Giải đấu này đã hủy') {
+    if (message === 'Giải đấu này đã hủy' || message === 'Không có giải đấu này') {
         return <NoValuePage message="Giải đấu này không tồn tại hoặc đã bị hủy" />;
     }
 

@@ -63,8 +63,6 @@ const userApi = {
         const url = `/admin/hr/viceheadclub/member/search`;
         return axiosClient.post(url, data, {
             params: {
-                dateFrom: params.dateFrom,
-                dateTo: params.dateTo,
                 email: params.email,
                 gender: params.gender,
                 generation: params.generation,
@@ -72,6 +70,7 @@ const userApi = {
                 name: params.name,
                 roleId: params.roleId,
                 studentId: params.studentId,
+                months: params.month,
             },
         });
     },
@@ -102,6 +101,11 @@ const userApi = {
     },
     getAllRole: () => {
         const url = `/role/getroles`;
+        return axiosClient.get(url);
+    },
+
+    getAllGen: () => {
+        const url = `/admin/hr/getallgen`;
         return axiosClient.get(url);
     },
 };

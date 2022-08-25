@@ -6,34 +6,14 @@ import { Box, Typography } from '@mui/material';
 import semesterApi from 'src/api/semesterApi';
 import { useEffect } from 'react';
 import dashboardApi from 'src/api/dashboardApi';
-// const data = [
-//     { name: 'Page A', uv: 400, pv: 2400, amt: 2400 },
-//     { name: 'Page b', uv: 500, pv: 100, amt: 6400 },
-//     { name: 'Page c', uv: 100, pv: 2900, amt: 4400 },
-// ];
-const data = [
-    {
-        semester: 'Spring2022',
-        numberJoin: 14,
-        numberPassed: 14,
-        numberNotPassed: 0,
-        numberMale: 8,
-        numberFemale: 6,
-    },
-    {
-        semester: 'Summer2022',
-        numberJoin: 20,
-        numberPassed: 15,
-        numberNotPassed: 5,
-        numberMale: 14,
-        numberFemale: 6,
-    },
-];
+import eventApi from 'src/api/eventApi';
 
 function AttendanceChart() {
     const [semesterList, setSemesterList] = useState([]);
     const [semester, setSemester] = useState('Summer2022');
     const [attendanceReportList, setAttendanceReportList] = useState([]);
+    const [monthInSemester, setMonthInSemester] = useState([]);
+    const [month, setMonth] = useState(new Date().getMonth() + 1);
 
     const handleChange = (event) => {
         setSemester(event.target.value);
@@ -47,41 +27,72 @@ function AttendanceChart() {
             console.log('That bai roi huhu, semester: ', error);
         }
     };
-    const fetchAttendanceReportBySemester = async (semester) => {
+    const fetchAttendanceReportBySemester = async (semester, month) => {
         try {
-            const response = await dashboardApi.getAttendanceReportBySemester(semester);
+            const response = await dashboardApi.getAttendanceReportBySemester(semester, month);
             console.log('fetchAttendanceReportBySemester:', response.data);
             setAttendanceReportList(response.data);
         } catch (error) {
             console.log('failed when fetchAttendanceReportBySemester:', error);
         }
     };
+
+    const fetchMonthInSemester = async (semester) => {
+        try {
+            const response = await eventApi.getMonthsBySemester(semester);
+            setMonthInSemester(response.data);
+            console.log('monthsInSemester', response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
     useEffect(() => {
         fetchSemester();
-        fetchAttendanceReportBySemester(semester);
-    }, [semester]);
+        fetchAttendanceReportBySemester(semester, month);
+        fetchMonthInSemester(semester);
+    }, [semester, month]);
     return (
         <Fragment>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6" color="initial">
                     Thống kê số lượng thành viên tham gia từng buổi tập
                 </Typography>
-                <TextField
-                    size="small"
-                    variant="standard"
-                    id="standard-select"
-                    select
-                    label="Chọn kỳ"
-                    value={semester}
-                    onChange={handleChange}
-                >
-                    {semesterList &&
-                        semesterList.map((semester) => (
-                            <MenuItem key={semester.id} value={semester.name}>
-                                {semester.name}
+                <Box>
+                    <TextField
+                        size="small"
+                        variant="standard"
+                        id="standard-select"
+                        select
+                        label="Chọn kỳ"
+                        value={semester}
+                        onChange={handleChange}
+                        sx={{ mr: 2 }}
+                    >
+                        {semesterList &&
+                            semesterList.map((semester) => (
+                                <MenuItem key={semester.id} value={semester.name}>
+                                    {semester.name}
+                                </MenuItem>
+                            ))}
+                    </TextField>
+                    <TextField
+                        size="small"
+                        variant="standard"
+                        id="standard-select"
+                        select
+                        label="Chọn tháng"
+                        value={month}
+                        onChange={(e) => {
+                            setMonth(e.target.value);
+                        }}
+                    >
+                        {monthInSemester.map((month) => (
+                            <MenuItem key={month} value={month}>
+                                Tháng {month}
                             </MenuItem>
                         ))}
-                </TextField>
+                    </TextField>
+                </Box>
             </Box>
 
             <ResponsiveContainer width="100%" height={300}>

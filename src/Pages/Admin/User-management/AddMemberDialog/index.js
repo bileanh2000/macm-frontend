@@ -132,9 +132,13 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
         name: Yup.string()
             .strict(false)
             .trim('Không để trống')
-            .min(2, 'Must be longer than 2 characters')
-            .max(20, 'Nice try, nobody has a first name that long')
-            .required('Required'),
+            .min(5, 'Vui lòng nhập lớn hơn 5 ký tự')
+            .max(255, 'Vui lòng không nhập lớn hơn 255 ký tự')
+            .matches(
+                /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹẾỀếề ]+$/,
+                'Vui lòng không nhập số, hoặc ký tự đặc biệt',
+            )
+            .required('Vui lòng không bỏ trống trường này'),
         // .nullable()
         // .required('Không được để trống trường này')
         // .test('len', 'Độ dài không cho phép', (val) => val.length > 5)
@@ -155,7 +159,8 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
             .required('Không được để trống trường này')
             .min(1, 'Vui lòng nhập lớn hơn 0')
             .typeError('Không được để trống trường này')
-            .matches(/^[0-9]*$/, 'Vui lòng chỉ nhập số nguyên'),
+            .matches(/^[0-9]*$/, 'Vui lòng chỉ nhập số nguyên')
+            .trim(),
     });
 
     const {
@@ -167,37 +172,37 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
         formState: { errors, isSubmitSuccessful },
     } = useForm({
         resolver: yupResolver(validationSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     });
 
     const onSubmit = async (data) => {
         console.log('data', data);
         const dataFormat = {
-            currentAddress: data.currentAddress,
+            currentAddress: data.currentAddress.trim(),
             dateOfBirth: moment(new Date(data.dateOfBirth)).format('yyyy-MM-DD'),
-            email: data.email,
+            email: data.email.trim(),
             gender: data.gender,
             name: data.name,
-            phone: data.phone,
+            phone: data.phone.trim(),
             roleId: data.roleId,
             studentId: data.studentId,
             generation: data.generation,
             active: true,
         };
-        // await userApi.createUser(dataFormat).then((res) => {
-        //     console.log('1', res);
-        //     console.log('2', res.data);
-        //     if (res.data.length != 0) {
-        //         enqueueSnackbar(res.message, { variant: 'success' });
-        //         onSucess && onSucess(res.data[0]);
-        //         handleClose();
-        //     } else {
-        //         console.log('huhu');
-        //         enqueueSnackbar(res.message, { variant: 'error' });
-        //     }
-        // });
+        await userApi.createUser(dataFormat).then((res) => {
+            console.log('1', res);
+            console.log('2', res.data);
+            if (res.data.length != 0) {
+                enqueueSnackbar(res.message, { variant: 'success' });
+                onSucess && onSucess(res.data[0]);
+                handleClose();
+            } else {
+                console.log('huhu');
+                enqueueSnackbar(res.message, { variant: 'error' });
+            }
+        });
 
-        console.log('form submit', data);
+        console.log('form submit', dataFormat);
     };
 
     useEffect(() => {

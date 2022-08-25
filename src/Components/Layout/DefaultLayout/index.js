@@ -48,7 +48,7 @@ import ContactPageIcon from '@mui/icons-material/ContactPage';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import NotificationsPausedRoundedIcon from '@mui/icons-material/NotificationsPausedRounded';
-
+import { useGlobalState, setGlobalState } from 'src/state';
 import moment from 'moment';
 
 const cx = classNames.bind(styles);
@@ -66,6 +66,8 @@ function DefaultLayout({ children, onLogout }) {
     const [checked, setChecked] = React.useState(false);
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
+    const [totalNotification, setTotalNotification] = useGlobalState('totalNotification');
+
     let navigator = useNavigate();
 
     const handleDrawerToggle = () => {
@@ -82,6 +84,7 @@ function DefaultLayout({ children, onLogout }) {
             const response = await notificationApi.getAllNotification(studentId, pageNo);
             console.log('fetch list notifications', response);
             setTotalUnRead(response.totalDeactive);
+            setTotalNotification(response.totalDeactive);
             setNews(response.data);
             setTotal(response.totalPage);
         } catch (error) {
@@ -107,13 +110,14 @@ function DefaultLayout({ children, onLogout }) {
             });
         });
         setTotalUnRead(0);
+        setTotalNotification(0);
         notificationApi.markAllNotificationAsRead(studentId).then((response) => {
             console.log('mark all notification', response);
         });
     };
     const onClickNotification = (news) => {
         if (!news.read) {
-            setTotalUnRead((prev) => prev - 1);
+            setTotalNotification((prev) => prev - 1);
         }
         notificationApi.markNotificationAsRead(news.id, studentId).then((response) => {
             console.log('mark notification', response);
@@ -240,7 +244,7 @@ function DefaultLayout({ children, onLogout }) {
                                                     backgroundColor: '#FF4444',
                                                 },
                                             }}
-                                            badgeContent={totalUnRead}
+                                            badgeContent={totalNotification}
                                         >
                                             <NotificationsIcon />
                                         </Badge>
@@ -259,7 +263,7 @@ function DefaultLayout({ children, onLogout }) {
                                                     backgroundColor: '#FF4444',
                                                 },
                                             }}
-                                            badgeContent={totalUnRead}
+                                            badgeContent={totalNotification}
                                         >
                                             <NotificationsIcon />
                                         </Badge>

@@ -115,8 +115,17 @@ function TechnicalDashboard() {
 
     useEffect(() => {
         let visited = localStorage['toShowPopup'] !== 'true';
-        if (!visited && paymentMessage !== 'Không có khoản nào phải đóng') {
+        if (!visited) {
             handleOpenNotificationDialog();
+        }
+        // if (!visited && paymentMessage === 'Không có khoản nào phải đóng') {
+        //     handleOpenNotificationDialog();
+        // }
+    }, []);
+
+    useEffect(() => {
+        if (paymentMessage === 'Không có khoản nào phải đóng') {
+            handleCloseNotificationDialog();
         }
     }, [paymentMessage]);
 

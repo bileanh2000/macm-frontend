@@ -25,6 +25,7 @@ import { useForm, Controller } from 'react-hook-form';
 import eventApi from 'src/api/eventApi';
 import { useSnackbar } from 'notistack';
 import { Title } from '@mui/icons-material';
+import EditIcon from '@mui/icons-material/Edit';
 
 function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -38,6 +39,7 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
     const [value, setValue] = useState(scheduleList);
     const [selectedDate, setSelectedDate] = useState();
     const [dateValue, setDateValue] = useState();
+    const [isEdit, setIsEdit] = useState(false);
 
     const schema = Yup.object().shape({
         // date: Yup.string().nullable().required('Vui lòng không để trống trường này'),
@@ -165,6 +167,13 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                 </DialogTitle>
                 <DialogContent>
                     {/* <DialogContentText id="alert-dialog-description">{facilityId}</DialogContentText> */}
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Tooltip title="Chỉnh sửa lịch tập">
+                            <IconButton aria-label="delete" onClick={() => setIsEdit(true)}>
+                                <EditIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
                     <Box
                         component="form"
                         noValidate
@@ -181,7 +190,7 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                                     component="form"
                                     noValidate
                                     // onSubmit={}
-                                    sx={{ width: '100%', mt: 5 }}
+                                    sx={{ width: '100%', mt: 1 }}
                                 >
                                     {scheduleList.map((item) => {
                                         return (
@@ -209,6 +218,7 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                                                             fieldState: { error, invalid },
                                                         }) => (
                                                             <TimePicker
+                                                                disabled={!isEdit}
                                                                 label="Thời gian bắt đầu"
                                                                 ampm={false}
                                                                 value={value}
@@ -242,6 +252,7 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                                                         }) => (
                                                             <TimePicker
                                                                 label="Thời gian kết thúc"
+                                                                disabled={!isEdit}
                                                                 ampm={false}
                                                                 value={value}
                                                                 onChange={(value) => onChange(value)}
@@ -271,16 +282,21 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Button variant="contained" color="error" onClick={handleClickOpen}>
-                        Xóa buổi tập
-                    </Button>
+                    {isEdit ? (
+                        <Button variant="contained" color="error" onClick={handleClickOpen}>
+                            Xóa buổi tập
+                        </Button>
+                    ) : null}
+
                     <Box>
                         <Button onClick={handleClose} sx={{ mr: 1 }}>
-                            Hủy
+                            Quay lại
                         </Button>
-                        <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
-                            Xác nhận
-                        </Button>
+                        {isEdit ? (
+                            <Button variant="contained" onClick={handleSubmit(onSubmit)} autoFocus>
+                                Xác nhận
+                            </Button>
+                        ) : null}
                     </Box>
                 </DialogActions>
             </Dialog>

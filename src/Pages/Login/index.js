@@ -77,10 +77,10 @@ function Login() {
                                         mb: 2,
                                     }}
                                 >
-                                    FPTU Martial Arts Clubs Management
+                                    FPTU Martial Arts Club Management
                                 </Typography>
                                 <Typography sx={{ color: '#162342', mb: 9, fontWeight: 'bold' }}>
-                                    Ứng Dụng Quản Lý Các Câu Lạc Bộ Võ Thuật tại Đại Học FPT Hòa Lạc
+                                    Ứng Dụng Quản Lý Câu Lạc Bộ Võ Thuật tại Đại Học FPT Hòa Lạc
                                 </Typography>
                                 <Box
                                     component="a"

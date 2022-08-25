@@ -2,8 +2,8 @@ import axios from 'axios';
 import axiosClient from './axiosClient';
 
 const dashboardApi = {
-    getAttendanceReportBySemester: (semester) => {
-        const url = `/admin/dashboard/attendance?semester=${semester}`;
+    getAttendanceReportBySemester: (semester, month) => {
+        const url = `/admin/dashboard/attendance?semester=${semester}&month=${month}`;
         return axiosClient.get(url);
     },
     getMemberReport: () => {

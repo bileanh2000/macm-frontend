@@ -85,10 +85,15 @@ function Index() {
         fetchPaymentNotification(studentId);
 
         let visited = localStorage['toShowPopup'] !== 'true';
-        if (!visited && paymentMessage !== 'Không có khoản nào phải đóng') {
+        if (!visited) {
             handleOpenNotificationDialog();
         }
     }, [studentId, paymentMessage]);
+    useEffect(() => {
+        if (paymentMessage === 'Không có khoản nào phải đóng') {
+            handleCloseNotificationDialog();
+        }
+    }, [paymentMessage]);
 
     useEffect(() => {
         if (new Date(startDateOfCurrentSemester) - new Date() === 0) {

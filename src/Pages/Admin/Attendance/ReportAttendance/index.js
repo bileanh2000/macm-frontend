@@ -1,12 +1,26 @@
-import { Grid, MenuItem, TextField, Typography } from '@mui/material';
+import { Button, createSvgIcon, Grid, MenuItem, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import {
+    DataGrid,
+    GridFooter,
+    GridFooterContainer,
+    gridPaginatedVisibleSortedGridRowIdsSelector,
+    gridSortedRowIdsSelector,
+    GridToolbar,
+    GridToolbarContainer,
+    GridToolbarQuickFilter,
+    gridVisibleSortedRowIdsSelector,
+    useGridApiContext,
+} from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import semesterApi from 'src/api/semesterApi';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 import clsx from 'clsx';
 import moment from 'moment';
 import LoadingProgress from 'src/Components/LoadingProgress';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+
+import * as XLSX from 'xlsx';
 
 function ReportAttendance() {
     const [semester, setSemester] = useState('Summer2022');
@@ -15,6 +29,9 @@ function ReportAttendance() {
     const [attendanceList, setAttendanceList] = useState([]);
     const [columns, setColumns] = useState([]);
     const [pageSize, setPageSize] = useState(30);
+    const [emailList, setEmailList] = useState([]);
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [selectionModel, setSelectionModel] = useState([]);
 
     const handleChange = (event) => {
         setSemester(event.target.value);
@@ -38,9 +55,9 @@ function ReportAttendance() {
         try {
             const response = await adminAttendanceAPI.getAttendanceTrainingStatistic(semester, id);
             console.log('fetchAttendanceReportBySemester: ', response);
-            setAttendanceList(response.data);
+            // setAttendanceList(response.data);
             let header = Object.keys(response.data[0]);
-            let columns = header.map((i) => {
+            let columns = header.map((i, index) => {
                 return {
                     field: i,
                     headerName:
@@ -74,15 +91,50 @@ function ReportAttendance() {
                         : i === 'studentId'
                         ? { width: 100 }
                         : i === 'percentAbsent'
-                        ? { width: 100 }
+                        ? {
+                              type: 'number',
+                              width: 100,
+                              valueFormatter: (params) => {
+                                  if (params.value == null) {
+                                      return '';
+                                  }
+
+                                  const valueFormatted = Number(params.value).toLocaleString();
+                                  return `${valueFormatted} %`;
+                              },
+                          }
                         : i === 'totalSession'
-                        ? { width: 100 }
+                        ? {
+                              type: 'number',
+                              width: 100,
+                              valueFormatter: (params) => {
+                                  if (params.value == null) {
+                                      return '';
+                                  }
+
+                                  const valueFormatted = Number(params.value).toLocaleString();
+                                  return `${valueFormatted}`;
+                              },
+                          }
                         : i === 'totalAbsent'
-                        ? { width: 100 }
+                        ? {
+                              type: 'number',
+                              width: 100,
+                              valueFormatter: (params) => {
+                                  if (params.value == null) {
+                                      return '';
+                                  }
+
+                                  const valueFormatted = Number(params.value).toLocaleString();
+                                  return `${valueFormatted}`;
+                              },
+                          }
                         : i === 'id'
                         ? { hide: true }
                         : i === 'roleName'
                         ? { width: 200 }
+                        : i === 'email'
+                        ? { hide: true }
                         : { flex: 1 }),
                 };
             });
@@ -93,6 +145,14 @@ function ReportAttendance() {
 
                 return false;
             });
+
+            const rows = response.data;
+            rows.map((i, j) => {
+                return (i.roll = j + 1);
+            });
+            setAttendanceList(rows);
+            results.unshift({ field: 'roll', headerName: 'STT', width: 50 });
+            console.log(results);
             setColumns(results);
         } catch (error) {
             console.log('failed when fetchAttendanceReportBySemester: ', error);
@@ -103,90 +163,123 @@ function ReportAttendance() {
         fetchSemester();
         fetchAttendanceReportBySemester(semester, roleId);
     }, [semester, roleId]);
+    useEffect(() => {
+        let emails = selectedRows.map((item) => item.email);
+        console.info('email', emails);
+        setEmailList(emails);
+    }, [selectedRows]);
 
-    function CustomToolbar() {
+    const CustomFooter = () => {
         return (
-            <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-                <Box
+            <GridFooterContainer>
+                {/* <a href="http://">Gửi email cho ({selectedRows.length}) người đã chọn</a> */}
+                <a href={`mailto:` + emailList.toString()} style={{ marginLeft: '10px' }}>
+                    {selectedRows.length > 0 ? `Gửi email cho (${selectedRows.length}) người đã chọn` : ''}
+                </a>
+                <GridFooter
                     sx={{
-                        p: 0.5,
-                        pb: 0,
+                        border: 'none', // To delete double border.
                     }}
-                >
-                    <GridToolbarQuickFilter />
-                </Box>
-                <Box sx={{ display: 'flex' }}>
-                    <Box sx={{ ml: 1 }}>
-                        <span>
-                            <strong style={{ color: 'green' }}>V</strong>:
-                        </span>
-                        <span> Có mặt </span>
-                    </Box>
-                    <Box sx={{ ml: 1 }}>
-                        <span>
-                            <strong style={{ color: 'red' }}>X</strong>:
-                        </span>
-                        <span> Vắng mặt</span>
-                    </Box>
-                    <Box sx={{ ml: 1 }}>
-                        <span>
-                            <strong style={{ color: 'blue' }}>╺</strong>:
-                        </span>
-                        <span> Chưa điểm danh</span>
-                    </Box>
-                </Box>
-            </GridToolbarContainer>
+                />
+            </GridFooterContainer>
         );
-    }
+    };
     if (!attendanceList[0]) {
         return <LoadingProgress />;
     }
+
+    const downloadExcel = (data) => {
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        // const ws = XLSX.utils.json_to_sheet(data, { header: ['id', 'Tên', 'Mã Sinh Viên'] });
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+        //let buffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+        //XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
+        XLSX.writeFile(workbook, 'MACM_ReportAttendance.xlsx');
+    };
     return (
         <div>
+            <Box sx={{ display: 'flex', position: 'absolute', top: '244px', left: '37px', zIndex: 2 }}>
+                <Box sx={{ ml: 1 }}>
+                    <span>
+                        <strong style={{ color: 'green' }}>V</strong>:
+                    </span>
+                    <span> Có mặt </span>
+                </Box>
+                <Box sx={{ ml: 1 }}>
+                    <span>
+                        <strong style={{ color: 'red' }}>X</strong>:
+                    </span>
+                    <span> Vắng mặt</span>
+                </Box>
+                <Box sx={{ ml: 1 }}>
+                    <span>
+                        <strong style={{ color: 'blue' }}>╺</strong>:
+                    </span>
+                    <span> Chưa điểm danh</span>
+                </Box>
+            </Box>
             <Grid container spacing={4}>
                 <Grid item xs={12}>
                     <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                         Thống kê thành viên tham gia buổi tập
                     </Typography>
                 </Grid>
-                <Grid item xs={8}>
-                    <Typography variant="h5" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                        <TextField
-                            sx={{ mr: 1 }}
-                            id="outlined-select-currency"
-                            select
-                            size="small"
-                            label="Chọn kỳ"
-                            value={semester}
-                            onChange={handleChange}
+                {/* <button onClick={() => downloadExcel(selectedRows)}>Download As Excel</button> */}
+
+                <Grid item xs={12}>
+                    <Box sx={{ fontWeight: 500, marginBottom: 2, display: 'flex', justifyContent: 'space-between' }}>
+                        <Box>
+                            <TextField
+                                sx={{ mr: 1 }}
+                                id="outlined-select-currency"
+                                select
+                                size="small"
+                                label="Chọn kỳ"
+                                value={semester}
+                                onChange={handleChange}
+                            >
+                                {semesterList.map((option) => (
+                                    <MenuItem key={option.id} value={option.name}>
+                                        {option.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                            <TextField
+                                id="outlined-select-currency"
+                                select
+                                size="small"
+                                label="Chọn vai trò"
+                                value={roleId}
+                                onChange={handleChangeRoleId}
+                            >
+                                <MenuItem value={0}>Tất cả</MenuItem>
+                                <MenuItem value={-1}>Thành viên</MenuItem>
+                                <MenuItem value={-2}>Cộng tác viên</MenuItem>
+                                <MenuItem value={10}>Thành viên ban truyền thông</MenuItem>
+                                <MenuItem value={11}>Thành viên ban văn hóa</MenuItem>
+                                <MenuItem value={12}>Thành viên ban chuyên môn</MenuItem>
+                                <MenuItem value={13}>CTV ban truyền thông</MenuItem>
+                                <MenuItem value={14}>CTV ban văn hóa</MenuItem>
+                                <MenuItem value={15}>CTV ban chuyên môn</MenuItem>
+                            </TextField>
+                        </Box>
+                        <Button
+                            variant="outlined"
+                            startIcon={<FileDownloadOutlinedIcon />}
+                            onClick={() => {
+                                if (!selectedRows.length) {
+                                    downloadExcel(attendanceList);
+                                } else {
+                                    downloadExcel(selectedRows);
+                                }
+                            }}
                         >
-                            {semesterList.map((option) => (
-                                <MenuItem key={option.id} value={option.name}>
-                                    {option.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                        <TextField
-                            id="outlined-select-currency"
-                            select
-                            size="small"
-                            label="Chọn vai trò"
-                            value={roleId}
-                            onChange={handleChangeRoleId}
-                        >
-                            <MenuItem value={0}>Tất cả</MenuItem>
-                            <MenuItem value={-1}>Thành viên</MenuItem>
-                            <MenuItem value={-2}>Cộng tác viên</MenuItem>
-                            <MenuItem value={10}>Thành viên ban truyền thông</MenuItem>
-                            <MenuItem value={11}>Thành viên ban văn hóa</MenuItem>
-                            <MenuItem value={12}>Thành viên ban chuyên môn</MenuItem>
-                            <MenuItem value={13}>CTV ban truyền thông</MenuItem>
-                            <MenuItem value={14}>CTV ban văn hóa</MenuItem>
-                            <MenuItem value={15}>CTV ban chuyên môn</MenuItem>
-                        </TextField>
-                    </Typography>
+                            Xuất Excel{' '}
+                            {selectedRows.length > 0 ? `đã chọn (${selectedRows.length})` : `toàn bộ danh sách`}
+                        </Button>
+                    </Box>
                 </Grid>
-                <Grid item xs={4}></Grid>
             </Grid>
             <Box
                 sx={{
@@ -216,10 +309,15 @@ function ReportAttendance() {
                         fontWeight: '600',
                         textAlign: 'center',
                     },
+                    'button.MuiButton-sizeSmall': { display: 'none !important' },
                 }}
             >
                 {attendanceList.length >= 1 ? (
                     <DataGrid
+                        disableColumnFilter
+                        disableColumnSelector
+                        disableDensitySelector
+                        checkboxSelection
                         loading={!attendanceList.length}
                         disableSelectionOnClick={true}
                         rows={attendanceList}
@@ -228,11 +326,24 @@ function ReportAttendance() {
                         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                         rowsPerPageOptions={[30, 50, 70]}
                         components={{
-                            Toolbar: CustomToolbar,
+                            Toolbar: GridToolbar,
+                            Footer: CustomFooter,
                         }}
-                        // initialState={{ pinnedColumns: { left: ['name'] } }}
-                        initialState={{
-                            pinnedColumns: { left: ['name'] },
+                        componentsProps={{
+                            toolbar: {
+                                showQuickFilter: true,
+                                quickFilterProps: { debounceMs: 500 },
+                            },
+                        }}
+                        onSelectionModelChange={(ids) => {
+                            console.log(ids);
+                            setSelectionModel(ids);
+                            const selectedIDs = new Set(ids);
+                            const selectedRows =
+                                attendanceList && attendanceList.filter((row) => selectedIDs.has(row.id));
+                            setSelectedRows(selectedRows);
+                            // console.log(selectedRows);
+                            console.log('selected', selectedRows);
                         }}
                     />
                 ) : (

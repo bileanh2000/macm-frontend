@@ -16,9 +16,12 @@ import {
     gridPageSizeSelector,
     GridFooterContainer,
     GridFooter,
+    GridLinkOperator,
 } from '@mui/x-data-grid';
 import {
     Alert,
+    Autocomplete,
+    Badge,
     Box,
     Button,
     ClickAwayListener,
@@ -60,6 +63,20 @@ import ViewDetailMemberDialog from '../ViewDetailMemberDialog';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useSnackbar } from 'notistack';
 
+const months = [
+    { name: 'Tháng 1', value: 1 },
+    { name: 'Tháng 2', value: 2 },
+    { name: 'Tháng 3', value: 3 },
+    { name: 'Tháng 4', value: 4 },
+    { name: 'Tháng 5', value: 5 },
+    { name: 'Tháng 6', value: 6 },
+    { name: 'Tháng 7', value: 7 },
+    { name: 'Tháng 8', value: 8 },
+    { name: 'Tháng 9', value: 9 },
+    { name: 'Tháng 10', value: 10 },
+    { name: 'Tháng 11', value: 11 },
+    { name: 'Tháng 12', value: 12 },
+];
 function MemberAndCollaborator() {
     const token = localStorage[`accessToken`];
     let navigate = useNavigate();
@@ -69,7 +86,6 @@ function MemberAndCollaborator() {
     const [semester, setSemester] = useState('Summer2022');
     const [editable, setEditable] = useState(false);
     const [checked, setChecked] = useState(false);
-    const [gender, setGender] = useState('');
     const [userData, setUserData] = useState([]);
     const [selectionModel, setSelectionModel] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
@@ -82,7 +98,15 @@ function MemberAndCollaborator() {
     const [isEditDialog, setIsEditDialog] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [errorList, setErrorList] = useState([]);
-
+    const [searchResult, setSearchResult] = useState([]);
+    const [listMonth, setListMonth] = useState([]);
+    const [listGen, setListGen] = useState([]);
+    const [generation, setGeneration] = useState(-1);
+    const [gender, setGender] = useState(-1);
+    const [status, setStatus] = useState(-1);
+    const [isActive, setIsActive] = useState(-1);
+    const [roleId, setRoleId] = useState(-1);
+    const [filterCount, setFilterCount] = useState(0);
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const styles = (theme) => ({
         disabledButton: {
@@ -90,6 +114,15 @@ function MemberAndCollaborator() {
         },
     });
 
+    const getAllGen = async () => {
+        try {
+            const response = await userApi.getAllGen();
+            console.log('getAllGen', response.data);
+            setListGen(response.data);
+        } catch (error) {
+            console.log('failed when getAllGen');
+        }
+    };
     const toggleFilter = () => {
         setChecked((prev) => !prev);
     };
@@ -131,6 +164,7 @@ function MemberAndCollaborator() {
         // fetchUserList();
         fetchUserListBySemester(semester);
         setIsUpdate(false);
+        getAllGen();
     }, [semester, isUpdate]);
 
     useEffect(() => {
@@ -149,10 +183,12 @@ function MemberAndCollaborator() {
         // resolver: yupResolver(validationSchema),
         // mode: 'onBlur',
     });
-    const handleUpdateStatus = (id) => {
-        console.log(id);
+    const handleUpdateStatus = (id, name) => {
+        console.log(id, name);
         const params = { semester: semester, studentId: id };
         userApi.updateUserStatus(params).then((res) => {
+            let status = res.data[0].active === false ? 'Deactive' : 'Active';
+            enqueueSnackbar(`Cập nhật trạng thái cho ${id} - ${name} thành công: ${status}`, { variant: 'success' });
             setUserList((oldUserList) => {
                 return oldUserList.map((user) => {
                     if (user.studentId === id) {
@@ -219,7 +255,7 @@ function MemberAndCollaborator() {
                         variant="contained"
                         color="primary"
                         onClick={(event) => {
-                            handleUpdateStatus(cellValues.row.studentId);
+                            handleUpdateStatus(cellValues.row.studentId, cellValues.row.name);
                         }}
                         // onClick={(event) => {
                         //     toggleStatus(cellValues.row.studentId);
@@ -338,14 +374,16 @@ function MemberAndCollaborator() {
     const filterSubmit = (data) => {
         console.log(data);
         const dataFormat = {
-            dateFrom: data.startDate === null ? '' : moment(new Date(data.startDate)).format('yyyy-MM-DD'),
-            dateTo: data.endDate === null ? '' : moment(new Date(data.endDate)).format('yyyy-MM-DD'),
-            gender: data.gender,
-            generation: data.generation,
-            isActive: data.isActive,
-            roleId: data.roleId,
+            // dateFrom: data.startDate === null ? '' : moment(new Date(data.startDate)).format('yyyy-MM-DD'),
+            // dateTo: data.endDate === null ? '' : moment(new Date(data.endDate)).format('yyyy-MM-DD'),
+            gender: gender === -1 ? '' : gender,
+            generation: generation === -1 ? '' : generation,
+            isActive: isActive === -1 ? '' : isActive,
+            roleId: roleId === -1 ? '' : roleId,
+            month: listMonth.map((i) => i.value),
         };
-
+        let count = Object.values(dataFormat).filter((i) => i.length != [].length && i !== '').length;
+        setFilterCount(count);
         userApi
             .searchByMultipleField(dataFormat, userData && userData)
             .then((res) => {
@@ -358,6 +396,28 @@ function MemberAndCollaborator() {
                 console.error('failed when filter', error.response);
             });
         console.log(dataFormat);
+    };
+
+    useEffect(() => {
+        console.log(listMonth);
+    }, [listMonth]);
+    const searchJson = (searchTerm) => {
+        rowsUser
+            .filter((val) => {
+                if (searchTerm == '') {
+                    return val;
+                } else if (
+                    val.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    val.studentId.toLowerCase().includes(searchTerm.toLowerCase())
+                ) {
+                    return val;
+                }
+            })
+            .map((val, key) => {
+                console.log('3', val);
+                setSearchResult(val);
+                return <div>{val.first_name} </div>;
+            });
     };
 
     const exportExcel = () => {
@@ -408,11 +468,9 @@ function MemberAndCollaborator() {
                 <GridToolbarContainer>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         {/* <GridToolbarColumnsButton /> */}
-                        <ClickAwayListener onClickAway={handleClickAway}>
-                            <Button startIcon={<FilterListIcon />} size="small" onClick={toggleFilter} sx={{ mr: 1 }}>
-                                BỘ LỌC
-                            </Button>
-                        </ClickAwayListener>
+                        <Button startIcon={<FilterListIcon />} size="small" onClick={toggleFilter} sx={{ mr: 1 }}>
+                            BỘ LỌC
+                        </Button>
 
                         <GridToolbarQuickFilter />
                     </Box>
@@ -489,7 +547,6 @@ function MemberAndCollaborator() {
                     }}
                 />
             )}
-
             {/* Filter */}
             <Grow in={checked}>
                 <Box
@@ -497,8 +554,8 @@ function MemberAndCollaborator() {
                     onSubmit={handleSubmit(filterSubmit)}
                     sx={{
                         position: 'absolute',
-                        top: '264px',
-                        left: '32px',
+                        top: '322px',
+                        right: '103px',
                         zIndex: '2',
                         backgroundColor: 'white',
                         padding: '10px 20px 30px 20px',
@@ -511,48 +568,40 @@ function MemberAndCollaborator() {
                     <Grid container spacing={3}>
                         <Grid item xs={6}>
                             <TextField
+                                id="outlined-select-currency"
                                 fullWidth
-                                id="standard-select-currency"
                                 select
-                                label="Gen"
-                                // onChange={handleChangeGender}
-                                defaultValue=""
                                 variant="standard"
                                 size="small"
-                                {...register('generation')}
-                                // onChange={(e) => {
-                                //     onChangeSearch.generation = e.target.value;
-                                //     // console.log(onChangeSearch);
-                                // }}
+                                label="Gen"
+                                value={generation}
+                                onChange={(event) => setGeneration(event.target.value)}
                             >
-                                <MenuItem value="">Tất cả</MenuItem>
-                                <MenuItem value="1">1</MenuItem>
-                                <MenuItem value="2">2</MenuItem>
-                                <MenuItem value="3">3</MenuItem>
-                                <MenuItem value="4">4</MenuItem>
-                                <MenuItem value="5">5</MenuItem>
+                                <MenuItem value={-1}>Tất cả</MenuItem>
+                                {listGen.map((i) => {
+                                    return (
+                                        <MenuItem key={i} value={i}>
+                                            {i}
+                                        </MenuItem>
+                                    );
+                                })}
                             </TextField>
 
                             <TextField
+                                id="outlined-select-currency"
                                 fullWidth
-                                id="standard-select-currency"
                                 select
-                                label="Trạng thái"
-                                // onChange={handleChangeGender}
-                                defaultValue=""
                                 variant="standard"
                                 size="small"
-                                {...register('isActive')}
-                                // onChange={(e) => {
-                                //     onChangeSearch.isActive = e.target.value;
-                                //     // console.log(onChangeSearch);
-                                // }}
+                                label="Trạng thái"
+                                value={isActive}
+                                onChange={(event) => setIsActive(event.target.value)}
                             >
-                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value={-1}>Tất cả</MenuItem>
                                 <MenuItem value="true">Active</MenuItem>
                                 <MenuItem value="false">Deactive</MenuItem>
                             </TextField>
-                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                            {/* <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                                 <Controller
                                     name="startDate"
                                     control={control}
@@ -588,34 +637,35 @@ function MemberAndCollaborator() {
                                         />
                                     )}
                                 />
-                            </LocalizationProvider>
+                            </LocalizationProvider> */}
                         </Grid>
                         <Grid item xs={6}>
                             <TextField
+                                id="outlined-select-currency"
                                 fullWidth
-                                id="standard-select-currency"
                                 select
-                                label="Giới tính"
-                                defaultValue=""
                                 variant="standard"
                                 size="small"
-                                {...register('gender')}
+                                label="Giới tính"
+                                value={gender}
+                                onChange={(event) => setGender(event.target.value)}
                             >
-                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value={-1}>Tất cả</MenuItem>
                                 <MenuItem value="true">Nam</MenuItem>
                                 <MenuItem value="false">Nữ</MenuItem>
                             </TextField>
+
                             <TextField
+                                id="outlined-select-currency"
                                 fullWidth
-                                id="standard-select-currency"
                                 select
-                                label="Vai trò"
-                                defaultValue=""
                                 variant="standard"
                                 size="small"
-                                {...register('roleId')}
+                                label="Vai trò"
+                                value={roleId}
+                                onChange={(event) => setRoleId(event.target.value)}
                             >
-                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value={-1}>Tất cả</MenuItem>
                                 <MenuItem value={10}>Ban truyền thông</MenuItem>
                                 <MenuItem value={11}>Ban văn hóa</MenuItem>
                                 <MenuItem value={12}>Ban chuyên môn</MenuItem>
@@ -623,7 +673,7 @@ function MemberAndCollaborator() {
                                 <MenuItem value={14}>CTV Ban văn hóa</MenuItem>
                                 <MenuItem value={15}>CTV Ban chuyên môn</MenuItem>
                             </TextField>
-                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                            {/* <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                                 <Controller
                                     name="endDate"
                                     control={control}
@@ -652,27 +702,50 @@ function MemberAndCollaborator() {
                                         />
                                     )}
                                 />
-                            </LocalizationProvider>
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                                <Button
-                                    variant="outlined"
-                                    sx={{ mr: 1 }}
-                                    onClick={() => {
-                                        reset({ gender: '', roleId: '' });
-                                        console.log('heheh');
-                                    }}
-                                >
-                                    Reset
-                                </Button>
-                                <Button variant="contained" type="submit">
-                                    Lọc
-                                </Button>
-                            </Box>
+                            </LocalizationProvider> */}
                         </Grid>
                     </Grid>
+                    <Autocomplete
+                        multiple
+                        id="tags-outlined"
+                        value={listMonth}
+                        defaultValue={[]}
+                        onChange={(e, v) => setListMonth(v)}
+                        options={months}
+                        getOptionLabel={(option) => option.name}
+                        // defaultValue={null}
+                        filterSelectedOptions
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Chọn tháng sinh"
+                                placeholder="Chọn tháng sinh"
+                                variant="standard"
+                            />
+                        )}
+                    />
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                        <Button
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                            onClick={() => {
+                                reset({ endDate: null, startDate: null });
+                                console.log('heheh');
+                                setGender(-1);
+                                setGeneration(-1);
+                                setIsActive(-1);
+                                setRoleId(-1);
+                                setListMonth([]);
+                            }}
+                        >
+                            Reset
+                        </Button>
+                        <Button variant="contained" type="submit">
+                            Lọc
+                        </Button>
+                    </Box>
                 </Box>
             </Grow>
-
             <Snackbar
                 open={openSnackBar}
                 autoHideDuration={5000}
@@ -688,6 +761,7 @@ function MemberAndCollaborator() {
                     {customAlert.message}
                 </Alert>
             </Snackbar>
+            {/* <TextField onChange={(e) => searchJson(e.target.value)}></TextField> */}
             <Dialog open={openUploadFile} onClose={handleClose} fullWidth maxWidth="sm">
                 <DialogTitle>Tải lên file Excel</DialogTitle>
                 <Box component="form" onSubmit={handleSubmit(onSubmit)}>
@@ -717,10 +791,23 @@ function MemberAndCollaborator() {
                     </DialogActions>
                 </Box>
             </Dialog>
+            <Typography
+                variant="button"
+                color="initial"
+                sx={{
+                    marginLeft: 'auto',
+                    marginRight: '1rem',
+                    position: 'absolute',
+                    top: '262px',
+                    left: '38px',
+                    zIndex: 2,
+                }}
+            >
+                Tổng thành viên Active: {countActive}/{userList.length}
+            </Typography>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                 Quản lý Thành viên và Cộng tác viên
             </Typography>
-
             <Box sx={{ marginBottom: 2, display: 'flex', justifyContent: 'space-between' }}>
                 <Box>
                     <TextField
@@ -762,14 +849,47 @@ function MemberAndCollaborator() {
                     </Button>
                 </Box>
             </Box>
-
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    position: 'relative',
+                    zIndex: '2',
+                    top: '37px',
+                    right: '220px',
+                }}
+            >
+                <Badge
+                    badgeContent={filterCount}
+                    color="primary"
+                    // overlap="circular"
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                    }}
+                >
+                    <Button
+                        variant="outlined"
+                        startIcon={<FilterListIcon />}
+                        size="small"
+                        onClick={toggleFilter}
+                        sx={{ mr: 1 }}
+                    >
+                        BỘ LỌC
+                    </Button>
+                </Badge>
+            </Box>
             <Box
                 sx={{
                     height: '70vh',
                     width: '100%',
+                    'button.MuiButton-sizeSmall': { display: 'none !important' },
                 }}
             >
                 <DataGrid
+                    disableColumnFilter
+                    disableColumnSelector
+                    disableDensitySelector
                     checkboxSelection
                     rows={rowsUser}
                     columns={columns}
@@ -784,8 +904,22 @@ function MemberAndCollaborator() {
                         toolbarFilters: 'Bộ lọc tìm kiếm',
                     }}
                     components={{
-                        Toolbar: CustomToolbar,
+                        Toolbar: GridToolbar,
                         Footer: CustomFooter,
+                    }}
+                    // initialState={{
+                    //     filter: {
+                    //         filterModel: {
+                    //             items: [],
+                    //             quickFilterLogicOperator: GridLinkOperator.Or,
+                    //         },
+                    //     },
+                    // }}
+                    componentsProps={{
+                        toolbar: {
+                            showQuickFilter: true,
+                            quickFilterProps: { debounceMs: 500 },
+                        },
                     }}
                     disableSelectionOnClick={true}
                     onSelectionModelChange={(ids) => {

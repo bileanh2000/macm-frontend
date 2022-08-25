@@ -76,7 +76,7 @@ function FeeReport() {
                 <LineChart
                     width={500}
                     height={300}
-                    data={feeReportList && feeReportList}
+                    data={feeReportList[0] && feeReportList[0].feeDashboardDtos}
                     margin={{
                         top: 5,
                         right: 30,
