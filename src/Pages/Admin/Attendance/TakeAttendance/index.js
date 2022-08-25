@@ -8,16 +8,20 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 import moment from 'moment';
 import { useSnackbar } from 'notistack';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 function TakeAttendance() {
     const [userList, setUserList] = useState([]);
-    const [pageSize, setPageSize] = useState(20);
+    const [pageSize, setPageSize] = useState(40);
     const [eventId, setEventId] = useState(0);
     const location = useLocation();
     const [scheduleId, setScheduleId] = useState(0);
     const history = useNavigate();
     const { enqueueSnackbar } = useSnackbar();
     const [title, setTitle] = useState('');
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up('md'));
 
     const _type = location.state?.type;
     const _trainingScheduleId = location.state?.id;
@@ -68,108 +72,14 @@ function TakeAttendance() {
         getAttendanceByStudentId();
     }, []);
 
-    // const columns = [
-    //     { field: 'id', headerName: 'Số thứ tự', flex: 0.5 },
-    //     { field: 'name', headerName: 'Tên', flex: 0.8 },
-    //     { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
-    //     {
-    //         field: 'status',
-    //         headerName: 'Trạng thái',
-    //         flex: 0.5,
-    //         cellClassName: (params) => {
-    //             if (params.value == null) {
-    //                 return '';
-    //             }
-
-    //             return clsx('status-rows', {
-    //                 active: params.value === 'Có mặt',
-    //                 deactive: params.value === 'Vắng mặt',
-    //                 subActive: params.value === 'Chưa điểm danh',
-    //             });
-    //         },
-    //     },
-    //     {
-    //         field: 'Attend',
-    //         type: 'actions',
-    //         headerName: 'Có mặt',
-    //         width: 50,
-    //         flex: 0.3,
-    //         cellClassName: 'actions',
-    //         getActions: (params) => {
-    //             if (params.row.status == 'Có mặt') {
-    //                 return [
-    //                     <GridActionsCellItem
-    //                         icon={<RadioButtonChecked />}
-    //                         label="Có mặt"
-    //                         onClick={() => toggleStatus(params.row.studentId, 1)}
-    //                         color="primary"
-    //                         aria-details="Có mặt"
-    //                     />,
-    //                 ];
-    //             } else if (params.row.status == 'Vắng mặt') {
-    //                 return [
-    //                     <GridActionsCellItem
-    //                         icon={<RadioButtonUnchecked />}
-    //                         label="Có mặt"
-    //                         onClick={() => toggleStatus(params.row.studentId, 1)}
-    //                     />,
-    //                 ];
-    //             }
-    //             return [
-    //                 <GridActionsCellItem
-    //                     icon={<RadioButtonUnchecked />}
-    //                     label="Có mặt"
-    //                     onClick={() => toggleStatus(params.row.studentId, 1)}
-    //                 />,
-    //             ];
-    //         },
-    //     },
-    //     {
-    //         field: 'Absent',
-    //         type: 'actions',
-    //         headerName: 'Vắng mặt',
-    //         width: 50,
-    //         flex: 0.3,
-    //         cellClassName: 'actions',
-    //         getActions: (params) => {
-    //             if (params.row.status == 'Có mặt') {
-    //                 return [
-    //                     <GridActionsCellItem
-    //                         icon={<RadioButtonUnchecked />}
-    //                         label="Vắng mặt"
-    //                         onClick={() => toggleStatus(params.row.studentId, 0)}
-    //                     />,
-    //                 ];
-    //             } else if (params.row.status == 'Vắng mặt') {
-    //                 return [
-    //                     <GridActionsCellItem
-    //                         icon={<RadioButtonChecked />}
-    //                         label="Vắng mặt"
-    //                         onClick={() => toggleStatus(params.row.studentId, 0)}
-    //                         color="primary"
-    //                     />,
-    //                 ];
-    //             }
-    //             return [
-    //                 <GridActionsCellItem
-    //                     icon={<RadioButtonUnchecked />}
-    //                     label="Vắng mặt"
-    //                     onClick={() => toggleStatus(params.row.studentId, 0)}
-    //                     color="primary"
-    //                 />,
-    //             ];
-    //         },
-    //     },
-    // ];
-
     const columns = [
-        { field: 'id', headerName: 'Số thứ tự', width: 10 },
-        { field: 'name', headerName: 'Tên', width: 150 },
-        { field: 'studentId', headerName: 'Mã sinh viên', width: 150 },
+        { field: 'id', headerName: 'Số thứ tự', flex: 0.5 },
+        { field: 'name', headerName: 'Tên', flex: 0.8 },
+        { field: 'studentId', headerName: 'Mã sinh viên', width: 150, flex: 0.6 },
         {
             field: 'status',
             headerName: 'Trạng thái',
-            width: 150,
+            flex: 0.5,
             cellClassName: (params) => {
                 if (params.value == null) {
                     return '';
@@ -187,7 +97,7 @@ function TakeAttendance() {
             type: 'actions',
             headerName: 'Có mặt',
             width: 50,
-            // flex: 0.3,
+            flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
                 if (params.row.status == 'Có mặt') {
@@ -223,6 +133,100 @@ function TakeAttendance() {
             type: 'actions',
             headerName: 'Vắng mặt',
             width: 50,
+            flex: 0.3,
+            cellClassName: 'actions',
+            getActions: (params) => {
+                if (params.row.status == 'Có mặt') {
+                    return [
+                        <GridActionsCellItem
+                            icon={<RadioButtonUnchecked />}
+                            label="Vắng mặt"
+                            onClick={() => toggleStatus(params.row.studentId, 0)}
+                        />,
+                    ];
+                } else if (params.row.status == 'Vắng mặt') {
+                    return [
+                        <GridActionsCellItem
+                            icon={<RadioButtonChecked />}
+                            label="Vắng mặt"
+                            onClick={() => toggleStatus(params.row.studentId, 0)}
+                            color="primary"
+                        />,
+                    ];
+                }
+                return [
+                    <GridActionsCellItem
+                        icon={<RadioButtonUnchecked />}
+                        label="Vắng mặt"
+                        onClick={() => toggleStatus(params.row.studentId, 0)}
+                        color="primary"
+                    />,
+                ];
+            },
+        },
+    ];
+
+    const columnsMobile = [
+        { field: 'id', headerName: 'STT', width: 5 },
+        { field: 'studentId', headerName: 'Mã sinh viên', width: 100 },
+        { field: 'name', headerName: 'Tên', width: 150 },
+        // {
+        //     field: 'status',
+        //     headerName: 'Trạng thái',
+        //     width: 150,
+        //     cellClassName: (params) => {
+        //         if (params.value == null) {
+        //             return '';
+        //         }
+
+        //         return clsx('status-rows', {
+        //             active: params.value === 'Có mặt',
+        //             deactive: params.value === 'Vắng mặt',
+        //             subActive: params.value === 'Chưa điểm danh',
+        //         });
+        //     },
+        // },
+        {
+            field: 'Attend',
+            type: 'actions',
+            headerName: 'Có mặt',
+            width: 70,
+            // flex: 0.3,
+            cellClassName: 'actions',
+            getActions: (params) => {
+                if (params.row.status == 'Có mặt') {
+                    return [
+                        <GridActionsCellItem
+                            icon={<RadioButtonChecked />}
+                            label="Có mặt"
+                            onClick={() => toggleStatus(params.row.studentId, 1)}
+                            color="primary"
+                            aria-details="Có mặt"
+                        />,
+                    ];
+                } else if (params.row.status == 'Vắng mặt') {
+                    return [
+                        <GridActionsCellItem
+                            icon={<RadioButtonUnchecked />}
+                            label="Có mặt"
+                            onClick={() => toggleStatus(params.row.studentId, 1)}
+                        />,
+                    ];
+                }
+                return [
+                    <GridActionsCellItem
+                        icon={<RadioButtonUnchecked />}
+                        label="Có mặt"
+                        onClick={() => toggleStatus(params.row.studentId, 1)}
+                    />,
+                ];
+            },
+        },
+        {
+            field: 'Absent',
+            type: 'actions',
+            headerName: 'Vắng mặt',
+            width: 80,
             // flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
@@ -385,7 +389,7 @@ function TakeAttendance() {
     }
 
     return (
-        <Box sx={{ m: 1, p: 1 }}>
+        <Box sx={{}}>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                 Điểm danh {_type == 0 ? title : 'sự kiện ' + title} ngày: {_nowDate}
             </Typography>
@@ -433,10 +437,10 @@ function TakeAttendance() {
                         // loading={!userList.length}
                         disableSelectionOnClick={true}
                         rows={rowsUser}
-                        columns={columns}
+                        columns={matches ? columns : columnsMobile}
                         pageSize={pageSize}
                         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                        rowsPerPageOptions={[20, 30, 50]}
+                        rowsPerPageOptions={[40, 60, 80]}
                         components={{
                             Toolbar: CustomToolbar,
                             NoRowsOverlay: CustomNoRowsOverlay,
