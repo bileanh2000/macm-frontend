@@ -25,6 +25,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
     const [isApprove, setIsApprove] = useState(false);
     const [idUpdate, setIdUpdate] = useState();
     const [_active, setActive] = useState(active);
+    const [isRender, setIsRender] = useState(true);
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -49,8 +50,9 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
     };
 
     useEffect(() => {
-        fetchAdminInTournament(tournamentId);
-    }, [tournamentId]);
+        isRender && fetchAdminInTournament(tournamentId);
+        setIsRender(false);
+    }, [tournamentId, isRender, userList]);
 
     const columns = [
         { field: 'studentName', headerName: 'Tên', flex: 0.6 },
@@ -119,6 +121,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
         try {
             const response = await adminTournamentAPI.acceptRequestToJoinOrganizingCommittee(organizingCommitteeId);
             enqueueSnackbar(response.message, { variant: 'success' });
+            setIsRender(true);
             onChange && onChange();
         } catch (error) {
             console.log('Khong the chap thuan yeu cau nay, loi:', error);
@@ -129,6 +132,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
         try {
             const response = await adminTournamentAPI.declineRequestToJoinOrganizingCommittee(organizingCommitteeId);
             enqueueSnackbar(response.message, { variant: 'success' });
+            setIsRender(true);
             onChange && onChange();
         } catch (error) {
             console.log('Khong the chap thuan yeu cau nay, loi:', error);

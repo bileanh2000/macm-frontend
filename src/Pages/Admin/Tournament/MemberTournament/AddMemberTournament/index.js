@@ -98,7 +98,8 @@ function AddMemberTourament({ tournament, isUpdate, tournamentStage }) {
                     data={exhibitionTeam}
                     type={type}
                     onChange={() => {
-                        return setIsRender(true);
+                        setIsRender(true);
+                        setIsRenderCompe(true);
                     }}
                     isUpdate={isUpdate}
                     tournamentStage={tournamentStage}

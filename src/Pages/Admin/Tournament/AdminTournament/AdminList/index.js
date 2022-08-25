@@ -176,7 +176,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             container['id'] = item.id;
             container['studentName'] = item.userName;
             container['studentId'] = item.userStudentId;
-            container['role'] = item.roleTournamentDto.name;
+            container['role'] = item.tournamentRoleDto.name;
             container['registerStatus'] = item.registerStatus;
             container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
             return container;

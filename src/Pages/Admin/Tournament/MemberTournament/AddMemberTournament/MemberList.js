@@ -44,7 +44,6 @@ import { useSnackbar } from 'notistack';
 import adminTournament from 'src/api/adminTournamentAPI';
 
 function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhibitionType, tournamentStage }) {
-    console.log(data);
     const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
     const [openDelete, setOpenDelete] = useState(false);
@@ -517,13 +516,9 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
                             {type == 1
-                                ? `Bạn có muốn ${
-                                      setIsApprove ? 'chấp thuận' : 'từ chối'
-                                  } yêu cầu tham gia thi đấu của{' '}
+                                ? `Bạn có muốn ${setIsApprove ? 'chấp thuận' : 'từ chối'} yêu cầu tham gia thi đấu của 
                             ${idUpdate.studentName} - ${idUpdate.studentId} cho hạng cân ${idUpdate.weightRange}`
-                                : `Bạn có muốn ${
-                                      setIsApprove ? 'chấp thuận' : 'từ chối'
-                                  } yêu cầu tham gia thi đấu đội{' '}
+                                : `Bạn có muốn ${setIsApprove ? 'chấp thuận' : 'từ chối'} yêu cầu tham gia thi đấu đội 
                             ${idUpdate.exhibitionTeamRegistration.teamName} cho hạng nội dung ${
                                       idUpdate.exhibitionType.name
                                   }`}
