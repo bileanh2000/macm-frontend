@@ -121,7 +121,7 @@ function Schedule() {
         container['status'] = item.status;
 
         // 0 la vang, 1 la co mat, 2 chua diem danh
-        container['backgroundColor'] = item.status === 0 ? '#fc8282' : item.status === 1 ? '#56f000' : '#fff';
+        container['backgroundColor'] = item.status === 0 ? '#fc8282' : item.status === 1 ? '#56f000' : '#fff0';
 
         return container;
     });
