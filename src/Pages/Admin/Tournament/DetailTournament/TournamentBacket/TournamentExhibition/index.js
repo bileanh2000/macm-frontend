@@ -94,7 +94,7 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage, 
         };
         isRender && getExhibitionResult(exhibitionType);
         setIsRender(false);
-    }, [isRender, exhibitionType, exhibitionTeam, nowDate]);
+    }, [isRender, exhibitionType, exhibitionTeam]);
 
     useEffect(() => {
         const getExhibitionResult = async (exhibitionType) => {
@@ -129,7 +129,7 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage, 
         };
         isRenderTotal && fetchExhibitionType(tournamentId);
         getAllArea();
-    }, [tournamentId, exhibitionType, nowDate, isRenderTotal, result, type]);
+    }, [tournamentId, exhibitionType, isRenderTotal, result, type]);
 
     const UpdateResultHandler = () => {
         setIsRender(true);

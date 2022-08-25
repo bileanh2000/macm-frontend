@@ -35,7 +35,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
     const { enqueueSnackbar } = useSnackbar();
     const [admin, setAdmin] = useState([]);
     const [selectionModel, setSelectionModel] = useState([]);
-    const [allMember, setAllMember] = useState();
+    const [allMember, setAllMember] = useState([]);
     const [pageSize, setPageSize] = useState(5);
     const [selectedRows, setSelectedRows] = useState([]);
     // const [roleInTournament, setRoleInTournament] = useState([]);
@@ -66,7 +66,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
 
     const handleRegister = (data) => {
         // const params = { userId: player[0].id, competitiveTypeId: weightRange, weight: data.weight, tournamentId };
-        if (admin.length === 0) {
+        if (selectedRows.length === 0) {
             let variant = 'error';
             enqueueSnackbar('Vui lòng chọn thông tin vận động viên', { variant });
             return;
@@ -114,13 +114,6 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
     );
 
     const columns = [
-        {
-            field: 'select',
-            headerName: '',
-            type: 'boolean',
-            width: 140,
-            editable: true,
-        },
         { field: 'studentName', headerName: 'Tên', flex: 0.8 },
         {
             field: 'studentId',
@@ -164,8 +157,8 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
     ];
 
     const rowsUser =
-        admin.length > 0 &&
-        admin.map((item, index) => {
+        allMember.length > 0 &&
+        allMember.map((item, index) => {
             const container = {};
             container['id'] = item.user.id;
             container['studentName'] = item.user.name;
@@ -321,11 +314,15 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
                 <Box sx={{ height: '500px' }}>
                     <DataGrid
                         rows={rowsUser}
-                        // checkboxSelection
+                        checkboxSelection
                         onSelectionModelChange={(ids) => {
                             setSelectionModel(ids);
                             const selectedIDs = new Set(ids);
-                            const selectedRows = allMember && allMember.filter((row) => selectedIDs.has(row.userId));
+                            const selectedRows =
+                                allMember &&
+                                allMember.filter((row) => {
+                                    selectedIDs.has(row.id);
+                                });
                             setSelectedRows(selectedRows);
                             console.log(selectedRows);
                             console.log('addMemberToEvent', selectedRows);

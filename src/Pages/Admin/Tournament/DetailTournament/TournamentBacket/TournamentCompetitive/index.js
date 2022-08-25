@@ -26,7 +26,6 @@ import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
 function TournamentCompetitive({ reload, result, type, endDate, tournamentStage, onHaveResult, isUnorganized }) {
-    console.log(result);
     let { tournamentId } = useParams();
     const [tournamentResult, setTournamentResult] = useState();
     const [tournamentStatus, setTournamentStatus] = useState(0);
@@ -186,18 +185,39 @@ function TournamentCompetitive({ reload, result, type, endDate, tournamentStage,
     };
 
     useEffect(() => {
+        const getListPlayerByCompetitiveID = async (weightRange) => {
+            try {
+                const response = await adminTournament.listMatchs(weightRange);
+                if (response.data.length > 0) {
+                    setListPlayer(response.data[0].listMatchDto);
+                    setTournamentStatus(response.data[0].status);
+                    setRounds(response.totalResult);
+                    // setIsCreate(response.data[0].changed);
+                } else {
+                    setListPlayer(response.data);
+                    setTournamentStatus(0);
+                    setRounds(0);
+                    // setIsCreate(true);
+                }
+            } catch (error) {
+                console.log('Failed to fetch match: ', error);
+            }
+        };
         const fetchTournamentById = async (tournamentId) => {
             try {
                 const response = await adminTournament.getAllCompetitiveType(tournamentId);
+                console.log(response);
                 if (response.data.length > 0) {
                     setListWeightRange(response.data[0]);
+                    getListPlayerByCompetitiveID(response.data[0][0].id);
                     type == 0 && setCompetitiveId(response.data[0][0].id);
                     const _result = result.find((subResult) =>
-                        subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id),
+                        subResult.data.length > 0
+                            ? subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id)
+                            : null,
                     ).data[0].listResult;
                     console.log(_result);
                     setTournamentResult(_result);
-                    getListPlayerByCompetitiveID(response.data[0][0].id);
                 }
                 setIsRenderTotal(false);
             } catch (error) {
@@ -206,7 +226,7 @@ function TournamentCompetitive({ reload, result, type, endDate, tournamentStage,
         };
         isRenderTotal && fetchTournamentById(tournamentId);
         getAllArea();
-    }, [tournamentId, isRenderTotal, result, type]);
+    }, [tournamentId, competitiveId, isRenderTotal, result, type]);
 
     return (
         <Fragment>
