@@ -34,9 +34,11 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [admin, setAdmin] = useState([]);
-    const [allMember, setAllMember] = useState();
+    const [selectionModel, setSelectionModel] = useState([]);
+    const [allMember, setAllMember] = useState([]);
     const [pageSize, setPageSize] = useState(5);
-    // const [roleInTournament, setRoleInTournament] = useState([]);
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [isRender, setIsRender] = useState(true);
 
     const AddPlayerHandler = (data) => {
         setAdmin(data);
@@ -52,22 +54,27 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
 
     const addListOrganizingCommittee = async () => {
         try {
-            const response = await adminTournament.addListOrganizingCommittee(user.studentId, tournamentId, admin);
+            const response = await adminTournament.addListOrganizingCommittee(
+                user.studentId,
+                tournamentId,
+                selectedRows,
+            );
             enqueueSnackbar(response.message, { variant: response.data ? 'success' : 'error' });
             onChange && onChange();
+            setIsRender(true);
         } catch (error) {}
     };
 
     const handleRegister = (data) => {
         // const params = { userId: player[0].id, competitiveTypeId: weightRange, weight: data.weight, tournamentId };
-        if (admin.length === 0) {
+        if (selectedRows.length === 0) {
             let variant = 'error';
             enqueueSnackbar('Vui lòng chọn thông tin vận động viên', { variant });
             return;
         }
 
         addListOrganizingCommittee();
-        const newPlayer = admin.map((p) => {
+        const newPlayer = selectedRows.map((p) => {
             return {
                 id: p.user.id,
                 userName: p.user.name,
@@ -97,14 +104,14 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
             console.log(id, key, value, params);
             const newRole = roles.find((role) => role.name == value);
             console.log(newRole);
-            console.log('old', admin);
-            const newAdminList = admin.map((member) =>
+            console.log('old', allMember);
+            const newAdminList = allMember.map((member) =>
                 member.user.id === id ? { ...member, roleId: newRole.id } : member,
             );
             console.log('new', newAdminList);
-            setAdmin(newAdminList);
+            setAllMember(newAdminList);
         },
-        [admin, roles],
+        [allMember, roles],
     );
 
     const columns = [
@@ -146,8 +153,8 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
     ];
 
     const rowsUser =
-        admin.length > 0 &&
-        admin.map((item, index) => {
+        allMember &&
+        allMember.map((item, index) => {
             const container = {};
             container['id'] = item.user.id;
             container['studentName'] = item.user.name;
@@ -160,7 +167,7 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
         const getAllMember = async (tournamentId) => {
             try {
                 const response = await adminTournament.getAllUserNotJoinTournament(tournamentId);
-                console.log(response.data);
+                console.log('getAllMember', response);
                 if (response.data.length > 0) {
                     const newAllMemberWithRole = response.data.map((data) => {
                         return { roleId: roles[0].id, user: data };
@@ -169,12 +176,13 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
                 } else {
                     setAllMember([]);
                 }
+                setIsRender(false);
             } catch (error) {
                 console.log('khong the lay data');
             }
         };
-        getAllMember(tournamentId);
-    }, [tournamentId, roles]);
+        isRender && getAllMember(tournamentId);
+    }, [tournamentId, roles, isRender]);
 
     const CustomToolbar = () => {
         return (
@@ -260,18 +268,8 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
         >
             <DialogTitle id="alert-dialog-title">Thêm thành viên vào ban tổ chức</DialogTitle>
             <DialogContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', m: 2 }}>
+                {/* <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', m: 2 }}>
                     {allMember && <AddAdmin data={admin} onAddPlayer={AddPlayerHandler} allMember={allMember} />}
-                    {/* <FormControl size="small">
-                        <Select id="demo-simple-select" value={weightRange} displayEmpty onChange={handleChangeWeight}>
-                            {listWeightRange &&
-                                listWeightRange.map((range) => (
-                                    <MenuItem value={range.id} key={range.id}>
-                                        {range.gender ? 'Nam: ' : 'Nữ: '} {range.weightMin} - {range.weightMax} Kg
-                                    </MenuItem>
-                                ))}
-                        </Select>
-                    </FormControl> */}
                 </Box>
 
                 <Grid container spacing={2}>
@@ -309,13 +307,38 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
                             )}
                         </Paper>
                     </Grid>
-                </Grid>
+                </Grid> */}
+                {allMember && (
+                    <Box sx={{ height: '500px' }}>
+                        <DataGrid
+                            rows={rowsUser}
+                            checkboxSelection
+                            onSelectionModelChange={(ids) => {
+                                setSelectionModel(ids);
+                                const selectedIDs = new Set(ids);
+                                const selectedRows =
+                                    allMember && allMember.filter((row) => selectedIDs.has(row.user.id));
+                                setSelectedRows(selectedRows);
+                                console.log('addMemberToEvent', selectedRows);
+                            }}
+                            disableSelectionOnClick={true}
+                            columns={columns}
+                            pageSize={pageSize}
+                            rowsPerPageOptions={[30, 40, 50]}
+                            components={{
+                                Toolbar: CustomToolbar,
+                                NoRowsOverlay: CustomNoRowsOverlay,
+                            }}
+                            onCellEditCommit={handleRowEditCommit}
+                        />
+                    </Box>
+                )}
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" onClick={handleCloseDialog}>
                     Hủy
                 </Button>
-                <Button variant="contained" onClick={handleRegister} autoFocus disabled={admin.length === 0}>
+                <Button variant="contained" onClick={handleRegister} autoFocus disabled={selectedRows.length === 0}>
                     Xác nhận
                 </Button>
             </DialogActions>

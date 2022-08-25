@@ -25,6 +25,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
     const [isApprove, setIsApprove] = useState(false);
     const [idUpdate, setIdUpdate] = useState();
     const [_active, setActive] = useState(active);
+    const [isRender, setIsRender] = useState(true);
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -49,25 +50,26 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
     };
 
     useEffect(() => {
-        fetchAdminInTournament(tournamentId);
-    }, [tournamentId]);
+        isRender && fetchAdminInTournament(tournamentId);
+        setIsRender(false);
+    }, [tournamentId, isRender, userList]);
 
     const columns = [
-        { field: 'studentName', headerName: 'Tên', flex: 0.3 },
+        { field: 'studentName', headerName: 'Tên', flex: 0.6 },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
             flex: 0.3,
         },
-        // {
-        //     field: 'roleInTournament',
-        //     headerName: 'Vai trò mong muốn',
-        //     flex: 0.3,
-        // },
+        {
+            field: 'roleInTournament',
+            headerName: 'Vai trò mong muốn',
+            flex: 0.6,
+        },
         {
             field: 'approve',
             type: 'actions',
-            flex: 0.5,
+            flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
                 return [
@@ -81,14 +83,13 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
                     </Button>,
                 ];
             },
-            hide: _active === 10,
+            // hide: _active === 10,
         },
 
         {
             field: 'reject',
-            headerName: 'hihi',
             type: 'actions',
-            flex: 0.5,
+            flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
                 return [
@@ -111,7 +112,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
         container['id'] = item.id;
         container['studentName'] = item.userName;
         container['studentId'] = item.userStudentId;
-        container['roleInTournament'] = item.roleTournamentDto.name;
+        container['roleInTournament'] = item.tournamentRoleDto.name;
         container['registerStatus'] = item.registerStatus;
         return container;
     });
@@ -120,6 +121,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
         try {
             const response = await adminTournamentAPI.acceptRequestToJoinOrganizingCommittee(organizingCommitteeId);
             enqueueSnackbar(response.message, { variant: 'success' });
+            setIsRender(true);
             onChange && onChange();
         } catch (error) {
             console.log('Khong the chap thuan yeu cau nay, loi:', error);
@@ -130,6 +132,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
         try {
             const response = await adminTournamentAPI.declineRequestToJoinOrganizingCommittee(organizingCommitteeId);
             enqueueSnackbar(response.message, { variant: 'success' });
+            setIsRender(true);
             onChange && onChange();
         } catch (error) {
             console.log('Khong the chap thuan yeu cau nay, loi:', error);

@@ -77,12 +77,39 @@ const adminTournament = {
         return axiosClient.delete(url);
     },
 
-    getAllSuggestionRole: () => {
-        const url = '/event/headculture/getallsuggestionrole';
+    // getAllSuggestionRole: () => {
+    //     const url = '/tournament/headclub/getallsuggestrole';
+    //     return axiosClient.get(url);
+    // },
+
+    //================================Role Tournament===========================//
+
+    addNewRoleTournament: (newRole) => {
+        const url = '/tournament/addnewroletournament';
+        return axiosClient.post(url, newRole);
+    },
+
+    getAllRoleTournament: () => {
+        const url = '/tournament/getallroletournament';
         return axiosClient.get(url);
     },
 
-    //Member
+    updateRoleEventName: (roleTournamentId, newRole) => {
+        const url = `/tournament/updateroletournamentname/${roleTournamentId}`;
+        return axiosClient.put(url, newRole);
+    },
+
+    updateStatusRoleTournament: (roleTournamentId) => {
+        const url = `/tournament/updatestatusroletournament/${roleTournamentId}`;
+        return axiosClient.put(url);
+    },
+
+    deleteRoleTournament: (roleTournamentId) => {
+        const url = `/tournament/deleteroletournament/${roleTournamentId}`;
+        return axiosClient.delete(url);
+    },
+
+    //================================Member Tournament =========================//
 
     addListOrganizingCommittee: (studentId, tournamentId, params) => {
         const url = `/tournament/headclub/addlistorganizingcommittee/${studentId}/${tournamentId}`;
@@ -154,7 +181,7 @@ const adminTournament = {
 
     deleteTournamentOrganizingCommittee: (tournamentOrganizingCommitteeId) => {
         const url = `/tournament/headclub/deletetournamentorganizingcommittee/${tournamentOrganizingCommitteeId}`;
-        return axiosClient.delete(url);
+        return axiosClient.put(url);
     },
 
     declineRequestToJoinOrganizingCommittee: (organizingCommitteeId) => {
@@ -179,6 +206,36 @@ const adminTournament = {
 
     deleteCompetitivePlayer: (competitivePlayerId) => {
         const url = `/competitive/headclub/deletecompetitiveplayer/${competitivePlayerId}`;
+        return axiosClient.put(url);
+    },
+
+    getAllRequestToJoinTournamentCompetitiveType: (tournamentId) => {
+        const url = `/tournament/getallrequesttojointournamentcompetitivetype/${tournamentId}`;
+        return axiosClient.get(url);
+    },
+
+    declineRequestToJoinTournamentCompetitiveType: (competitiveTypeRegistrationId) => {
+        const url = `/tournament/declinerequesttojointournamentcompetitivetype/${competitiveTypeRegistrationId}`;
+        return axiosClient.put(url);
+    },
+
+    acceptRequestToJoinTournamentCompetitiveType: (competitiveTypeRegistrationId) => {
+        const url = `/tournament/acceptrequesttojointournamentcompetitivetype/${competitiveTypeRegistrationId}`;
+        return axiosClient.put(url);
+    },
+
+    getAllRequestToJoinTournamentExhibitionType: (tournamentId) => {
+        const url = `/tournament/getallrequesttojointournamentexhibitiontype/${tournamentId}`;
+        return axiosClient.get(url);
+    },
+
+    declineRequestToJoinTournamentExhibitionType: (exhibitionTypeRegistrationId) => {
+        const url = `/tournament/declinerequesttojointournamentexhibitiontype/${exhibitionTypeRegistrationId}`;
+        return axiosClient.delete(url);
+    },
+
+    acceptRequestToJoinTournamentExhibitionType: (exhibitionTypeRegistrationId) => {
+        const url = `/tournament/acceptrequesttojointournamentexhibitiontype/${exhibitionTypeRegistrationId}`;
         return axiosClient.put(url);
     },
 
@@ -290,10 +347,6 @@ const adminTournament = {
     //     return axiosClient.post(url);
     // },
 
-    getAllArea: () => {
-        const url = `/area/headclub/getallarea`;
-        return axiosClient.get(url);
-    },
     updateTimeAndPlaceMatch: (matchId, params) => {
         const url = `/tournament/headclub/updatetimeandplacematch/${matchId}`;
         return axiosClient.put(url, params);
@@ -352,9 +405,58 @@ const adminTournament = {
         return axiosClient.put(url, null, { params: { score: score } });
     },
 
+    //==================================== Suggest Type ================================//
+
     getAllSuggestType: () => {
         const url = `/tournament/headclub/getallsuggesttype`;
         return axiosClient.get(url);
+    },
+
+    addCompetitiveTypeSample: (competitiveTypeSample) => {
+        const url = '/tournament/headclub/addcompetitivetypesample';
+        return axiosClient.post(url, competitiveTypeSample);
+    },
+
+    updateCompetitiveTypeSample: (competitiveTypeSample) => {
+        const url = `/tournament/headclub/updatecompetitivetypesample/${competitiveTypeSample.id}`;
+        return axiosClient.put(url, competitiveTypeSample);
+    },
+
+    deleteCompetitiveTypeSample: (competitiveTypeSampleId) => {
+        const url = `/tournament/headclub/deletecompetitivetypesample/${competitiveTypeSampleId}`;
+        return axiosClient.delete(url);
+    },
+
+    addExhibitionTypeSample: (exhibitionTypeSample) => {
+        const url = '/tournament/headclub/addexhibitiontypesample';
+        return axiosClient.post(url, exhibitionTypeSample);
+    },
+
+    updateExhibitionTypeSample: (exhibitionTypeSample) => {
+        const url = `/tournament/headclub/updateexhibitiontypesample/${exhibitionTypeSample.id}`;
+        return axiosClient.put(url, exhibitionTypeSample);
+    },
+
+    deleteExhibitionTypeSample: (exhibitionTypeSampleId) => {
+        const url = `/tournament/headclub/deleteexhibitiontypesample/${exhibitionTypeSampleId}`;
+        return axiosClient.delete(url);
+    },
+
+    //============================ Area ================================//
+
+    getAllArea: () => {
+        const url = `/area/headclub/getallarea`;
+        return axiosClient.get(url);
+    },
+
+    addNewArea: (area) => {
+        const url = '/area/headclub/addnewarea';
+        return axiosClient.post(url, area);
+    },
+
+    updateListArea: (area) => {
+        const url = '/area/headclub/updatelistarea';
+        return axiosClient.post(url, area);
     },
 };
 export default adminTournament;

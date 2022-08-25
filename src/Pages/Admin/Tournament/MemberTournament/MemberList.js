@@ -191,10 +191,10 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                 width: 150,
                 flex: 0.6,
             },
-            { field: 'playerGender', headerName: 'Giới tính', width: 150, flex: 0.8 },
+            { field: 'playerGender', headerName: 'Giới tính', width: 150, flex: 0.5 },
             { field: 'weight', headerName: 'Cân nặng', width: 150, flex: 0.8 },
             { field: 'isEligible', headerName: 'Điều kiện cân nặng', width: 150, flex: 1 },
-            { field: 'weightRange', headerName: 'Hạng cân thi đấu', width: 150, flex: 1 },
+            { field: 'weightRange', headerName: 'Hạng cân thi đấu', width: 150, flex: 0.5 },
             {
                 field: 'actions',
                 type: 'actions',
@@ -233,7 +233,7 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                 const container = {};
                 container['id'] = item.id;
                 container['studentName'] = item.tournamentPlayer.user.name;
-                container['weight'] = item.weight + 'Kg';
+                container['weight'] = item.weight == 0 ? 'Chưa cập nhật cân nặng' : item.weight + 'Kg';
                 container['isEligible'] = item.isEligible ? 'Đạt tiêu chuẩn' : 'Không đạt tiêu chuẩn';
                 container['studentId'] = item.tournamentPlayer.user.studentId;
                 container['playerGender'] = item.tournamentPlayer.user.gender ? 'Nam' : 'Nữ';

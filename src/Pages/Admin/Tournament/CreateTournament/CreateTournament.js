@@ -2,6 +2,7 @@ import {
     Autocomplete,
     Box,
     Button,
+    Checkbox,
     Collapse,
     Dialog,
     DialogActions,
@@ -93,7 +94,7 @@ function CreateTournament({
     const [preview, setPreview] = useState([]);
     const [dataEdit, setDataEdit] = useState();
     const [isEdit, setIsEdit] = useState(false);
-    const [dataTemp, setDataTemp] = useState([]);
+    const [suggestDate, setSuggestDate] = useState();
 
     useEffect(() => {
         setDatas(roles);
@@ -116,6 +117,10 @@ function CreateTournament({
     };
     const PerformanceCompetitionHandler = (PerformanceCompetition) => {
         setDataPerformanceCompetition(PerformanceCompetition);
+    };
+
+    const handleSelectRole = (data) => {
+        setDatas(datas.map((d) => (d.id === data.id ? { ...d, selected: !d.selected } : d)));
     };
 
     const handleChangeOverride = (event) => {
@@ -342,6 +347,15 @@ function CreateTournament({
         reValidateMode: 'onChange',
     });
 
+    const handleSetSuggestDate = (date) => {
+        if (date == null) {
+            return;
+        } else {
+            console.log(date);
+            setSuggestDate(date.setDate(date.getDate() - 3));
+        }
+    };
+
     const handleDelete = (id) => {
         // datas.map((data) => {
         //     return data.id === id;
@@ -355,7 +369,7 @@ function CreateTournament({
         // });
         const data = datas.filter((item) => item.id !== role.id);
         const dataEdit = datas.filter((item) => item.id === role.id);
-        setDataTemp(data);
+        // setDataTemp(data);
         setDataEdit(dataEdit[0]);
         setIsEdit(true);
         setIsChecked(!isChecked);
@@ -369,7 +383,10 @@ function CreateTournament({
             return;
         }
 
-        const newData = [...datas, { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity }];
+        const newData = [
+            ...datas,
+            { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity, selected: true },
+        ];
         setDatas(newData);
 
         /**
@@ -472,20 +489,24 @@ function CreateTournament({
             tournament: {
                 name: data.name,
                 description: data.description,
-                competitiveTypes: datasFightingCompetition.map((competitive) => {
-                    return {
-                        weightMax: competitive.weightMax,
-                        weightMin: competitive.weightMin,
-                        gender: competitive.gender,
-                    };
-                }),
-                exhibitionTypes: datasPerformanceCompetition.map((exhibition) => {
-                    return {
-                        name: exhibition.name,
-                        numberFemale: exhibition.numberFemale,
-                        numberMale: exhibition.numberMale,
-                    };
-                }),
+                competitiveTypes: datasFightingCompetition
+                    .filter((data) => data.selected)
+                    .map((competitive) => {
+                        return {
+                            weightMax: competitive.weightMax,
+                            weightMin: competitive.weightMin,
+                            gender: competitive.gender,
+                        };
+                    }),
+                exhibitionTypes: datasPerformanceCompetition
+                    .filter((data) => data.selected)
+                    .map((exhibition) => {
+                        return {
+                            name: exhibition.name,
+                            numberFemale: exhibition.numberFemale,
+                            numberMale: exhibition.numberMale,
+                        };
+                    }),
                 maxQuantityComitee: data.numOfOrganizingCommitee,
                 registrationPlayerDeadline: moment(data.datePlayerDeadline).format('yyyy-MM-DDTHH:mm:ss'),
                 registrationOrganizingCommitteeDeadline: moment(
@@ -501,7 +522,7 @@ function CreateTournament({
                           totalAmountFromClubEstimate: temp > 0 ? temp : 0,
                       }),
             },
-            rolesEventDto: datas,
+            tournamentRolesDto: datas.filter((data) => data.selected),
             listPreview: previewSchedule,
         };
         adminTournament.createTournament(createTournamentData, user.studentId).then((response) => {
@@ -656,13 +677,15 @@ function CreateTournament({
                                                         <>
                                                             <br />
                                                             <ul>
-                                                                {datas.map((role) => {
-                                                                    return (
-                                                                        <li key={role.id}>
-                                                                            {role.name} - {role.maxQuantity} người
-                                                                        </li>
-                                                                    );
-                                                                })}
+                                                                {datas
+                                                                    .filter((data) => data.selected)
+                                                                    .map((role) => {
+                                                                        return (
+                                                                            <li key={role.id}>
+                                                                                {role.name} - {role.maxQuantity} người
+                                                                            </li>
+                                                                        );
+                                                                    })}
                                                             </ul>
                                                         </>
                                                     )}
@@ -898,15 +921,21 @@ function CreateTournament({
                                                     </caption>
                                                     <TableHead>
                                                         <TableRow>
+                                                            <TableCell align="center"></TableCell>
                                                             <TableCell align="center">Tên vai trò</TableCell>
                                                             <TableCell align="center">Số lượng thành viên</TableCell>
-                                                            <TableCell align="center"></TableCell>
                                                             <TableCell align="center"></TableCell>
                                                         </TableRow>
                                                     </TableHead>
                                                     <TableBody>
                                                         {datas.map((data) => (
                                                             <TableRow key={data.id}>
+                                                                <TableCell align="center">
+                                                                    <Checkbox
+                                                                        checked={data.selected}
+                                                                        onChange={() => handleSelectRole(data)}
+                                                                    />
+                                                                </TableCell>
                                                                 <TableCell align="center">{data.name}</TableCell>
                                                                 <TableCell align="center">{data.maxQuantity}</TableCell>
                                                                 <TableCell>
@@ -921,7 +950,7 @@ function CreateTournament({
                                                                         <Edit />
                                                                     </IconButton>
                                                                 </TableCell>
-                                                                <TableCell>
+                                                                {/* <TableCell>
                                                                     <IconButton
                                                                         aria-label="delete"
                                                                         onClick={() => {
@@ -932,7 +961,7 @@ function CreateTournament({
                                                                     >
                                                                         <Delete />
                                                                     </IconButton>
-                                                                </TableCell>
+                                                                </TableCell> */}
                                                             </TableRow>
                                                         ))}
                                                     </TableBody>
@@ -1044,7 +1073,10 @@ function CreateTournament({
                                             >
                                                 Thi đấu đối kháng{' '}
                                             </Typography>
-                                            <small>Số lượng hạng mục hiện tại: {datasFightingCompetition.length}</small>
+                                            <small>
+                                                Số lượng hạng mục hiện tại:{' '}
+                                                {datasFightingCompetition.filter((data) => data.selected).length}
+                                            </small>
                                             <FightingCompetition
                                                 onAddFightingCompetition={AddFightingCompetitionHandler}
                                                 data={datasFightingCompetition}
@@ -1059,7 +1091,8 @@ function CreateTournament({
                                                 Thi đấu biểu diễn
                                             </Typography>
                                             <small>
-                                                Số lượng hạng mục hiện tại: {datasPerformanceCompetition.length}
+                                                Số lượng hạng mục hiện tại:{' '}
+                                                {datasPerformanceCompetition.filter((data) => data.selected).length}
                                             </small>
                                             <PerformanceCompetition
                                                 onAddPerformanceCompetition={PerformanceCompetitionHandler}
@@ -1157,17 +1190,24 @@ function CreateTournament({
                                                 variant="outlined"
                                                 defaultValue={
                                                     Number(
-                                                        datasPerformanceCompetition.length > 0
-                                                            ? +datasPerformanceCompetition.reduce(
-                                                                  (total, data) =>
-                                                                      total + (data.numberMale + data.numberMale) * 3,
-                                                                  0,
-                                                              )
+                                                        datasPerformanceCompetition.filter((data) => data.selected)
+                                                            .length > 0
+                                                            ? +datasPerformanceCompetition
+                                                                  .filter((data) => data.selected)
+                                                                  .reduce(
+                                                                      (total, data) =>
+                                                                          total +
+                                                                          (data.numberMale + data.numberMale) * 3,
+                                                                      0,
+                                                                  )
                                                             : +0,
                                                     ) +
                                                     Number(
-                                                        datasFightingCompetition.length > 0
-                                                            ? +datasPerformanceCompetition.length * 3
+                                                        datasFightingCompetition.filter((data) => data.selected)
+                                                            .length > 0
+                                                            ? +datasPerformanceCompetition.filter(
+                                                                  (data) => data.selected,
+                                                              ).length * 3
                                                             : +0,
                                                     )
                                                 }
@@ -1234,7 +1274,16 @@ function CreateTournament({
                                                             disablePast
                                                             ampm={false}
                                                             value={value}
-                                                            onChange={(value) => onChange(value)}
+                                                            onChange={(value) => {
+                                                                // console.log(value);
+                                                                onChange(value);
+                                                                setSuggestDate(value);
+                                                                // // let date = value;
+                                                                // // date.setDate(date.getDate() - 3);
+                                                                // // console.log(value, date);
+                                                                // handleSetSuggestDate(value);
+                                                                // console.log(value);
+                                                            }}
                                                             renderInput={(params) => (
                                                                 <TextField
                                                                     sx={{
@@ -1378,8 +1427,13 @@ function CreateTournament({
                                                             label="Hạn đăng kí cho vận động viên"
                                                             disablePast
                                                             ampm={false}
-                                                            value={value}
-                                                            onChange={(value) => onChange(value)}
+                                                            // value={value}
+                                                            // onChange={(value) => onChange(value)}
+                                                            value={suggestDate}
+                                                            onChange={(value) => {
+                                                                onChange(value);
+                                                                setSuggestDate(value);
+                                                            }}
                                                             renderInput={(params) => (
                                                                 <TextField
                                                                     sx={{
@@ -1417,8 +1471,13 @@ function CreateTournament({
                                                             disablePast
                                                             disabled={skipped.has(1)}
                                                             ampm={false}
-                                                            value={value}
-                                                            onChange={(value) => onChange(value)}
+                                                            // value={value}
+                                                            // onChange={(value) => onChange(value)}
+                                                            value={suggestDate}
+                                                            onChange={(value) => {
+                                                                onChange(value);
+                                                                setSuggestDate(value);
+                                                            }}
                                                             renderInput={(params) => (
                                                                 <TextField
                                                                     sx={{
@@ -1488,8 +1547,8 @@ function CreateTournament({
                                     disabled={
                                         datasFightingCompetition &&
                                         datasPerformanceCompetition &&
-                                        datasFightingCompetition.length === 0 &&
-                                        datasPerformanceCompetition.length === 0
+                                        datasFightingCompetition.filter((data) => data.selected).length === 0 &&
+                                        datasPerformanceCompetition.filter((data) => data.selected).length === 0
                                     }
                                 >
                                     {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}

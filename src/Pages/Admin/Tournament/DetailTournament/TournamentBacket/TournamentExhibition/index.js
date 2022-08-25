@@ -11,7 +11,7 @@ import Sliver from 'src/Components/Common/Material/Sliver';
 import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function TournamentExhibition({ reload, result, type, endDate, tournamentStage }) {
+function TournamentExhibition({ reload, result, type, endDate, tournamentStage, isUnorganized }) {
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
 
     let { tournamentId } = useParams();
@@ -94,7 +94,7 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage }
         };
         isRender && getExhibitionResult(exhibitionType);
         setIsRender(false);
-    }, [isRender, exhibitionType, exhibitionTeam, nowDate]);
+    }, [isRender, exhibitionType, exhibitionTeam]);
 
     useEffect(() => {
         const getExhibitionResult = async (exhibitionType) => {
@@ -108,25 +108,28 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage }
         const fetchExhibitionType = async (tournamentId) => {
             try {
                 const response = await adminTournament.getListExhibitionType(tournamentId);
-                setTournamentStatus(response.data[0].status);
-                setListExhibitionType(response.data);
-                type == 0 && setExhibitionType(response.data[0].id);
-                const _result = result.find((subResult) =>
-                    subResult.data.length > 0
-                        ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
-                        : null,
-                );
+                if (response.data.length > 0) {
+                    setTournamentStatus(response.data[0].status);
+                    setListExhibitionType(response.data);
+                    getExhibitionResult(response.data[0].id);
+                    type == 0 && setExhibitionType(response.data[0].id);
+                    const _result = result.find((subResult) =>
+                        subResult.data.length > 0
+                            ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
+                            : null,
+                    );
 
-                setTournamentResult(_result ? _result.data[0].listResult : null);
-                getExhibitionResult(response.data[0].id);
-                setIsRenderTotal(false);
+                    setTournamentResult(_result ? _result.data[0].listResult : null);
+                    setIsRenderTotal(false);
+                } else {
+                }
             } catch (error) {
                 console.log('Failed to fetch user list: ', error);
             }
         };
         isRenderTotal && fetchExhibitionType(tournamentId);
         getAllArea();
-    }, [tournamentId, exhibitionType, nowDate, isRenderTotal, result, type]);
+    }, [tournamentId, exhibitionType, isRenderTotal, result, type]);
 
     const UpdateResultHandler = () => {
         setIsRender(true);
@@ -134,77 +137,87 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage }
 
     return (
         <Fragment>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-                <FormControl size="small">
-                    <Typography variant="caption">Thể thức thi đấu</Typography>
-                    <Select
-                        id="demo-simple-select"
-                        value={exhibitionType}
-                        displayEmpty
-                        onChange={handleChangeExhibitionType}
-                    >
-                        {listExhibitionType &&
-                            listExhibitionType.map((type) => (
-                                <MenuItem value={type.id} key={type.id}>
-                                    {type.name}
-                                </MenuItem>
-                            ))}
-                    </Select>
-                </FormControl>
-            </Box>
-            {tournamentResult && tournamentResult.length > 0 && (
-                <Paper elevation={3} sx={{ m: 2, p: 2 }}>
-                    <Typography variant="h6">Kết quả bảng đấu</Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Tooltip title="Huy chương vàng">
-                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <Gold />
-
-                                <Typography variant="body1">
-                                    {tournamentResult.filter((result) => result.rank == 1)[0].teamName}
-                                </Typography>
-                            </Box>
-                        </Tooltip>
-                        <Tooltip title="Huy chương bạc">
-                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <Sliver />
-
-                                <Typography variant="body1">
-                                    {tournamentResult.filter((result) => result.rank == 2)[0].teamName}
-                                </Typography>
-                            </Box>
-                        </Tooltip>
-                        <Tooltip title="Huy chương đồng">
-                            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <Brone />
-
-                                <Typography variant="body1">
-                                    {tournamentResult.filter((result) => result.rank == 3)[0].teamName}
-                                </Typography>
-                            </Box>
-                        </Tooltip>
+            {!isUnorganized ? (
+                <>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
+                        <FormControl size="small">
+                            <Typography variant="caption">Thể thức thi đấu</Typography>
+                            <Select
+                                id="demo-simple-select"
+                                value={exhibitionType}
+                                displayEmpty
+                                onChange={handleChangeExhibitionType}
+                            >
+                                {listExhibitionType &&
+                                    listExhibitionType.map((type) => (
+                                        <MenuItem value={type.id} key={type.id}>
+                                            {type.name}
+                                        </MenuItem>
+                                    ))}
+                            </Select>
+                        </FormControl>
                     </Box>
-                </Paper>
-            )}
-            {exhibitionTeam && areaList ? (
-                exhibitionTeam.length > 0 ? (
-                    <TableMatch
-                        matches={exhibitionTeam}
-                        status={tournamentStatus}
-                        areaList={areaList}
-                        stage={tournamentStage}
-                        onUpdateResult={UpdateResultHandler}
-                        endDate={endDate}
-                    />
-                ) : (
-                    <Box sx={{ display: 'flex' }}>
-                        <Typography variant="body1" sx={{ m: 'auto' }}>
-                            Thể thức này chưa có thời gian và địa điểm thi đấu
-                        </Typography>
-                    </Box>
-                )
+                    {tournamentResult && tournamentResult.length > 0 && (
+                        <Paper elevation={3} sx={{ m: 2, p: 2 }}>
+                            <Typography variant="h6">Kết quả bảng đấu</Typography>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Tooltip title="Huy chương vàng">
+                                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                        <Gold />
+
+                                        <Typography variant="body1">
+                                            {tournamentResult.filter((result) => result.rank == 1)[0].teamName}
+                                        </Typography>
+                                    </Box>
+                                </Tooltip>
+                                <Tooltip title="Huy chương bạc">
+                                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                        <Sliver />
+
+                                        <Typography variant="body1">
+                                            {tournamentResult.filter((result) => result.rank == 2)[0].teamName}
+                                        </Typography>
+                                    </Box>
+                                </Tooltip>
+                                <Tooltip title="Huy chương đồng">
+                                    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                        <Brone />
+
+                                        <Typography variant="body1">
+                                            {tournamentResult.filter((result) => result.rank == 3)[0].teamName}
+                                        </Typography>
+                                    </Box>
+                                </Tooltip>
+                            </Box>
+                        </Paper>
+                    )}
+                    {exhibitionTeam && areaList ? (
+                        exhibitionTeam.length > 0 ? (
+                            <TableMatch
+                                matches={exhibitionTeam}
+                                status={tournamentStatus}
+                                areaList={areaList}
+                                stage={tournamentStage}
+                                onUpdateResult={UpdateResultHandler}
+                                endDate={endDate}
+                            />
+                        ) : (
+                            <Box sx={{ display: 'flex' }}>
+                                <Typography variant="body1" sx={{ m: 'auto' }}>
+                                    Thể thức này chưa có thời gian và địa điểm thi đấu
+                                </Typography>
+                            </Box>
+                        )
+                    ) : (
+                        <LoadingProgress />
+                    )}
+                </>
             ) : (
-                <LoadingProgress />
+                <Box sx={{ display: 'flex' }}>
+                    <Typography variant="body1" sx={{ m: 'auto' }}>
+                        Giải đấu không tổ chức thi đấu biểu diễn
+                    </Typography>
+                </Box>
             )}
         </Fragment>
     );

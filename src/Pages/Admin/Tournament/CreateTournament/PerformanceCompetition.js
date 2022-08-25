@@ -1,5 +1,6 @@
 import {
     Button,
+    Checkbox,
     Collapse,
     Fab,
     Grid,
@@ -63,13 +64,18 @@ function PerformanceCompetition(props) {
         handleCancel();
     };
 
+    const handleSelectExhibition = (data) => {
+        props.onAddPerformanceCompetition(datas.map((d) => (d.id === data.id ? { ...d, selected: !d.selected } : d)));
+        setDatas(datas.map((d) => (d.id === data.id ? { ...d, selected: !d.selected } : d)));
+    };
+
     const handleAddCompetition = (data) => {
         if (data.numberMale == 0 && data.numberFemale == 0) {
             setFocus('numberMale', { shouldSelect: true });
             setError('numberMale', { message: 'Số lượng nam và nữ không được bằng 0' });
             setError('numberFemale', { message: 'Số lượng nam và nữ không được bằng 0' });
         } else {
-            const newInput = { ...data, id: Math.random() };
+            const newInput = { ...data, id: Math.random(), selected: true };
             const newData = [...datas, newInput];
             setDatas(newData);
             props.onAddPerformanceCompetition(newData);
@@ -119,16 +125,22 @@ function PerformanceCompetition(props) {
                         <Table stickyHeader aria-label="sticky table">
                             <TableHead>
                                 <TableRow>
+                                    <TableCell align="center"></TableCell>
                                     <TableCell align="center">Nội dung thi đấu</TableCell>
                                     <TableCell align="center">Số lượng nam</TableCell>
                                     <TableCell align="center">Số lượng nữ</TableCell>
-                                    <TableCell align="center"></TableCell>
                                     <TableCell align="center"></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {datas.map((data) => (
                                     <TableRow key={data.id}>
+                                        <TableCell>
+                                            <Checkbox
+                                                checked={data.selected}
+                                                onChange={() => handleSelectExhibition(data)}
+                                            />
+                                        </TableCell>
                                         <TableCell>{data.name}</TableCell>
                                         <TableCell align="center">{data.numberMale}</TableCell>
                                         <TableCell align="center">{data.numberFemale}</TableCell>
@@ -144,7 +156,7 @@ function PerformanceCompetition(props) {
                                                 <Edit />
                                             </IconButton>
                                         </TableCell>
-                                        <TableCell>
+                                        {/* <TableCell>
                                             <IconButton
                                                 aria-label="delete"
                                                 onClick={() => {
@@ -155,7 +167,7 @@ function PerformanceCompetition(props) {
                                             >
                                                 <Delete />
                                             </IconButton>
-                                        </TableCell>
+                                        </TableCell> */}
                                     </TableRow>
                                 ))}
                             </TableBody>

@@ -31,19 +31,20 @@ import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
 function TournamentExhibition({ exhibition, result, type }) {
+    console.log(type);
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
-    console.log(exhibition);
     let { tournamentId } = useParams();
-    const [exhibitionType, setExhibitionType] = useState(0);
+    const [exhibitionType, setExhibitionType] = useState(type);
     const [exhibitionTeam, setExhibitionTeam] = useState();
     const [listExhibitionType, setListExhibitionType] = useState([]);
     const [tournamentStatus, setTournamentStatus] = useState(-1);
     const [open, setOpen] = useState(false);
     const [myTeam, setMyTeam] = useState();
     const [tournamentResult, setTournamentResult] = useState();
+    const [isRender, setIsRender] = useState(true);
+    const [isRenderTotal, setIsRenderTotal] = useState(true);
 
     const handleChangeExhibitionType = (event) => {
-        console.log(event.target.value);
         if (result && result.length > 0) {
             const _result = result.find((subResult) =>
                 subResult.data.length > 0
@@ -61,47 +62,56 @@ function TournamentExhibition({ exhibition, result, type }) {
         } else {
             exType = listExhibitionType.find((type) => type.id === event.target.value);
         }
-        console.log(exType);
-        getExhibitionResult(exType.id, nowDate);
+        getExhibitionResult(exType.id);
     };
 
-    const fetchExhibitionType = async (tournamentId) => {
+    const getExhibitionResult = async (exhibitionType) => {
         try {
-            const response = await adminTournament.getListExhibitionType(tournamentId);
-            console.log(response);
-            setListExhibitionType(response.data);
-            setExhibitionType(response.data[0].id);
-            type == 0 && setExhibitionType(response.data[0].id);
-            console.log(response.data[0].id, result);
-            const _result = result.find((subResult) =>
-                subResult.data.length > 0
-                    ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
-                    : null,
-            );
-            setTournamentResult(_result ? _result.data[0].listResult : null);
-            const team = exhibition.find((t) => t.exhibitionTypeId === response.data[0].id);
-            setMyTeam(team);
-            getExhibitionResult(response.data[0].id, nowDate);
-            setTournamentStatus(response.code);
-        } catch (error) {
-            console.log('Failed to fetch user list: ', error);
-        }
-    };
-
-    const getExhibitionResult = async (exhibitionType, date) => {
-        try {
-            const response = await adminTournament.getExhibitionResult({ exhibitionType, date });
-            console.log(response);
-            setExhibitionTeam(response.data);
+            const response = await adminTournament.getExhibitionResult(exhibitionType);
+            response.data.length > 0 ? setExhibitionTeam(response.data[0].listResult) : setExhibitionTeam();
         } catch (error) {
             console.log('Failed to fetch user list: ', error);
         }
     };
 
     useEffect(() => {
-        getExhibitionResult(exhibitionType, nowDate);
-        fetchExhibitionType(tournamentId);
-    }, [tournamentId]);
+        const getExhibitionResult = async (exhibitionType) => {
+            try {
+                const response = await adminTournament.getExhibitionResult(exhibitionType);
+                console.log('exhi', response.data[0]);
+                response.data.length > 0 ? setExhibitionTeam(response.data[0].listResult) : setExhibitionTeam();
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
+        isRender && getExhibitionResult(exhibitionType);
+        setIsRender(false);
+    }, [isRender, exhibitionType, exhibitionTeam]);
+
+    useEffect(() => {
+        const fetchExhibitionType = async (tournamentId) => {
+            try {
+                const response = await adminTournament.getListExhibitionType(tournamentId);
+                console.log(response);
+                setListExhibitionType(response.data);
+                const team = exhibition.find((t) => t.exhibitionTypeId === response.data[0].id);
+                setMyTeam(team);
+                getExhibitionResult(response.data[0].id);
+                setTournamentStatus(response.code);
+                type == 0 && setExhibitionType(response.data[0].id);
+                const _result = result.find((subResult) =>
+                    subResult.data.length > 0
+                        ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
+                        : null,
+                );
+                setTournamentResult(_result ? _result.data[0].listResult : null);
+                setIsRenderTotal(false);
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
+        isRenderTotal && fetchExhibitionType(tournamentId);
+    }, [tournamentId, exhibitionType, result, type, exhibition, isRenderTotal]);
 
     const handleOpenTeam = () => {
         setOpen(true);

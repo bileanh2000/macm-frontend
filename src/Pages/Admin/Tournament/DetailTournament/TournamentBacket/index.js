@@ -170,6 +170,7 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
                             type={valueTab == 0 ? type : 0}
                             endDate={endDate}
                             onHaveResult={() => setRenderResult(true)}
+                            isUnorganized={tournament.competitiveTypes.length === 0}
                         />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
@@ -181,6 +182,7 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
                             type={valueTab == 1 ? type : 0}
                             endDate={endDate}
                             onHaveResult={() => setRenderResult(true)}
+                            isUnorganized={tournament.exhibitionTypes.length === 0}
                         />
                     </TabPanel>
                 </Box>
