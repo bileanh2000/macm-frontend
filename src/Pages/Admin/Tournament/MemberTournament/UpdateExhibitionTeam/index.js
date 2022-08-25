@@ -34,7 +34,7 @@ import { Delete } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, exhibitionTeam }) {
+function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, exhibitionTeam, user }) {
     // let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     // const [exhibitionType, setExhibitionType] = useState(exhibitionId);
@@ -93,7 +93,7 @@ function UpdateExhibitionTeam({ isOpen, handleClose, onSuccess, onChangeData, ex
 
     const updateTeam = async (exhibitionTeamId, params) => {
         try {
-            const response = await adminTournament.updateExhibitionTeam(exhibitionTeamId, params);
+            const response = await adminTournament.updateExhibitionTeam(exhibitionTeamId, params, user.studentId);
             let variant = response.message.includes('thành công') ? 'success' : 'error';
             enqueueSnackbar(response.message, { variant });
             setIsRender(true);

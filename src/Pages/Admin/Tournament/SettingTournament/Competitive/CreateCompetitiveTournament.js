@@ -49,14 +49,14 @@ function CreateCompetitiveTournament({ isOpen, handleClose, onSucess, data }) {
                     weightMale = weightMale.concat(newWeightRange);
                 }
             });
-        // console.log(weightFemale, weightMale);
+        // console.log(datas, weightFemale, weightMale);
         setWeightRangeFemale(weightFemale);
         setWeightRangeMale(weightMale);
     };
 
     useEffect(() => {
         getData(data);
-    }, [data]);
+    }, []);
 
     function checkContain(arr1, arr2) {
         return arr1.some((item) => arr2.includes(item));
@@ -198,7 +198,7 @@ function CreateCompetitiveTournament({ isOpen, handleClose, onSucess, data }) {
                         Validate
                         autoComplete="off"
                     >
-                        <Grid container spacing={2} sx={{ p: 1 }}>
+                        <Grid container spacing={2} sx={{ p: 1, alignItems: 'center' }}>
                             <Grid item xs={2}>
                                 {/* <InputLabel id="demo-simple-select-label">Giới tính</InputLabel> */}
                                 <Select

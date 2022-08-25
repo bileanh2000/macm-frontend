@@ -395,11 +395,11 @@ function DetailTournament() {
                                                         {...(handleRegisterDeadline(0)
                                                             ? { disabled: false }
                                                             : { disabled: true })}
-                                                        {...(isJoinAdmin.message.includes(
-                                                            'Bạn chưa tham gia ban tổ chức giải đấu',
-                                                        )
-                                                            ? { disabled: false }
-                                                            : { disabled: true })}
+                                                        // {...(isJoinAdmin.message.includes(
+                                                        //     'Bạn chưa tham gia ban tổ chức giải đấu',
+                                                        // )
+                                                        //     ? { disabled: false }
+                                                        //     : { disabled: true })}
                                                         sx={{ mr: 2, float: 'right' }}
                                                     >
                                                         {handleRegisterDeadline(0)

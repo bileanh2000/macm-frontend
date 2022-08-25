@@ -47,7 +47,7 @@ function CreateRoleTournament({ isOpen, handleClose, onSucess, datas }) {
 
     const CreateRoleTournament = async (data) => {
         try {
-            const response = await adminTournament.addNewRoleTournament(data.roleName);
+            const response = await adminTournament.addNewRoleTournament(data);
             enqueueSnackbar(response.message, { variant: 'success' });
             onSucess && onSucess();
         } catch (error) {

@@ -125,6 +125,8 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
+        setIsApprove();
+        setIdUpdate();
     };
 
     const handleOpenDialog = (data, isApprove) => {
@@ -516,9 +518,9 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
                             {type == 1
-                                ? `Bạn có muốn ${setIsApprove ? 'chấp thuận' : 'từ chối'} yêu cầu tham gia thi đấu của 
+                                ? `Bạn có muốn ${isApprove ? 'chấp thuận' : 'từ chối'} yêu cầu tham gia thi đấu của 
                             ${idUpdate.studentName} - ${idUpdate.studentId} cho hạng cân ${idUpdate.weightRange}`
-                                : `Bạn có muốn ${setIsApprove ? 'chấp thuận' : 'từ chối'} yêu cầu tham gia thi đấu đội 
+                                : `Bạn có muốn ${isApprove ? 'chấp thuận' : 'từ chối'} yêu cầu tham gia thi đấu đội 
                             ${idUpdate.exhibitionTeamRegistration.teamName} cho hạng nội dung ${
                                       idUpdate.exhibitionType.name
                                   }`}

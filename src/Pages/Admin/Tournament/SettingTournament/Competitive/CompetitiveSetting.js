@@ -23,7 +23,7 @@ import EditCompetitiveTournament from './EditCompetitiveTournament';
 
 function CompetitiveSetting({ title, isOpen, handleClose }) {
     const { enqueueSnackbar } = useSnackbar();
-    const [datas, setDatas] = useState([]);
+    const [datas, setDatas] = useState();
     const [competitive, setCompetitive] = useState();
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -32,14 +32,6 @@ function CompetitiveSetting({ title, isOpen, handleClose }) {
     const [weightRangeMale, setWeightRangeMale] = useState([]);
     const [weightRangeFemale, setWeightRangeFemale] = useState([]);
     const [weightRangeTemp, setWeightRangeTemp] = useState([]);
-
-    const getAllSuggestType = async () => {
-        try {
-            const response = await adminTournamentAPI.getAllSuggestType();
-            console.log('getAllSuggestType', response.data);
-            setDatas(response.data[0].competitiveTypeSamples);
-        } catch (error) {}
-    };
 
     const deleteCompetitive = async (role) => {
         try {
@@ -51,7 +43,36 @@ function CompetitiveSetting({ title, isOpen, handleClose }) {
         }
     };
 
+    const getData = (datas) => {
+        let weightFemale = [];
+        let weightMale = [];
+        datas &&
+            datas.map((data) => {
+                let newWeightRange = [];
+                let i;
+                for (i = data.weightMin; i < data.weightMax; i = i + 0.5) {
+                    newWeightRange.push(i);
+                }
+                if (!data.gender) {
+                    weightFemale = weightFemale.concat(newWeightRange);
+                } else {
+                    weightMale = weightMale.concat(newWeightRange);
+                }
+            });
+        // console.log(datas, weightFemale, weightMale);
+        setWeightRangeFemale(weightFemale);
+        setWeightRangeMale(weightMale);
+    };
+
     useEffect(() => {
+        const getAllSuggestType = async () => {
+            try {
+                const response = await adminTournamentAPI.getAllSuggestType();
+                console.log('getAllSuggestType', response.data);
+                setDatas(response.data[0].competitiveTypeSamples);
+                getData(response.data[0].competitiveTypeSamples);
+            } catch (error) {}
+        };
         isRender && getAllSuggestType();
         setIsRender(false);
     }, [isRender, datas]);
@@ -63,7 +84,7 @@ function CompetitiveSetting({ title, isOpen, handleClose }) {
         // const data = datas.filter((item) => item.id !== role.id);
         // const dataEdit = datas.filter((item) => item.id === role.id);
         // setDataTemp(data);
-
+        console.log(data);
         let i;
         let newWeightRange = [];
         for (i = data.weightMin; i < data.weightMax; i = i + 0.5) {
@@ -123,7 +144,7 @@ function CompetitiveSetting({ title, isOpen, handleClose }) {
                         setIsRender(true);
                         setEditDialogOpen(false);
                     }}
-                    datas={datas}
+                    data={datas}
                     weightRange={weightRangeTemp}
                 />
             )}
@@ -137,7 +158,7 @@ function CompetitiveSetting({ title, isOpen, handleClose }) {
                         setIsRender(true);
                         setCreateDialogOpen(false);
                     }}
-                    datas={datas}
+                    data={datas}
                 />
             )}
             {competitive && (
@@ -185,7 +206,7 @@ function CompetitiveSetting({ title, isOpen, handleClose }) {
                     }}
                 >
                     <Box>
-                        {datas.length > 0 && (
+                        {datas && datas.length > 0 && (
                             <TableContainer sx={{ maxHeight: 350, m: 1, mr: 0, p: 1, mb: 2 }}>
                                 <Table stickyHeader aria-label="sticky table">
                                     <caption style={{ captionSide: 'top' }}>

@@ -76,8 +76,8 @@ function PerformanceCompetition(props) {
             setIsChecked(!isChecked);
             reset({
                 name: '',
-                numberMale: 0,
-                numberFemale: 0,
+                numberMale: '',
+                numberFemale: '',
             });
         }
     };
@@ -86,8 +86,8 @@ function PerformanceCompetition(props) {
         isEdit && setIsEdit(false);
         reset({
             name: '',
-            numberMale: 0,
-            numberFemale: 0,
+            numberMale: '',
+            numberFemale: '',
         });
     };
 

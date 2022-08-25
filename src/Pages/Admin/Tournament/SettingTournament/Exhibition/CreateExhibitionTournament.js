@@ -36,8 +36,8 @@ function CreateExhibitionTournament({ isOpen, handleClose, onSucess, datas }) {
     };
 
     const handleAddCompetition = (data) => {
-        if (datas.findIndex((d) => d.name.includes(data.name)) >= 0) {
-            setError('roleName', {
+        if (datas.findIndex((d) => d.name.toLowerCase().includes(data.name.toLowerCase())) >= 0) {
+            setError('name', {
                 message: `Thể thức ${data.name} này đã tồn tại, vui lòng chọn thể thức khác`,
             });
             return;
@@ -145,7 +145,7 @@ function CreateExhibitionTournament({ isOpen, handleClose, onSucess, datas }) {
                                         variant="outlined"
                                         defaultValue={0}
                                         {...register('numberFemale')}
-                                        error={errors.numberMale ? true : false}
+                                        error={errors.numberFemale ? true : false}
                                         helperText={errors.numberFemale?.message}
                                         fullWidth
                                     />
