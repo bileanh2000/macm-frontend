@@ -20,6 +20,8 @@ import {
 } from '@mui/x-data-grid';
 import {
     Alert,
+    Autocomplete,
+    Badge,
     Box,
     Button,
     ClickAwayListener,
@@ -61,6 +63,20 @@ import ViewDetailMemberDialog from '../ViewDetailMemberDialog';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useSnackbar } from 'notistack';
 
+const months = [
+    { name: 'Tháng 1', value: 1 },
+    { name: 'Tháng 2', value: 2 },
+    { name: 'Tháng 3', value: 3 },
+    { name: 'Tháng 4', value: 4 },
+    { name: 'Tháng 5', value: 5 },
+    { name: 'Tháng 6', value: 6 },
+    { name: 'Tháng 7', value: 7 },
+    { name: 'Tháng 8', value: 8 },
+    { name: 'Tháng 9', value: 9 },
+    { name: 'Tháng 10', value: 10 },
+    { name: 'Tháng 11', value: 11 },
+    { name: 'Tháng 12', value: 12 },
+];
 function MemberAndCollaborator() {
     const token = localStorage[`accessToken`];
     let navigate = useNavigate();
@@ -83,20 +99,14 @@ function MemberAndCollaborator() {
     const [isUpdate, setIsUpdate] = useState(false);
     const [errorList, setErrorList] = useState([]);
     const [searchResult, setSearchResult] = useState([]);
-
-    // const [filter, setFilter] = useState({
-    //     generation: -1,
-    //     gender: -1,
-    //     status: -1,
-    //     isActive: -1,
-    //     roleId: -1,
-    // });
+    const [listMonth, setListMonth] = useState([]);
+    const [listGen, setListGen] = useState([]);
     const [generation, setGeneration] = useState(-1);
     const [gender, setGender] = useState(-1);
     const [status, setStatus] = useState(-1);
     const [isActive, setIsActive] = useState(-1);
     const [roleId, setRoleId] = useState(-1);
-
+    const [filterCount, setFilterCount] = useState(0);
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const styles = (theme) => ({
         disabledButton: {
@@ -104,6 +114,15 @@ function MemberAndCollaborator() {
         },
     });
 
+    const getAllGen = async () => {
+        try {
+            const response = await userApi.getAllGen();
+            console.log('getAllGen', response.data);
+            setListGen(response.data);
+        } catch (error) {
+            console.log('failed when getAllGen');
+        }
+    };
     const toggleFilter = () => {
         setChecked((prev) => !prev);
     };
@@ -145,6 +164,7 @@ function MemberAndCollaborator() {
         // fetchUserList();
         fetchUserListBySemester(semester);
         setIsUpdate(false);
+        getAllGen();
     }, [semester, isUpdate]);
 
     useEffect(() => {
@@ -354,14 +374,16 @@ function MemberAndCollaborator() {
     const filterSubmit = (data) => {
         console.log(data);
         const dataFormat = {
-            dateFrom: data.startDate === null ? '' : moment(new Date(data.startDate)).format('yyyy-MM-DD'),
-            dateTo: data.endDate === null ? '' : moment(new Date(data.endDate)).format('yyyy-MM-DD'),
+            // dateFrom: data.startDate === null ? '' : moment(new Date(data.startDate)).format('yyyy-MM-DD'),
+            // dateTo: data.endDate === null ? '' : moment(new Date(data.endDate)).format('yyyy-MM-DD'),
             gender: gender === -1 ? '' : gender,
             generation: generation === -1 ? '' : generation,
             isActive: isActive === -1 ? '' : isActive,
             roleId: roleId === -1 ? '' : roleId,
+            month: listMonth.map((i) => i.value),
         };
-
+        let count = Object.values(dataFormat).filter((i) => i.length != [].length && i !== '').length;
+        setFilterCount(count);
         userApi
             .searchByMultipleField(dataFormat, userData && userData)
             .then((res) => {
@@ -376,6 +398,9 @@ function MemberAndCollaborator() {
         console.log(dataFormat);
     };
 
+    useEffect(() => {
+        console.log(listMonth);
+    }, [listMonth]);
     const searchJson = (searchTerm) => {
         rowsUser
             .filter((val) => {
@@ -529,8 +554,8 @@ function MemberAndCollaborator() {
                     onSubmit={handleSubmit(filterSubmit)}
                     sx={{
                         position: 'absolute',
-                        top: '264px',
-                        left: '32px',
+                        top: '322px',
+                        right: '103px',
                         zIndex: '2',
                         backgroundColor: 'white',
                         padding: '10px 20px 30px 20px',
@@ -553,11 +578,13 @@ function MemberAndCollaborator() {
                                 onChange={(event) => setGeneration(event.target.value)}
                             >
                                 <MenuItem value={-1}>Tất cả</MenuItem>
-                                <MenuItem value="1">1</MenuItem>
-                                <MenuItem value="2">2</MenuItem>
-                                <MenuItem value="3">3</MenuItem>
-                                <MenuItem value="4">4</MenuItem>
-                                <MenuItem value="5">5</MenuItem>
+                                {listGen.map((i) => {
+                                    return (
+                                        <MenuItem key={i} value={i}>
+                                            {i}
+                                        </MenuItem>
+                                    );
+                                })}
                             </TextField>
 
                             <TextField
@@ -574,7 +601,7 @@ function MemberAndCollaborator() {
                                 <MenuItem value="true">Active</MenuItem>
                                 <MenuItem value="false">Deactive</MenuItem>
                             </TextField>
-                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                            {/* <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                                 <Controller
                                     name="startDate"
                                     control={control}
@@ -610,7 +637,7 @@ function MemberAndCollaborator() {
                                         />
                                     )}
                                 />
-                            </LocalizationProvider>
+                            </LocalizationProvider> */}
                         </Grid>
                         <Grid item xs={6}>
                             <TextField
@@ -646,7 +673,7 @@ function MemberAndCollaborator() {
                                 <MenuItem value={14}>CTV Ban văn hóa</MenuItem>
                                 <MenuItem value={15}>CTV Ban chuyên môn</MenuItem>
                             </TextField>
-                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
+                            {/* <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                                 <Controller
                                     name="endDate"
                                     control={control}
@@ -675,28 +702,48 @@ function MemberAndCollaborator() {
                                         />
                                     )}
                                 />
-                            </LocalizationProvider>
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                                <Button
-                                    variant="outlined"
-                                    sx={{ mr: 1 }}
-                                    onClick={() => {
-                                        reset({ endDate: null, startDate: null });
-                                        console.log('heheh');
-                                        setGender(-1);
-                                        setGeneration(-1);
-                                        setIsActive(-1);
-                                        setRoleId(-1);
-                                    }}
-                                >
-                                    Reset
-                                </Button>
-                                <Button variant="contained" type="submit">
-                                    Lọc
-                                </Button>
-                            </Box>
+                            </LocalizationProvider> */}
                         </Grid>
                     </Grid>
+                    <Autocomplete
+                        multiple
+                        id="tags-outlined"
+                        value={listMonth}
+                        defaultValue={[]}
+                        onChange={(e, v) => setListMonth(v)}
+                        options={months}
+                        getOptionLabel={(option) => option.name}
+                        // defaultValue={null}
+                        filterSelectedOptions
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Chọn tháng sinh"
+                                placeholder="Chọn tháng sinh"
+                                variant="standard"
+                            />
+                        )}
+                    />
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                        <Button
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                            onClick={() => {
+                                reset({ endDate: null, startDate: null });
+                                console.log('heheh');
+                                setGender(-1);
+                                setGeneration(-1);
+                                setIsActive(-1);
+                                setRoleId(-1);
+                                setListMonth([]);
+                            }}
+                        >
+                            Reset
+                        </Button>
+                        <Button variant="contained" type="submit">
+                            Lọc
+                        </Button>
+                    </Box>
                 </Box>
             </Grow>
             <Snackbar
@@ -744,7 +791,13 @@ function MemberAndCollaborator() {
                     </DialogActions>
                 </Box>
             </Dialog>
-
+            <Typography
+                variant="button"
+                color="initial"
+                sx={{ marginLeft: 'auto', marginRight: '1rem', position: 'absolute', top: '262px', left: '38px' }}
+            >
+                Tổng thành viên Active: {countActive}/{userList.length}
+            </Typography>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                 Quản lý Thành viên và Cộng tác viên
             </Typography>
@@ -789,9 +842,36 @@ function MemberAndCollaborator() {
                     </Button>
                 </Box>
             </Box>
-            <Button startIcon={<FilterListIcon />} size="small" onClick={toggleFilter} sx={{ mr: 1 }}>
-                BỘ LỌC
-            </Button>
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    position: 'relative',
+                    zIndex: '2',
+                    top: '37px',
+                    right: '220px',
+                }}
+            >
+                <Badge
+                    badgeContent={filterCount}
+                    color="primary"
+                    // overlap="circular"
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                    }}
+                >
+                    <Button
+                        variant="outlined"
+                        startIcon={<FilterListIcon />}
+                        size="small"
+                        onClick={toggleFilter}
+                        sx={{ mr: 1 }}
+                    >
+                        BỘ LỌC
+                    </Button>
+                </Badge>
+            </Box>
             <Box
                 sx={{
                     height: '70vh',
