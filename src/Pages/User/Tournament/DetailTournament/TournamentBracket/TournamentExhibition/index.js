@@ -94,7 +94,8 @@ function TournamentExhibition({ exhibition, result, type }) {
                 const response = await adminTournament.getListExhibitionType(tournamentId);
                 console.log(response);
                 setListExhibitionType(response.data);
-                const team = exhibition.find((t) => t.exhibitionTypeId === response.data[0].id);
+                const team =
+                    exhibition.length > 0 && exhibition.find((t) => t.exhibitionTypeId === response.data[0].id);
                 setMyTeam(team);
                 getExhibitionResult(response.data[0].id);
                 setTournamentStatus(response.code);

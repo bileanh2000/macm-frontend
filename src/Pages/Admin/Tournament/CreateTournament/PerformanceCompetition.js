@@ -70,6 +70,12 @@ function PerformanceCompetition(props) {
     };
 
     const handleAddCompetition = (data) => {
+        if (props.data.findIndex((row) => row.name.toLowerCase().includes(data.name.toLowerCase())) >= 0) {
+            setError('name', {
+                message: `Tên thể thức ${data.name} này đã tồn tại, vui lòng chọn tên khác`,
+            });
+            return;
+        }
         if (data.numberMale == 0 && data.numberFemale == 0) {
             setFocus('numberMale', { shouldSelect: true });
             setError('numberMale', { message: 'Số lượng nam và nữ không được bằng 0' });

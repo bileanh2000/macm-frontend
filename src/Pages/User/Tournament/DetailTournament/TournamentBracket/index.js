@@ -100,14 +100,14 @@ function TournamentBracket({ tournament, competitive, exhibition, valueTab, type
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <TournamentExhibition
-                            exhibition={exhibition}
+                            exhibition={exhibition.data}
                             reload={isRender}
                             result={tournamentResult.listExhibitionResult}
                             type={valueTab == 1 ? type : 0}
                         />
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                        <MyTeam competitive={competitive} exhibition={exhibition} />
+                        <MyTeam competitive={competitive} exhibition={exhibition.data} />
                     </TabPanel>
                 </Box>
             )}

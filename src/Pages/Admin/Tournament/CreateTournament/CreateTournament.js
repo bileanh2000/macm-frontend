@@ -379,7 +379,7 @@ function CreateTournament({
     };
     const handleAddEventRoles = (data) => {
         console.log(data);
-        if (datas.findIndex((d) => d.name.includes(data.roleName)) >= 0) {
+        if (datas.findIndex((d) => d.name.toLowerCase().includes(data.roleName.toLowerCase())) >= 0) {
             setError('roleName', {
                 message: 'Vai trò này đã tồn tại, vui lòng chọn vai trò khác',
             });

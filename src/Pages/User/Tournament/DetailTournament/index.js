@@ -411,6 +411,7 @@ function DetailTournament() {
                                                 )}
                                                 {isJoinCompetitive.data.length === 0 &&
                                                     isJoinExhibition.data.length === 0 && (
+                                                        // isJoinCompetitive.data.message.includes('Bạn chưa đăng ký tham gia thi đấu đối kháng')
                                                         <Button
                                                             variant="outlined"
                                                             // startIcon={<Edit />}
@@ -425,15 +426,18 @@ function DetailTournament() {
                                                                 : { disabled: true })}
                                                             {...(isJoinCompetitive.message.includes(
                                                                 'Bạn chưa đăng ký tham gia thi đấu đối kháng',
-                                                            )
-                                                                ? { disabled: false }
-                                                                : { disabled: true })}
-                                                            {...(isJoinExhibition.message.includes(
+                                                            ) &&
+                                                            isJoinExhibition.message.includes(
                                                                 'Bạn chưa đăng ký tham gia thi đấu biểu diễn',
                                                             )
                                                                 ? { disabled: false }
                                                                 : { disabled: true })}
-                                                            sx={{ float: 'right' }}
+                                                            //{...(isJoinExhibition.message.includes(
+                                                            //     'Bạn chưa đăng ký tham gia thi đấu biểu diễn',
+                                                            // )
+                                                            //     ? { disabled: false }
+                                                            //     : { disabled: true })}
+                                                            // sx={{ float: 'right' }}
                                                         >
                                                             {isJoinAdmin.message.includes(
                                                                 'Bạn chưa tham gia ban tổ chức giải đấu',
