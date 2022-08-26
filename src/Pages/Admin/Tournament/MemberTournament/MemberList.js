@@ -451,19 +451,21 @@ function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhi
                         },
                     }}
                 >
-                    <DataGrid
-                        // loading={data.length === 0}
-                        disableSelectionOnClick={true}
-                        rows={rowsPlayer}
-                        columns={columns}
-                        pageSize={pageSize}
-                        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                        rowsPerPageOptions={[10, 20, 30]}
-                        components={{
-                            Toolbar: CustomToolbar,
-                            NoRowsOverlay: CustomNoRowsOverlay,
-                        }}
-                    />
+                    {rowsPlayer && (
+                        <DataGrid
+                            // loading={data.length === 0}
+                            disableSelectionOnClick={true}
+                            rows={rowsPlayer}
+                            columns={columns}
+                            pageSize={pageSize}
+                            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                            rowsPerPageOptions={[10, 20, 30]}
+                            components={{
+                                Toolbar: CustomToolbar,
+                                NoRowsOverlay: CustomNoRowsOverlay,
+                            }}
+                        />
+                    )}
                 </Box>
             ) : (
                 <TableContainer component={Paper}>
