@@ -46,11 +46,6 @@ import adminTournament from 'src/api/adminTournamentAPI';
 function MemberList({ data, type, onChange, isUpdate, tournamentStatus, listExhibitionType, tournamentStage }) {
     const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
-    const [openDelete, setOpenDelete] = useState(false);
-    const [openUpdate, setOpenUpdate] = useState(false);
-    const [competitivePlayerId, setCompetitivePlayerId] = useState();
-    const [openDialogExhibition, setOpenDialogExhibition] = useState(false);
-    const [exhibitionTeam, setExhibitionTeam] = useState();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [openDialog, setOpenDialog] = useState(false);

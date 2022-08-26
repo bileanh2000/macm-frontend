@@ -51,6 +51,7 @@ import { useNavigate } from 'react-router-dom';
 import PreviewCommonSchedule from './Schedule/Schedule';
 import EditableSchedule from './Schedule/EditableSchedule';
 import EditRole from './EditRole';
+import LoadingProgress from 'src/Components/LoadingProgress';
 
 const steps = ['Thông tin sự kiện', 'Thêm vai trò BTC', 'Nội dung thi đấu', 'Thêm chi phí', 'Thêm lịch', 'Xem trước'];
 
@@ -94,7 +95,9 @@ function CreateTournament({
     const [preview, setPreview] = useState([]);
     const [dataEdit, setDataEdit] = useState();
     const [isEdit, setIsEdit] = useState(false);
-    const [suggestDate, setSuggestDate] = useState();
+    const [dateCommitteeDeadline, setDateCommitteeDeadline] = useState(new Date(tomorrow));
+    const [datePlayerDeadline, setDatePlayerDeadline] = useState(new Date(tomorrow));
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         setDatas(roles);
@@ -347,14 +350,14 @@ function CreateTournament({
         reValidateMode: 'onChange',
     });
 
-    const handleSetSuggestDate = (date) => {
-        if (date == null) {
-            return;
-        } else {
-            console.log(date);
-            setSuggestDate(date.setDate(date.getDate() - 3));
-        }
-    };
+    // const handleSetSuggestDate = (date) => {
+    //     if (date == null) {
+    //         return;
+    //     } else {
+    //         console.log(date);
+    //         setSuggestDate(date.setDate(date.getDate() - 3));
+    //     }
+    // };
 
     const handleDelete = (id) => {
         // datas.map((data) => {
@@ -441,6 +444,7 @@ function CreateTournament({
      */
 
     const handlePreviewSchedule = (data) => {
+        setIsLoading(true);
         setPreviewTournament(data);
         console.log(data);
         let formatData = {
@@ -474,6 +478,7 @@ function CreateTournament({
                     message: res.message,
                 });
             }
+            setIsLoading(false);
         });
         setIsUpdate(false);
     }, [preview, isUpdate]);
@@ -615,6 +620,7 @@ function CreateTournament({
                                 '& .MuiTextField-root': { mb: 2 },
                             }}
                         >
+                            {isLoading && <LoadingProgress />}
                             <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
                                 {steps.map((label, index) => {
                                     const stepProps = {};
@@ -1280,9 +1286,9 @@ function CreateTournament({
                                                             ampm={false}
                                                             value={value}
                                                             onChange={(value) => {
-                                                                // console.log(value);
                                                                 onChange(value);
-                                                                setSuggestDate(value);
+                                                                setDateCommitteeDeadline(value);
+                                                                setDatePlayerDeadline(value);
                                                                 // // let date = value;
                                                                 // // date.setDate(date.getDate() - 3);
                                                                 // // console.log(value, date);
@@ -1423,7 +1429,7 @@ function CreateTournament({
                                                     required
                                                     name="datePlayerDeadline"
                                                     control={control}
-                                                    defaultValue={null}
+                                                    defaultValue={new Date(datePlayerDeadline)}
                                                     render={({
                                                         field: { onChange, value },
                                                         fieldState: { error, invalid },
@@ -1434,10 +1440,11 @@ function CreateTournament({
                                                             ampm={false}
                                                             // value={value}
                                                             // onChange={(value) => onChange(value)}
-                                                            value={suggestDate}
+                                                            value={new Date(datePlayerDeadline)}
                                                             onChange={(value) => {
+                                                                console.log(value, datePlayerDeadline);
                                                                 onChange(value);
-                                                                setSuggestDate(value);
+                                                                setDatePlayerDeadline(value);
                                                             }}
                                                             renderInput={(params) => (
                                                                 <TextField
@@ -1465,7 +1472,7 @@ function CreateTournament({
                                                     required
                                                     name="dateCommitteeDeadline"
                                                     control={control}
-                                                    defaultValue={skipped.has(1) ? null : null}
+                                                    defaultValue={dateCommitteeDeadline}
                                                     render={({
                                                         field: { onChange, value },
                                                         fieldState: { error, invalid },
@@ -1478,10 +1485,10 @@ function CreateTournament({
                                                             ampm={false}
                                                             // value={value}
                                                             // onChange={(value) => onChange(value)}
-                                                            value={suggestDate}
+                                                            value={dateCommitteeDeadline}
                                                             onChange={(value) => {
                                                                 onChange(value);
-                                                                setSuggestDate(value);
+                                                                setDateCommitteeDeadline(value);
                                                             }}
                                                             renderInput={(params) => (
                                                                 <TextField
@@ -1559,7 +1566,11 @@ function CreateTournament({
                                     {activeStep === steps.length - 2 ? 'Xem trước' : 'Tiếp tục'}
                                 </Button>
                             ) : activeStep === 4 ? (
-                                <Button variant="contained" onClick={handleSubmit(handlePreviewSchedule)}>
+                                <Button
+                                    variant="contained"
+                                    onClick={handleSubmit(handlePreviewSchedule)}
+                                    disabled={isLoading}
+                                >
                                     Xem trước
                                 </Button>
                             ) : (

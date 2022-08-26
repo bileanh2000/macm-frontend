@@ -34,7 +34,7 @@ import { Delete } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhibitionId }) {
+function RegisterExhibition({ data, isOpen, handleClose, onSuccess, onChangeData, exhibitionId }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [exhibitionType, setExhibitionType] = useState(exhibitionId);
@@ -129,6 +129,12 @@ function RegisterExhibition({ isOpen, handleClose, onSuccess, onChangeData, exhi
     };
 
     const handleRegister = (data) => {
+        if (data.findIndex((row) => row.teamName.toLowerCase().includes(data.teamName.toLowerCase())) >= 0) {
+            setError('teamName', {
+                message: `Tên đội ${data.roleName} này đã tồn tại, vui lòng chọn tên khác`,
+            });
+            return;
+        }
         const teamMember = [...dataMale, ...dataFemale];
         const listStudentId = teamMember.map((student) => student.studentId);
 

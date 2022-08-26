@@ -85,9 +85,9 @@ function AddMemberTourament({ tournament, isUpdate, tournamentStage, onChange })
                     data={competitivePlayer}
                     type={type}
                     onChange={() => {
-                        onChange && onChange();
                         setIsRender(true);
                         setIsRenderCompe(true);
+                        onChange && onChange();
                     }}
                     isUpdate={isUpdate}
                     tournamentStatus={tournamentStatus}
@@ -100,9 +100,9 @@ function AddMemberTourament({ tournament, isUpdate, tournamentStage, onChange })
                     data={exhibitionTeam}
                     type={type}
                     onChange={() => {
-                        onChange && onChange();
                         setIsRender(true);
                         setIsRenderCompe(true);
+                        onChange && onChange();
                     }}
                     isUpdate={isUpdate}
                     tournamentStage={tournamentStage}

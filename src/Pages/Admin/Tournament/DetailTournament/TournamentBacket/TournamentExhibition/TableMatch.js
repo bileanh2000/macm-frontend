@@ -81,6 +81,7 @@ function TableMatch(params) {
     const {
         handleSubmit,
         control,
+        setError,
         formState: { errors },
         reset,
     } = useForm({
@@ -114,6 +115,12 @@ function TableMatch(params) {
     };
 
     const handleUpdate = (data) => {
+        if (params.matches.findIndex((row) => row.score === data.score) >= 0) {
+            setError('score', {
+                message: `Số điểm của mỗi đội không được trùng nhau, vui nhập số điểm khác khác`,
+            });
+            return;
+        }
         updateResult(match.id, data.score);
         const newMatches = matches.map((m) => {
             return m.id == match.id ? { ...m, score: data.score } : m;

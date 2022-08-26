@@ -77,7 +77,9 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
     const spawnTimeAndArea = async () => {
         try {
             const response = await adminTournament.spawnTimeAndArea(tournamentId);
-            enqueueSnackbar(response.message, { variant: 'success' });
+            enqueueSnackbar(response.message, {
+                variant: response.message.toLowerCase().includes('thành công') ? 'success' : 'error',
+            });
             setIsRender(true);
             changeData && changeData();
         } catch (error) {
@@ -166,6 +168,7 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
                             tournamentStatus={tournamentStatus}
                             tournamentStage={tournamentStage}
                             reload={isRender}
+                            setReload={() => setIsRender(false)}
                             result={tournamentResult.listCompetitiveResult}
                             type={valueTab == 0 ? type : 0}
                             endDate={endDate}
@@ -178,6 +181,7 @@ function TournamentBacket({ tournament, tournamentStatus, valueTab, type, endDat
                             tournamentStatus={tournamentStatus}
                             tournamentStage={tournamentStage}
                             reload={isRender}
+                            setReload={() => setIsRender(false)}
                             result={tournamentResult.listExhibitionResult}
                             type={valueTab == 1 ? type : 0}
                             endDate={endDate}
