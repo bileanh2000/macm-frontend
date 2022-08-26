@@ -183,12 +183,13 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
                       ...role,
                       maxQuantity: data.maxQuantity,
                       availableQuantity:
-                          role.maxQuantity == role.availableQuantity ? data.maxQuantity : role.availableQuantity,
+                          role.maxQuantity == role.availableQuantity
+                              ? data.maxQuantity
+                              : +data.maxQuantity + +role.availableQuantity,
                   }
                 : role,
         );
         setDatas(newData);
-
         /**
          * Reset field keep error (isValid)
          */

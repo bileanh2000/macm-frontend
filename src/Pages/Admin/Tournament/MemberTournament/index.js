@@ -346,6 +346,7 @@ function MemberTournament({ tournament, isUpdate, tournamentStage, user, onChang
                                 setOpenDialog(false);
                             }}
                             onChangeData={() => {
+                                setCompetitivePlayer();
                                 setIsRender(true);
                                 setIsRenderCompe(true);
                                 onChange && onChange();
@@ -366,6 +367,7 @@ function MemberTournament({ tournament, isUpdate, tournamentStage, user, onChang
                                 setOpenDialogExhibition(false);
                             }}
                             onChangeData={() => {
+                                setExhibitionTeam();
                                 setIsRender(true);
                                 setIsRenderCompe(true);
                                 onChange && onChange();

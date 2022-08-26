@@ -137,7 +137,7 @@ function EditCompetitive({ dataEdit, onEdit, onCancel, weightRange }) {
             </Grid>
             <Grid item xs={12}>
                 <Button variant="contained" color="success" onClick={handleSubmit(handleEditCompetition)} sx={{ m: 1 }}>
-                    Chỉnh sửa
+                    Xác nhận
                 </Button>
                 <Button variant="contained" color="warning" onClick={() => onCancel && onCancel()}>
                     Hủy

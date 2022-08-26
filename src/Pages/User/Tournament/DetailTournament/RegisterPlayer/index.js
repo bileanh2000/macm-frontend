@@ -43,6 +43,7 @@ function RegisterPlayer({
     isJoinExhibition,
     onRegister,
 }) {
+    console.log('isJoinExhibition', isJoinExhibition);
     const userInfo = { ...userInformation, studentName: userInformation.name };
     // const userInfo = { gender: true, studentId: 'HE150001', studentName: 'dam van toan 22' };
     // console.log(userInfo);
@@ -290,7 +291,7 @@ function RegisterPlayer({
                     <strong>Giới tính: </strong> {userInformation.gender ? 'Nam' : 'Nữ'}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-between', m: 2 }}>
-                    <FormControl size="small" sx={{ mr: 1 }}>
+                    <FormControl size="small" sx={{ mr: 1, minWidth: '10rem' }}>
                         <Typography variant="caption">Nội dung thi đấu</Typography>
                         <Select id="demo-simple-select" value={type} displayEmpty onChange={handleChangeType}>
                             <MenuItem value={1}>Đối kháng</MenuItem>
@@ -299,9 +300,7 @@ function RegisterPlayer({
                     </FormControl>
                     {type === 1 ? (
                         isJoinCompetitive.data.length == 0 && listWeightRange.length > 0 ? (
-                            isJoinCompetitive.message.includes(' đang chờ duyệt') ? (
-                                <Typography variant="caption">{isJoinCompetitive.message}</Typography>
-                            ) : (
+                            isJoinCompetitive.message.includes('Bạn chưa đăng ký tham gia thi đấu đối kháng') ? (
                                 <Box
                                     sx={{
                                         display: 'flex',
@@ -328,6 +327,8 @@ function RegisterPlayer({
                                         </Select>
                                     </FormControl>
                                 </Box>
+                            ) : (
+                                <Typography variant="caption">{isJoinCompetitive.message}</Typography>
                             )
                         ) : (
                             <Typography variant="caption">Bạn đã đăng kí tham gia thi đấu rồi</Typography>
@@ -358,7 +359,7 @@ function RegisterPlayer({
                 {type == 1 &&
                     isJoinCompetitive.data.length == 0 &&
                     listWeightRange.length > 0 &&
-                    !isJoinCompetitive.message.includes('đang chờ duyệt') && (
+                    isJoinCompetitive.message.includes('Bạn chưa đăng ký tham gia thi đấu đối kháng') && (
                         <Grid container spacing={2}>
                             <Grid item xs={5}>
                                 <Typography sx={{ m: 1 }}>
@@ -382,9 +383,12 @@ function RegisterPlayer({
                         </Grid>
                     )}
                 {type == 2 &&
-                    listExhibitionType.length > 0 &&
-                    (isJoinExhibition.data.length > 0 &&
-                    isJoinExhibition.data.filter((exhibition) => exhibition.id === exhibitionType).length == 0 ? (
+                    (listExhibitionType.length > 0 &&
+                    (isJoinExhibition.data.length == 0 ||
+                        (isJoinExhibition.data.length > 0 &&
+                            isJoinExhibition.data.filter((exhibition) => exhibition.id === exhibitionType).length ==
+                                0)) ? (
+                        //
                         <Box>
                             <TextField
                                 fullWidth
@@ -525,7 +529,11 @@ function RegisterPlayer({
                     autoFocus
                     disabled={
                         (type == 2 && (dataFemale.length != numberFemale || dataMale.length != numberMale)) ||
-                        (type == 1 && !(isJoinCompetitive.data.length == 0 && listWeightRange.length > 0))
+                        (type == 1 &&
+                            !(
+                                isJoinCompetitive.message.includes('Bạn chưa đăng ký tham gia thi đấu đối kháng') &&
+                                listWeightRange.length > 0
+                            ))
                     }
                 >
                     {/* <Button onClick={handleSubmit(onSubmit)} autoFocus> */}

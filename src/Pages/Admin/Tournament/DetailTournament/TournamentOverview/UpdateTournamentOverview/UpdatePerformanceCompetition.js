@@ -64,6 +64,12 @@ function PerformanceCompetition(props) {
     };
 
     const handleAddCompetition = (data) => {
+        if (props.data.findIndex((row) => row.name.toLowerCase().includes(data.name.toLowerCase())) >= 0) {
+            setError('name', {
+                message: `Tên thể thức ${data.name} này đã tồn tại, vui lòng chọn tên khác`,
+            });
+            return;
+        }
         if (data.numberFemale == 0 && data.numberMale == 0) {
             setFocus('numberMale', { shouldSelect: true });
             setError('numberMale', { message: 'Số lượng nam và nữ không được bằng 0' });
@@ -139,7 +145,11 @@ function PerformanceCompetition(props) {
                                                     // handleOpenDialog();
                                                     handleEdit(data);
                                                 }}
-                                                disabled={isEdit || isChecked || data.exhibitionTeams.length > 0}
+                                                disabled={
+                                                    isEdit ||
+                                                    isChecked ||
+                                                    (data.exhibitionTeams && data.exhibitionTeams.length > 0)
+                                                }
                                             >
                                                 <Edit />
                                             </IconButton>
@@ -151,7 +161,11 @@ function PerformanceCompetition(props) {
                                                     // handleOpenDialog();
                                                     handleDelete(data.id);
                                                 }}
-                                                disabled={isEdit || isChecked || data.exhibitionTeams.length > 0}
+                                                disabled={
+                                                    isEdit ||
+                                                    isChecked ||
+                                                    (data.exhibitionTeams && data.exhibitionTeams.length > 0)
+                                                }
                                             >
                                                 <Delete />
                                             </IconButton>

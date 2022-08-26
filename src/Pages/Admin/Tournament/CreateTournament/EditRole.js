@@ -91,7 +91,7 @@ function EditRole({ roleEdit, onEdit, onCancel }) {
             </Grid>
             <Grid item xs={12}>
                 <Button variant="contained" onClick={handleSubmit(handleAddEventRoles)} sx={{ mr: 1 }}>
-                    Chỉnh sửa
+                    Xác nhận
                 </Button>
                 <Button variant="contained" color="error" onClick={() => onCancel && onCancel()}>
                     Hủy
