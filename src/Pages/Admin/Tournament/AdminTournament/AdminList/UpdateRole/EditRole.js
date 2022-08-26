@@ -23,7 +23,22 @@ function EditRole({ roleEdit, onEdit, onCancel }) {
     });
 
     const handleAddEventRoles = (data) => {
-        const newRole = { ...roleEdit, maxQuantity: data.maxQuantity };
+        if (
+            roleEdit.maxQuantity != roleEdit.availableQuantity &&
+            roleEdit.maxQuantity - roleEdit.availableQuantity > data.maxQuantity
+        ) {
+            setError('maxQuantity', {
+                message: 'Số lượng thành viên yêu cầu không được nhỏ hơn số thành viên tham gia hiện tại',
+            });
+            return;
+        }
+        const newRole = {
+            ...roleEdit,
+            maxQuantity: data.maxQuantity,
+            availableQuantity:
+                roleEdit.maxQuantity == roleEdit.availableQuantity ? data.maxQuantity : roleEdit.availableQuantity,
+        };
+        console.log(newRole);
         onEdit && onEdit(newRole);
     };
 

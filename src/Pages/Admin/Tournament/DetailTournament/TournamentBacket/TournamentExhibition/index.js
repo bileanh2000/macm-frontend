@@ -11,7 +11,7 @@ import Sliver from 'src/Components/Common/Material/Sliver';
 import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function TournamentExhibition({ reload, result, type, endDate, tournamentStage, isUnorganized }) {
+function TournamentExhibition({ reload, setReload, result, type, endDate, tournamentStage, isUnorganized }) {
     console.log(result);
 
     const nowDate = moment(new Date()).format('yyyy-MM-DD');
@@ -104,6 +104,20 @@ function TournamentExhibition({ reload, result, type, endDate, tournamentStage, 
         isRender && getExhibitionResult(exhibitionType);
         setIsRender(false);
     }, [isRender, exhibitionType, exhibitionTeam]);
+
+    useEffect(() => {
+        const getExhibitionResult = async (exhibitionType) => {
+            try {
+                const response = await adminTournament.getExhibitionResult(exhibitionType);
+                console.log('exhi', response.data[0]);
+                response.data.length > 0 ? setExhibitionTeam(response.data[0].listResult) : setExhibitionTeam();
+                setReload && setReload();
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
+        reload && getExhibitionResult(exhibitionType);
+    }, [reload, setReload, exhibitionType, exhibitionTeam]);
 
     useEffect(() => {
         const getExhibitionResult = async (exhibitionType) => {

@@ -25,7 +25,16 @@ import Trophy from 'src/Components/Common/Material/Trophy';
 import Brone from 'src/Components/Common/Material/Brone';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-function TournamentCompetitive({ reload, result, type, endDate, tournamentStage, onHaveResult, isUnorganized }) {
+function TournamentCompetitive({
+    reload,
+    setReload,
+    result,
+    type,
+    endDate,
+    tournamentStage,
+    onHaveResult,
+    isUnorganized,
+}) {
     let { tournamentId } = useParams();
     const [tournamentResult, setTournamentResult] = useState();
     const [tournamentStatus, setTournamentStatus] = useState(0);
@@ -126,6 +135,29 @@ function TournamentCompetitive({ reload, result, type, endDate, tournamentStage,
         isRender && getListPlayerByCompetitiveID(competitiveId);
         setIsRender(false);
     }, [isRender, listPlayer, competitiveId]);
+
+    useEffect(() => {
+        const getListPlayerByCompetitiveID = async (weightRange) => {
+            try {
+                const response = await adminTournament.listMatchs(weightRange);
+                if (response.data.length > 0) {
+                    setListPlayer(response.data[0].listMatchDto);
+                    setTournamentStatus(response.data[0].status);
+                    setRounds(response.totalResult);
+                    // setIsCreate(response.data[0].changed);
+                } else {
+                    setListPlayer(response.data);
+                    setTournamentStatus(0);
+                    setRounds(0);
+                    // setIsCreate(true);
+                }
+                setReload && setReload();
+            } catch (error) {
+                console.log('Failed to fetch match: ', error);
+            }
+        };
+        reload && getListPlayerByCompetitiveID(competitiveId);
+    }, [reload, competitiveId, setReload, listPlayer]);
 
     const spawnMatches = async (weightRange) => {
         try {

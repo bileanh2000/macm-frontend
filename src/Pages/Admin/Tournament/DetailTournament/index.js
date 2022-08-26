@@ -355,6 +355,7 @@ function DetailTournament() {
                                     tournamentStage={tournament.stage}
                                     isUpdate={isUpdate}
                                     user={user}
+                                    onChange={() => setIsRender(true)}
                                 />
                             </TabPanel>
                             <TabPanel value={value} index={5}>

@@ -125,7 +125,6 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
         // datas.map((data) => {
         //     return data.id === id;
         // });
-        const data = datas.filter((item) => item.id !== role.id);
         const dataEdit = datas.filter((item) => item.id === role.id);
         setDataEdit(dataEdit[0]);
         setIsEdit(true);
@@ -178,7 +177,16 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
             return;
         }
 
-        const newData = datas.map((role) => (role.id == data.id ? { ...role, maxQuantity: data.maxQuantity } : role));
+        const newData = datas.map((role) =>
+            role.id == data.id
+                ? {
+                      ...role,
+                      maxQuantity: data.maxQuantity,
+                      availableQuantity:
+                          role.maxQuantity == role.availableQuantity ? data.maxQuantity : role.availableQuantity,
+                  }
+                : role,
+        );
         setDatas(newData);
 
         /**

@@ -16,7 +16,7 @@ function a11yProps(index) {
     };
 }
 
-function MemberTournament({ tournament, isUpdate, tournamentStage, user }) {
+function MemberTournament({ tournament, isUpdate, tournamentStage, user, onChange }) {
     let { tournamentId } = useParams();
     const [type, setType] = useState(1);
     const { enqueueSnackbar } = useSnackbar();
@@ -348,12 +348,14 @@ function MemberTournament({ tournament, isUpdate, tournamentStage, user }) {
                             onChangeData={() => {
                                 setIsRender(true);
                                 setIsRenderCompe(true);
+                                onChange && onChange();
                             }}
                         />
                     )}
                     {tournament.exhibitionTypes.length > 0 && exhibitionTeam && (
                         <RegisterExhibition
                             title="Đăng kí tham gia biểu diễn"
+                            data={exhibitionTeam}
                             isOpen={openDialogExhibition}
                             exhibitionId={exhibitionType}
                             handleClose={() => {
@@ -366,6 +368,7 @@ function MemberTournament({ tournament, isUpdate, tournamentStage, user }) {
                             onChangeData={() => {
                                 setIsRender(true);
                                 setIsRenderCompe(true);
+                                onChange && onChange();
                             }}
                         />
                     )}
@@ -376,8 +379,9 @@ function MemberTournament({ tournament, isUpdate, tournamentStage, user }) {
                     value={value}
                     index={1}
                     onChange={() => {
+                        setIsRenderCompe(true);
                         setIsRender(true);
-                        // onChange && onChange();
+                        onChange && onChange();
                     }}
                     tournament={tournament}
                     isUpdate={isUpdate}

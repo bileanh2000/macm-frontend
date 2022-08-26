@@ -67,7 +67,7 @@ function MembershipFee() {
     const getListMemberShip = async (data) => {
         try {
             const response = await adminClubFeeAPI.getListMembership(data);
-            console.log('dong tien', response);
+            console.log('dong tien', data, response);
             setUserList(response.data);
         } catch (error) {
             console.log('Không thể lấy dữ liệu các thành viên tham gia đóng tiền, error: ', error);
@@ -101,12 +101,34 @@ function MembershipFee() {
         try {
             const response = await adminClubFeeAPI.getSemesterFee(semesterName);
             response.data.length > 0 ? setCost(response.data[0].amount) : setCost();
+            response.data.length > 0 ? getListMemberShip(response.data[0].id) : setUserList([]);
         } catch (error) {
             console.log('Không thể lấy được dữ liệu phí thành viên, error: ', error);
         }
     };
 
     useEffect(() => {
+        const getAmount = async (semesterName) => {
+            try {
+                const response = await adminClubFeeAPI.getSemesterFee(semesterName);
+                response.data.length > 0 ? setCost(response.data[0].amount) : setCost();
+                getListMemberShip(response.data[0].id);
+            } catch (error) {
+                console.log('Không thể lấy được dữ liệu phí thành viên, error: ', error);
+            }
+        };
+        const getCurrentSemester = async () => {
+            try {
+                const response = await adminClubFeeAPI.getCurrentSemester();
+                console.log('getCurrentSemester', response);
+                getAmount(response.data[0].name);
+                setCurrentSemester(response.data[0]);
+                setSemesterId(response.data[0].id);
+                setSemesterName(response.data[0].name);
+            } catch (error) {
+                console.log('Không thể lấy dữ liệu kì hiện tại, error: ', error);
+            }
+        };
         fetchFunClub();
         getSemester();
         getCurrentSemester();
@@ -140,7 +162,7 @@ function MembershipFee() {
     const handleChangeSemester = (e) => {
         setSemesterId(e.target.value);
         setSemesterName(semesterList.find((semester) => semester.id == e.target.value).name);
-        getListMemberShip(e.target.value);
+        // getListMemberShip(e.target.value);
         getAmount(semesterList.find((semester) => semester.id == e.target.value).name);
     };
 
