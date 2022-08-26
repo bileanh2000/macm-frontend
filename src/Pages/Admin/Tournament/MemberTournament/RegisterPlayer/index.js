@@ -258,26 +258,28 @@ function RegisterPlayer({ isOpen, handleClose, onSuccess, onChangeData, competit
                     </Grid>
                 </Grid> */}
                 <Box sx={{ height: '400px' }}>
-                    <DataGrid
-                        rows={rowsUser}
-                        checkboxSelection
-                        onSelectionModelChange={(ids) => {
-                            setSelectionModel(ids);
-                            const selectedIDs = new Set(ids);
-                            const selectedRows = allMember && allMember.filter((row) => selectedIDs.has(row.id));
-                            setPlayer(selectedRows);
-                            console.log(selectedRows);
-                            console.log('addMemberToEvent', selectedRows);
-                        }}
-                        disableSelectionOnClick={true}
-                        columns={columns}
-                        pageSize={pageSize}
-                        rowsPerPageOptions={[30, 40, 50]}
-                        components={{
-                            Toolbar: CustomToolbar,
-                            NoRowsOverlay: CustomNoRowsOverlay,
-                        }}
-                    />
+                    {rowsUser && (
+                        <DataGrid
+                            rows={rowsUser}
+                            checkboxSelection
+                            onSelectionModelChange={(ids) => {
+                                setSelectionModel(ids);
+                                const selectedIDs = new Set(ids);
+                                const selectedRows = allMember && allMember.filter((row) => selectedIDs.has(row.id));
+                                setPlayer(selectedRows);
+                                console.log(selectedRows);
+                                console.log('addMemberToEvent', selectedRows);
+                            }}
+                            disableSelectionOnClick={true}
+                            columns={columns}
+                            pageSize={pageSize}
+                            rowsPerPageOptions={[30, 40, 50]}
+                            components={{
+                                Toolbar: CustomToolbar,
+                                NoRowsOverlay: CustomNoRowsOverlay,
+                            }}
+                        />
+                    )}
                 </Box>
             </DialogContent>
             <DialogActions>
