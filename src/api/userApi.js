@@ -117,5 +117,10 @@ const userApi = {
         const url = `/admin/hr/membersemesterinfor?studentId=${studentId}`;
         return axiosClient.get(url);
     },
+
+    checkAttendanceStatusByStudentId: (studentId) => {
+        const url = `/admin/headtechnique/checkattendancestatusbystudentid/${studentId}`;
+        return axiosClient.get(url);
+    },
 };
 export default userApi;

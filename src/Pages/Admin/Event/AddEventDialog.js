@@ -1051,7 +1051,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                             render={({ field: { onChange, value }, fieldState: { error } }) => (
                                                 <DateTimePicker
                                                     label="Thời gian bắt đầu"
-                                                    // disablePast
+                                                    disablePast
+                                                    // minDate={new Date()}
                                                     minDate={tomorrow}
                                                     ampm={false}
                                                     value={value}
