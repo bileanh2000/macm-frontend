@@ -10,7 +10,10 @@ import moment from 'moment';
 import { useSnackbar } from 'notistack';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { over } from 'stompjs';
+import SockJS from 'sockjs-client';
 
+let stompClient = null;
 function TakeAttendance() {
     const [userList, setUserList] = useState([]);
     const [pageSize, setPageSize] = useState(40);
@@ -22,6 +25,8 @@ function TakeAttendance() {
     const [title, setTitle] = useState('');
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
+    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
+    // const [attendanceResponse, setAttendanceResponse] = useState([]);
 
     const _type = location.state?.type;
     const _trainingScheduleId = location.state?.id;
@@ -30,6 +35,53 @@ function TakeAttendance() {
     let attendance = userList.reduce((attendaceCount, user) => {
         return user.status == 1 ? attendaceCount + 1 : attendaceCount;
     }, 0);
+
+    const connect = () => {
+        let Sock = new SockJS('https://capstone-project-macm.herokuapp.com/ws');
+        stompClient = over(Sock);
+        // stompClient.connect({}, onConnected, onError);
+        stompClient.connect(
+            {},
+            function (frame) {
+                console.log('Connected: ' + frame);
+                setTimeout(function () {
+                    onConnected();
+                }, 1000);
+            },
+            onError,
+        );
+    };
+    const onConnected = () => {
+        // setUserData({...userData,"connected": true});
+        // stompClient.subscribe('/chatroom/public', onMessageReceived);
+        stompClient.subscribe(`/user/${studentId}/private`, onMessageReceived);
+        // userJoin();
+    };
+
+    const onError = (err) => {
+        console.log(err);
+    };
+
+    const onMessageReceived = (payload) => {
+        var payloadData = JSON.parse(payload.body);
+        console.log(payload.body);
+        console.log(payloadData);
+    };
+
+    const testSend = (data) => {
+        var chatMessage = {
+            senderName: studentId,
+            receiverName: data.studentId,
+            ...(data.status === 0 ? { message: 'Vắng mặt' } : { message: 'Bạn đã được điểm danh hôm nay!' }),
+
+            status: 'MESSAGE',
+        };
+        stompClient.send('/app/private-message', {}, JSON.stringify(chatMessage));
+    };
+
+    useEffect(() => {
+        connect();
+    }, []);
 
     const getAttendanceByStudentId = async () => {
         try {
@@ -51,6 +103,7 @@ function TakeAttendance() {
                     setScheduleId(res.data[0].id);
                     adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
                         setUserList(res.data);
+                        // setAttendanceResponse(res.data[0]);
                     });
                 });
             }
@@ -60,6 +113,8 @@ function TakeAttendance() {
                     setEventId(res.data[0].event.id);
                     adminAttendanceAPI.getAttendanceByEventId(res.data[0].event.id).then((res) => {
                         setUserList(res.data);
+
+                        // setAttendanceResponse(res.data[0]);
                     });
                 });
             }
@@ -170,22 +225,6 @@ function TakeAttendance() {
         { field: 'id', headerName: 'STT', width: 5 },
         { field: 'studentId', headerName: 'Mã sinh viên', width: 100 },
         { field: 'name', headerName: 'Tên', width: 150 },
-        // {
-        //     field: 'status',
-        //     headerName: 'Trạng thái',
-        //     width: 150,
-        //     cellClassName: (params) => {
-        //         if (params.value == null) {
-        //             return '';
-        //         }
-
-        //         return clsx('status-rows', {
-        //             active: params.value === 'Có mặt',
-        //             deactive: params.value === 'Vắng mặt',
-        //             subActive: params.value === 'Chưa điểm danh',
-        //         });
-        //     },
-        // },
         {
             field: 'Attend',
             type: 'actions',
@@ -283,6 +322,7 @@ function TakeAttendance() {
         try {
             const response = await adminAttendanceAPI.takeAttendance(id, trainingScheduleId, status);
             enqueueSnackbar(response.message, { variant: 'success' });
+            testSend(response.data[0]);
         } catch (error) {
             console.log('Không thể điểm danh, error: ', error);
         }
@@ -292,6 +332,7 @@ function TakeAttendance() {
         try {
             const response = await adminAttendanceAPI.takeAttendanceEvent(eventId, id, status);
             enqueueSnackbar(response.message, { variant: 'success' });
+            testSend(response.data[0]);
         } catch (error) {
             console.log('Không thể điểm danh, error: ', error);
         }
@@ -394,6 +435,13 @@ function TakeAttendance() {
                 Điểm danh {_type == 0 ? title : 'sự kiện ' + title} ngày: {_nowDate}
             </Typography>
             <Divider sx={{ mb: 2 }} />
+
+            {/* <button type="button" onClick={() => connect()}>
+                connect
+            </button> */}
+            {/* <button type="button" onClick={() => testSend()}>
+                test send
+            </button> */}
             <Box component="form" onSubmit={handleSubmit(onSubmit)}>
                 <Box
                     sx={{
