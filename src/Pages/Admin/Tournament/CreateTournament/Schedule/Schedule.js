@@ -311,13 +311,13 @@ function PreviewCommonSchedule({ isEdit, isOpen, handleClose, onSucess }) {
                                     datesSet={(dateInfo) => {
                                         getMonthInCurrentTableView(dateInfo.start);
                                     }}
-                                    eventClick={(args) => {
-                                        navigateToUpdate(args.event.id, args.event.start);
-                                        // console.log(args);
-                                    }}
-                                    dateClick={function (arg) {
-                                        navigateToCreate(arg.dateStr);
-                                    }}
+                                    // eventClick={(args) => {
+                                    //     navigateToUpdate(args.event.id, args.event.start);
+                                    //     // console.log(args);
+                                    // }}
+                                    // dateClick={function (arg) {
+                                    //     navigateToCreate(arg.dateStr);
+                                    // }}
                                 />
                             )}
                             {/* </div> */}

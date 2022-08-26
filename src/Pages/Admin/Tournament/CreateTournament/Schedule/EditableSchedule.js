@@ -78,7 +78,7 @@ export const CustomTrainingSchedule = styled.div`
     background-color: #fff;
     height: 80vh;
 `;
-function EditableSchedule({ isEdit, isOpen, handleClose, onSucess, initialDate, description }) {
+function EditableSchedule({ isEdit, isOpen, handleClose, onSucess, initialDate, description, previewData, name }) {
     const nowDate = new Date();
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
     const [scheduleList, setScheduleList] = useState([]);
@@ -88,8 +88,9 @@ function EditableSchedule({ isEdit, isOpen, handleClose, onSucess, initialDate, 
     const [startDateOfSemester, setStartDateOfSemester] = useState();
     const [commonList, setCommonList] = useState([]);
     const [selectedDate, setSelectedDate] = useState();
+    const [removeDate, setRemoveDate] = useState();
     const [isOpenAddSessionDialog, setIsOpenAddSessionDialog] = useState(false);
-    const [isOpenAddScheduleDialog, setIsOpenAddScheduleDialog] = useState(false);
+    const [newData, setNewData] = useState([]);
     const [isOpenEditSessionDialog, setIsOpenEditSessionDialog] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
@@ -134,6 +135,10 @@ function EditableSchedule({ isEdit, isOpen, handleClose, onSucess, initialDate, 
         setIsUpdate(false);
     }, [isUpdate]);
 
+    useEffect(() => {
+        console.log('previewData in dialog', previewData);
+    }, []);
+
     const scheduleData = commonList.map((item) => {
         const container = {};
         container['id'] = item.id;
@@ -149,13 +154,44 @@ function EditableSchedule({ isEdit, isOpen, handleClose, onSucess, initialDate, 
         return container;
     });
 
+    let formatPreviewData = previewData.map((item) => {
+        const container = {};
+        container['date'] = item.date;
+        container['display'] = 'background';
+        container['backgroundColor'] = '#fff';
+        // container['backgroundColor'] = item.existed ? '#ffb199' : '#ccffe6';
+        container['title'] = '';
+        container['type'] = 4;
+        container['existed'] = item.existed;
+
+        return container;
+    });
+    let filterPreviewData = formatPreviewData.filter((i) => {
+        return i.existed !== true;
+    });
+    scheduleData.push(...filterPreviewData);
+    // console.log(scheduleData);
+    console.log('push data worked');
+
+    // useEffect(() => {
+    //     formatPreviewData.filter((i) => {
+    //         console.log(i.date, moment(removeDate).format('yyyy-MM-DD'));
+    //         return i.date !== moment(removeDate).format('yyyy-MM-DD');
+    //     });
+    //     setRemoveDate(null);
+    // }, [isUpdate]);
+
     const handleEventAdd = () => {
         console.log('selected');
     };
     let navigate = useNavigate();
     const navigateToUpdate = (params, date) => {
         // console.log(date, nowDate);
-        const filterEventClicked = commonList.filter((item) => item.date === moment(date).format('YYYY-MM-DD'));
+        // console.log(scheduleData);
+        const filterEventClicked = scheduleData.filter((item) => item.date === moment(date).format('YYYY-MM-DD'));
+        setSelectedDate(date);
+        setRemoveDate(date);
+
         console.log('filter event clicked', filterEventClicked);
         if (filterEventClicked[0].type !== 0) {
             console.log('ko phai lich tap');
@@ -168,19 +204,19 @@ function EditableSchedule({ isEdit, isOpen, handleClose, onSucess, initialDate, 
             new Date(date) < new Date()
         ) {
             console.log('lịch tập quá khứ');
-            navigate(
-                { pathname: '../admin/attendance' },
-                { state: { date: moment(date).format('DD/MM/YYYY'), id: params } },
-            );
+            // navigate(
+            //     { pathname: '../admin/attendance' },
+            //     { state: { date: moment(date).format('DD/MM/YYYY'), id: params } },
+            // );
         } else {
             console.log('lich tap tuong lai, update');
-            setSelectedDate(date);
             setIsOpenEditSessionDialog(true);
         }
     };
     const navigateToCreate = (date) => {
         console.log(date);
-        const existSession = commonList.filter((item) => item.date === date).length; //length = 0 (false) is not exist
+
+        const existSession = scheduleData.filter((item) => item.date === date).length; //length = 0 (false) is not exist
         // const scheduleDateList = scheduleList.
         if (new Date(date) < nowDate) {
             return;
@@ -211,6 +247,8 @@ function EditableSchedule({ isEdit, isOpen, handleClose, onSucess, initialDate, 
                         ? eventDate < current
                             ? 'Xem thông tin điểm danh'
                             : 'Cập nhật thời gian'
+                        : eventInfo.event.extendedProps.type === 4
+                        ? `Không thể tạo lịch tập (trùng với sự kiện ${name} dự tính)`
                         : `Không thể tạo lịch tập (trùng với ${eventInfo.event.title})`
                 }
                 placement="top"
@@ -232,6 +270,15 @@ function EditableSchedule({ isEdit, isOpen, handleClose, onSucess, initialDate, 
                                         {eventInfo.event.extendedProps.time}
                                     </>
                                 )}
+                            </div>
+                        </Box>
+                    </Box>
+                ) : eventInfo.event.extendedProps.type === 4 ? (
+                    <Box>
+                        <Box sx={{ ml: '10px' }}>
+                            <div className={cx('event-title')} style={{ opacity: 1 }}>
+                                {eventInfo.event.title} <br />
+                                {eventInfo.event.extendedProps.time}
                             </div>
                         </Box>
                     </Box>
@@ -280,6 +327,7 @@ function EditableSchedule({ isEdit, isOpen, handleClose, onSucess, initialDate, 
                     date={selectedDate}
                     onSucess={(isUpdate) => {
                         setIsUpdate(isUpdate);
+                        console.log('selectedDate', moment(selectedDate).format('yyyy-MM-DD'));
                     }}
                 />
             )}

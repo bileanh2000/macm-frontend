@@ -578,7 +578,12 @@ function CreateTournament({
                 }}
                 ref={formRef}
             >
-                <PreviewCommonSchedule isOpen={isOpenPreviewDialog} handleClose={() => setIsOpenPreviewDialog(false)} />
+                {isOpenPreviewDialog && (
+                    <PreviewCommonSchedule
+                        isOpen={isOpenPreviewDialog}
+                        handleClose={() => setIsOpenPreviewDialog(false)}
+                    />
+                )}
 
                 {isEditableSchedule && (
                     <EditableSchedule

@@ -83,10 +83,19 @@ function SlideShow() {
                             <img
                                 className={cx('rounded-circle')}
                                 alt={'users here'}
-                                src={admin.image == null ? url : admin.image}
+                                src={
+                                    admin.image == null
+                                        ? url
+                                        : 'https://kingchoice.me/media/CACHE/images/89ec1ad0c5de50dace1875e58f330c0d_e6nWcxW/8ad05a39ff80c2797490331340bc917e.jpg'
+                                }
                                 // height={250}
                                 width="100%"
                                 style={{ borderRadius: '5px' }}
+                                // onError={(currentTarget) => {
+                                //     currentTarget.onerror = null;
+                                //     currentTarget.src =
+                                //         'https://kingchoice.me/media/CACHE/images/89ec1ad0c5de50dace1875e58f330c0d_e6nWcxW/8ad05a39ff80c2797490331340bc917e.jpg';
+                                // }}
                             />
                             <div className={cx('card-body')}>
                                 <p className={cx('card-title')}>{admin.name}</p>
