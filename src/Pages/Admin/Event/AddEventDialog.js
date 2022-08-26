@@ -499,6 +499,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                     }}
                     initialDate={eventSchedule[0] && new Date(eventSchedule[0].date)}
                     description={existedDate}
+                    previewData={previewSchedule && previewSchedule}
+                    name={preview?.name}
                 />
             )}
             <Dialog
