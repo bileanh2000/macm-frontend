@@ -182,10 +182,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
                 ? {
                       ...role,
                       maxQuantity: data.maxQuantity,
-                      availableQuantity:
-                          role.maxQuantity == role.availableQuantity
-                              ? data.maxQuantity
-                              : +data.maxQuantity + +role.availableQuantity,
+                      availableQuantity: data.availableQuantity,
                   }
                 : role,
         );
@@ -248,8 +245,8 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
                                                 onChange={() => handleSelectRole(data)}
                                                 disabled={
                                                     isEdit ||
-                                                    (data.availableQuantity &&
-                                                        data.availableQuantity != data.maxQuantity)
+                                                    // (data.availableQuantity &&
+                                                    data.availableQuantity != data.maxQuantity
                                                 }
                                             />
                                         </TableCell>

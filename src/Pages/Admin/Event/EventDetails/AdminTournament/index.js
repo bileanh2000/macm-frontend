@@ -32,6 +32,7 @@ function AdminTournament({ isUpdate, user }) {
     const [adminList, setAdminList] = useState([]);
     const [active, setActive] = useState(-1);
     const [total, setTotal] = useState(-1);
+    const [isRender, SetIsRender] = useState(true);
     const [updateRoleDialog, setUpdateRoleDialog] = useState(false);
     const [addAdminDialog, setAddAdminDialog] = useState(false);
     const [value, setValue] = React.useState(0);
@@ -55,8 +56,9 @@ function AdminTournament({ isUpdate, user }) {
     };
 
     useEffect(() => {
-        fetchAdminInEvent(id, 2);
-    }, [id, notiStatus]);
+        isRender && fetchAdminInEvent(id, 2);
+        SetIsRender(false);
+    }, [id, notiStatus, adminList, isRender]);
 
     return (
         <Fragment>
@@ -99,9 +101,20 @@ function AdminTournament({ isUpdate, user }) {
                     >
                         CẬP NHẬT VAI TRÒ
                     </ToggleButton>
+                    <ToggleButton
+                        value={2}
+                        sx={{
+                            p: 1,
+                            borderRadius: '10px !important',
+                            border: 'none',
+                            textTransform: 'none',
+                        }}
+                    >
+                        XÉT DUYỆT THAM GIA
+                    </ToggleButton>
                 </ToggleButtonGroup>
             </Box>
-            {notiStatus === 0 ? (
+            {notiStatus === 0 && (
                 <AdminList
                     adminList={adminList}
                     isUpdate={isUpdate}
@@ -118,8 +131,15 @@ function AdminTournament({ isUpdate, user }) {
                         setAdminList([...newItem, ...adminList]);
                     }}
                 />
-            ) : (
-                <AddMemberToAdminEvent />
+            )}
+            {notiStatus === 1 && <AddMemberToAdminEvent />}
+            {notiStatus === 2 && (
+                <AddAdminTourament
+                    onChange={() => {
+                        SetIsRender(true);
+                        // onChange && onChange();
+                    }}
+                />
             )}
         </Fragment>
     );

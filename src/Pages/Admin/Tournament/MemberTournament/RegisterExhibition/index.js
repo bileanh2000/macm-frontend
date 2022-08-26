@@ -128,17 +128,18 @@ function RegisterExhibition({ data, isOpen, handleClose, onSuccess, onChangeData
         handleClose && handleClose();
     };
 
-    const handleRegister = (data) => {
-        if (data.findIndex((row) => row.teamName.toLowerCase().includes(data.teamName.toLowerCase())) >= 0) {
+    const handleRegister = (team) => {
+        console.log(data);
+        if (data.findIndex((row) => row.teamName.toLowerCase().includes(team.teamName.toLowerCase())) >= 0) {
             setError('teamName', {
-                message: `Tên đội ${data.roleName} này đã tồn tại, vui lòng chọn tên khác`,
+                message: `Tên đội ${team.roleName} này đã tồn tại, vui lòng chọn tên khác`,
             });
             return;
         }
         const teamMember = [...dataMale, ...dataFemale];
         const listStudentId = teamMember.map((student) => student.studentId);
 
-        const params = { listStudentId, teamName: data.teamName, exhibitionTypeId: exhibitionType };
+        const params = { listStudentId, teamName: team.teamName, exhibitionTypeId: exhibitionType };
         registerTeam(exhibitionType, params);
         onSuccess && onSuccess();
         handleCloseDialog();

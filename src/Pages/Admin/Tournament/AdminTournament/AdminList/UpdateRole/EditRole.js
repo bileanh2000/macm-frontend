@@ -32,11 +32,16 @@ function EditRole({ roleEdit, onEdit, onCancel }) {
             });
             return;
         }
+        console.log(data, roleEdit);
         const newRole = {
             ...roleEdit,
             maxQuantity: data.maxQuantity,
             availableQuantity:
-                roleEdit.maxQuantity == roleEdit.availableQuantity ? data.maxQuantity : roleEdit.availableQuantity,
+                roleEdit.maxQuantity == roleEdit.availableQuantity
+                    ? data.maxQuantity
+                    : data.maxQuantity > roleEdit.maxQuantity
+                    ? data.maxQuantity - roleEdit.maxQuantity + roleEdit.availableQuantity
+                    : data.maxQuantity - (roleEdit.maxQuantity - roleEdit.availableQuantity),
         };
         console.log(newRole);
         onEdit && onEdit(newRole);

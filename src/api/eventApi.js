@@ -175,6 +175,42 @@ const eventApi = {
         const url = '/event/headculture/getallsuggestionrole';
         return axiosClient.get(url);
     },
+
+    addNewRoleEvent: (newRole) => {
+        const url = '/roleevent/addnewroleevent';
+        return axiosClient.post(url, newRole);
+    },
+
+    getAllRoleEvent: () => {
+        const url = '/roleevent/getallroleevent';
+        return axiosClient.get(url);
+    },
+
+    updateRoleEventName: (roleEventId, newRole) => {
+        const url = `/roleevent/updateroleeventname/${roleEventId}`;
+        return axiosClient.put(url, newRole);
+    },
+
+    updateStatusRoleTournament: (roleTournamentId) => {
+        const url = `/tournament/updatestatusroletournament/${roleTournamentId}`;
+        return axiosClient.put(url);
+    },
+
+    deleteRoleEvent: (roleEventId) => {
+        const url = `/roleevent/deleteroleevent/${roleEventId}`;
+        return axiosClient.delete(url);
+    },
+
+    acceptRequestToJoinEvent: (memberEventId) => {
+        const url = `/event/acceptrequesttojoinevent/${memberEventId}`;
+        return axiosClient.delete(url);
+    },
+
+    declineRequestToJoinEvent: (memberEventId) => {
+        const url = `/event/declinerequesttojoinevent/${memberEventId}`;
+        return axiosClient.delete(url);
+    },
+
     // getAllOnGoingEvent:{}=>
 };
 export default eventApi;

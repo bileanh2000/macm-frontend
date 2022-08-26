@@ -11,6 +11,8 @@ import {
     MenuItem,
     Pagination,
     Paper,
+    SpeedDial,
+    SpeedDialAction,
     TextField,
     Typography,
 } from '@mui/material';
@@ -24,7 +26,7 @@ import eventApi from 'src/api/eventApi';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import semesterApi from 'src/api/semesterApi';
 import moment from 'moment';
-import { EventSeatTwoTone } from '@mui/icons-material';
+import { AdminPanelSettings, EventSeatTwoTone, Settings } from '@mui/icons-material';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import EventItem from './EventItem';
 import trainingScheduleApi from 'src/api/trainingScheduleApi';
@@ -32,6 +34,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import AddEventDialog from './AddEventDialog';
+import RolesSetting from './SettingEvent/Role/RolesSetting';
 
 const cx = classNames.bind(styles);
 
@@ -52,6 +55,7 @@ function Event() {
     const [commonList, setCommonList] = useState([]);
     const [startDateOfSemester, setStartDateOfSemester] = useState();
     const calendarComponentRef = useRef(null);
+    const [openSettingRole, setOpenSettingRole] = useState(false);
     const user = JSON.parse(localStorage.getItem('currentUser'));
 
     let navigate = useNavigate();
@@ -98,9 +102,9 @@ function Event() {
 
     const getAllSuggestionRole = async () => {
         try {
-            const response = await eventApi.getAllSuggestionRole();
+            const response = await eventApi.getAllRoleEvent();
             const roles = response.data.map((role) => {
-                return { ...role, maxQuantity: 5 };
+                return { ...role, maxQuantity: 5, selected: true };
             });
             console.log('suggestion role: ', roles);
             setSuggestionRole(roles);
@@ -189,6 +193,13 @@ function Event() {
                     user={user}
                 />
             )}
+            <RolesSetting
+                title="Chỉnh sửa gợi ý vai trò ban tổ chức "
+                isOpen={openSettingRole}
+                handleClose={() => {
+                    setOpenSettingRole(false);
+                }}
+            />
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 4 }}>
                     Danh sách sự kiện
@@ -208,40 +219,74 @@ function Event() {
                     </Button>
                 ) : null}
             </Box>
-            <Box sx={{ mb: 2 }}>
-                <TextField
-                    id="outlined-select-currency"
-                    select
-                    size="small"
-                    label="Chọn kỳ"
-                    value={semester}
-                    onChange={handleChange}
-                    sx={{ mr: 2 }}
+            <Box sx={{ mb: 2, display: 'flex' }}>
+                <Box>
+                    <TextField
+                        id="outlined-select-currency"
+                        select
+                        size="small"
+                        label="Chọn kỳ"
+                        value={semester}
+                        onChange={handleChange}
+                        sx={{ mr: 2 }}
+                    >
+                        {semesterList.map((option) => (
+                            <MenuItem key={option.id} value={option.name}>
+                                {option.name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                    <TextField
+                        id="outlined-select-currency"
+                        select
+                        size="small"
+                        label="Chọn tháng"
+                        value={month}
+                        onChange={(e) => {
+                            setMonth(e.target.value);
+                        }}
+                    >
+                        <MenuItem value={0}>Tất cả</MenuItem>
+                        {monthInSemester.map((option) => (
+                            <MenuItem key={option} value={option}>
+                                Tháng {option}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                </Box>
+                <SpeedDial
+                    ariaLabel="SpeedDial openIcon example"
+                    sx={{ transform: 'translateZ(0px)', flexGrow: 1, position: 'absolute', right: 16 }}
+                    icon={<Settings />}
+                    direction={'left'}
                 >
-                    {semesterList.map((option) => (
-                        <MenuItem key={option.id} value={option.name}>
-                            {option.name}
-                        </MenuItem>
-                    ))}
-                </TextField>
-                <TextField
-                    id="outlined-select-currency"
-                    select
-                    size="small"
-                    label="Chọn tháng"
-                    value={month}
-                    onChange={(e) => {
-                        setMonth(e.target.value);
-                    }}
-                >
-                    <MenuItem value={0}>Tất cả</MenuItem>
-                    {monthInSemester.map((option) => (
-                        <MenuItem key={option} value={option}>
-                            Tháng {option}
-                        </MenuItem>
-                    ))}
-                </TextField>
+                    {/* <SpeedDialAction
+                    key={'area'}
+                    icon={<MapTwoTone />}
+                    tooltipTitle={'Chỉnh sửa thông tin sân thi đấu'}
+                    onClick={() => setOpenSettingArea(true)}
+                /> */}
+                    <SpeedDialAction
+                        key={'role'}
+                        icon={<AdminPanelSettings />}
+                        tooltipTitle={'Chỉnh sửa thông tin ban tổ chức'}
+                        onClick={() => setOpenSettingRole(true)}
+                    />
+                    {/* <SpeedDialAction
+                    key={'competitive'}
+                    icon={<SportsGymnastics />}
+                    tooltipTitle={'Chỉnh sửa đề xuất thể thức thi đấu đối kháng'}
+                    onClick={() => setOpenSettingCompetitive(true)}
+                />
+                <SpeedDialAction
+                    key={'exhibition'}
+                    icon={<SportsKabaddi />}
+                    tooltipTitle={'Chỉnh sửa đề xuất thể thức thi đấu biểu diễn'}
+                    onClick={() => setOpenSettingExhibition(true)}
+                /> */}
+                </SpeedDial>
             </Box>
+
             <Grid container spacing={4}>
                 <Grid item xs={4}>
                     {events.length !== 0 ? null : (
