@@ -130,7 +130,7 @@ function Schedule() {
     //     return <LoadingProgress />;
     // }
     const renderEventContent = (eventInfo) => {
-        console.log(eventInfo);
+        // console.log(eventInfo);
         return (
             <Tooltip title={eventInfo.event.title + ' ' + eventInfo.event.extendedProps.time} placement="top">
                 {calendarView === 'dayGridWeek' ? (

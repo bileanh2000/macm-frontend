@@ -25,7 +25,10 @@ import notificationApi from 'src/api/notificationApi';
 import semesterApi from 'src/api/semesterApi';
 import ActiveRegister from './ActiveRegister';
 import userApi from 'src/api/userApi';
+import { over } from 'stompjs';
+import SockJS from 'sockjs-client';
 
+let stompClient = null;
 function Index() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
@@ -34,6 +37,12 @@ function Index() {
     const [startDateOfCurrentSemester, setStartDateOfCurrentSemester] = useState([]);
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
     const [currentSemesterName, setCurrentSemesterName] = useState('');
+    const [receiverSocket, setReceiverSocket] = useState({
+        senderName: '',
+        receiverName: '',
+        message: '',
+        status: '',
+    });
     const roleId = JSON.parse(localStorage.getItem('currentUser')).role.id;
 
     const handleOpenNotificationDialog = () => {
@@ -47,6 +56,46 @@ function Index() {
         localStorage.removeItem('toShowPopup');
         setOpenNotificationDialog(false);
     };
+
+    /***
+     * Socket connect
+     */
+    const connect = () => {
+        let Sock = new SockJS('https://capstone-project-macm.herokuapp.com/ws');
+        stompClient = over(Sock);
+        // stompClient.connect({}, onConnected, onError);
+        stompClient.connect(
+            {},
+            function (frame) {
+                console.log('Connected: ' + frame);
+                setTimeout(function () {
+                    onConnected();
+                }, 1000);
+            },
+            onError,
+        );
+    };
+    const onConnected = () => {
+        // setUserData({...userData,"connected": true});
+        // stompClient.subscribe('/chatroom/public', onMessageReceived);
+        stompClient.subscribe(`/user/${studentId}/private`, onMessageReceived);
+        // userJoin();
+    };
+
+    const onError = (err) => {
+        console.log(err);
+    };
+
+    const onMessageReceived = (payload) => {
+        var payloadData = JSON.parse(payload.body);
+        console.log(payloadData);
+        // console.log(payloadData);
+        setReceiverSocket(payloadData);
+    };
+
+    useEffect(() => {
+        connect();
+    }, []);
 
     const getCurrentSemester = async () => {
         try {
@@ -68,6 +117,19 @@ function Index() {
             console.log('failed when fetchPaymentNotification', error);
         }
     };
+
+    const checkAttendanceStatusByStudentId = async (studentId) => {
+        try {
+            const response = await userApi.checkAttendanceStatusByStudentId(studentId);
+            console.log('checkAttendanceStatusByStudentId', response);
+            setPaymentMessage(response.message);
+        } catch (error) {
+            console.log('failed when checkAttendanceStatusByStudentId', error);
+        }
+    };
+    useEffect(() => {
+        checkAttendanceStatusByStudentId(studentId);
+    }, []);
     const getStatusWhenStartSemester = async (studentId) => {
         try {
             const response = await userApi.getStatusWhenStartSemester(studentId);
@@ -113,19 +175,6 @@ function Index() {
         }
     }, [paymentMessage]);
 
-    // useEffect(() => {
-    //     // let startDateParse = new Date('2022-08-25').setHours(0, 0, 0, 0);
-    //     // let currentDateParse = new Date().setHours(0, 0, 0, 0);
-    //     // if (startDateParse - currentDateParse === 0) {
-    //     //     console.log('hien thong bao nao babe');
-    //     //     handleOpenActiveRegisterDialog();
-    //     // } else {
-    //     //     console.log(`chwa den ngay ${startDateParse}`);
-    //     // }
-    //     // console.log(startDateParse - currentDateParse);
-    //     handleOpenActiveRegisterDialog();
-    // }, []);
-
     return (
         <Fragment>
             <ActiveRegister
@@ -161,18 +210,45 @@ function Index() {
                 </Grid>
                 <Grid item md={2} xs={12} order={{ md: 2, xs: 1 }}>
                     <Grid item md={12} sx={{ p: 0.5 }}>
-                        <Box
+                        {receiverSocket.message === 'Bạn đã được điểm danh hôm nay!' ? (
+                            <Box
+                                sx={{
+                                    p: 2,
+                                    mb: 2,
+                                    textAlign: 'center',
+                                    fontWeight: 'bold',
+                                    backgroundColor: '#16ce8e',
+                                    color: 'white',
+                                }}
+                            >
+                                Bạn đã được điểm danh hôm nay!
+                            </Box>
+                        ) : (
+                            <Box
+                                sx={{
+                                    p: 2,
+                                    mb: 2,
+                                    textAlign: 'center',
+                                    fontWeight: 'bold',
+                                    backgroundColor: '#e01441',
+                                    color: 'white',
+                                }}
+                            >
+                                Vắng mặt!
+                            </Box>
+                        )}
+                        {/* <Box
                             sx={{
                                 p: 2,
                                 mb: 2,
                                 textAlign: 'center',
                                 fontWeight: 'bold',
-                                backgroundColor: '#16ce8e',
+                                backgroundColor: '#1f67ed',
                                 color: 'white',
                             }}
                         >
-                            Bạn đã được điểm danh hôm nay!
-                        </Box>
+                            Chưa điểm danh
+                        </Box> */}
                     </Grid>
                     <Grid item md={12}>
                         <News

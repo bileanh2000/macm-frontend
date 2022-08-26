@@ -10,10 +10,13 @@ import userApi from 'src/api/userApi';
 import { useSnackbar } from 'notistack';
 import moment from 'moment';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { over } from 'stompjs';
+import SockJS from 'sockjs-client';
 
 const LIMIT_TIME = 1; //HOURS
 const TIME_OUT = 100000; //ms
 
+let stompClient = null;
 function QRScanner({ activityData, activityType }) {
     const { enqueueSnackbar } = useSnackbar();
     const [attendanceMessages, setAttendanceMessages] = useState('');
@@ -23,11 +26,58 @@ function QRScanner({ activityData, activityType }) {
     const audioPlayer = useRef(null);
     const now = new Date();
     const [tabHasFocus, setTabHasFocus] = useState(true);
+    const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
 
     const handleClickVariant = (message, variant) => () => {
         // variant could be success, error, warning, info, or default
         enqueueSnackbar(message, { variant });
     };
+    const connect = () => {
+        let Sock = new SockJS('https://capstone-project-macm.herokuapp.com/ws');
+        stompClient = over(Sock);
+        // stompClient.connect({}, onConnected, onError);
+        stompClient.connect(
+            {},
+            function (frame) {
+                console.log('Connected: ' + frame);
+                setTimeout(function () {
+                    onConnected();
+                }, 1000);
+            },
+            onError,
+        );
+    };
+    const onConnected = () => {
+        // setUserData({...userData,"connected": true});
+        // stompClient.subscribe('/chatroom/public', onMessageReceived);
+        stompClient.subscribe(`/user/${studentId}/private`, onMessageReceived);
+        // userJoin();
+    };
+
+    const onError = (err) => {
+        console.log(err);
+    };
+
+    const onMessageReceived = (payload) => {
+        var payloadData = JSON.parse(payload.body);
+        console.log(payload.body);
+        console.log(payloadData);
+    };
+
+    const testSend = (data) => {
+        var chatMessage = {
+            senderName: studentId,
+            receiverName: data.studentId,
+            ...(data.status === 0 ? { message: 'Vắng mặt' } : { message: 'Bạn đã được điểm danh hôm nay!' }),
+
+            status: 'MESSAGE',
+        };
+        stompClient.send('/app/private-message', {}, JSON.stringify(chatMessage));
+    };
+
+    useEffect(() => {
+        connect();
+    }, []);
 
     useEffect(() => {
         const handleFocus = () => {
@@ -80,12 +130,16 @@ function QRScanner({ activityData, activityType }) {
             let response;
             if (!activityType) {
                 response = await adminAttendanceAPI.takeAttendance(studentId, activityData.id, 1);
+                testSend(response.data[0]);
+
                 if (response.data.length === 0) {
                     enqueueSnackbar(response.message, { variant: 'warning' });
                     return;
                 }
             } else {
                 response = await adminAttendanceAPI.takeAttendanceEvent(activityData.event.id, studentId, 1);
+                testSend(response.data[0]);
+
                 if (response.data.length === 0) {
                     enqueueSnackbar(response.message, { variant: 'warning' });
                     return;
