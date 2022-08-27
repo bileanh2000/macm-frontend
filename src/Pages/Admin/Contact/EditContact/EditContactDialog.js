@@ -37,14 +37,48 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import FileBase64 from 'react-file-base64';
 import styles from './EditContact.module.scss';
 import classNames from 'classnames/bind';
+import adminContactAPI from 'src/api/adminContactAPI';
+// import LoadingButton from '@mui/lab/LoadingButton';
 
 const cx = classNames.bind(styles);
 
-const EditContactDialog = ({ title, selectedStudent, isOpen, handleClose, onSucess, editable, adminRole }) => {
+const EditContactDialog = ({
+    title,
+    selectedStudent,
+    isOpen,
+    handleClose,
+    onSucess,
+    editable,
+    adminRole,
+    contacts,
+}) => {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const [file, setFile] = useState();
-    const validationSchema = Yup.object().shape({});
+    const [loading, setLoading] = useState(true);
+
+    const validationSchema = Yup.object().shape({
+        clubMail: Yup.string()
+            .email('Vui lòng nhập đúng định dạng email')
+            .max(255)
+            .required('Không được bỏ trống trường này')
+            .trim(),
+        clubName: Yup.string().trim().required('Không được bỏ trống trường này'),
+        clubPhoneNumber: Yup.string()
+            .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/, 'Vui lòng nhập đúng số điện thoại')
+            .trim()
+            .required('Không được bỏ trống trường này'),
+        fanpageUrl: Yup.string()
+            .matches(
+                /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
+                'Vui lòng nhập đúng định dạng URL',
+            )
+            .required('Không được bỏ trống trường này')
+            .trim(),
+        foundingDate: Yup.string()
+            .required('Vui lòng không được để trống trường này')
+            .typeError('Vui lòng không được để trống trường này'),
+    });
 
     const {
         register,
@@ -59,21 +93,18 @@ const EditContactDialog = ({ title, selectedStudent, isOpen, handleClose, onSuce
     });
 
     const onSubmit = async (data) => {
-        console.log('data', data);
+        setLoading(true);
+        // console.log('data', data);
         const dataFormat = {
-            currentAddress: data.currentAddress,
-            dateOfBirth: moment(new Date(data.dateOfBirth)).format('yyyy-MM-DD'),
-            email: data.email,
-            gender: data.gender,
-            name: data.name,
-            phone: data.phone,
-            roleId: data.roleId,
-            studentId: data.studentId,
-            generation: data.generation,
-            active: true,
+            clubMail: data.clubMail,
+            clubName: data.clubName,
+            clubPhoneNumber: data.clubPhoneNumber,
+            fanpageUrl: data.fanpageUrl,
+            foundingDate: moment(data.foundingDate).format('yyyy-MM-DD'),
+            image: file ? file : contacts[0]?.image,
         };
 
-        await userApi.updateUser(dataFormat).then((res) => {
+        await adminContactAPI.updateContact(dataFormat).then((res) => {
             console.log('1', res);
             console.log('2', res.data);
             if (res.data.length !== 0) {
@@ -125,7 +156,7 @@ const EditContactDialog = ({ title, selectedStudent, isOpen, handleClose, onSuce
                             transform: 'translateX(-50%)',
                             border: '4px solid #fff',
                         }}
-                        srcSet={file}
+                        srcSet={file ? file : contacts[0]?.image}
                     />
 
                     <IconButton color="primary" aria-label="upload picture" component="label" sx={{}}>
@@ -170,11 +201,12 @@ const EditContactDialog = ({ title, selectedStudent, isOpen, handleClose, onSuce
                                 <TextField
                                     required
                                     fullWidth
+                                    defaultValue={contacts[0]?.clubName}
                                     id="outlined-disabled"
                                     label="Tên Câu Lạc Bộ"
-                                    {...register('name')}
-                                    error={errors.name ? true : false}
-                                    helperText={errors.name?.message}
+                                    {...register('clubName')}
+                                    error={errors.clubName ? true : false}
+                                    helperText={errors.clubName?.message}
                                 />
                             </Box>
                         </Box>
@@ -188,9 +220,10 @@ const EditContactDialog = ({ title, selectedStudent, isOpen, handleClose, onSuce
                                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
                                     <Controller
                                         required
-                                        name="dateOfBirth"
+                                        name="foundingDate"
                                         control={control}
-                                        defaultValue=""
+                                        // defaultValue=""
+                                        defaultValue={contacts[0]?.foundingDate}
                                         // defaultValue="2011-09-12"
                                         render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
                                             <DatePicker
@@ -230,10 +263,11 @@ const EditContactDialog = ({ title, selectedStudent, isOpen, handleClose, onSuce
                                     type="number"
                                     id="outlined-disabled"
                                     label="Số điện thoại"
+                                    defaultValue={contacts[0]?.clubPhoneNumber}
                                     fullWidth
-                                    {...register('phone')}
-                                    error={errors.phone ? true : false}
-                                    helperText={errors.phone?.message}
+                                    {...register('clubPhoneNumber')}
+                                    error={errors.clubPhoneNumber ? true : false}
+                                    helperText={errors.clubPhoneNumber?.message}
                                 />
                             </Box>
                         </Box>
@@ -250,9 +284,10 @@ const EditContactDialog = ({ title, selectedStudent, isOpen, handleClose, onSuce
                                     fullWidth
                                     id="outlined-disabled"
                                     label="Email"
-                                    {...register('email')}
-                                    error={errors.email ? true : false}
-                                    helperText={errors.email?.message}
+                                    defaultValue={contacts[0]?.clubMail}
+                                    {...register('clubMail')}
+                                    error={errors.clubMail ? true : false}
+                                    helperText={errors.clubMail?.message}
                                 />
                             </Box>
                         </Box>
@@ -263,17 +298,15 @@ const EditContactDialog = ({ title, selectedStudent, isOpen, handleClose, onSuce
                             }}
                         >
                             <Box>
-                                <TextField fullWidth id="outlined-disabled" label="Fanpage" {...register('facebook')} />
-                            </Box>
-                        </Box>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'flex-start',
-                            }}
-                        >
-                            <Box>
-                                <TextField fullWidth id="outlined-disabled" label="Địa chỉ" {...register('address')} />
+                                <TextField
+                                    fullWidth
+                                    id="outlined-disabled"
+                                    label="Fanpage"
+                                    defaultValue={contacts[0]?.fanpageUrl}
+                                    {...register('fanpageUrl')}
+                                    error={errors.fanpageUrl ? true : false}
+                                    helperText={errors.fanpageUrl?.message}
+                                />
                             </Box>
                         </Box>
                     </Box>
@@ -284,6 +317,16 @@ const EditContactDialog = ({ title, selectedStudent, isOpen, handleClose, onSuce
                         <Button onClick={handleSubmit(onSubmit)} autoFocus>
                             Xác nhận
                         </Button>
+                        {/* <LoadingButton
+                            size="small"
+                            onClick={handleSubmit(onSubmit)}
+                            //   endIcon={<SendIcon />}
+                            loading={loading}
+                            loadingPosition="end"
+                            variant="contained"
+                        >
+                            Send
+                        </LoadingButton> */}
                     </>
                 </DialogActions>
             </Dialog>
