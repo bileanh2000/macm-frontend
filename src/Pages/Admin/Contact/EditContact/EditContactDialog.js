@@ -55,7 +55,7 @@ const EditContactDialog = ({
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const [file, setFile] = useState();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const validationSchema = Yup.object().shape({
         clubMail: Yup.string()
@@ -313,9 +313,9 @@ const EditContactDialog = ({
                 </DialogContent>
                 <DialogActions>
                     <>
-                        <Button onClick={handleClose}>Hủy</Button>
-                        <Button onClick={handleSubmit(onSubmit)} autoFocus>
-                            Xác nhận
+                        {loading ? null : <Button onClick={handleClose}>Hủy</Button>}
+                        <Button onClick={handleSubmit(onSubmit)} autoFocus disabled={loading}>
+                            {loading ? 'Loading...' : 'Xác nhận'}
                         </Button>
                         {/* <LoadingButton
                             size="small"
