@@ -1,0 +1,68 @@
+@-webkit-keyframes scanner {
+    0% {
+        bottom: 80%;
+    }
+    50% {
+        bottom: 20%;
+    }
+    100% {
+        bottom: 80%;
+    }
+}
+
+@-moz-keyframes scanner {
+    0% {
+        bottom: 80%;
+    }
+    50% {
+        bottom: 20%;
+    }
+    100% {
+        bottom: 80%;
+    }
+}
+
+@-o-keyframes scanner {
+    0% {
+        bottom: 80%;
+    }
+    50% {
+        bottom: 20%;
+    }
+    100% {
+        bottom: 80%;
+    }
+}
+
+@keyframes scanner {
+    0% {
+        bottom: 80%;
+    }
+    50% {
+        bottom: 20%;
+    }
+    100% {
+        bottom: 80%;
+    }
+}
+
+.custom-scanner {
+    display: block;
+    width: 55%;
+    height: 3px;
+    background: red;
+    position: absolute;
+    z-index: 1;
+    left: 0px;
+    /* top: 0px; */
+    bottom: 30%;
+    right: 0;
+    margin: auto;
+    -webkit-transition: all 200ms linear;
+    -moz-transition: all 200ms linear;
+    transition: all 200ms linear;
+    -webkit-animation: scanner 3s infinite linear;
+    -moz-animation: scanner 3s infinite linear;
+    -o-animation: scanner 3s infinite linear;
+    animation: scanner 3s infinite linear;
+}
