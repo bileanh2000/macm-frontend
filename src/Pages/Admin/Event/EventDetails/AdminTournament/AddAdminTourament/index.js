@@ -14,17 +14,19 @@ import { Box } from '@mui/system';
 import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 
-import adminTournamentAPI from 'src/api/adminTournamentAPI';
+import eventApi from 'src/api/eventApi';
 
-function AddAdminTourament({ value, index, total, active }) {
+function AddAdminTourament({ value, index, total, active, onChange }) {
     let { tournamentId } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
     const [userList, setUserList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [isApprove, setIsApprove] = useState(false);
-    const [idUpdate, setIdUpdate] = useState(0);
+    const [idUpdate, setIdUpdate] = useState();
     const [_active, setActive] = useState(active);
+    const [_total, setTotal] = useState(total);
+    const [isRender, setIsRender] = useState(true);
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -34,84 +36,76 @@ function AddAdminTourament({ value, index, total, active }) {
         setIdUpdate(id);
         setOpenDialog(true);
     };
-
-    const fetchAdminInTournament = async (params) => {
+    const fetchAdminInEvent = async (params, index) => {
         try {
-            const response = await adminTournamentAPI.getAllTournamentOrganizingCommittee(params);
+            const response = await eventApi.getAllMemberEvent(params, index);
             console.log(response);
-            setActive(response.totalActive);
             const newUser = response.data.filter((user) => user.registerStatus === 'Đang chờ duyệt');
             console.log(newUser);
             setUserList(newUser);
+            setActive(response.totalActive);
+            setTotal(response.totalResult);
         } catch (error) {
-            console.log('Failed to fetch user list: ', error);
+            console.log('Failed to fetch admin list: ', error);
         }
     };
 
     useEffect(() => {
-        fetchAdminInTournament(tournamentId);
-    }, [tournamentId]);
+        isRender && fetchAdminInEvent(tournamentId);
+        setIsRender(false);
+    }, [tournamentId, isRender, userList]);
 
     const columns = [
-        { field: 'studentName', headerName: 'Tên', flex: 0.3 },
+        { field: 'studentName', headerName: 'Tên', flex: 0.6 },
         {
             field: 'studentId',
             headerName: 'Mã sinh viên',
             flex: 0.3,
         },
-        // {
-        //     field: 'roleInTournament',
-        //     headerName: 'Vai trò mong muốn',
-        //     flex: 0.3,
-        // },
+        {
+            field: 'roleInTournament',
+            headerName: 'Vai trò mong muốn',
+            flex: 0.6,
+        },
         {
             field: 'approve',
             type: 'actions',
-            flex: 0.5,
+            flex: 0.3,
             cellClassName: 'actions',
             getActions: (params) => {
                 return [
                     <Button
                         component="button"
                         label="Đã đóng"
-                        onClick={() => handleOpenDialog(params.row.id, true)}
+                        onClick={() => handleOpenDialog(params.row, true)}
                         style={{ backgroundColor: 'aquamarine' }}
                     >
                         Chấp nhận
                     </Button>,
+                ];
+            },
+            // hide: _active === 10,
+        },
+
+        {
+            field: 'reject',
+            type: 'actions',
+            flex: 0.3,
+            cellClassName: 'actions',
+            getActions: (params) => {
+                return [
                     <Button
                         component="button"
                         label="Đã đóng"
-                        onClick={() => handleOpenDialog(params.row.id, false)}
+                        onClick={() => handleOpenDialog(params.row, false)}
                         style={{ backgroundColor: 'lightcoral' }}
                     >
-                        Hủy
+                        Từ chối
                     </Button>,
                 ];
             },
-            hide: _active === 10,
+            // hide: _active === 10,
         },
-
-        // {
-        //     field: 'reject',
-        //     headerName: 'hihi',
-        //     type: 'actions',
-        //     flex: 0.5,
-        //     cellClassName: 'actions',
-        //     getActions: (params) => {
-        //         return [
-        //             <Button
-        //                 component="button"
-        //                 label="Đã đóng"
-        //                 onClick={() => handleOpenDialog(params.row.id, false)}
-        //                 style={{ backgroundColor: 'lightcoral' }}
-        //             >
-        //                 Hủy
-        //             </Button>,
-        //         ];
-        //     },
-        //     // hide: _active === 10,
-        // },
     ];
 
     const rowsUser = userList.map((item, index) => {
@@ -119,24 +113,28 @@ function AddAdminTourament({ value, index, total, active }) {
         container['id'] = item.id;
         container['studentName'] = item.userName;
         container['studentId'] = item.userStudentId;
-        container['roleInTournament'] = item.roleTournamentDto.name;
+        container['roleInTournament'] = item.tournamentRoleDto.name;
         container['registerStatus'] = item.registerStatus;
         return container;
     });
 
-    const acceptRequestToJoinOrganizingCommittee = async (organizingCommitteeId) => {
+    const acceptRequestToJoinEvent = async (memberEventId) => {
         try {
-            const response = await adminTournamentAPI.acceptRequestToJoinOrganizingCommittee(organizingCommitteeId);
+            const response = await eventApi.acceptRequestToJoinEvent(memberEventId);
             enqueueSnackbar(response.message, { variant: 'success' });
+            setIsRender(true);
+            onChange && onChange();
         } catch (error) {
             console.log('Khong the chap thuan yeu cau nay, loi:', error);
         }
     };
 
-    const declineRequestToJoinOrganizingCommittee = async (organizingCommitteeId) => {
+    const declineRequestToJoinEvent = async (memberEventId) => {
         try {
-            const response = await adminTournamentAPI.declineRequestToJoinOrganizingCommittee(organizingCommitteeId);
+            const response = await eventApi.declineRequestToJoinEvent(memberEventId);
             enqueueSnackbar(response.message, { variant: 'success' });
+            setIsRender(true);
+            onChange && onChange();
         } catch (error) {
             console.log('Khong the chap thuan yeu cau nay, loi:', error);
         }
@@ -144,10 +142,10 @@ function AddAdminTourament({ value, index, total, active }) {
     const handleUpdate = () => {
         console.log(idUpdate, isApprove);
         if (isApprove) {
-            acceptRequestToJoinOrganizingCommittee(idUpdate);
+            acceptRequestToJoinEvent(idUpdate.id);
             setActive((prev) => prev + 1);
         } else {
-            declineRequestToJoinOrganizingCommittee(idUpdate);
+            declineRequestToJoinEvent(idUpdate.id);
         }
 
         const newUser = userList.filter((user) => user.id !== idUpdate);
@@ -168,7 +166,7 @@ function AddAdminTourament({ value, index, total, active }) {
                     <GridToolbarQuickFilter />
                 </Box>
                 <Typography variant="body1" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                    Số lượng thành viên trong ban tổ chức: {_active}/{total}
+                    Số lượng thành viên : {_active}/{total}
                 </Typography>
             </GridToolbarContainer>
         );
@@ -238,23 +236,28 @@ function AddAdminTourament({ value, index, total, active }) {
             id={`simple-tabpanel-${index}`}
             aria-labelledby={`simple-tab-${index}`}
         >
-            <Dialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">Bạn có muốn lưu các thay đổi ?</DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog}>Hủy</Button>
-                    <Button onClick={handleUpdate} autoFocus>
-                        Xác nhận
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {idUpdate && (
+                <Dialog
+                    open={openDialog}
+                    onClose={handleCloseDialog}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Bạn có muốn {isApprove ? 'chấp thuận' : 'từ chối'} yêu cầu tham gia ban tổ chức của{' '}
+                            {idUpdate.studentName} - {idUpdate.studentId}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDialog}>Hủy</Button>
+                        <Button onClick={handleUpdate} autoFocus>
+                            Xác nhận
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
 
             <Box
                 sx={{

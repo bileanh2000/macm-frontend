@@ -2,6 +2,7 @@ import {
     Alert,
     Box,
     Button,
+    Checkbox,
     Collapse,
     Dialog,
     DialogActions,
@@ -85,6 +86,9 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
 
     const handleChange = (event) => {
         setSubmitOption(event.target.value);
+    };
+    const handleSelectRole = (data) => {
+        setDatas(datas.map((d) => (d.id === data.id ? { ...d, selected: !d.selected } : d)));
     };
     const getClubFund = async () => {
         try {
@@ -311,8 +315,17 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
     };
 
     const handleAddEventRoles = (data) => {
+        if (datas.findIndex((d) => d.name.toLowerCase().includes(data.roleName.toLowerCase())) >= 0) {
+            setError('roleName', {
+                message: 'Vai trò này đã tồn tại, vui lòng chọn vai trò khác',
+            });
+            return;
+        }
         console.log(data);
-        const newData = [...datas, { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity }];
+        const newData = [
+            ...datas,
+            { id: Math.random(), name: data.roleName, maxQuantity: data.maxQuantity, selected: true },
+        ];
         setDatas(newData);
 
         /**
@@ -426,7 +439,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                 : {
                       rolesEventDto: datas,
                   }),
-            // rolesEventDto: datas,
+            eventRolesDto: datas.filter((data) => data.selected),
             listPreview: previewSchedule,
         };
         eventApi.createEvent(createEventData, user.studentId).then((response) => {
@@ -593,13 +606,15 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                                     <>
                                                         <br />
                                                         <ul>
-                                                            {datas.map((role) => {
-                                                                return (
-                                                                    <li key={role.id}>
-                                                                        {role.name} - {role.maxQuantity} người
-                                                                    </li>
-                                                                );
-                                                            })}
+                                                            {datas
+                                                                .filter((data) => data.selected)
+                                                                .map((role) => {
+                                                                    return (
+                                                                        <li key={role.id}>
+                                                                            {role.name} - {role.maxQuantity} người
+                                                                        </li>
+                                                                    );
+                                                                })}
                                                         </ul>
                                                     </>
                                                 )}
@@ -799,15 +814,21 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                                 </caption>
                                                 <TableHead>
                                                     <TableRow>
+                                                        <TableCell align="center"></TableCell>
                                                         <TableCell align="center">Tên vai trò</TableCell>
                                                         <TableCell align="center">Số lượng</TableCell>
-                                                        <TableCell align="center"></TableCell>
                                                         <TableCell align="center"></TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
                                                     {datas.map((data) => (
                                                         <TableRow key={data.id}>
+                                                            <TableCell align="center">
+                                                                <Checkbox
+                                                                    checked={data.selected}
+                                                                    onChange={() => handleSelectRole(data)}
+                                                                />
+                                                            </TableCell>
                                                             <TableCell align="center">{data.name}</TableCell>
                                                             <TableCell align="center">{data.maxQuantity}</TableCell>
                                                             <TableCell>
@@ -822,7 +843,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                                                     <Edit />
                                                                 </IconButton>
                                                             </TableCell>
-                                                            <TableCell>
+                                                            {/* <TableCell>
                                                                 <IconButton
                                                                     aria-label="delete"
                                                                     onClick={() => {
@@ -832,7 +853,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                                                 >
                                                                     <Delete />
                                                                 </IconButton>
-                                                            </TableCell>
+                                                            </TableCell> */}
                                                         </TableRow>
                                                     ))}
                                                 </TableBody>
