@@ -36,7 +36,7 @@ function CreateExhibitionTournament({ isOpen, handleClose, onSucess, datas }) {
     };
 
     const handleAddCompetition = (data) => {
-        if (datas.findIndex((d) => d.name.toLowerCase().includes(data.name.toLowerCase())) >= 0) {
+        if (datas.findIndex((d) => d.name.toLowerCase() === data.name.toLowerCase()) >= 0) {
             setError('name', {
                 message: `Thể thức ${data.name} này đã tồn tại, vui lòng chọn thể thức khác`,
             });

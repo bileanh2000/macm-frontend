@@ -7,6 +7,7 @@ import {
     DialogContent,
     DialogTitle,
     IconButton,
+    Paper,
     Table,
     TableBody,
     TableCell,
@@ -71,6 +72,9 @@ function AreaSetting({ title, isOpen, handleClose }) {
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
+            sx={{
+                height: '80vh !importance',
+            }}
         >
             {area && (
                 <EditArea
@@ -119,29 +123,31 @@ function AreaSetting({ title, isOpen, handleClose }) {
                         '& .MuiTextField-root': { mb: 2 },
                     }}
                 >
-                    <Box>
+                    <Paper elevation={1}>
                         {datas.length > 0 && (
-                            <TableContainer sx={{ maxHeight: 300, m: 1, p: 1 }}>
-                                <Table stickyHeader aria-label="sticky table">
-                                    <caption style={{ captionSide: 'top' }}>
-                                        Số lượng sân thi đấu hiện tại : {datas.length}
-                                    </caption>
+                            <TableContainer sx={{ maxHeight: 480, m: 1, p: 1 }}>
+                                <Table stickyHeader aria-label="sticky table" size="small">
                                     <TableHead>
                                         <TableRow>
                                             <TableCell align="center">Tên sân </TableCell>
                                             <TableCell align="center">Trạng thái</TableCell>
-                                            <TableCell align="center"></TableCell>
-                                            <TableCell align="center"></TableCell>
+                                            <TableCell align="center">
+                                                {' '}
+                                                Số lượng sân thi đấu hiện tại : {datas.length}
+                                            </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {datas.map((data) => (
-                                            <TableRow key={data.id}>
+                                            <TableRow
+                                                key={data.id}
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
                                                 <TableCell align="center">{data.name}</TableCell>
                                                 <TableCell align="center">
                                                     {data.isActive ? 'Có thể sử dụng' : 'Không thể sử dụng'}
                                                 </TableCell>
-                                                <TableCell>
+                                                <TableCell align="center">
                                                     <IconButton
                                                         aria-label="edit"
                                                         onClick={() => {
@@ -157,7 +163,7 @@ function AreaSetting({ title, isOpen, handleClose }) {
                                 </Table>
                             </TableContainer>
                         )}
-                    </Box>
+                    </Paper>
                 </Box>
             </DialogContent>
             <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>

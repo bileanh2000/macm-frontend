@@ -136,7 +136,12 @@ function MemberTournament({ tournament, isUpdate, tournamentStage, user, onChang
 
     return (
         <Fragment>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Box
+                sx={{
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                }}
+            >
                 <Tabs
                     value={value}
                     onChange={handleChange}
@@ -154,7 +159,13 @@ function MemberTournament({ tournament, isUpdate, tournamentStage, user, onChang
                         </Button>
                     )} */}
             </Box>
-            <div role="tabpanel" hidden={value !== 0} id={`simple-tabpanel-${0}`} aria-labelledby={`simple-tab-${0}`}>
+            <div
+                role="tabpanel"
+                hidden={value !== 0}
+                id={`simple-tabpanel-${0}`}
+                aria-labelledby={`simple-tab-${0}`}
+                style={{ padding: '1rem' }}
+            >
                 <Box sx={{ minHeight: '60vh' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                         <FormControl size="small" sx={{ mr: 2, minWidth: '10rem' }}>
@@ -377,20 +388,22 @@ function MemberTournament({ tournament, isUpdate, tournamentStage, user, onChang
                 </Box>
             </div>
             {value == 1 && (
-                <AddMemberTourament
-                    value={value}
-                    index={1}
-                    onChange={() => {
-                        setIsRenderCompe(true);
-                        setIsRender(true);
-                        onChange && onChange();
-                    }}
-                    tournament={tournament}
-                    isUpdate={isUpdate}
-                    tournamentStatus={tournamentStatus}
-                    tournamentStage={tournamentStage}
-                    listExhibitionType={listExhibitionType}
-                />
+                <Box style={{ padding: '1rem' }}>
+                    <AddMemberTourament
+                        value={value}
+                        index={1}
+                        onChange={() => {
+                            setIsRenderCompe(true);
+                            setIsRender(true);
+                            onChange && onChange();
+                        }}
+                        tournament={tournament}
+                        isUpdate={isUpdate}
+                        tournamentStatus={tournamentStatus}
+                        tournamentStage={tournamentStage}
+                        listExhibitionType={listExhibitionType}
+                    />
+                </Box>
             )}
         </Fragment>
     );

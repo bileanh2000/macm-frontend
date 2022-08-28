@@ -21,6 +21,7 @@ function a11yProps(index) {
 }
 
 function CustomMatchBracket(params) {
+    console.log(params.matches, params.rounds);
     let i,
         __matches = [];
     for (i = 1; i <= params.rounds; i++) {
@@ -254,7 +255,7 @@ function CustomMatchBracket(params) {
 
     return (
         <Fragment>
-            <Dialog fullWidth maxWidth="lg" open={open}>
+            <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
                 <div>
                     <DialogTitle>
                         {value == 0 ? 'Thời gian và địa điểm thi đấu' : 'Xác nhận người chiến thắng'}

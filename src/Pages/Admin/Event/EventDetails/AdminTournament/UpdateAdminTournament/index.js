@@ -19,7 +19,7 @@ import { useSnackbar } from 'notistack';
 import adminTournamentAPI from 'src/api/adminTournamentAPI';
 
 function UpdateAdminTournament({ value, index }) {
-    let { tournamentId } = useParams();
+    let { id } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
     const [adminList, setAdminList] = useState([]);
@@ -76,9 +76,9 @@ function UpdateAdminTournament({ value, index }) {
     };
 
     useEffect(() => {
-        fetchAdminInTournament(tournamentId);
+        fetchAdminInTournament(id);
         fetchRolesInTournament();
-    }, [tournamentId]);
+    }, [id]);
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
@@ -120,7 +120,7 @@ function UpdateAdminTournament({ value, index }) {
         container['id'] = item.id;
         container['studentName'] = item.userName;
         container['studentId'] = item.userStudentId;
-        container['role'] = item.roleTournamentDto.name;
+        container['role'] = item.eventRoleDto.name;
         return container;
     });
 

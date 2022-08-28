@@ -39,6 +39,11 @@ const userTournamentAPI = {
         const url = `tournament/getalluserorganizingcommittee/${tournamentId}/${studentId}`;
         return axiosClient.get(url);
     },
+
+    getMyTeam: (tournamentId, studentId) => {
+        const url = `tournament/getmyteam/${tournamentId}/${studentId}`;
+        return axiosClient.get(url);
+    },
 };
 
 export default userTournamentAPI;

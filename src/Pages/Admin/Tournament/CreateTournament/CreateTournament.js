@@ -53,7 +53,7 @@ import EditableSchedule from './Schedule/EditableSchedule';
 import EditRole from './EditRole';
 import LoadingProgress from 'src/Components/LoadingProgress';
 
-const steps = ['Thông tin sự kiện', 'Thêm vai trò BTC', 'Nội dung thi đấu', 'Thêm chi phí', 'Thêm lịch', 'Xem trước'];
+const steps = ['Thông tin giải đấu', 'Thêm vai trò BTC', 'Nội dung thi đấu', 'Thêm chi phí', 'Thêm lịch', 'Xem trước'];
 
 function CreateTournament({
     title,
@@ -580,6 +580,9 @@ function CreateTournament({
                 autoComplete="off"
                 sx={{
                     '& .MuiTextField-root': { mb: 2 },
+                    // sx={{
+                    height: '80vh !importance',
+                    // }}
                 }}
                 ref={formRef}
             >
@@ -612,6 +615,9 @@ function CreateTournament({
                     onClose={handleClose}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
+                    sx={{
+                        height: '80vh !importance',
+                    }}
                 >
                     <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
                     <DialogContent>
@@ -923,45 +929,50 @@ function CreateTournament({
                                 </>
                             ) : activeStep === 1 ? (
                                 <>
-                                    <Box>
-                                        {datas.length > 0 && (
-                                            <TableContainer sx={{ maxHeight: 300, m: 1, p: 1 }}>
-                                                <Table stickyHeader aria-label="sticky table">
-                                                    <caption style={{ captionSide: 'top' }}>
-                                                        Số lượng vai trò hiện tại : {datas.length}
-                                                    </caption>
-                                                    <TableHead>
-                                                        <TableRow>
-                                                            <TableCell align="center"></TableCell>
-                                                            <TableCell align="center">Tên vai trò</TableCell>
-                                                            <TableCell align="center">Số lượng thành viên</TableCell>
-                                                            <TableCell align="center"></TableCell>
-                                                        </TableRow>
-                                                    </TableHead>
-                                                    <TableBody>
-                                                        {datas.map((data) => (
-                                                            <TableRow key={data.id}>
+                                    <Paper elevation={1}>
+                                        <TableContainer sx={{ maxHeight: 450, m: 1, p: 1 }}>
+                                            {datas.length > 0 && (
+                                                <>
+                                                    <Table stickyHeader aria-label="sticky table" size="small">
+                                                        <TableHead>
+                                                            <TableRow>
                                                                 <TableCell align="center">
-                                                                    <Checkbox
-                                                                        checked={data.selected}
-                                                                        onChange={() => handleSelectRole(data)}
-                                                                    />
+                                                                    {' '}
+                                                                    Số lượng vai trò hiện tại : {datas.length}
                                                                 </TableCell>
-                                                                <TableCell align="center">{data.name}</TableCell>
-                                                                <TableCell align="center">{data.maxQuantity}</TableCell>
-                                                                <TableCell>
-                                                                    <IconButton
-                                                                        aria-label="edit"
-                                                                        onClick={() => {
-                                                                            // handleOpenDialog();
-                                                                            handleEdit(data);
-                                                                        }}
-                                                                        disabled={isEdit || isChecked}
-                                                                    >
-                                                                        <Edit />
-                                                                    </IconButton>
+                                                                <TableCell align="center">Tên vai trò</TableCell>
+                                                                <TableCell align="center">
+                                                                    Số lượng thành viên
                                                                 </TableCell>
-                                                                {/* <TableCell>
+                                                                <TableCell align="center"></TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {datas.map((data) => (
+                                                                <TableRow key={data.id}>
+                                                                    <TableCell align="center">
+                                                                        <Checkbox
+                                                                            checked={data.selected}
+                                                                            onChange={() => handleSelectRole(data)}
+                                                                        />
+                                                                    </TableCell>
+                                                                    <TableCell align="center">{data.name}</TableCell>
+                                                                    <TableCell align="center">
+                                                                        {data.maxQuantity}
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <IconButton
+                                                                            aria-label="edit"
+                                                                            onClick={() => {
+                                                                                // handleOpenDialog();
+                                                                                handleEdit(data);
+                                                                            }}
+                                                                            disabled={isEdit || isChecked}
+                                                                        >
+                                                                            <Edit />
+                                                                        </IconButton>
+                                                                    </TableCell>
+                                                                    {/* <TableCell>
                                                                     <IconButton
                                                                         aria-label="delete"
                                                                         onClick={() => {
@@ -973,19 +984,18 @@ function CreateTournament({
                                                                         <Delete />
                                                                     </IconButton>
                                                                 </TableCell> */}
-                                                            </TableRow>
-                                                        ))}
-                                                    </TableBody>
-                                                </Table>
-                                            </TableContainer>
-                                        )}
-                                        <Paper elevation={3}>
-                                            <Collapse in={isChecked}>
-                                                {!isEdit ? (
-                                                    <Grid container spacing={2} sx={{ p: 2 }}>
-                                                        <Grid item xs={12} container spacing={2}>
-                                                            <Grid item xs={6}>
-                                                                {/* {roles.length > 0 ? (
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+
+                                                    <Paper elevation={3}>
+                                                        <Collapse in={isChecked}>
+                                                            {!isEdit ? (
+                                                                <Grid container spacing={2} sx={{ p: 2 }}>
+                                                                    <Grid item xs={12} container spacing={2}>
+                                                                        <Grid item xs={6}>
+                                                                            {/* {roles.length > 0 ? (
                                                                 <Autocomplete
                                                                     id="free-solo-demo"
                                                                     freeSolo
@@ -1005,89 +1015,92 @@ function CreateTournament({
                                                                     )}
                                                                 />
                                                             ) : ( */}
-                                                                <TextField
-                                                                    id="outlined-basic"
-                                                                    label="Tên vai trò"
-                                                                    variant="outlined"
-                                                                    fullWidth
-                                                                    {...register('roleName')}
-                                                                    error={errors.roleName ? true : false}
-                                                                    helperText={errors.roleName?.message}
-                                                                />
-                                                                {/* )} */}
-                                                            </Grid>
-                                                            <Grid item xs={6}>
-                                                                <TextField
-                                                                    label="Số lượng"
-                                                                    type="number"
-                                                                    id="outlined-basic"
-                                                                    variant="outlined"
-                                                                    fullWidth
-                                                                    {...register('maxQuantity')}
-                                                                    error={errors.maxQuantity ? true : false}
-                                                                    helperText={errors.maxQuantity?.message}
-                                                                />
-                                                            </Grid>
-                                                        </Grid>
-                                                        <Grid item xs={12}>
-                                                            <Button
-                                                                variant="contained"
-                                                                onClick={handleSubmit(handleAddEventRoles)}
-                                                                sx={{ mr: 1 }}
-                                                            >
-                                                                Thêm
-                                                            </Button>
-                                                            <Button
-                                                                variant="contained"
-                                                                color="error"
-                                                                onClick={handleCancel}
-                                                            >
-                                                                Hủy
-                                                            </Button>
-                                                        </Grid>
-                                                    </Grid>
-                                                ) : (
-                                                    dataEdit && (
-                                                        <EditRole
-                                                            roleEdit={dataEdit}
-                                                            onEdit={handleEditEventRoles}
-                                                            onCancel={handleCancel}
-                                                        />
-                                                    )
-                                                )}
-                                            </Collapse>
-                                        </Paper>
-                                        <Collapse in={!isChecked}>
-                                            <Fab
-                                                color="primary"
-                                                variant="extended"
-                                                aria-label="add"
-                                                onClick={() => setIsChecked(!isChecked)}
-                                                size="medium"
-                                            >
-                                                <Add />
-                                                Thêm vai trò
-                                            </Fab>
-                                        </Collapse>
-                                        {/* <button disabled={!isDirty || !isValid} type="submit">
-                                        Submit
-                                    </button> */}
-                                    </Box>
+                                                                            <TextField
+                                                                                id="outlined-basic"
+                                                                                label="Tên vai trò"
+                                                                                variant="outlined"
+                                                                                fullWidth
+                                                                                {...register('roleName')}
+                                                                                error={errors.roleName ? true : false}
+                                                                                helperText={errors.roleName?.message}
+                                                                            />
+                                                                            {/* )} */}
+                                                                        </Grid>
+                                                                        <Grid item xs={6}>
+                                                                            <TextField
+                                                                                label="Số lượng"
+                                                                                type="number"
+                                                                                id="outlined-basic"
+                                                                                variant="outlined"
+                                                                                fullWidth
+                                                                                {...register('maxQuantity')}
+                                                                                error={
+                                                                                    errors.maxQuantity ? true : false
+                                                                                }
+                                                                                helperText={errors.maxQuantity?.message}
+                                                                            />
+                                                                        </Grid>
+                                                                    </Grid>
+                                                                    <Grid item xs={12}>
+                                                                        <Button
+                                                                            variant="contained"
+                                                                            onClick={handleSubmit(handleAddEventRoles)}
+                                                                            sx={{ mr: 1 }}
+                                                                        >
+                                                                            Thêm
+                                                                        </Button>
+                                                                        <Button
+                                                                            variant="contained"
+                                                                            color="error"
+                                                                            onClick={handleCancel}
+                                                                        >
+                                                                            Hủy
+                                                                        </Button>
+                                                                    </Grid>
+                                                                </Grid>
+                                                            ) : (
+                                                                dataEdit && (
+                                                                    <EditRole
+                                                                        roleEdit={dataEdit}
+                                                                        onEdit={handleEditEventRoles}
+                                                                        onCancel={handleCancel}
+                                                                    />
+                                                                )
+                                                            )}
+                                                        </Collapse>
+                                                    </Paper>
+                                                    <Collapse in={!isChecked}>
+                                                        <Fab
+                                                            color="primary"
+                                                            variant="extended"
+                                                            aria-label="add"
+                                                            onClick={() => setIsChecked(!isChecked)}
+                                                            size="small"
+                                                            sx={{ mt: 1, mr: 1, float: 'right' }}
+                                                        >
+                                                            <Add />
+                                                            Thêm vai trò
+                                                        </Fab>
+                                                    </Collapse>
+                                                </>
+                                            )}
+                                        </TableContainer>
+                                    </Paper>
                                 </>
                             ) : activeStep === 2 ? (
                                 <>
                                     <Grid container spacing={2}>
                                         <Grid item xs={12} sm={6}>
                                             <Typography
-                                                sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }}
+                                                sx={{ marginLeft: '10px', fontWeight: 500, mb: 1 }}
                                                 variant="body1"
                                             >
                                                 Thi đấu đối kháng{' '}
                                             </Typography>
-                                            <small>
+                                            {/* <small>
                                                 Số lượng hạng mục hiện tại:{' '}
                                                 {datasFightingCompetition.filter((data) => data.selected).length}
-                                            </small>
+                                            </small> */}
                                             <FightingCompetition
                                                 onAddFightingCompetition={AddFightingCompetitionHandler}
                                                 data={datasFightingCompetition}
@@ -1096,15 +1109,15 @@ function CreateTournament({
 
                                         <Grid item xs={12} sm={6}>
                                             <Typography
-                                                sx={{ marginLeft: '10px', fontWeight: 500, mb: 2 }}
+                                                sx={{ marginLeft: '10px', fontWeight: 500, mb: 1 }}
                                                 variant="body1"
                                             >
                                                 Thi đấu biểu diễn
                                             </Typography>
-                                            <small>
+                                            {/* <small>
                                                 Số lượng hạng mục hiện tại:{' '}
                                                 {datasPerformanceCompetition.filter((data) => data.selected).length}
-                                            </small>
+                                            </small> */}
                                             <PerformanceCompetition
                                                 onAddPerformanceCompetition={PerformanceCompetitionHandler}
                                                 data={datasPerformanceCompetition}
@@ -1485,7 +1498,7 @@ function CreateTournament({
                                                             ampm={false}
                                                             // value={value}
                                                             // onChange={(value) => onChange(value)}
-                                                            value={dateCommitteeDeadline}
+                                                            value={datePlayerDeadline}
                                                             onChange={(value) => {
                                                                 onChange(value);
                                                                 setDateCommitteeDeadline(value);

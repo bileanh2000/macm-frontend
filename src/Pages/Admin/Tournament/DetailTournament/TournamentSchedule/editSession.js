@@ -27,7 +27,7 @@ import { useSnackbar } from 'notistack';
 import { Title } from '@mui/icons-material';
 import adminTournament from 'src/api/adminTournamentAPI';
 
-function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
+function EditSession({ title, children, isOpen, handleClose, onSucess, date, scheduleData }) {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const currentDate = new Date();
     const { scheduleId } = useParams();
@@ -266,7 +266,12 @@ function EditSession({ title, children, isOpen, handleClose, onSucess, date }) {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Button variant="contained" color="error" onClick={handleClickOpen}>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={handleClickOpen}
+                        disabled={scheduleData.length == 1}
+                    >
                         Xóa lịch
                     </Button>
                     <Box>

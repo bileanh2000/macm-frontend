@@ -8,6 +8,7 @@ import {
     DialogContent,
     DialogTitle,
     IconButton,
+    Paper,
     Table,
     TableBody,
     TableCell,
@@ -86,6 +87,9 @@ function ExhibitionSetting({ title, isOpen, handleClose }) {
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
+            sx={{
+                height: '80vh !importance',
+            }}
         >
             {datas && exhibition && (
                 <EditExhibitionTournament
@@ -157,29 +161,30 @@ function ExhibitionSetting({ title, isOpen, handleClose }) {
                         '& .MuiTextField-root': { mb: 2 },
                     }}
                 >
-                    <Box>
+                    <Paper elevation={1}>
                         {datas.length > 0 && (
-                            <TableContainer sx={{ maxHeight: 350, m: 1, p: 1, mb: 2 }}>
-                                <Table stickyHeader aria-label="sticky table">
-                                    <caption style={{ captionSide: 'top' }}>
-                                        Số lượng thể thức biểu diễn hiện tại : {datas.length}
-                                    </caption>
+                            <TableContainer sx={{ maxHeight: 480, m: 1, p: 1, mb: 2 }}>
+                                <Table stickyHeader aria-label="sticky table" size="small">
                                     <TableHead>
                                         <TableRow>
                                             <TableCell align="center">Nội dung thi đấu</TableCell>
                                             <TableCell align="center">Số lượng nam</TableCell>
                                             <TableCell align="center">Số lượng nữ</TableCell>
-                                            <TableCell align="center"></TableCell>
-                                            <TableCell align="center"></TableCell>
+                                            <TableCell align="center">
+                                                Số lượng thể thức biểu diễn hiện tại : {datas.length}
+                                            </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {datas.map((data) => (
-                                            <TableRow key={data.id}>
+                                            <TableRow
+                                                key={data.id}
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
                                                 <TableCell>{data.name}</TableCell>
                                                 <TableCell align="center">{data.numberMale}</TableCell>
                                                 <TableCell align="center">{data.numberFemale}</TableCell>
-                                                <TableCell>
+                                                <TableCell align="center">
                                                     <IconButton
                                                         aria-label="delete"
                                                         onClick={() => {
@@ -189,8 +194,6 @@ function ExhibitionSetting({ title, isOpen, handleClose }) {
                                                     >
                                                         <Edit />
                                                     </IconButton>
-                                                </TableCell>
-                                                <TableCell>
                                                     <IconButton
                                                         aria-label="delete"
                                                         onClick={() => {
@@ -207,7 +210,7 @@ function ExhibitionSetting({ title, isOpen, handleClose }) {
                                 </Table>
                             </TableContainer>
                         )}
-                    </Box>
+                    </Paper>
                 </Box>
             </DialogContent>
             <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
