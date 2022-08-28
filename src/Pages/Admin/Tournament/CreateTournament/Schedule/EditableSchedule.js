@@ -276,9 +276,12 @@ function EditableSchedule({ isEdit, isOpen, handleClose, onSucess, initialDate, 
                 ) : eventInfo.event.extendedProps.type === 4 ? (
                     <Box>
                         <Box sx={{ ml: '10px' }}>
-                            <div className={cx('event-title')} style={{ opacity: 1 }}>
-                                {eventInfo.event.title} <br />
-                                {eventInfo.event.extendedProps.time}
+                            <div className={cx('event-title')} style={{ opacity: 0 }}>
+                                {/* {eventInfo.event.title} <br />
+                                {eventInfo.event.extendedProps.time} */}
+                                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Rem cumque voluptatum nihil
+                                magni sint cum veritatis voluptas consequuntur delectus, facere magnam quisquam
+                                architecto illum officiis ratione, nobis est nesciunt autem!
                             </div>
                         </Box>
                     </Box>
