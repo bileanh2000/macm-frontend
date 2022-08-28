@@ -263,21 +263,21 @@ function Tournament() {
                     }}
                 />
                 <RolesSetting
-                    title="Chỉnh sửa gợi ý vai trò ban tổ chức "
+                    title="Chỉnh sửa danh sách mặc định vai trò ban tổ chức"
                     isOpen={openSettingRole}
                     handleClose={() => {
                         setOpenSettingRole(false);
                     }}
                 />
                 <CompetitiveSetting
-                    title="Chỉnh sửa đề xuất thể thức thi đấu đối kháng"
+                    title="Chỉnh sửa danh sách đề xuất thể thức thi đấu đối kháng"
                     isOpen={openSettingCompetitive}
                     handleClose={() => {
                         setOpenSettingCompetitive(false);
                     }}
                 />
                 <ExhibitionSetting
-                    title="Chỉnh sửa đề xuất thể thức thi đấu biểu diễn"
+                    title="Chỉnh sửa danh sách đề xuất thể thức thi đấu biểu diễn"
                     isOpen={openSettingExhibition}
                     handleClose={() => {
                         setOpenSettingExhibition(false);

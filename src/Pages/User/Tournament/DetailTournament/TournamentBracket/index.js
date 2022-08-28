@@ -32,7 +32,7 @@ function TabPanel(props) {
     );
 }
 
-function TournamentBracket({ tournament, competitive, exhibition, valueTab, type }) {
+function TournamentBracket({ tournament, competitive, exhibition, valueTab, type, user }) {
     let isDisplay = false;
     if (tournament.competitiveTypes.length > 0 || tournament.exhibitionTypes.length > 0) {
         const competitiveStatus = tournament.competitiveTypes.map((competitive) => competitive.status);
@@ -107,7 +107,7 @@ function TournamentBracket({ tournament, competitive, exhibition, valueTab, type
                         />
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                        <MyTeam competitive={competitive} exhibition={exhibition.data} />
+                        <MyTeam competitive={competitive} exhibition={exhibition.data} user={user} />
                     </TabPanel>
                 </Box>
             )}
