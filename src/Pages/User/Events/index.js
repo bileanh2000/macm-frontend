@@ -12,7 +12,7 @@ import {
     Pagination,
     Stack,
     TextField,
-    Typography, 
+    Typography,
 } from '@mui/material';
 import styles from 'src/Pages/Admin/Event/Event.module.scss';
 import classNames from 'classnames/bind';
@@ -37,7 +37,7 @@ function EventList() {
     const [pageSize, setPageSize] = useState(0);
     const [semester, setSemester] = useState('Summer2022');
     const [monthInSemester, setMonthInSemester] = useState([]);
-    const [month, setMonth] = useState(new Date().getMonth() + 1);
+    const [month, setMonth] = useState(0);
     const [semesterList, setSemesterList] = useState([]);
     const [totalResult, setTotalResult] = useState([]);
     const theme = useTheme();
