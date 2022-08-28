@@ -16,7 +16,7 @@ import { useSnackbar } from 'notistack';
 
 import eventApi from 'src/api/eventApi';
 
-function AddAdminTourament({ value, index, total, active, onChange }) {
+function RequestJointEventMember({ value, index, total, active, onChange }) {
     let { id } = useParams();
     const { enqueueSnackbar } = useSnackbar();
     const [pageSize, setPageSize] = useState(10);
@@ -36,10 +36,10 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
         setIdUpdate(id);
         setOpenDialog(true);
     };
-    const getAllRequestToJoinOrganizingCommittee = async (eventId) => {
+    const getAllRequestToJoinEvent = async (eventId) => {
         try {
-            const response = await eventApi.getAllRequestToJoinOrganizingCommittee(eventId);
-            console.log('getAllRequestToJoinOrganizingCommittee', response);
+            const response = await eventApi.getAllRequestToJoinEvent(eventId);
+            console.log('getAllRequestToJoinEvent', response);
             // const newUser = response.data.filter((user) => user.registerStatus === 'Đang chờ duyệt');
             // console.log(newUser);
             setUserList(response.data);
@@ -51,7 +51,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
     };
 
     useEffect(() => {
-        isRender && getAllRequestToJoinOrganizingCommittee(id);
+        isRender && getAllRequestToJoinEvent(id);
         setIsRender(false);
     }, [id, isRender, userList]);
 
@@ -62,11 +62,11 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
             headerName: 'Mã sinh viên',
             flex: 0.3,
         },
-        {
-            field: 'roleInTournament',
-            headerName: 'Vai trò mong muốn',
-            flex: 0.6,
-        },
+        // {
+        //     field: 'roleInTournament',
+        //     headerName: 'Vai trò mong muốn',
+        //     flex: 0.6,
+        // },
         {
             field: 'approve',
             type: 'actions',
@@ -113,7 +113,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
         container['id'] = item.id;
         container['studentName'] = item.userName;
         container['studentId'] = item.userStudentId;
-        container['eventRoleDto'] = item.eventRoleDto.name;
+        // container['roleInTournament'] = item.tournamentRoleDto.name;
         container['registerStatus'] = item.registerStatus;
         return container;
     });
@@ -230,12 +230,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
     }
 
     return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`simple-tabpanel-${index}`}
-            aria-labelledby={`simple-tab-${index}`}
-        >
+        <div>
             {idUpdate && (
                 <Dialog
                     open={openDialog}
@@ -246,7 +241,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
                     <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            Bạn có muốn {isApprove ? 'chấp thuận' : 'từ chối'} yêu cầu tham gia ban tổ chức của{' '}
+                            Bạn có muốn {isApprove ? 'chấp thuận' : 'từ chối'} yêu cầu tham gia sự kiện của{' '}
                             {idUpdate.studentName} - {idUpdate.studentId}
                         </DialogContentText>
                     </DialogContent>
@@ -287,4 +282,4 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
     );
 }
 
-export default AddAdminTourament;
+export default RequestJointEventMember;

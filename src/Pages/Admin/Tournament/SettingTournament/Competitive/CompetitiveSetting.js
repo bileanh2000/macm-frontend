@@ -8,6 +8,7 @@ import {
     DialogContent,
     DialogTitle,
     IconButton,
+    Paper,
     Table,
     TableBody,
     TableCell,
@@ -130,6 +131,7 @@ function CompetitiveSetting({ title, isOpen, handleClose }) {
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
+            sx={{ height: '80vh !importance' }}
         >
             {datas && competitive && (
                 <EditCompetitiveTournament
@@ -205,29 +207,31 @@ function CompetitiveSetting({ title, isOpen, handleClose }) {
                         '& .MuiTextField-root': { mb: 2 },
                     }}
                 >
-                    <Box>
+                    <Paper elevation={1}>
                         {datas && datas.length > 0 && (
-                            <TableContainer sx={{ maxHeight: 350, m: 1, mr: 0, p: 1, mb: 2 }}>
+                            <TableContainer sx={{ maxHeight: 480, m: 1, mr: 0, p: 1, mb: 2 }}>
                                 <Table stickyHeader aria-label="sticky table">
-                                    <caption style={{ captionSide: 'top' }}>
-                                        Số lượng hạng cân thi đấu hiện tại : {datas.length}
-                                    </caption>
                                     <TableHead>
                                         <TableRow>
                                             <TableCell align="center">Giới tính</TableCell>
                                             <TableCell align="center">Hạng cân</TableCell>
-                                            <TableCell align="center"></TableCell>
-                                            <TableCell align="center"></TableCell>
+                                            <TableCell align="center">
+                                                Số lượng hạng cân thi đấu hiện tại : {datas.length}
+                                            </TableCell>
+                                            {/* <TableCell align="center"></TableCell> */}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {datas.map((data) => (
-                                            <TableRow key={data.id}>
+                                            <TableRow
+                                                key={data.id}
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
                                                 <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
                                                 <TableCell align="center">
                                                     {data.weightMin} - {data.weightMax} Kg
                                                 </TableCell>
-                                                <TableCell>
+                                                <TableCell align="center">
                                                     <IconButton
                                                         aria-label="edit"
                                                         onClick={() => {
@@ -237,8 +241,6 @@ function CompetitiveSetting({ title, isOpen, handleClose }) {
                                                     >
                                                         <Edit />
                                                     </IconButton>
-                                                </TableCell>
-                                                <TableCell>
                                                     <IconButton
                                                         aria-label="delete"
                                                         onClick={() => {
@@ -255,7 +257,7 @@ function CompetitiveSetting({ title, isOpen, handleClose }) {
                                 </Table>
                             </TableContainer>
                         )}
-                    </Box>
+                    </Paper>
                 </Box>
             </DialogContent>
             <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>

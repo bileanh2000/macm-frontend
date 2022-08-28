@@ -142,7 +142,7 @@ function DetailTournament() {
 
     useEffect(() => {
         isRender && getTournamentById(tournamentId);
-        fetchTournamentSchedule(tournamentId);
+        isRender && fetchTournamentSchedule(tournamentId);
         window.scrollTo({ behavior: 'smooth', top: '0px' });
     }, [tournamentId, tournament, isRender]);
 
@@ -332,7 +332,11 @@ function DetailTournament() {
                                 user.role.name === 'ROLE_HeadTechnique' ||
                                 user.role.name === 'ROLE_ViceHeadTechnique' ||
                                 user.role.name === 'ROLE_ViceHeadClub' ? (
-                                    <TournamentSchedule isUpdate={isUpdate} tournamentStage={tournament.stage} />
+                                    <TournamentSchedule
+                                        isUpdate={isUpdate}
+                                        tournamentStage={tournament.stage}
+                                        isChange={() => setIsRender(true)}
+                                    />
                                 ) : (
                                     <Preview />
                                 )}

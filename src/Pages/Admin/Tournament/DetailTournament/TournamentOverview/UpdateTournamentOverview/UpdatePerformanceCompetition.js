@@ -64,7 +64,7 @@ function PerformanceCompetition(props) {
     };
 
     const handleAddCompetition = (data) => {
-        if (props.data.findIndex((row) => row.name.toLowerCase().includes(data.name.toLowerCase())) >= 0) {
+        if (props.data.findIndex((row) => row.name.toLowerCase() === data.name.toLowerCase()) >= 0) {
             setError('name', {
                 message: `Tên thể thức ${data.name} này đã tồn tại, vui lòng chọn tên khác`,
             });

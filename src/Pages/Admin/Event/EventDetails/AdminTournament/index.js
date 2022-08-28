@@ -19,6 +19,7 @@ import AddMemberToAdminEvent from '../../MenberEvent/AddMemberToAdminEvent';
 import AddAdminTourament from './AddAdminTourament';
 import AdminList from './AdminList';
 import UpdateAdminTournament from './UpdateAdminTournament';
+import UpdateRole from './UpdateRole';
 
 function a11yProps(index) {
     return {
@@ -34,13 +35,44 @@ function AdminTournament({ isUpdate, user }) {
     const [total, setTotal] = useState(-1);
     const [isRender, SetIsRender] = useState(true);
     const [updateRoleDialog, setUpdateRoleDialog] = useState(false);
-    const [addAdminDialog, setAddAdminDialog] = useState(false);
+    const [openDialogEdit, setOpenDialogEdit] = useState(false);
     const [value, setValue] = React.useState(0);
     const [notiStatus, setNotiStatus] = useState(0);
+    const [roleList, setRoleList] = useState([]);
+    const [allRoles, setAllRoles] = useState([]);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    const getAllRoleEvent = async () => {
+        try {
+            const response = await eventApi.getAllRoleEvent();
+            console.log('getAllRoleEvent', response);
+            const newRole = response.data.map((role) => {
+                return { ...role, selected: false, maxQuantity: 5, availableQuantity: 5 };
+            });
+            setAllRoles(newRole);
+        } catch (error) {
+            console.log('Failed to fetch user list: ', error);
+        }
+    };
+
+    useEffect(() => {
+        const fetchRoleInEvent = async (params) => {
+            try {
+                const response = await eventApi.getAllOrganizingCommitteeRoleByEventId(params);
+                console.log('fetchRoleInEvent', response);
+                const newRole = response.data.map((role) => {
+                    return { ...role, selected: true };
+                });
+                setRoleList(newRole);
+            } catch (error) {
+                console.log('Failed to fetch user list: ', error);
+            }
+        };
+        isRender && fetchRoleInEvent(id);
+    }, [id, roleList, isRender]);
 
     const fetchAdminInEvent = async (params, index) => {
         try {
@@ -57,8 +89,9 @@ function AdminTournament({ isUpdate, user }) {
 
     useEffect(() => {
         isRender && fetchAdminInEvent(id, 2);
+        isRender && getAllRoleEvent();
         SetIsRender(false);
-    }, [id, notiStatus, adminList, isRender]);
+    }, [id, notiStatus, adminList, isRender, allRoles]);
 
     return (
         <Fragment>
@@ -114,6 +147,9 @@ function AdminTournament({ isUpdate, user }) {
                     </ToggleButton>
                 </ToggleButtonGroup>
             </Box>
+            <Button variant="outlined" sx={{ m: 1, mt: 0 }} onClick={() => setOpenDialogEdit(true)}>
+                Chỉnh sửa vai trò của giải đấu
+            </Button>
             {notiStatus === 0 && (
                 <AdminList
                     adminList={adminList}
@@ -132,12 +168,37 @@ function AdminTournament({ isUpdate, user }) {
                     }}
                 />
             )}
-            {notiStatus === 1 && <AddMemberToAdminEvent />}
+            {notiStatus === 1 && <AddMemberToAdminEvent roleList={roleList} roles={allRoles} />}
             {notiStatus === 2 && (
                 <AddAdminTourament
                     onChange={() => {
                         SetIsRender(true);
                         // onChange && onChange();
+                    }}
+                />
+            )}
+            {allRoles.length > 0 && roleList.length > 0 && (
+                <UpdateRole
+                    title="Chỉnh sửa vai trò ban tổ chức"
+                    isOpen={openDialogEdit}
+                    handleClose={() => {
+                        setOpenDialogEdit(false);
+                    }}
+                    id={id}
+                    user={user}
+                    roleInTournament={roleList}
+                    roles={allRoles}
+                    onSuccess={() => {
+                        // if (competitivePlayer.find((player) => player.playerStudentId == newItem.playerStudentId)) {
+                        //     return;
+                        // }
+                        // setCompetitivePlayer([...newItem, ...competitivePlayer]);
+                        // Success && Success(newItem);
+                        setOpenDialogEdit(false);
+                    }}
+                    onChange={() => {
+                        // onChange && onChange();
+                        SetIsRender(true);
                     }}
                 />
             )}

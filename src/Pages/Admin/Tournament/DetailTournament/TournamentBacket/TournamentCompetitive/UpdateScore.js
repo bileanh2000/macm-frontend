@@ -77,7 +77,7 @@ function UpdateScoreTournament({ winner, match, handleClose, WinnerTemp, onChang
         try {
             const res = await adminTournament.updateResultMatch(match);
             onChangeData && onChangeData();
-            match.round = round ? onHaveResult && onHaveResult() : null;
+            (match.round == round || match.round == round - 1) && onHaveResult && onHaveResult();
             let variant = 'success';
             enqueueSnackbar(res.message, { variant });
         } catch (error) {

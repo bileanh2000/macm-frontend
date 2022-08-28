@@ -70,7 +70,7 @@ function PerformanceCompetition(props) {
     };
 
     const handleAddCompetition = (data) => {
-        if (props.data.findIndex((row) => row.name.toLowerCase().includes(data.name.toLowerCase())) >= 0) {
+        if (props.data.findIndex((row) => row.name.toLowerCase() == data.name.toLowerCase()) >= 0) {
             setError('name', {
                 message: `Tên thể thức ${data.name} này đã tồn tại, vui lòng chọn tên khác`,
             });
@@ -126,43 +126,46 @@ function PerformanceCompetition(props) {
     return (
         <Box>
             <Paper elevation={3} sx={{ width: '100%' }}>
-                {props.data.length > 0 && (
-                    <TableContainer sx={{ maxHeight: 350, m: 1, p: 1, mb: 2 }}>
-                        <Table stickyHeader aria-label="sticky table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell align="center"></TableCell>
-                                    <TableCell align="center">Nội dung thi đấu</TableCell>
-                                    <TableCell align="center">Số lượng nam</TableCell>
-                                    <TableCell align="center">Số lượng nữ</TableCell>
-                                    <TableCell align="center"></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {datas.map((data) => (
-                                    <TableRow key={data.id}>
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={data.selected}
-                                                onChange={() => handleSelectExhibition(data)}
-                                            />
+                <TableContainer sx={{ maxHeight: 390, m: 1, p: 1, mb: 2 }}>
+                    {props.data.length > 0 && (
+                        <>
+                            <Table stickyHeader aria-label="sticky table" size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell align="center">
+                                            SL: {datas.filter((data) => data.selected).length}
                                         </TableCell>
-                                        <TableCell>{data.name}</TableCell>
-                                        <TableCell align="center">{data.numberMale}</TableCell>
-                                        <TableCell align="center">{data.numberFemale}</TableCell>
-                                        <TableCell>
-                                            <IconButton
-                                                aria-label="delete"
-                                                onClick={() => {
-                                                    // handleOpenDialog();
-                                                    handleEdit(data);
-                                                }}
-                                                disabled={isEdit || isChecked}
-                                            >
-                                                <Edit />
-                                            </IconButton>
-                                        </TableCell>
-                                        {/* <TableCell>
+                                        <TableCell align="center">Nội dung thi đấu</TableCell>
+                                        <TableCell align="center">SL nam</TableCell>
+                                        <TableCell align="center">SL nữ</TableCell>
+                                        <TableCell align="center"></TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {datas.map((data) => (
+                                        <TableRow key={data.id}>
+                                            <TableCell align="center">
+                                                <Checkbox
+                                                    checked={data.selected}
+                                                    onChange={() => handleSelectExhibition(data)}
+                                                />
+                                            </TableCell>
+                                            <TableCell>{data.name}</TableCell>
+                                            <TableCell align="center">{data.numberMale}</TableCell>
+                                            <TableCell align="center">{data.numberFemale}</TableCell>
+                                            <TableCell>
+                                                <IconButton
+                                                    aria-label="delete"
+                                                    onClick={() => {
+                                                        // handleOpenDialog();
+                                                        handleEdit(data);
+                                                    }}
+                                                    disabled={isEdit || isChecked}
+                                                >
+                                                    <Edit />
+                                                </IconButton>
+                                            </TableCell>
+                                            {/* <TableCell>
                                             <IconButton
                                                 aria-label="delete"
                                                 onClick={() => {
@@ -174,94 +177,96 @@ function PerformanceCompetition(props) {
                                                 <Delete />
                                             </IconButton>
                                         </TableCell> */}
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                )}
-            </Paper>
-            <Paper elevation={3}>
-                <Collapse in={isChecked}>
-                    {!isEdit ? (
-                        <Grid container spacing={2} sx={{ p: 1 }}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    id="outlined-error-helper-text fullWidth"
-                                    label="Tên nội dung"
-                                    {...register('name')}
-                                    error={errors.name ? true : false}
-                                    defaultValue=""
-                                    helperText={errors.name?.message}
-                                    required
-                                    fullWidth
-                                />
-                            </Grid>
-                            <Grid item xs={12} container spacing={2}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        type="number"
-                                        id="outlined-basic"
-                                        label="Số lượng nam mỗi đội"
-                                        variant="outlined"
-                                        defaultValue={0}
-                                        {...register('numberMale')}
-                                        error={errors.numberMale ? true : false}
-                                        helperText={errors.numberMale?.message}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        type="number"
-                                        id="outlined-basic"
-                                        label="Số lượng nữ mỗi đội"
-                                        variant="outlined"
-                                        defaultValue={0}
-                                        {...register('numberFemale')}
-                                        error={errors.numberMale ? true : false}
-                                        helperText={errors.numberFemale?.message}
-                                        fullWidth
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Button
-                                    variant="contained"
-                                    color="success"
-                                    onClick={handleSubmit(handleAddCompetition)}
-                                    sx={{ m: 1 }}
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                            <Paper elevation={3}>
+                                <Collapse in={isChecked}>
+                                    {!isEdit ? (
+                                        <Grid container spacing={2} sx={{ p: 1 }}>
+                                            <Grid item xs={12}>
+                                                <TextField
+                                                    id="outlined-error-helper-text fullWidth"
+                                                    label="Tên nội dung"
+                                                    {...register('name')}
+                                                    error={errors.name ? true : false}
+                                                    defaultValue=""
+                                                    helperText={errors.name?.message}
+                                                    required
+                                                    fullWidth
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} container spacing={2}>
+                                                <Grid item xs={6}>
+                                                    <TextField
+                                                        fullWidth
+                                                        type="number"
+                                                        id="outlined-basic"
+                                                        label="Số lượng nam mỗi đội"
+                                                        variant="outlined"
+                                                        defaultValue={0}
+                                                        {...register('numberMale')}
+                                                        error={errors.numberMale ? true : false}
+                                                        helperText={errors.numberMale?.message}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <TextField
+                                                        type="number"
+                                                        id="outlined-basic"
+                                                        label="Số lượng nữ mỗi đội"
+                                                        variant="outlined"
+                                                        defaultValue={0}
+                                                        {...register('numberFemale')}
+                                                        error={errors.numberMale ? true : false}
+                                                        helperText={errors.numberFemale?.message}
+                                                        fullWidth
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Button
+                                                    variant="contained"
+                                                    color="success"
+                                                    onClick={handleSubmit(handleAddCompetition)}
+                                                    sx={{ m: 1 }}
+                                                >
+                                                    Thêm
+                                                </Button>
+                                                <Button variant="contained" color="warning" onClick={handleCancel}>
+                                                    Hủy
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    ) : (
+                                        dataEdit && (
+                                            <EditExhibition
+                                                dataEdit={dataEdit}
+                                                onEdit={handleEditCompetition}
+                                                onCancel={handleCancel}
+                                            />
+                                        )
+                                    )}
+                                </Collapse>
+                            </Paper>
+                            <Collapse in={!isChecked}>
+                                <Fab
+                                    color="primary"
+                                    variant="extended"
+                                    aria-label="add"
+                                    onClick={() => setIsChecked(!isChecked)}
+                                    size="small"
+                                    sx={{ mt: 1 }}
                                 >
-                                    Thêm
-                                </Button>
-                                <Button variant="contained" color="warning" onClick={handleCancel}>
-                                    Hủy
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    ) : (
-                        dataEdit && (
-                            <EditExhibition
-                                dataEdit={dataEdit}
-                                onEdit={handleEditCompetition}
-                                onCancel={handleCancel}
-                            />
-                        )
+                                    <Add />
+                                    Thêm nội dung biểu diễn
+                                </Fab>
+                            </Collapse>
+                        </>
                     )}
-                </Collapse>
+                </TableContainer>
             </Paper>
-            <Collapse in={!isChecked}>
-                <Fab
-                    color="primary"
-                    variant="extended"
-                    aria-label="add"
-                    onClick={() => setIsChecked(!isChecked)}
-                    size="medium"
-                >
-                    <Add />
-                    Thêm nội dung biểu diễn
-                </Fab>
-            </Collapse>
         </Box>
     );
 }

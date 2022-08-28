@@ -203,12 +203,26 @@ const eventApi = {
 
     acceptRequestToJoinEvent: (memberEventId) => {
         const url = `/event/acceptrequesttojoinevent/${memberEventId}`;
-        return axiosClient.delete(url);
+        return axiosClient.put(url);
     },
 
     declineRequestToJoinEvent: (memberEventId) => {
         const url = `/event/declinerequesttojoinevent/${memberEventId}`;
-        return axiosClient.delete(url);
+        return axiosClient.put(url);
+    },
+
+    getAllRequestToJoinEvent: (eventId) => {
+        const url = `/event/getallrequesttojoinevent/${eventId}`;
+        return axiosClient.get(url);
+    },
+
+    getAllRequestToJoinOrganizingCommittee: (eventId) => {
+        const url = `/event/getallrequesttojoinorganizingcommittee/${eventId}`;
+        return axiosClient.get(url);
+    },
+    editRoleEvent: (eventId, params) => {
+        const url = `/event/headculture/editroleevent/${eventId}`;
+        return axiosClient.put(url, params);
     },
 
     // getAllOnGoingEvent:{}=>

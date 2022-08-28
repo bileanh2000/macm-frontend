@@ -18,6 +18,7 @@ import AddMemberToEvent from './AddMemberToEvent';
 import Header from './Header';
 import MemberCancelEvent from './MemberCancelEvent';
 import MemberList from './MemberList';
+import RequestJointEventMember from './RequestJointEventMember';
 
 function MenberEvent() {
     let { id } = useParams();
@@ -112,7 +113,16 @@ function MenberEvent() {
                 </ToggleButton>
             </ToggleButtonGroup>
 
-            {!notiStatus ? <MemberList data={userList} /> : <p> hehe</p>}
+            {!notiStatus ? (
+                <MemberList data={userList} />
+            ) : (
+                <RequestJointEventMember
+                    onChange={() => {
+                        //SetIsRender(true);
+                        // onChange && onChange();
+                    }}
+                />
+            )}
         </Fragment>
     );
 }

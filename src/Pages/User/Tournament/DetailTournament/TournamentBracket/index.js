@@ -107,7 +107,7 @@ function TournamentBracket({ tournament, competitive, exhibition, valueTab, type
                         />
                     </TabPanel>
                     <TabPanel value={value} index={2}>
-                        <MyTeam competitive={competitive} exhibition={exhibition.data} user={user} />
+                        <MyTeam tournament={tournament} competitive={competitive} exhibition={exhibition.data} user={user} />
                     </TabPanel>
                 </Box>
             )}
