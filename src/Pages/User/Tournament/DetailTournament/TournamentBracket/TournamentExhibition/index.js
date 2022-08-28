@@ -46,16 +46,23 @@ function TournamentExhibition({ exhibition, result, type }) {
 
     const handleChangeExhibitionType = (event) => {
         if (result && result.length > 0) {
-            const _result = result.find((subResult) =>
-                subResult.data.length > 0
-                    ? subResult.data.find((d) => d.exhibitionType.id == event.target.value)
-                    : null,
-            );
+            const _result =
+                result.find((subResult) =>
+                    subResult.data.length > 0
+                        ? subResult.data.find((d) => d.exhibitionType.id == event.target.value)
+                        : null,
+                ) != null
+                    ? result.find((subResult) =>
+                          subResult.data.length > 0
+                              ? subResult.data.find((d) => d.exhibitionType.id == event.target.value)
+                              : null,
+                      )
+                    : null;
             setTournamentResult(_result ? _result.data[0].listResult : null);
         }
         setExhibitionType(event.target.value);
-        const team = exhibition.find((t) => t.exhibitionTypeId === event.target.value);
-        setMyTeam(team);
+        // const team = exhibition.find((t) => t.exhibitionTypeId === event.target.value);
+        // setMyTeam(team);
         let exType;
         if (event.target.value === 0) {
             exType = { exhibitionType: 0 };
@@ -94,17 +101,24 @@ function TournamentExhibition({ exhibition, result, type }) {
                 const response = await adminTournament.getListExhibitionType(tournamentId);
                 console.log(response);
                 setListExhibitionType(response.data);
-                const team =
-                    exhibition.length > 0 && exhibition.find((t) => t.exhibitionTypeId === response.data[0].id);
-                setMyTeam(team);
+                // const team =
+                //     exhibition.length > 0 && exhibition.find((t) => t.exhibitionTypeId === response.data[0].id);
+                // setMyTeam(team);
                 getExhibitionResult(response.data[0].id);
                 setTournamentStatus(response.code);
                 type == 0 && setExhibitionType(response.data[0].id);
-                const _result = result.find((subResult) =>
-                    subResult.data.length > 0
-                        ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
-                        : null,
-                );
+                const _result =
+                    result.find((subResult) =>
+                        subResult.data.length > 0
+                            ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
+                            : null,
+                    ) != null
+                        ? result.find((subResult) =>
+                              subResult.data.length > 0
+                                  ? subResult.data.find((d) => d.exhibitionType.id == response.data[0].id)
+                                  : null,
+                          )
+                        : null;
                 setTournamentResult(_result ? _result.data[0].listResult : null);
                 setIsRenderTotal(false);
             } catch (error) {

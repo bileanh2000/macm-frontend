@@ -2,8 +2,23 @@ import { Typography, Table, TableBody, TableCell, TableContainer, TableHead, Tab
 import { Box } from '@mui/system';
 import React, { Fragment } from 'react';
 
-function MyTeam({ competitive, exhibition }) {
-    console.log(competitive, exhibition);
+function MyTeam({ competitive, exhibition, user }) {
+    console.log(exhibition, user);
+
+    // const myTeam =
+    //     exhibition.length > 0 &&
+    //     exhibition.filter((ex) =>
+    //         ex.exhibitionTeams.filter(
+    //             (exhibitionTeam) =>
+    //                 exhibitionTeam.exhibitionPlayers.filter(
+    //                     (exhibitionPlayer) => exhibitionPlayer.tournamentPlayer.user.studentId == user.studentId,
+    //                 )[0].tournamentPlayer.user.studentId == user.studentId,
+    //         ),
+    //     )[0].exhibitionTeams[0].exhibitionPlayers[0].tournamentPlayer.user.studentId;
+    // const hehe =
+    //     exhibition.length > 0 && exhibition[0].exhibitionTeams[0].exhibitionPlayers[0].tournamentPlayer.user.studentId;
+
+    // console.log(myTeam);
 
     return competitive.length > 0 && exhibition.length > 0 ? (
         <>
@@ -13,7 +28,7 @@ function MyTeam({ competitive, exhibition }) {
                     <Typography variant="body1">Tên nhóm : {exhibition[0].teamName}</Typography>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 650 }} aria-label="caption table">
-                            <caption>{exhibition[0].exhibitionTypeName}</caption>
+                            <caption>{exhibition.data[0].name}</caption>
                             <TableHead>
                                 <TableRow>
                                     <TableCell>STT</TableCell>
