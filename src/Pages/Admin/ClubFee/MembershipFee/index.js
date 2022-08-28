@@ -283,8 +283,14 @@ function MembershipFee() {
     const updateMembership = async (id) => {
         try {
             const res = await adminClubFeeAPI.updateMembership(id, user.studentId);
-            console.log(res.message);
-            enqueueSnackbar('Cập nhật trạng thái đóng tiền thành công', { variant: 'success' });
+            console.log(res.data[0].user.name);
+            enqueueSnackbar(
+                `Cập nhật trạng thái đóng tiền cho ${res.data[0].user.studentId} - ${res.data[0].user.name} thành công`,
+                {
+                    variant: 'success',
+                    preventDuplicate: false,
+                },
+            );
         } catch (error) {
             // enqueueSnackbar(error.message, { variant: 'error' });
 

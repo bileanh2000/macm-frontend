@@ -136,6 +136,10 @@ function QRScanner({ activityData, activityType }) {
         stompClient.send('/app/private-message', {}, JSON.stringify(chatMessage));
     };
 
+    let uniqueAttendance = attendance.filter((c, index) => {
+        return attendance.indexOf(c) === index;
+    });
+
     useEffect(() => {
         connect();
     }, []);
@@ -148,7 +152,7 @@ function QRScanner({ activityData, activityType }) {
 
         const handleBlur = () => {
             console.log('Tab lost focus');
-            setTabHasFocus(true);
+            setTabHasFocus(false);
             // handleClickVariant('chuyển quả thẻ này để quét QR code', 'warning');
         };
 
@@ -313,24 +317,6 @@ function QRScanner({ activityData, activityType }) {
         console.log(attendanceList);
     }, [attendanceList]);
 
-    const userTestData = [
-        { id: 1, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 2, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 3, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 4, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 5, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 6, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 7, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 8, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 9, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 10, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 11, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 12, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 13, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 14, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 15, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-        { id: 16, studentId: 'HE141277', name: 'Lê Anh Tuấn' },
-    ];
     return (
         <Fragment>
             {/* {activityData.id}
@@ -392,16 +378,17 @@ function QRScanner({ activityData, activityType }) {
             {/* <button onClick={testPushMessages}>test hehe</button> */}
             {/* <Box>{JSON.stringify(attendanceList)}</Box> */}
             <Box>
-                <Typography sx={{ mt: 1 }}>Đã điểm danh cho: {attendance.length} người</Typography>
+                <Typography sx={{ mt: 1 }}>Đã điểm danh cho: {uniqueAttendance.length} người</Typography>
                 <Box sx={{ height: '30vh', overflow: 'auto' }}>
                     <ul>
-                        {attendance.map((user) => {
-                            return (
-                                <li key={user.id}>
-                                    {user.studentId} - {user.name}
-                                </li>
-                            );
-                        })}
+                        {uniqueAttendance &&
+                            uniqueAttendance.map((user) => {
+                                return (
+                                    <li key={user.id}>
+                                        {user.studentId} - {user.name}
+                                    </li>
+                                );
+                            })}
                     </ul>
                 </Box>
                 {/* {JSON.stringify(attendance)} */}
