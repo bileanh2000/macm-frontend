@@ -87,6 +87,7 @@ function QRScanner({ activityData, activityType }) {
     const [tabHasFocus, setTabHasFocus] = useState(true);
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
     const [attendanceList, setAttendanceList] = useState([]);
+    const attendance = JSON.parse(localStorage.getItem('attendanced')) || [];
 
     const handleClickVariant = (message, variant) => () => {
         // variant could be success, error, warning, info, or default
@@ -231,6 +232,7 @@ function QRScanner({ activityData, activityType }) {
                         variant: 'success',
                     },
                 );
+                // setAttendanceList([...response.data[0], ...attendanceList]);
             }
             console.log('data', localData);
             console.log('diem danh thanh cong', response);
@@ -390,10 +392,10 @@ function QRScanner({ activityData, activityType }) {
             {/* <button onClick={testPushMessages}>test hehe</button> */}
             {/* <Box>{JSON.stringify(attendanceList)}</Box> */}
             <Box>
-                <Typography sx={{ mt: 1 }}>Đã điểm danh cho: 3 người</Typography>
+                <Typography sx={{ mt: 1 }}>Đã điểm danh cho: {attendance.length} người</Typography>
                 <Box sx={{ height: '30vh', overflow: 'auto' }}>
                     <ul>
-                        {userTestData.map((user) => {
+                        {attendance.map((user) => {
                             return (
                                 <li key={user.id}>
                                     {user.studentId} - {user.name}
@@ -402,6 +404,7 @@ function QRScanner({ activityData, activityType }) {
                         })}
                     </ul>
                 </Box>
+                {/* {JSON.stringify(attendance)} */}
             </Box>
             {/* <Box
                 sx={{

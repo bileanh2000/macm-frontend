@@ -104,12 +104,14 @@ function News({ name, studentId, roleName, email, isAdmin, isActive }) {
 
                     {isAdmin ? (
                         <>
-                            <Button component={Link} to="/admin/attendance">
-                                Điểm danh
-                            </Button>
-                            <Button component={Link} to="/admin">
-                                Trang quản trị
-                            </Button>
+                            <Box sx={{ display: 'flex', mt: 1, mb: 1, flexDirection: 'column' }}>
+                                <Button variant="outlined" component={Link} to="/admin/attendance" sx={{ mb: 1 }}>
+                                    Điểm danh
+                                </Button>
+                                <Button variant="outlined" component={Link} to="/admin" sx={{}}>
+                                    Trang quản trị
+                                </Button>
+                            </Box>
                         </>
                     ) : null}
                 </Box>

@@ -39,9 +39,9 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
         setOpenDialog(true);
     };
 
-    const fetchUserInEvent = async (params) => {
+    const fetchUserInEvent = async (params, index) => {
         try {
-            const response = await eventApi.getListMemberToUpdate(params);
+            const response = await eventApi.getAllMemberEvent(params, index);
             console.log(response);
             setUserList(response.data);
         } catch (error) {
@@ -69,7 +69,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
     //     { roleId: 4, roleName: 'Thành viên ban hậu cần' },
     // ];
     useEffect(() => {
-        fetchUserInEvent(id);
+        fetchUserInEvent(id, 2);
         fetchRoleInEvent(id);
         // console.log('role', formatRoles);
     }, [index, id, value]);

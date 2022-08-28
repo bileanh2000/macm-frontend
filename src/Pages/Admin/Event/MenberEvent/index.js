@@ -1,4 +1,14 @@
-import { Box, Button, FormControl, Grid, MenuItem, Select, Typography } from '@mui/material';
+import {
+    Box,
+    Button,
+    FormControl,
+    Grid,
+    MenuItem,
+    Select,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
+} from '@mui/material';
 import React, { Fragment, useState } from 'react';
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -16,6 +26,7 @@ function MenberEvent() {
     const [isOpenAddMemberDialog, setIsOpenAddMemberDialog] = useState(false);
     const [isMemberCancelDialog, setIsMemberCancelDialog] = useState(false);
     const [isUpdateRole, setisUpdateRole] = useState(false);
+    const [notiStatus, setNotiStatus] = useState(0);
 
     const handleChangeType = (event) => {
         setType(event.target.value);
@@ -63,7 +74,45 @@ function MenberEvent() {
                 {/* <Link to={`../admin/events/${id}/membercancel`}>Danh sách thành viên hủy đăng ký tham gia sự kiện</Link> */}
                 <Button onClick={() => setIsMemberCancelDialog(true)}>Danh sách thành viên hủy đăng ký tham gia</Button>
             </Box>
-            <MemberList data={userList} />
+
+            <ToggleButtonGroup
+                color="primary"
+                value={notiStatus}
+                exclusive
+                onChange={(event, newNotiStatus) => {
+                    if (newNotiStatus !== null) {
+                        setNotiStatus(newNotiStatus);
+                        console.log(newNotiStatus);
+                    }
+                }}
+                sx={{ mb: 1 }}
+            >
+                <ToggleButton
+                    value={0}
+                    sx={{
+                        p: 1,
+                        borderRadius: '10px !important',
+                        border: 'none',
+                        textTransform: 'none',
+                        mr: 1,
+                    }}
+                >
+                    DANH SÁCH THÀNH VIÊN THAM GIA
+                </ToggleButton>
+                <ToggleButton
+                    value={1}
+                    sx={{
+                        p: 1,
+                        borderRadius: '10px !important',
+                        border: 'none',
+                        textTransform: 'none',
+                    }}
+                >
+                    XÉT DUYỆT THAM GIA
+                </ToggleButton>
+            </ToggleButtonGroup>
+
+            {!notiStatus ? <MemberList data={userList} /> : <p> hehe</p>}
         </Fragment>
     );
 }

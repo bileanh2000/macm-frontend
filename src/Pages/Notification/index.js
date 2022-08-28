@@ -106,13 +106,13 @@ function Notification() {
             });
         });
         console.log(news);
-        // if (news.notificationType == 1) {
-        //     navigator({ pathname: `/events/${news.notificationTypeId}` });
-        // } else if (news.notificationType == 0) {
-        //     navigator({ pathname: `/tournament/${news.notificationTypeId}` });
-        // } else {
-        //     return;
-        // }
+        if (news.notificationType == 1) {
+            navigator({ pathname: `/events/${news.notificationTypeId}` });
+        } else if (news.notificationType == 0) {
+            navigator({ pathname: `/tournament/${news.notificationTypeId}` });
+        } else {
+            return;
+        }
     };
     return (
         // <Paper elevation={3} sx={{}}>

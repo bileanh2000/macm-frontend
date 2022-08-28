@@ -49,7 +49,8 @@ function Event() {
     const [semester, setSemester] = useState('Summer2022');
     const [monthInSemester, setMonthInSemester] = useState([]);
     const [suggestionRole, setSuggestionRole] = useState([]);
-    const [month, setMonth] = useState(new Date().getMonth() + 1);
+    // const [month, setMonth] = useState(new Date().getMonth() + 1);
+    const [month, setMonth] = useState(0);
     const [semesterList, setSemesterList] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [commonList, setCommonList] = useState([]);
@@ -118,7 +119,7 @@ function Event() {
             const response = await semesterApi.getTop3Semester();
             console.log('getTop3Semester: ', response);
             setSemesterList(response.data);
-            setSemester(response.data[0].name);
+            // setSemester(response.data[0].name);
         } catch (error) {
             console.log('Fail when getTop3Semester', error);
         }

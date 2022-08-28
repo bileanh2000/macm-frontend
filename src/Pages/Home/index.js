@@ -27,6 +27,7 @@ import ActiveRegister from './ActiveRegister';
 import userApi from 'src/api/userApi';
 import { over } from 'stompjs';
 import SockJS from 'sockjs-client';
+import { useSnackbar } from 'notistack';
 
 let stompClient = null;
 function Index() {
@@ -44,6 +45,7 @@ function Index() {
         message: '',
         status: '',
     });
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const roleId = JSON.parse(localStorage.getItem('currentUser')).role.id;
 
     const handleOpenNotificationDialog = () => {
@@ -92,6 +94,7 @@ function Index() {
         console.log(payloadData);
         // console.log(payloadData);
         setReceiverSocket(payloadData);
+        enqueueSnackbar('Bạn đã được điểm danh', { variant: 'success' });
     };
 
     useEffect(() => {
@@ -130,7 +133,10 @@ function Index() {
     };
     useEffect(() => {
         checkAttendanceStatusByStudentId(studentId);
-    }, []);
+    }, [receiverSocket, studentId]);
+    // useEffect(() => {
+
+    // }, [receiverSocket]);
     const getStatusWhenStartSemester = async (studentId) => {
         try {
             const response = await userApi.getStatusWhenStartSemester(studentId);
@@ -210,7 +216,7 @@ function Index() {
                     <Schedule />
                 </Grid>
                 <Grid item md={2} xs={12} order={{ md: 2, xs: 1 }}>
-                    <Grid item md={12} sx={{ p: 1 }}>
+                    <Grid item md={12} sx={{ pl: 1, pr: 1 }}>
                         {!attendanceInfor.length ? (
                             <Box
                                 sx={{
