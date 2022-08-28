@@ -182,7 +182,7 @@ function AdminList({ adminList, value, index, active, total, isUpdate, user, Suc
             container['studentId'] = item.userStudentId;
             container['email'] = item.userMail;
             container['roleInClub'] = item.roleInClub;
-            container['role'] = item.roleEventDto.name;
+            container['role'] = item.eventRoleDto.name;
 
             // container['registerStatus'] = item.registerStatus;
             // container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';

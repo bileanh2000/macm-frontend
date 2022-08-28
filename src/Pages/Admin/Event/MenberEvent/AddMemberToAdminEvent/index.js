@@ -131,7 +131,7 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
         container['studentId'] = item.userStudentId;
         container['userMail'] = item.userMail;
         container['attendanceStatus'] = item.attendanceStatus ? 'Đã đăng kí' : 'Đã hủy';
-        container['role'] = item.roleEventDto.name;
+        container['role'] = item.eventRoleDto.name;
         container['roleInClub'] = item.roleInClub;
         container['paymentStatus'] = item.paymentStatus ? 'Đã đóng' : 'Chưa đóng';
         return container;
