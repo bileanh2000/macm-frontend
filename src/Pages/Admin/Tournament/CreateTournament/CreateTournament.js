@@ -478,6 +478,8 @@ function CreateTournament({
                     message: res.message,
                 });
             }
+            // setPreviewSchedule(res.data);
+
             setIsLoading(false);
         });
         setIsUpdate(false);
@@ -603,6 +605,8 @@ function CreateTournament({
                         }}
                         initialDate={eventSchedule[0] && new Date(eventSchedule[0].date)}
                         description={existedDate}
+                        previewData={previewSchedule && previewSchedule}
+                        name={previewTournament?.name}
                     />
                 )}
                 <Dialog
