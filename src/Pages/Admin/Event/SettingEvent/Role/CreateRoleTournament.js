@@ -65,7 +65,7 @@ function CreateRoleTournament({ isOpen, handleClose, onSucess, datas }) {
             return;
         }
         const newData = { name: data.roleName };
-        CreateRoleTournament(newData.name);
+        CreateRoleTournament(newData);
         reset({ roleName: '' });
         handleClose && handleClose();
     };

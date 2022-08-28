@@ -79,6 +79,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
     const [isOverride, setIsOverride] = useState(-1);
     const [dataEdit, setDataEdit] = useState();
     const [isEdit, setIsEdit] = useState(false);
+    const [dateCommitteeDeadline, setDateCommitteeDeadline] = useState(new Date(tomorrow));
+    const [datePlayerDeadline, setDatePlayerDeadline] = useState(new Date(tomorrow));
 
     useEffect(() => {
         setDatas(roles);
@@ -1079,6 +1081,8 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                                     value={value}
                                                     onChange={(value) => {
                                                         onChange(value);
+                                                        setDateCommitteeDeadline(value);
+                                                        setDatePlayerDeadline(value);
                                                         console.log('startDate value', value);
                                                         // setStartDate(value);
                                                     }}
@@ -1149,14 +1153,18 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                             required
                                             name="registrationMemberDeadline"
                                             control={control}
-                                            defaultValue={null}
+                                            defaultValue={datePlayerDeadline}
                                             render={({ field: { onChange, value }, fieldState: { error } }) => (
                                                 <DateTimePicker
                                                     label="Deadline đăng ký tham gia"
                                                     minDate={tomorrow}
                                                     ampm={false}
-                                                    value={value}
-                                                    onChange={(value) => onChange(value)}
+                                                    value={datePlayerDeadline}
+                                                    onChange={(value) => {
+                                                        onChange(value);
+                                                        // setDateCommitteeDeadline(value);
+                                                        setDatePlayerDeadline(value);
+                                                    }}
                                                     renderInput={(params) => (
                                                         <TextField
                                                             sx={{
@@ -1183,7 +1191,7 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                             required
                                             name="registrationOrganizingCommitteeDeadline"
                                             control={control}
-                                            defaultValue={skipped.has(1) ? null : null}
+                                            defaultValue={skipped.has(1) ? null : dateCommitteeDeadline}
                                             render={({
                                                 field: { onChange, value },
                                                 fieldState: { error, invalid },
@@ -1193,8 +1201,12 @@ const AddEventDialog = ({ title, children, isOpen, handleClose, onSucess, roles,
                                                     minDate={tomorrow}
                                                     disabled={skipped.has(1)}
                                                     ampm={false}
-                                                    value={value}
-                                                    onChange={(value) => onChange(value)}
+                                                    value={dateCommitteeDeadline}
+                                                    onChange={(value) => {
+                                                        onChange(value);
+                                                        setDateCommitteeDeadline(value);
+                                                        // setDatePlayerDeadline(value);
+                                                    }}
                                                     renderInput={(params) => (
                                                         <TextField
                                                             sx={{

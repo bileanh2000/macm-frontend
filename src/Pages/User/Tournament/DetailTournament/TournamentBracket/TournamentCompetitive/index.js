@@ -20,11 +20,20 @@ function TournamentCompetitive({ competitive, result, type }) {
 
     const handleChangeCompetitiveId = (event) => {
         if (result && result.length > 0) {
-            const _result = result.find((subResult) =>
-                subResult.data.find((d) => d.competitiveType.id == event.target.value),
-            ).data[0].listResult;
+            const _result =
+                result.find((subResult) =>
+                    subResult.data.length > 0
+                        ? subResult.data.find((d) => d.competitiveType.id == event.target.value)
+                        : null,
+                ) != null
+                    ? result.find((subResult) =>
+                          subResult.data.length > 0
+                              ? subResult.data.find((d) => d.competitiveType.id == event.target.value)
+                              : null,
+                      ).data[0].listResult
+                    : null;
+            console.log(_result);
             setTournamentResult(_result);
-            console.log('result', _result);
         }
         setCompetitiveId(event.target.value);
         getListPlayerByCompetitiveID(event.target.value);
@@ -73,11 +82,18 @@ function TournamentCompetitive({ competitive, result, type }) {
                     setListWeightRange(response.data[0]);
                     type == 0 && setCompetitiveId(response.data[0][0].id);
                     console.log(response.data[0][0].id, result);
-                    const _result = result.find((subResult) =>
-                        subResult.data.length > 0
-                            ? subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id)
-                            : null,
-                    ).data[0].listResult;
+                    const _result =
+                        result.find((subResult) =>
+                            subResult.data.length > 0
+                                ? subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id)
+                                : null,
+                        ) != null
+                            ? result.find((subResult) =>
+                                  subResult.data.length > 0
+                                      ? subResult.data.find((d) => d.competitiveType.id == response.data[0][0].id)
+                                      : null,
+                              ).data[0].listResult
+                            : null;
                     setTournamentResult(_result);
                     console.log('result', _result);
 

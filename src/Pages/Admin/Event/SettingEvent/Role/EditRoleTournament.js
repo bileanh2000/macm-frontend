@@ -59,7 +59,7 @@ function EditRoleTournament({ role, isOpen, handleClose, onSucess }) {
 
     const onSubmit = async (data) => {
         const newData = { name: data.roleName };
-        updateRule(newData.name);
+        updateRule(newData);
         handleClose && handleClose();
     };
 

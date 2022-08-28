@@ -35,6 +35,7 @@ import userTournamentAPI from 'src/api/userTournamentAPI';
 import { useSnackbar } from 'notistack';
 
 function RegisterPlayer({
+    datas,
     title,
     isOpen,
     handleClose,
@@ -187,12 +188,22 @@ function RegisterPlayer({
     };
 
     const handleRegister = (data) => {
+        console.log('data191',datas)
         const teamMember = [...dataMale, ...dataFemale];
         if (type == 1) {
             const params = { ...data, competitiveTypeId: weightRange };
             console.log(params);
             registerToJoinTournamentCompetitiveType(tournamentId, userInformation.studentId, params);
         } else {
+            if (
+                datas.length > 0 && datas.filter(ex => ex.id === exhibitionType)[0].exhibitionTeams.length > 0 &&
+                datas.filter(ex => ex.id === exhibitionType)[0].exhibitionTeams.findIndex((row) => row.teamName.toLowerCase().includes(data.teamName.toLowerCase())) >= 0
+            ) {
+                setError('teamName', {
+                    message: `Tên đội ${data.teamName} này đã tồn tại, vui lòng chọn tên khác`,
+                });
+                return;
+            }
             const params = { teamMember, teamName: data.teamName, exhibitionTypeId: exhibitionType };
             console.log(params);
             registerToJoinTournamentExhibitionType(tournamentId, userInformation.studentId, params);
