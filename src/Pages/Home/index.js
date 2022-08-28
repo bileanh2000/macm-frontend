@@ -37,6 +37,7 @@ function Index() {
     const [startDateOfCurrentSemester, setStartDateOfCurrentSemester] = useState([]);
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
     const [currentSemesterName, setCurrentSemesterName] = useState('');
+    const [attendanceInfor, setAttendanceInfor] = useState([]);
     const [receiverSocket, setReceiverSocket] = useState({
         senderName: '',
         receiverName: '',
@@ -122,7 +123,7 @@ function Index() {
         try {
             const response = await userApi.checkAttendanceStatusByStudentId(studentId);
             console.log('checkAttendanceStatusByStudentId', response);
-            setPaymentMessage(response.message);
+            setAttendanceInfor(response.data);
         } catch (error) {
             console.log('failed when checkAttendanceStatusByStudentId', error);
         }
@@ -209,8 +210,65 @@ function Index() {
                     <Schedule />
                 </Grid>
                 <Grid item md={2} xs={12} order={{ md: 2, xs: 1 }}>
-                    <Grid item md={12} sx={{ p: 0.5 }}>
-                        {receiverSocket.message === 'Bạn đã được điểm danh hôm nay!' ? (
+                    <Grid item md={12} sx={{ p: 1 }}>
+                        {!attendanceInfor.length ? (
+                            <Box
+                                sx={{
+                                    p: 2,
+                                    mb: 2,
+                                    textAlign: 'center',
+                                    fontWeight: 'bold',
+                                    backgroundColor: '#b3ecff',
+                                    color: '#007399',
+                                    borderRadius: '10px',
+                                }}
+                            >
+                                Hôm nay không có hoạt động nào cần điểm danh !
+                            </Box>
+                        ) : attendanceInfor[0]?.status === 0 ? (
+                            <Box
+                                sx={{
+                                    p: 2,
+                                    mb: 2,
+                                    textAlign: 'center',
+                                    fontWeight: 'bold',
+                                    backgroundColor: '#ffcccc',
+                                    color: '#e01441',
+                                    borderRadius: '10px',
+                                }}
+                            >
+                                Vắng mặt !
+                            </Box>
+                        ) : attendanceInfor[0]?.status === 1 ? (
+                            <Box
+                                sx={{
+                                    p: 2,
+                                    mb: 2,
+                                    textAlign: 'center',
+                                    fontWeight: 'bold',
+                                    backgroundColor: '#b9f8e2',
+                                    color: '#0e8b5f',
+                                    borderRadius: '10px',
+                                }}
+                            >
+                                Bạn đã được điểm danh hôm nay !
+                            </Box>
+                        ) : (
+                            <Box
+                                sx={{
+                                    p: 2,
+                                    mb: 2,
+                                    textAlign: 'center',
+                                    fontWeight: 'bold',
+                                    backgroundColor: '#ffe8b3',
+                                    color: '#996b00',
+                                    borderRadius: '10px',
+                                }}
+                            >
+                                Bạn chưa được điểm danh hôm nay !
+                            </Box>
+                        )}
+                        {/* {receiverSocket.message === 'Bạn đã được điểm danh hôm nay!' ? (
                             <Box
                                 sx={{
                                     p: 2,
@@ -236,7 +294,7 @@ function Index() {
                             >
                                 Vắng mặt!
                             </Box>
-                        )}
+                        )} */}
                         {/* <Box
                             sx={{
                                 p: 2,

@@ -10,6 +10,7 @@ import ViewContact from './ViewContact';
 import { IfAnyGranted } from 'react-authorization';
 import EditContactDialog from './EditContact/EditContactDialog';
 import { Container } from '@mui/system';
+import moment from 'moment';
 
 const cx = classNames.bind(styles);
 
@@ -51,79 +52,39 @@ function Contacts() {
                 <div className={cx('wrapper')}>
                     <div className={cx('container')}>
                         <ViewContact />
-                        <Grid container spacing={2} alignItems="center">
+                        <Grid container spacing={2}>
                             <Grid item xs={2}>
                                 <img
-                                    src="https://scontent.fhan5-8.fna.fbcdn.net/v/t1.6435-9/68275017_653525195127933_5293448296403042304_n.png?_nc_cat=110&ccb=1-7&_nc_sid=174925&_nc_ohc=N_esqbEIiEAAX-uGB4V&_nc_ht=scontent.fhan5-8.fna&oh=00_AT-imS7k70wjPSUPuuNzg1Y_iiNXTKE_ZAg9gVzQ6pI_PA&oe=63262856"
+                                    src={contacts[0].image}
                                     alt="club logo"
-                                    width="100%"
+                                    width="150px"
+                                    height="150px"
                                     style={{ borderRadius: '50%' }}
                                 />
                             </Grid>
                             <Grid item xs={10}>
-                                {/* <p style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{contacts[0]?.clubName}</p> */}
-                                <p style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>FNC - FPTU Nunchaku CLub</p>
-                                <p>25/06/2019</p>
+                                <p style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{contacts[0]?.clubName}</p>
+
+                                <p>{moment(contacts[0]?.foundingDate).format('DD/MM/yyyy')}</p>
                                 <p>{contacts[0]?.clubMail}</p>
                                 <p>{contacts[0]?.clubPhoneNumber}</p>
                                 <div style={{ display: 'flex' }}>
-                                    <a href={socials[0]?.url}>
+                                    <a
+                                        href={contacts[0]?.fanpageUrl}
+                                        style={{ display: 'flex' }}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
                                         <Facebook />
-                                        {/* {socials[0]?.url} */}
+                                        {contacts[0]?.fanpageUrl}
                                     </a>
-                                    <a href="##" style={{ color: 'black !important' }}>
+                                    {/* <a href="##" style={{ color: 'black !important' }}>
                                         Le Anh Tuan
-                                    </a>
+                                    </a> */}
                                 </div>
 
                                 <p>ĐH FPT, km29 Đại lộ Thăng Long, xã Thạch Hoà, huyện Thạch Thất Hà Nội</p>
                             </Grid>
-                            {/* <Grid item xs={8}>
-                            <Grid container spacing={0}>
-                                <Grid item xs={2}>
-                                    <LocationOn />
-                                </Grid>
-                                <Grid item xs={10}>
-                                    <p>ĐH FPT, km29 Đại lộ Thăng Long, xã Thạch Hoà, huyện Thạch Thất Hà Nội</p>
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={0}>
-                                <Grid item xs={2}>
-                                    <LocalPhone />
-                                </Grid>
-                                <Grid item xs={10}>
-                                    <p>{contacts[0]?.clubPhoneNumber}</p>
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={0}>
-                                <Grid item xs={2}>
-                                    <Email />
-                                </Grid>
-                                <Grid item xs={10}>
-                                    <p>{contacts[0]?.clubMail}</p>
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={0}>
-                                <Grid item xs={2}>
-                                    <p>Mạng xã hội</p>
-                                </Grid>
-                                <Grid item xs={10}>
-                                    <a href={socials[0]?.url}>
-                                        {' '}
-                                        <Facebook />
-                                    </a>
-                                    <a href={socials[1]?.url}>
-                                        {' '}
-                                        <Instagram />
-                                    </a>
-                                    <a href={socials[2]?.url}>
-                                        {' '}
-                                        <YouTube />
-                                    </a>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                        <Grid item xs={4}></Grid> */}
                         </Grid>
                     </div>
                 </div>
