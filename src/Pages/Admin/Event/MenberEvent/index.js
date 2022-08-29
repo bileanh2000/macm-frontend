@@ -60,11 +60,13 @@ function MenberEvent() {
                 }}
             />
 
-            <MemberCancelEvent
-                title="Danh sách thành viên hủy tham gia sự kiện"
-                isOpen={isMemberCancelDialog}
-                handleClose={() => setIsMemberCancelDialog(false)}
-            />
+            {isMemberCancelDialog && (
+                <MemberCancelEvent
+                    title="Danh sách thành viên bị từ chối tham gia"
+                    isOpen={isMemberCancelDialog}
+                    handleClose={() => setIsMemberCancelDialog(false)}
+                />
+            )}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <Box>
                     <Button variant="outlined" onClick={() => setIsOpenAddMemberDialog(true)} sx={{ mr: 2 }}>
@@ -73,7 +75,7 @@ function MenberEvent() {
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}></Box>
                 {/* <Link to={`../admin/events/${id}/membercancel`}>Danh sách thành viên hủy đăng ký tham gia sự kiện</Link> */}
-                <Button onClick={() => setIsMemberCancelDialog(true)}>Danh sách thành viên hủy đăng ký tham gia</Button>
+                <Button onClick={() => setIsMemberCancelDialog(true)}>Danh sách thành viên bị từ chối tham gia</Button>
             </Box>
 
             <ToggleButtonGroup
