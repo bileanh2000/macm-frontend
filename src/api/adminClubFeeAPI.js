@@ -37,7 +37,8 @@ const adminClubFeeAPI = {
     },
 
     getReportMembership: (id) => {
-        const url = `admin/treasure/membership/getreportmembershippaymentstatus/${id}`;
+        const url = `admin/treasure/membership/getreportmembershippaymentstatus/${id}?pageNo=0&pageSize=1000&sortBy=id
+        `;
         return axiosClient.get(url);
     },
 
