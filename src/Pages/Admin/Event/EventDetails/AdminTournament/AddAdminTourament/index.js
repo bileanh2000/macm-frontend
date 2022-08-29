@@ -63,7 +63,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
             flex: 0.3,
         },
         {
-            field: 'roleInTournament',
+            field: 'eventRoleDto',
             headerName: 'Vai trò mong muốn',
             flex: 0.6,
         },
@@ -166,7 +166,7 @@ function AddAdminTourament({ value, index, total, active, onChange }) {
                     <GridToolbarQuickFilter />
                 </Box>
                 <Typography variant="body1" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                    Số lượng thành viên : {_active}/{total}
+                    Số lượng thành viên chờ duyệt : {userList.length}
                 </Typography>
             </GridToolbarContainer>
         );

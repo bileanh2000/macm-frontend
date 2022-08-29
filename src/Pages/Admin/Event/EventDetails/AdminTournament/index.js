@@ -148,7 +148,7 @@ function AdminTournament({ isUpdate, user }) {
                 </ToggleButtonGroup>
             </Box>
             <Button variant="outlined" sx={{ m: 1, mt: 0 }} onClick={() => setOpenDialogEdit(true)}>
-                Chỉnh sửa vai trò của giải đấu
+                Chỉnh sửa vai trò của sự kiện
             </Button>
             {notiStatus === 0 && (
                 <AdminList
