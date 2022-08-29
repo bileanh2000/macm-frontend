@@ -268,44 +268,47 @@ function FightingCompetition(props) {
     return (
         <Box>
             <Paper elevation={3}>
-                {props.data.length > 0 && (
-                    <TableContainer sx={{ maxHeight: 350, m: 1, mr: 0, p: 1, mb: 2 }}>
-                        <Table stickyHeader aria-label="sticky table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell align="center"></TableCell>
-                                    <TableCell align="center">Giới tính</TableCell>
-                                    <TableCell align="center">Hạng cân</TableCell>
-                                    <TableCell align="center"></TableCell>
-                                    {/* <TableCell align="center"></TableCell> */}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {datas.map((data) => (
-                                    <TableRow key={data.id}>
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={data.selected}
-                                                onChange={() => handleSelectCompetitve(data)}
-                                            />
-                                        </TableCell>
-                                        <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
+                <TableContainer sx={{ maxHeight: 390, m: 1, mr: 0, p: 1, mb: 2 }}>
+                    {props.data.length > 0 && (
+                        <>
+                            <Table stickyHeader aria-label="sticky table" size="small">
+                                <TableHead>
+                                    <TableRow>
                                         <TableCell align="center">
-                                            {data.weightMin} - {data.weightMax} Kg
+                                            SL: {datas.filter((data) => data.selected).length}
                                         </TableCell>
-                                        <TableCell>
-                                            <IconButton
-                                                aria-label="edit"
-                                                onClick={() => {
-                                                    // handleOpenDialog();
-                                                    handleEdit(data);
-                                                }}
-                                                disabled={isEdit || isChecked}
-                                            >
-                                                <Edit />
-                                            </IconButton>
-                                        </TableCell>
-                                        {/* <TableCell>
+                                        <TableCell align="center">Giới tính</TableCell>
+                                        <TableCell align="center">Hạng cân</TableCell>
+                                        <TableCell align="center"></TableCell>
+                                        {/* <TableCell align="center"></TableCell> */}
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {datas.map((data) => (
+                                        <TableRow key={data.id}>
+                                            <TableCell align="center">
+                                                <Checkbox
+                                                    checked={data.selected}
+                                                    onChange={() => handleSelectCompetitve(data)}
+                                                />
+                                            </TableCell>
+                                            <TableCell align="center">{data.gender ? 'Nam' : 'Nữ'}</TableCell>
+                                            <TableCell align="center">
+                                                {data.weightMin} - {data.weightMax} Kg
+                                            </TableCell>
+                                            <TableCell>
+                                                <IconButton
+                                                    aria-label="edit"
+                                                    onClick={() => {
+                                                        // handleOpenDialog();
+                                                        handleEdit(data);
+                                                    }}
+                                                    disabled={isEdit || isChecked}
+                                                >
+                                                    <Edit />
+                                                </IconButton>
+                                            </TableCell>
+                                            {/* <TableCell>
                                             <IconButton
                                                 aria-label="delete"
                                                 onClick={() => {
@@ -317,92 +320,94 @@ function FightingCompetition(props) {
                                                 <Delete />
                                             </IconButton>
                                         </TableCell> */}
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                )}
-            </Paper>
-            <Paper elevation={3}>
-                <Collapse in={isChecked}>
-                    {!isEdit ? (
-                        <Grid container spacing={2} sx={{ p: 1 }}>
-                            <Grid item xs={2}>
-                                {/* <InputLabel id="demo-simple-select-label">Giới tính</InputLabel> */}
-                                <Select
-                                    labelId="demo-simple-select-label"
-                                    id="gender"
-                                    value={gender}
-                                    onChange={handleChange}
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                            <Paper elevation={3}>
+                                <Collapse in={isChecked}>
+                                    {!isEdit ? (
+                                        <Grid container spacing={2} sx={{ p: 1 }}>
+                                            <Grid item xs={3}>
+                                                {/* <InputLabel id="demo-simple-select-label">Giới tính</InputLabel> */}
+                                                <Select
+                                                    labelId="demo-simple-select-label"
+                                                    id="gender"
+                                                    value={gender}
+                                                    onChange={handleChange}
+                                                >
+                                                    <MenuItem value={1}>Nam</MenuItem>
+                                                    <MenuItem value={0}>Nữ</MenuItem>
+                                                </Select>
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                {/* <InputLabel>Hạng cân</InputLabel> */}
+                                                <TextField
+                                                    fullWidth
+                                                    type="number"
+                                                    id="outlined-basic"
+                                                    label="Hạng cân tối thiểu"
+                                                    variant="outlined"
+                                                    {...register('weightMin')}
+                                                    error={errors.weightMin ? true : false}
+                                                    helperText={errors.weightMin?.message}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={4}>
+                                                <TextField
+                                                    type="number"
+                                                    id="outlined-basic"
+                                                    label="Hạng cân tối đa"
+                                                    variant="outlined"
+                                                    {...register('weightMax')}
+                                                    error={errors.weightMax ? true : false}
+                                                    helperText={errors.weightMax?.message}
+                                                    fullWidth
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Button
+                                                    variant="contained"
+                                                    color="success"
+                                                    onClick={handleSubmit(handleAddCompetition)}
+                                                    sx={{ m: 1 }}
+                                                >
+                                                    Thêm
+                                                </Button>
+                                                <Button variant="contained" color="warning" onClick={handleCancel}>
+                                                    Hủy
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    ) : (
+                                        dataEdit && (
+                                            <EditCompetitive
+                                                dataEdit={dataEdit}
+                                                onEdit={handleEditCompetition}
+                                                onCancel={handleCancel}
+                                                weightRange={weightRangeTemp}
+                                            />
+                                        )
+                                    )}
+                                </Collapse>
+                            </Paper>
+                            <Collapse in={!isChecked}>
+                                <Fab
+                                    color="primary"
+                                    variant="extended"
+                                    aria-label="add"
+                                    onClick={() => setIsChecked(!isChecked)}
+                                    size="small"
+                                    sx={{ mt: 1 }}
                                 >
-                                    <MenuItem value={1}>Nam</MenuItem>
-                                    <MenuItem value={0}>Nữ</MenuItem>
-                                </Select>
-                            </Grid>
-                            <Grid item xs={5}>
-                                {/* <InputLabel>Hạng cân</InputLabel> */}
-                                <TextField
-                                    fullWidth
-                                    type="number"
-                                    id="outlined-basic"
-                                    label="Hạng cân tối thiểu"
-                                    variant="outlined"
-                                    {...register('weightMin')}
-                                    error={errors.weightMin ? true : false}
-                                    helperText={errors.weightMin?.message}
-                                />
-                            </Grid>
-                            <Grid item xs={5}>
-                                <TextField
-                                    type="number"
-                                    id="outlined-basic"
-                                    label="Hạng cân tối đa"
-                                    variant="outlined"
-                                    {...register('weightMax')}
-                                    error={errors.weightMax ? true : false}
-                                    helperText={errors.weightMax?.message}
-                                    fullWidth
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Button
-                                    variant="contained"
-                                    color="success"
-                                    onClick={handleSubmit(handleAddCompetition)}
-                                    sx={{ m: 1 }}
-                                >
-                                    Thêm
-                                </Button>
-                                <Button variant="contained" color="warning" onClick={handleCancel}>
-                                    Hủy
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    ) : (
-                        dataEdit && (
-                            <EditCompetitive
-                                dataEdit={dataEdit}
-                                onEdit={handleEditCompetition}
-                                onCancel={handleCancel}
-                                weightRange={weightRangeTemp}
-                            />
-                        )
+                                    <Add />
+                                    Thêm hạng cân thi đấu
+                                </Fab>
+                            </Collapse>
+                        </>
                     )}
-                </Collapse>
+                </TableContainer>
             </Paper>
-            <Collapse in={!isChecked}>
-                <Fab
-                    color="primary"
-                    variant="extended"
-                    aria-label="add"
-                    onClick={() => setIsChecked(!isChecked)}
-                    size="medium"
-                >
-                    <Add />
-                    Thêm hạng cân thi đấu
-                </Fab>
-            </Collapse>
         </Box>
     );
 }

@@ -56,7 +56,7 @@ function CreateRoleTournament({ isOpen, handleClose, onSucess, datas }) {
     };
 
     const handleCreateRoleTournament = async (data) => {
-        if (datas.findIndex((d) => d.name.toLowerCase().includes(data.roleName.toLowerCase())) >= 0) {
+        if (datas.findIndex((d) => d.name.toLowerCase() === data.roleName.toLowerCase()) >= 0) {
             setError('roleName', {
                 message: `Vai trò ${data.roleName} này đã tồn tại, vui lòng chọn vai trò khác`,
             });

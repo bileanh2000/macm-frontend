@@ -130,7 +130,7 @@ function RegisterExhibition({ data, isOpen, handleClose, onSuccess, onChangeData
 
     const handleRegister = (team) => {
         console.log(team);
-        if (data.findIndex((row) => row.teamName.toLowerCase().includes(team.teamName.toLowerCase())) >= 0) {
+        if (data.findIndex((row) => row.teamName.toLowerCase() === team.teamName.toLowerCase()) >= 0) {
             setError('teamName', {
                 message: `Tên đội ${team.teamName} này đã tồn tại, vui lòng chọn tên khác`,
             });

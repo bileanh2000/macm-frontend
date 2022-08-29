@@ -7,6 +7,7 @@ import {
     DialogContent,
     DialogTitle,
     IconButton,
+    Paper,
     Table,
     TableBody,
     TableCell,
@@ -86,6 +87,9 @@ function RolesSetting({ title, isOpen, handleClose }) {
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
+            sx={{
+                height: '80vh !importance',
+            }}
         >
             {role && (
                 <EditRoleTournament
@@ -149,27 +153,31 @@ function RolesSetting({ title, isOpen, handleClose }) {
                 <Box
                     sx={{
                         '& .MuiTextField-root': { mb: 2 },
+                        // height: '80vh',
                     }}
                 >
-                    <Box>
+                    <Paper elevation={1}>
                         {datas.length > 0 && (
-                            <TableContainer sx={{ maxHeight: 300, m: 1, p: 1 }}>
-                                <Table stickyHeader aria-label="sticky table">
-                                    <caption style={{ captionSide: 'top' }}>
-                                        Số lượng vai trò hiện tại : {datas.length}
-                                    </caption>
+                            <TableContainer sx={{ maxHeight: 480, m: 1, p: 1 }}>
+                                <Table stickyHeader aria-label="sticky table" size="small">
+                                    {/* <caption style={{ captionSide: 'top' }}></caption> */}
                                     <TableHead>
                                         <TableRow>
                                             <TableCell align="center">Tên vai trò</TableCell>
-                                            <TableCell align="center"></TableCell>
-                                            <TableCell align="center"></TableCell>
+                                            <TableCell align="center">
+                                                Số lượng vai trò hiện tại : {datas.length}
+                                            </TableCell>
+                                            {/* <TableCell align="center"></TableCell> */}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {datas.map((data) => (
-                                            <TableRow key={data.id}>
+                                            <TableRow
+                                                key={data.id}
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
                                                 <TableCell align="center">{data.name}</TableCell>
-                                                <TableCell>
+                                                <TableCell align="center">
                                                     <IconButton
                                                         aria-label="edit"
                                                         onClick={() => {
@@ -178,8 +186,6 @@ function RolesSetting({ title, isOpen, handleClose }) {
                                                     >
                                                         <Edit />
                                                     </IconButton>
-                                                </TableCell>
-                                                <TableCell>
                                                     <IconButton
                                                         aria-label="delete"
                                                         onClick={() => {
@@ -189,13 +195,14 @@ function RolesSetting({ title, isOpen, handleClose }) {
                                                         <Delete />
                                                     </IconButton>
                                                 </TableCell>
+                                                {/* <TableCell></TableCell> */}
                                             </TableRow>
                                         ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                         )}
-                    </Box>
+                    </Paper>
                 </Box>
             </DialogContent>
             <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>

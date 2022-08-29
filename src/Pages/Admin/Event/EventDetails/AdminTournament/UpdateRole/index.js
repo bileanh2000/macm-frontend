@@ -31,10 +31,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Add, Delete, Edit } from '@mui/icons-material';
 
 import EditRole from './EditRole';
-import adminTournament from 'src/api/adminTournamentAPI';
+// import adminTournament from 'src/api/adminTournamentAPI';
 import { useSnackbar } from 'notistack';
+import eventApi from 'src/api/eventApi';
 
-function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, tournamentId, onChange }) {
+function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, id, onChange }) {
     const newData =
         roleInTournament.length > 0
             ? roles.map((role) =>
@@ -52,7 +53,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
 
     const editRoleTournament = async (tournamentId, params) => {
         try {
-            const response = await adminTournament.editRoleTournament(tournamentId, params);
+            const response = await eventApi.editRoleEvent(tournamentId, params);
             enqueueSnackbar(response.message, { variant: 'success' });
             onChange && onChange();
         } catch (error) {
@@ -205,7 +206,7 @@ function UpdateRole({ isOpen, handleClose, onSuccess, roleInTournament, roles, t
                       return { name: data.name, maxQuantity: data.maxQuantity };
                   })
                 : [];
-        editRoleTournament(tournamentId, submitData);
+        editRoleTournament(id, submitData);
         handleClose && handleClose();
     };
     const handleCloseDialog = () => {

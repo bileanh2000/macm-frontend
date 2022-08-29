@@ -86,7 +86,7 @@ export const CustomTrainingSchedule = styled.div`
     width: 70%;
 `;
 
-function TournamentSchedule({ isUpdate, tournamentStage }) {
+function TournamentSchedule({ isUpdate, tournamentStage, isChange }) {
     const calendarComponentRef = useRef(null);
     const nowDate = new Date();
     let { tournamentId } = useParams();
@@ -259,7 +259,7 @@ function TournamentSchedule({ isUpdate, tournamentStage }) {
     };
 
     const navigateToUpdate = (params, date) => {
-        if (isUpdate || tournamentStage > 2) {
+        if (isUpdate || tournamentStage > 1) {
             return;
         }
         console.log(params);
@@ -281,7 +281,7 @@ function TournamentSchedule({ isUpdate, tournamentStage }) {
     };
 
     const navigateToCreate = (date) => {
-        if (isUpdate || tournamentStage > 2) {
+        if (isUpdate || tournamentStage > 1) {
             return;
         }
         console.log(date);
@@ -398,6 +398,7 @@ function TournamentSchedule({ isUpdate, tournamentStage }) {
                     onSucess={(isUpdate) => {
                         setIsRender(true);
                         setUpdate(isUpdate);
+                        isChange && isChange();
                     }}
                 />
             )}
@@ -409,10 +410,12 @@ function TournamentSchedule({ isUpdate, tournamentStage }) {
                         setIsOpenEditSessionDialog(false);
                         setScheduleUpdate(null);
                     }}
+                    scheduleData={scheduleList}
                     date={scheduleUpdate}
                     onSucess={(isUpdate) => {
                         setIsRender(true);
                         setUpdate(isUpdate);
+                        isChange && isChange();
                     }}
                 />
             )}

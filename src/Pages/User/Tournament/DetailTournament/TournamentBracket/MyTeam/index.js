@@ -1,61 +1,59 @@
 import { Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { Box } from '@mui/system';
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 
-function MyTeam({ competitive, exhibition, user }) {
-    console.log(exhibition, user);
+import userTournamentAPI from 'src/api/userTournamentAPI';
 
-    // const myTeam =
-    //     exhibition.length > 0 &&
-    //     exhibition.filter((ex) =>
-    //         ex.exhibitionTeams.filter(
-    //             (exhibitionTeam) =>
-    //                 exhibitionTeam.exhibitionPlayers.filter(
-    //                     (exhibitionPlayer) => exhibitionPlayer.tournamentPlayer.user.studentId == user.studentId,
-    //                 )[0].tournamentPlayer.user.studentId == user.studentId,
-    //         ),
-    //     )[0].exhibitionTeams[0].exhibitionPlayers[0].tournamentPlayer.user.studentId;
-    // const hehe =
-    //     exhibition.length > 0 && exhibition[0].exhibitionTeams[0].exhibitionPlayers[0].tournamentPlayer.user.studentId;
+function MyTeam({ tournament, competitive, exhibition, user }) {
+    // console.log(exhibition, user);
+    const [myteam, setMyTeam] = useState([]);
 
-    // console.log(myTeam);
+    useEffect(() => {
+        const getMyTeam = async () => {
+            try {
+                const response = await userTournamentAPI.getMyTeam(tournament.id, user.studentId);
+                console.log('setMyTeam', response);
+                setMyTeam(response.data);
+            } catch (error) {
+                console.warn('Failed to get my team', error);
+            }
+        };
+        getMyTeam();
+    }, [tournament.id, user.studentId]);
 
-    return competitive.length > 0 && exhibition.length > 0 ? (
-        <>
-            {competitive.length > 0 && <Typography variant="body1"></Typography>}{' '}
-            {exhibition.length > 0 && (
-                <>
-                    <Typography variant="body1">Tên nhóm : {exhibition[0].teamName}</Typography>
-                    <TableContainer component={Paper}>
-                        <Table sx={{ minWidth: 650 }} aria-label="caption table">
-                            <caption>{exhibition.data[0].name}</caption>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>STT</TableCell>
-                                    <TableCell align="left">Tên thành viên</TableCell>
-                                    <TableCell align="left">Mã số sinh viên</TableCell>
-                                    <TableCell align="left">Giới tính</TableCell>
-                                    <TableCell align="left">Vai trò</TableCell>
+    return myteam.length > 0 ? (
+        myteam.map((team) => (
+            <Box key={team.id}>
+                <Typography variant="body1">Tên nhóm : {team.teamName}</Typography>
+                <TableContainer component={Paper}>
+                    <Table sx={{ minWidth: 650 }} aria-label="caption table">
+                        <caption>{team.exhibitionTypeName}</caption>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>STT</TableCell>
+                                <TableCell align="left">Tên thành viên</TableCell>
+                                <TableCell align="left">Mã số sinh viên</TableCell>
+                                <TableCell align="left">Giới tính</TableCell>
+                                <TableCell align="left">Vai trò</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {team.exhibitionPlayersDto.map((row, index) => (
+                                <TableRow key={row.id}>
+                                    <TableCell component="th" scope="row">
+                                        {index + 1}
+                                    </TableCell>
+                                    <TableCell align="left">{row.playerName}</TableCell>
+                                    <TableCell align="left">{row.playerStudentId}</TableCell>
+                                    <TableCell align="left">{row.playerGender ? 'Nam' : 'Nữ'}</TableCell>
+                                    <TableCell align="left">{row.roleInTeam == 0 ? '' : 'Nhóm trưởng'}</TableCell>
                                 </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {exhibition[0].exhibitionPlayersDto.map((row, index) => (
-                                    <TableRow key={row.id}>
-                                        <TableCell component="th" scope="row">
-                                            {index + 1}
-                                        </TableCell>
-                                        <TableCell align="left">{row.playerName}</TableCell>
-                                        <TableCell align="left">{row.playerStudentId}</TableCell>
-                                        <TableCell align="left">{row.playerGender ? 'Nam' : 'Nữ'}</TableCell>
-                                        <TableCell align="left">{row.roleInTeam == 0 ? '' : 'Nhóm trưởng'}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </>
-            )}
-        </>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Box>
+        ))
     ) : (
         <Box sx={{ d: 'flex' }}>
             <Typography variant="body1" sx={{ m: 'auto' }}>

@@ -42,7 +42,7 @@ function CreateArea({ isOpen, handleClose, onSucess, datas }) {
     });
 
     const handleCreateArea = (data) => {
-        if (datas.findIndex((d) => d.name.toUpperCase().includes(data.name.toUpperCase())) >= 0) {
+        if (datas.findIndex((d) => d.name.toUpperCase() === data.name.toUpperCase()) >= 0) {
             setError('name', {
                 message: `Sân ${data.name} này đã tồn tại, vui lòng chọn sân khác`,
             });
