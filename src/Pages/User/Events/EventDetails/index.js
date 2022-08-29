@@ -44,6 +44,8 @@ import LoadingProgress from 'src/Components/LoadingProgress';
 import RegisterEventDialog from '../RegisterEventDialog';
 import ConfirmCancel from '../ConfirmDialog';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import BlockIcon from '@mui/icons-material/Block';
+import DoneRoundedIcon from '@mui/icons-material/DoneRounded';
 // import AdminTournament from '../AdminTournament';
 // import MemberTournament from '../MemberTournament';
 
@@ -90,6 +92,7 @@ function UserEventDetails() {
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [isUpdateEvent, setIsUpdateEvent] = useState(false);
     const [dataStatus, setDataStatus] = useState('');
+    const [registerStatus, setRegisterStatus] = useState('');
     const [eventJoined, setEventJoined] = useState([]);
     const [isJoined, setIsJoined] = useState(false);
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
@@ -123,6 +126,11 @@ function UserEventDetails() {
         try {
             const response = await eventApi.getAllEventByStudentId(studentId);
             console.log(`List event joined by student Id`, response.data);
+            let currentEvent = response.data.filter((i) => i.eventId === parseInt(id));
+            console.log('getListEventJoined', currentEvent);
+            if (currentEvent.length !== 0) {
+                setRegisterStatus(currentEvent[0].registerStatus);
+            }
             setEventJoined(response.data);
         } catch (error) {
             console.log('Lấy dữ liệu thất bại', error);
@@ -144,6 +152,7 @@ function UserEventDetails() {
             // setIsJoined(false);
         }
     };
+
     const handleRegisterEventDeadline = () => {
         if (tournament) {
             if (new Date(tournament.registrationMemberDeadline) > now) {
@@ -194,6 +203,9 @@ function UserEventDetails() {
     const handleUpdateTournament = (data) => {
         setTournament(data);
     };
+    useEffect(() => {
+        console.log('registerStatus', registerStatus);
+    }, [registerStatus]);
 
     if (dataStatus === 'Sự kiện này đã hủy' || dataStatus === 'Không có sự kiện này') {
         return <NoValuePage message="Hoạt động này không tồn tại hoặc đã bị xóa" />;
@@ -201,6 +213,7 @@ function UserEventDetails() {
     if (!scheduleList[0]) {
         return <LoadingProgress />;
     }
+
     return (
         <Box sx={{}}>
             {/* {tournament && scheduleList[0] && (
@@ -296,12 +309,19 @@ function UserEventDetails() {
                                                         : 'Hết hạn đăng ký'}
                                                 </Button>
                                             </Fragment>
+                                        ) : registerStatus === 'Đã chấp nhận' ? (
+                                            <Button startIcon={<DoneRoundedIcon />} variant="outlined" color="success">
+                                                Đăng ký thành công
+                                            </Button>
+                                        ) : registerStatus === 'Đã từ chối' ? (
+                                            <Button startIcon={<BlockIcon />} variant="outlined" color="warning">
+                                                Bị từ chối
+                                            </Button>
                                         ) : (
                                             <Button
                                                 startIcon={<AccessTimeFilledIcon />}
                                                 variant="outlined"
                                                 color="warning"
-                                                onClick={() => setOpenConfirmDialog(true)}
                                                 disabled
                                             >
                                                 Đang chờ duyệt

@@ -118,7 +118,7 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
 
         registrationMemberDeadline: Yup.date()
             .max(Yup.ref('startDate'), ({ max }) => `Deadline không được muộn hơn thời gian bắt đầu`)
-            .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+            // .min(min, 'Vui lòng không nhập ngày trong quá khứ')
             .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy')
             .required('Vui lòng không để trống trường này'),
         ...(data.registrationOrganizingCommitteeDeadline === null
@@ -126,7 +126,7 @@ function UpdateTournamentOverview({ title, isOpen, data, handleClose, onSuccessS
             : {
                   registrationOrganizingCommitteeDeadline: Yup.date()
                       .max(Yup.ref('startDate'), ({ max }) => `Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu`)
-                      .min(min, 'Vui lòng không nhập ngày trong quá khứ')
+                      //   .min(min, 'Vui lòng không nhập ngày trong quá khứ')
                       .typeError('Vui lòng nhập đúng định dạng ngày DD/mm/yyyy')
                       .required('Vui lòng không để trống trường này')
                       .test('same_dates_test', 'Deadline đăng ký BTC phải sớm hơn thời gian bắt đầu', function (value) {

@@ -199,7 +199,7 @@ function EventDetails() {
     }
     return (
         <Box sx={{ m: 1, p: 1, height: '80vh' }}>
-            {tournament && scheduleList[0] && (
+            {openEditDialog && tournament && scheduleList[0] && (
                 <UpdateTournamentOverview
                     // DialogOpen={true}
                     data={tournament}

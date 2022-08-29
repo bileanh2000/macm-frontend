@@ -209,7 +209,7 @@ function AddMemberToEvent({ title, children, isOpen, handleClose, onSucess }) {
                             pageSize={pageSize}
                             rowsPerPageOptions={[30, 40, 50]}
                             components={{
-                                Toolbar: CustomToolbar,
+                                Toolbar: GridToolbarQuickFilter,
                                 NoRowsOverlay: CustomNoRowsOverlay,
                             }}
                         />

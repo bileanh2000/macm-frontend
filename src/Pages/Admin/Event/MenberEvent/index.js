@@ -45,7 +45,7 @@ function MenberEvent() {
 
     useEffect(() => {
         fetchUserInEvent(id, 0);
-    }, [id, type]);
+    }, [id, type, notiStatus]);
 
     return (
         <Fragment>
