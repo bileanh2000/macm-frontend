@@ -55,7 +55,7 @@ function Contacts() {
                         <Grid container spacing={2}>
                             <Grid item xs={2}>
                                 <img
-                                    src={contacts[0].image}
+                                    src={contacts[0]?.image}
                                     alt="club logo"
                                     width="150px"
                                     height="150px"
