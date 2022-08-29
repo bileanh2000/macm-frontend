@@ -1,4 +1,4 @@
-import { Alert, Box, Snackbar, styled, Typography } from '@mui/material';
+import { Alert, Box, Button, MenuItem, Snackbar, styled, TextField, Typography } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import moment from 'moment';
@@ -17,6 +17,11 @@ function ViewAttendance({ data }) {
     const location = useLocation();
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up('md'));
+    const [attendanceStatus, setAttendanceStatus] = useState(2);
+
+    const handleChangeStatus = (event) => {
+        setAttendanceStatus(event.target.value);
+    };
 
     let _type = location.state?.type;
     if (!_type) _type = data.type;
@@ -27,13 +32,13 @@ function ViewAttendance({ data }) {
     let _nowDate = location.state?.date;
     if (!_nowDate) _nowDate = data.date;
 
-    const checkAttendanceByScheduleId = async () => {
+    const checkAttendanceByScheduleId = async (status) => {
         try {
             console.log(_trainingScheduleId, _nowDate);
             let response;
             if (_type == 0) {
                 adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
-                    adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
+                    adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id, status).then((res) => {
                         setUserList(res.data);
                         setTotalActive(res.totalActive);
                         setTotalResult(res.totalResult);
@@ -42,7 +47,7 @@ function ViewAttendance({ data }) {
             }
             if (_type == 1) {
                 adminAttendanceAPI.getEventSessionByDate(_nowDate).then((res) => {
-                    adminAttendanceAPI.getAttendanceByEventId(res.data[0].event.id).then((res) => {
+                    adminAttendanceAPI.getAttendanceByEventId(res.data[0].event.id, status).then((res) => {
                         setUserList(res.data);
                         setTotalActive(res.totalActive);
                         setTotalResult(res.totalResult);
@@ -55,8 +60,8 @@ function ViewAttendance({ data }) {
     };
 
     useEffect(() => {
-        checkAttendanceByScheduleId();
-    }, []);
+        checkAttendanceByScheduleId(attendanceStatus);
+    }, [attendanceStatus]);
 
     const columns = [
         { field: 'id', headerName: 'Số thứ tự', flex: 0.5 },
@@ -123,7 +128,7 @@ function ViewAttendance({ data }) {
                     <GridToolbarQuickFilter />
                 </Box>
                 <Typography variant="body1">
-                    Số người tham gia điểm danh: {totalActive}/{totalResult}
+                    Có mặt: {totalActive}/{totalResult}
                 </Typography>
             </GridToolbarContainer>
         );
@@ -188,6 +193,59 @@ function ViewAttendance({ data }) {
 
     return (
         <Fragment>
+            <Typography
+                variant="body1"
+                sx={{
+                    position: 'absolute',
+                    right: '50px',
+                    top: '227px',
+                    zIndex: 2,
+                }}
+            >
+                Có mặt: {totalActive}/{totalResult}
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, mt: 2, flexWrap: 'wrap' }}>
+                {/* <Button variant="outlined">
+                                <Link to={`./report`} style={{ color: 'black' }}>
+                                    Thống kê thành viên tham gia buổi tập
+                                </Link>
+                            </Button> */}
+                <TextField
+                    id="outlined-select-currency"
+                    select
+                    label="Trạng thái"
+                    value={attendanceStatus}
+                    onChange={handleChangeStatus}
+                    size="small"
+                    sx={{ mb: 1 }}
+                >
+                    <MenuItem value={0}>Vắng mặt</MenuItem>
+                    <MenuItem value={-1}>Tất Cả</MenuItem>
+                    <MenuItem value={1}>Có mặt</MenuItem>
+                    <MenuItem value={2}>Chưa điểm danh</MenuItem>
+                </TextField>
+                <Box>
+                    <Button variant="outlined" sx={{ color: 'black', mr: 2 }}>
+                        <Link
+                            sx={{ color: 'black' }}
+                            to="./take"
+                            state={{ id: data.trainingScheduleId, date: _nowDate, type: data.type }}
+                        >
+                            Điểm danh
+                        </Link>
+                    </Button>
+                    <Button variant="outlined" sx={{ color: 'black' }}>
+                        <Link
+                            sx={{ color: 'black' }}
+                            to="./scanqrcode"
+                            // state={{ id: trainingScheduleId, date: date, type: type }}
+                        >
+                            QRCode
+                        </Link>
+                    </Button>
+                </Box>
+            </Box>
+
             <Box
                 sx={{
                     height: '70vh',
@@ -237,7 +295,7 @@ function ViewAttendance({ data }) {
                     onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                     rowsPerPageOptions={[30, 40, 80]}
                     components={{
-                        Toolbar: CustomToolbar,
+                        Toolbar: GridToolbarQuickFilter,
                         NoRowsOverlay: CustomNoRowsOverlay,
                     }}
                 />

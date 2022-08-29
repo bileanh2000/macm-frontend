@@ -66,6 +66,12 @@ export const CustomTrainingSchedule = styled.div`
         // text-align: center;
         font-weight: bold;
     }
+    .fc-day-today {
+        border: 2px solid #0f80f0;
+    }
+    .fc-event-today {
+        border: 2px solid #0f80f0;
+    }
     // .fc-day-today:hover:after {
     //     // content: 'Không buổi tập';
     //     position: absolute;

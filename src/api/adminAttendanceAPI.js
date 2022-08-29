@@ -2,13 +2,15 @@ import axios from 'axios';
 import axiosClient from './axiosClient';
 
 const adminAttendanceAPI = {
-    checkAttendanceByScheduleId: (trainingScheduleId) => {
-        const url = `/admin/headtechnique/checkattendance/${trainingScheduleId}`;
+    checkAttendanceByScheduleId: (trainingScheduleId, status) => {
+        const url = `/admin/headtechnique/checkattendance/${trainingScheduleId}?status=${status}`;
         return axiosClient.get(url);
     },
 
     takeAttendance: (studentId, trainingScheduleId, status) => {
-        const url = `/admin/headtechnique/takeattendance/${studentId}/${trainingScheduleId}`;
+        const url = `/admin/headtechnique/takeattendance/${studentId}/${trainingScheduleId}?adminStudentId=${
+            JSON.parse(localStorage.getItem('currentUser')).studentId
+        }`;
         return axiosClient.put(url, null, { params: { status } });
     },
 
@@ -28,13 +30,15 @@ const adminAttendanceAPI = {
 
     //Event
 
-    getAttendanceByEventId: (eventId) => {
-        const url = `/event/headculture/checkattendance/${eventId}`;
+    getAttendanceByEventId: (eventId, status) => {
+        const url = `/event/headculture/checkattendance/${eventId}?status=${status}`;
         return axiosClient.get(url);
     },
 
     takeAttendanceEvent: (eventId, studentId, status) => {
-        const url = `/event/headculture/takeattendanceevent/${eventId}/${studentId}`;
+        const url = `/event/headculture/takeattendanceevent/${eventId}/${studentId}?adminStudentId=${
+            JSON.parse(localStorage.getItem('currentUser')).studentId
+        }`;
         return axiosClient.put(url, null, { params: { status: status } });
     },
 

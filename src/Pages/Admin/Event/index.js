@@ -344,7 +344,20 @@ function Event() {
                     ) : null}
                 </Grid>
                 <Grid item xs={8}>
-                    <Box sx={{ backgroundColor: '#fff', height: '80vh', padding: 2, borderRadius: '5px' }}>
+                    <Box
+                        sx={{
+                            backgroundColor: '#fff',
+                            height: '80vh',
+                            padding: 2,
+                            borderRadius: '5px',
+                            '.fc-day-today': {
+                                border: '2px solid #0f80f0',
+                            },
+                            ' .fc-event-today': {
+                                border: '2px solid #0f80f0',
+                            },
+                        }}
+                    >
                         <FullCalendar
                             // initialDate={new Date(2022, month - 1, 1)}
                             // {...(semester!==2?(initialDate: '2022-10-01'):{})}

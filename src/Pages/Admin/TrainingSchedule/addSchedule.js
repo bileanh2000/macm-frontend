@@ -39,7 +39,7 @@ import semesterApi from 'src/api/semesterApi';
 import { useSnackbar } from 'notistack';
 
 function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
-    const max = '2200-12-31'; 
+    const max = '2200-12-31';
     const today = new Date();
     let tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
@@ -208,7 +208,11 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                 // setSnackBarStatus(true);
                 // snackBarStatus = true;
                 // dynamicAlert(snackBarStatus, res.message);
-                setPreviewStatistical({ totalSession: res.data.length });
+                let totalSession = res.data.filter((i) => i.existed !== true);
+                setPreviewStatistical({
+                    totalSession: totalSession.length,
+                    coincideEvent: res.data.length - totalSession.length,
+                });
                 setPreviewData(res.data);
                 setOpen(true);
             } else {
@@ -289,6 +293,9 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                 <DialogContent sx={{ height: '590px' }}>
                     <Typography>
                         <strong>Tổng số buổi tập có thể tạo:</strong> {previewStatistical.totalSession}
+                        <br />
+                        <strong>Tổng số buổi tập bị trùng với Sự kiện/Giải đấu:</strong>{' '}
+                        {previewStatistical.coincideEvent}
                     </Typography>
                     <FullCalendar
                         locale="vie"
@@ -355,10 +362,8 @@ function AddSchedule({ title, children, isOpen, handleClose, onSucess, date }) {
                                         render={({ field: { onChange, value }, fieldState: { error } }) => (
                                             <DatePicker
                                                 label="Ngày bắt đầu"
-
                                                 // disablePast
                                                 minDate={addDays(new Date(), 1)}
-
                                                 ampm={false}
                                                 value={value}
                                                 onChange={(value) => {

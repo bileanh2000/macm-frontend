@@ -1,4 +1,4 @@
-import { Box, Divider, styled, Typography } from '@mui/material';
+import { Box, Divider, MenuItem, styled, TextField, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridToolbarContainer, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import clsx from 'clsx';
 import { RadioButtonChecked, RadioButtonUnchecked } from '@mui/icons-material';
@@ -27,6 +27,11 @@ function TakeAttendance() {
     const matches = useMediaQuery(theme.breakpoints.up('md'));
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
     // const [attendanceResponse, setAttendanceResponse] = useState([]);
+    const [attendanceStatus, setAttendanceStatus] = useState(2);
+
+    const handleChangeStatus = (event) => {
+        setAttendanceStatus(event.target.value);
+    };
 
     const _type = location.state?.type;
     const _trainingScheduleId = location.state?.id;
@@ -83,7 +88,7 @@ function TakeAttendance() {
         connect();
     }, []);
 
-    const getAttendanceByStudentId = async () => {
+    const getAttendanceByStudentId = async (status) => {
         try {
             // const response = await adminAttendanceAPI.getAttendanceByStudentId(_trainingScheduleId);
             // setUserList(response.data);
@@ -101,7 +106,7 @@ function TakeAttendance() {
                 adminAttendanceAPI.getTrainingSessionByDate(_nowDate).then((res) => {
                     setTitle('buổi tập');
                     setScheduleId(res.data[0].id);
-                    adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id).then((res) => {
+                    adminAttendanceAPI.checkAttendanceByScheduleId(res.data[0].id, status).then((res) => {
                         setUserList(res.data);
                         // setAttendanceResponse(res.data[0]);
                     });
@@ -111,7 +116,7 @@ function TakeAttendance() {
                 adminAttendanceAPI.getEventSessionByDate(_nowDate).then((res) => {
                     setTitle(res.data[0].event.name);
                     setEventId(res.data[0].event.id);
-                    adminAttendanceAPI.getAttendanceByEventId(res.data[0].event.id).then((res) => {
+                    adminAttendanceAPI.getAttendanceByEventId(res.data[0].event.id, status).then((res) => {
                         setUserList(res.data);
 
                         // setAttendanceResponse(res.data[0]);
@@ -124,8 +129,8 @@ function TakeAttendance() {
     };
 
     useEffect(() => {
-        getAttendanceByStudentId();
-    }, []);
+        getAttendanceByStudentId(attendanceStatus);
+    }, [attendanceStatus]);
 
     const columns = [
         { field: 'id', headerName: 'Số thứ tự', flex: 0.5 },
@@ -364,9 +369,6 @@ function TakeAttendance() {
                 >
                     <GridToolbarQuickFilter />
                 </Box>
-                <Typography variant="body1">
-                    Số người tham gia điểm danh {attendance}/{userList.length}
-                </Typography>
             </GridToolbarContainer>
         );
     }
@@ -431,6 +433,17 @@ function TakeAttendance() {
 
     return (
         <Box sx={{}}>
+            <Typography
+                variant="body1"
+                sx={{
+                    position: 'absolute',
+                    right: '28px',
+                    top: '209px',
+                    zIndex: 2,
+                }}
+            >
+                Có mặt: {attendance}/{userList.length}
+            </Typography>
             <Typography variant="h4" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
                 Điểm danh {_type == 0 ? title : 'sự kiện ' + title} ngày: {_nowDate}
             </Typography>
@@ -442,6 +455,20 @@ function TakeAttendance() {
             {/* <button type="button" onClick={() => testSend()}>
                 test send
             </button> */}
+            <TextField
+                id="outlined-select-currency"
+                select
+                label="Trạng thái"
+                value={attendanceStatus}
+                onChange={handleChangeStatus}
+                size="small"
+                sx={{ mb: 1 }}
+            >
+                <MenuItem value={0}>Vắng mặt</MenuItem>
+                <MenuItem value={-1}>Tất Cả</MenuItem>
+                <MenuItem value={1}>Có mặt</MenuItem>
+                <MenuItem value={2}>Chưa điểm danh</MenuItem>
+            </TextField>
             <Box component="form" onSubmit={handleSubmit(onSubmit)}>
                 <Box
                     sx={{
@@ -490,7 +517,7 @@ function TakeAttendance() {
                         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                         rowsPerPageOptions={[40, 60, 80]}
                         components={{
-                            Toolbar: CustomToolbar,
+                            Toolbar: GridToolbarQuickFilter,
                             NoRowsOverlay: CustomNoRowsOverlay,
                         }}
                     />

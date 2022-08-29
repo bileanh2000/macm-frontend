@@ -53,33 +53,6 @@ function Attendance() {
                             Trạng thái điểm danh {type == 0 ? title : 'sự kiện ' + title} ngày: {_nowDate}
                         </Typography>
                         <Divider />
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, mt: 2 }}>
-                            {/* <Button variant="outlined">
-                                <Link to={`./report`} style={{ color: 'black' }}>
-                                    Thống kê thành viên tham gia buổi tập
-                                </Link>
-                            </Button> */}
-                            <Box>
-                                <Button variant="outlined" sx={{ color: 'black', mr: 2 }}>
-                                    <Link
-                                        sx={{ color: 'black' }}
-                                        to="./take"
-                                        state={{ id: trainingScheduleId, date: _nowDate, type: type }}
-                                    >
-                                        Điểm danh
-                                    </Link>
-                                </Button>
-                                <Button variant="outlined" sx={{ color: 'black' }}>
-                                    <Link
-                                        sx={{ color: 'black' }}
-                                        to="./scanqrcode"
-                                        // state={{ id: trainingScheduleId, date: date, type: type }}
-                                    >
-                                        QRCode
-                                    </Link>
-                                </Button>
-                            </Box>
-                        </Box>
 
                         <ViewAttendance data={{ trainingScheduleId, date: _nowDate, type }} />
                     </Container>
