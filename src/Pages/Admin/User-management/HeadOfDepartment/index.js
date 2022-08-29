@@ -26,6 +26,7 @@ import moment from 'moment';
 import AddMemberDialog from '../AddMemberDialog';
 import ViewDetailMemberDialog from '../ViewDetailMemberDialog';
 import { useSnackbar } from 'notistack';
+import semesterApi from 'src/api/semesterApi';
 
 function HeadOfDepartment() {
     let navigate = useNavigate();
@@ -35,10 +36,13 @@ function HeadOfDepartment() {
     const [semester, setSemester] = useState('Summer2022');
     const [editable, setEditable] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState([]);
+    const [semesterList, setSemesterList] = useState([]);
 
     const [isOpenAddMember, setIsOpenAddMember] = useState(false);
     const [isOpenViewMember, setIsOpenViewMember] = useState(false);
     const [isEditDialog, setIsEditDialog] = useState(false);
+    const [currentSemester, setCurrentSemester] = useState([]);
+
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
@@ -65,7 +69,7 @@ function HeadOfDepartment() {
     const handleChange = (event) => {
         console.log(event.target.value);
         setSemester(event.target.value);
-        if (event.target.value != 'Summer2022') {
+        if (event.target.value != currentSemester) {
             setEditable(true);
         } else {
             setEditable(false);
@@ -116,6 +120,30 @@ function HeadOfDepartment() {
             ],
         },
     ];
+
+    useEffect(() => {
+        const fetchTop3Semester = async () => {
+            try {
+                const response = await semesterApi.getTop3Semester();
+                console.log('fetchTop3Semester', response.data);
+                setSemesterList(response.data);
+            } catch (error) {
+                console.log('failed when fetchTop3Semester', error);
+            }
+        };
+        const fetchCurrentSemester = async () => {
+            try {
+                const response = await semesterApi.getCurrentSemester();
+                console.log('fetchCurrentSemester', response.data);
+                setSemester(response.data[0].name);
+                setCurrentSemester(response.data[0].name);
+            } catch (error) {
+                console.log('failed when fetchTop3Semester', error);
+            }
+        };
+        fetchTop3Semester();
+        fetchCurrentSemester();
+    }, []);
 
     const rows = userList.map((item, index) => {
         const container = {};
@@ -251,8 +279,13 @@ function HeadOfDepartment() {
                                 {option.label}
                             </MenuItem>
                         ))} */}
-                <MenuItem value="Summer2022">Summer 2022</MenuItem>
-                <MenuItem value="Spring2022">Spring 2022</MenuItem>
+                {semesterList.map((i, index) => {
+                    return (
+                        <MenuItem key={index} value={i.name}>
+                            {i.name}
+                        </MenuItem>
+                    );
+                })}
             </TextField>
             <Box
                 sx={{

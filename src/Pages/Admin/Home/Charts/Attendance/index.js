@@ -7,6 +7,7 @@ import semesterApi from 'src/api/semesterApi';
 import { useEffect } from 'react';
 import dashboardApi from 'src/api/dashboardApi';
 import eventApi from 'src/api/eventApi';
+import { useNavigate } from 'react-router-dom';
 
 function AttendanceChart() {
     const [semesterList, setSemesterList] = useState([]);
@@ -14,7 +15,7 @@ function AttendanceChart() {
     const [attendanceReportList, setAttendanceReportList] = useState([]);
     const [monthInSemester, setMonthInSemester] = useState([]);
     const [month, setMonth] = useState(new Date().getMonth() + 1);
-
+    let navigate = useNavigate();
     const handleChange = (event) => {
         setSemester(event.target.value);
     };
@@ -51,6 +52,23 @@ function AttendanceChart() {
         fetchAttendanceReportBySemester(semester, month);
         fetchMonthInSemester(semester);
     }, [semester, month]);
+    // const handleNavigateOnClick = (e) => {
+    //     navigate('../admin/attendance/take',     state={{
+    //                 id: row.id,
+    //                 date: type == 0 ? moment(row.date).format('DD/MM/YYYY') : moment(row.startDate).format('DD/MM/YYYY'),
+    //                 type: type,
+    //             }});
+    // };
+
+    // <IconButton
+    //     LinkComponent={Link}
+    //     to="../admin/attendance/take"
+    //     state={{
+    //         id: row.id,
+    //         date: type == 0 ? moment(row.date).format('DD/MM/YYYY') : moment(row.startDate).format('DD/MM/YYYY'),
+    //         type: type,
+    //     }}
+    // ></IconButton>;
     return (
         <Fragment>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
@@ -111,10 +129,22 @@ function AttendanceChart() {
                     <XAxis dataKey="date" />
                     <YAxis />
                     <Tooltip />
-                    ff569b
+
                     <Legend />
-                    <Bar name="Có mặt" dataKey="totalAttendInTrainingSession" stackId="a" fill="#8884d8" />
-                    <Bar name="Vắng mặt" dataKey="totalAbsentInTrainingSession" stackId="a" fill="#ff569b" />
+                    <Bar
+                        name="Có mặt"
+                        dataKey="totalAttendInTrainingSession"
+                        stackId="a"
+                        fill="#8884d8"
+                        // onClick={(e) => handleNavigateOnClick(e)}
+                    />
+                    <Bar
+                        name="Vắng mặt"
+                        dataKey="totalAbsentInTrainingSession"
+                        stackId="a"
+                        fill="#ff569b"
+                        // onClick={(e) => handleNavigateOnClick(e)}
+                    />
                 </BarChart>
             </ResponsiveContainer>
         </Fragment>

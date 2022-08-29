@@ -62,6 +62,7 @@ import AddMemberDialog from '../AddMemberDialog';
 import ViewDetailMemberDialog from '../ViewDetailMemberDialog';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { useSnackbar } from 'notistack';
+import semesterApi from 'src/api/semesterApi';
 
 const months = [
     { name: 'Tháng 1', value: 1 },
@@ -107,6 +108,8 @@ function MemberAndCollaborator() {
     const [isActive, setIsActive] = useState(-1);
     const [roleId, setRoleId] = useState(-1);
     const [filterCount, setFilterCount] = useState(0);
+    const [semesterList, setSemesterList] = useState([]);
+    const [currenSemester, setCurrentSemester] = useState([]);
     const user = JSON.parse(localStorage.getItem('currentUser'));
     const styles = (theme) => ({
         disabledButton: {
@@ -151,7 +154,7 @@ function MemberAndCollaborator() {
     const handleChange = (event) => {
         console.log(event.target.value);
         setSemester(event.target.value);
-        if (event.target.value != 'Summer2022') {
+        if (event.target.value != currenSemester) {
             setEditable(true);
         } else {
             setEditable(false);
@@ -173,6 +176,15 @@ function MemberAndCollaborator() {
         setEmailList(emails);
     }, [selectedRows]);
 
+    const fetchTop3Semester = async () => {
+        try {
+            const response = await semesterApi.getTop3Semester();
+            console.log('fetchTop3Semester', response.data);
+            setSemesterList(response.data);
+        } catch (error) {
+            console.log('failed when fetchTop3Semester', error);
+        }
+    };
     const {
         register,
         control,
@@ -401,6 +413,10 @@ function MemberAndCollaborator() {
     useEffect(() => {
         console.log(listMonth);
     }, [listMonth]);
+
+    useEffect(() => {
+        fetchTop3Semester();
+    }, []);
     const searchJson = (searchTerm) => {
         rowsUser
             .filter((val) => {
@@ -502,6 +518,20 @@ function MemberAndCollaborator() {
             </GridFooterContainer>
         );
     };
+
+    useEffect(() => {
+        const fetchCurrentSemester = async () => {
+            try {
+                const response = await semesterApi.getCurrentSemester();
+                console.log('fetchCurrentSemester', response.data);
+                setSemester(response.data[0].name);
+                setCurrentSemester(response.data[0].name);
+            } catch (error) {
+                console.log('failed when fetchTop3Semester', error);
+            }
+        };
+        fetchCurrentSemester();
+    }, []);
 
     return (
         <Fragment>
@@ -818,8 +848,13 @@ function MemberAndCollaborator() {
                         value={semester}
                         onChange={handleChange}
                     >
-                        <MenuItem value="Summer2022">Summer 2022</MenuItem>
-                        <MenuItem value="Spring2022">Spring 2022</MenuItem>
+                        {semesterList.map((i, index) => {
+                            return (
+                                <MenuItem key={index} value={i.name}>
+                                    {i.name}
+                                </MenuItem>
+                            );
+                        })}
                     </TextField>
                 </Box>
                 <Box>
