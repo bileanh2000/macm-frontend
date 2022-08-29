@@ -50,6 +50,7 @@ function MembershipFee() {
     const [idMember, setIdMember] = useState();
     const [isRender, setIsRender] = useState(true);
     const user = JSON.parse(localStorage.getItem('currentUser'));
+    const [membershipInforId, setMembershipInforId] = useState();
 
     let payment = userList.reduce((paymentCount, user) => {
         return user.status ? paymentCount + 1 : paymentCount;
@@ -100,8 +101,10 @@ function MembershipFee() {
     const getAmount = async (semesterName) => {
         try {
             const response = await adminClubFeeAPI.getSemesterFee(semesterName);
+            console.log('memberid' + response)
             response.data.length > 0 ? setCost(response.data[0].amount) : setCost();
             response.data.length > 0 ? getListMemberShip(response.data[0].id) : setUserList([]);
+            response.data.length > 0 ? setMembershipInforId(response.data[0].id) : setMembershipInforId();
         } catch (error) {
             console.log('Không thể lấy được dữ liệu phí thành viên, error: ', error);
         }
@@ -112,6 +115,7 @@ function MembershipFee() {
             try {
                 const response = await adminClubFeeAPI.getSemesterFee(semesterName);
                 response.data.length > 0 ? setCost(response.data[0].amount) : setCost();
+                response.data.length > 0 ? setMembershipInforId(response.data[0].id) : setMembershipInforId();
                 getListMemberShip(response.data[0].id);
             } catch (error) {
                 console.log('Không thể lấy được dữ liệu phí thành viên, error: ', error);
@@ -333,7 +337,7 @@ function MembershipFee() {
                         to={`report`}
                         state={{
                             semester: {
-                                id: semesterId,
+                                id: membershipInforId,
                                 name: semesterName,
                             },
                         }}
