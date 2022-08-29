@@ -152,7 +152,7 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
                 userList &&
                 userList.map((member) =>
                     member.id == id
-                        ? { ...member, roleEventDto: { id: newRole.roleId, name: newRole.roleName } }
+                        ? { ...member, eventRoleDto: { id: newRole.roleId, name: newRole.roleName } }
                         : member,
                 );
             setUserList(newMemberList);
@@ -215,7 +215,7 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
             </Dialog>
 
             <Typography variant="caption" sx={{ mb: 3 }}>
-                Bấm vào vai trò của từng người để chỉnh sửa
+                Bấm vào vai trò của từng người để chỉnh sửa, sau đó bấm nút "Lưu lại"
             </Typography>
             <p></p>
             <Box
@@ -246,7 +246,7 @@ function AddMemberToAdminEvent({ adminList, value, index, active, total, isUpdat
                 />
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button variant="contained" onClick={handleOpenDialog} sx={{ mt: 3 }}>
+                <Button variant="contained" onClick={handleOpenDialog} sx={{ mt: 2 }}>
                     Lưu lại
                 </Button>
             </Box>
