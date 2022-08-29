@@ -45,7 +45,7 @@ function MemberCancelEvent({ title, isOpen, handleClose }) {
 
     useEffect(() => {
         fetchUserCancelEvent(id);
-    }, [id]);
+    }, [id, isOpen]);
     const columns = [
         { field: 'studentName', headerName: 'Tên', flex: 0.8 },
         { field: 'email', headerName: 'Email', flex: 1 },
@@ -84,7 +84,7 @@ function MemberCancelEvent({ title, isOpen, handleClose }) {
                     <GridToolbarQuickFilter />
                 </Box>
                 <Typography variant="button" color="initial" sx={{ marginLeft: 'auto', marginRight: '1rem' }}>
-                    Tổng thành viên hủy tham gia: {rowsUser.length}
+                    Tổng thành viên bị từ chối tham gia: {rowsUser.length}
                 </Typography>
             </GridToolbarContainer>
         );
