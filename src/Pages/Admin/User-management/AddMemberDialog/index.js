@@ -132,7 +132,7 @@ const AddMemberDialog = ({ title, children, isOpen, handleClose, onSucess }) => 
         name: Yup.string()
             .strict(false)
             .trim('Không để trống')
-            .min(5, 'Vui lòng nhập lớn hơn 5 ký tự')
+            // .min(5, 'Vui lòng nhập lớn hơn 5 ký tự')
             .max(255, 'Vui lòng không nhập lớn hơn 255 ký tự')
             .matches(
                 /^[a-zA-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹẾỀếề ]+$/,

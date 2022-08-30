@@ -53,17 +53,23 @@ function Contacts() {
                 <div className={cx('wrapper')}>
                     <div className={cx('container')}>
                         <ViewContact />
-                        <Grid container spacing={2}>
-                            <Grid item xs={2}>
-                                <img
-                                    src={contacts[0]?.image}
-                                    alt="club logo"
-                                    width="150px"
-                                    height="150px"
-                                    style={{ borderRadius: '50%' }}
-                                />
-                            </Grid>
-                            <Grid item xs={10}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                padding: 1,
+                                fontSize: '0.9rem',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <img
+                                src={contacts[0]?.image}
+                                alt="club logo"
+                                width="150vw"
+                                height="150vh"
+                                style={{ borderRadius: '50%' }}
+                            />
+                            <Box>
                                 <p style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{contacts[0]?.clubName}</p>
 
                                 <p>{moment(contacts[0]?.foundingDate).format('DD/MM/yyyy')}</p>
@@ -80,13 +86,13 @@ function Contacts() {
                                         {contacts[0]?.fanpageUrl}
                                     </a>
                                     {/* <a href="##" style={{ color: 'black !important' }}>
-                                        Le Anh Tuan
-                                    </a> */}
+        Le Anh Tuan
+    </a> */}
                                 </div>
 
                                 <p>ĐH FPT, km29 Đại lộ Thăng Long, xã Thạch Hoà, huyện Thạch Thất Hà Nội</p>
-                            </Grid>
-                        </Grid>
+                            </Box>
+                        </Box>
                     </div>
                 </div>
             </Container>
