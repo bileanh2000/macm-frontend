@@ -54,11 +54,11 @@ function RegisterAdmin({ isOpen, handleClose, onSuccess, roles, user, onChange }
 
     const addListOrganizingCommittee = async () => {
         try {
-            const response = await adminTournament.addListOrganizingCommittee(
-                user.studentId,
-                tournamentId,
-                selectedRows,
-            );
+            const userList = selectedRows.map((row) => {
+                return allMember.filter((member) => member.user.id === row.user.id)[0];
+            });
+            console.log('Register Admin', userList);
+            const response = await adminTournament.addListOrganizingCommittee(user.studentId, tournamentId, userList);
             enqueueSnackbar(response.message, { variant: response.data ? 'success' : 'error' });
             onChange && onChange();
             setIsRender(true);
