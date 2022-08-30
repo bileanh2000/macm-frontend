@@ -1,6 +1,6 @@
 // const keys = require("../config/keys");
 
-export const API_BASE_URL = 'https://capstone-project-macm.herokuapp.com/api';
+export const API_BASE_URL = 'https://fpt-macm.herokuapp.com/api';
 
 export const ACCESS_TOKEN = 'accessToken';
 

@@ -351,7 +351,7 @@ function MemberAndCollaborator() {
         let formData = new FormData();
         formData.append('file', data.file[0]);
         axios
-            .post('https://capstone-project-macm.herokuapp.com/api/admin/hr/users/import', formData, {
+            .post('https://fpt-macm.herokuapp.com/api/admin/hr/users/import', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`,
@@ -438,7 +438,7 @@ function MemberAndCollaborator() {
 
     const exportExcel = () => {
         axios({
-            url: 'https://capstone-project-macm.herokuapp.com/api/admin/hr/users/export', //your url
+            url: 'https://fpt-macm.herokuapp.com/api/admin/hr/users/export', //your url
             method: 'POST',
             ...(selectedRows.length > 0 ? { data: selectedRows } : { data: userList }),
             // data: selectedRows,
@@ -459,7 +459,7 @@ function MemberAndCollaborator() {
 
     const exportErrorList = () => {
         axios({
-            url: 'https://capstone-project-macm.herokuapp.com/api/admin/hr/users/exporterror', //your url
+            url: 'https://fpt-macm.herokuapp.com/api/admin/hr/users/exporterror', //your url
             method: 'POST',
 
             data: errorList,
