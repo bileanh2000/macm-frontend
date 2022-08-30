@@ -1,7 +1,8 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import { QrReader } from 'react-qr-reader';
-import qrSuccessSound from './Sound/off.mp3';
+import qrSuccessSound from './Sound/success.mp3';
+import qrErrorSound from './Sound/off.mp3';
 import adminAttendanceAPI from 'src/api/adminAttendanceAPI';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import ErrorRoundedIcon from '@mui/icons-material/ErrorRounded';
@@ -83,6 +84,7 @@ function QRScanner({ activityData, activityType }) {
     const [isSessionTime, setIsSessionTime] = useState(true);
     const [test, setTest] = useState('null');
     const audioPlayer = useRef(null);
+    const audioPlayerError = useRef(null);
     const now = new Date();
     const [tabHasFocus, setTabHasFocus] = useState(true);
     const studentId = JSON.parse(localStorage.getItem('currentUser')).studentId;
@@ -234,8 +236,11 @@ function QRScanner({ activityData, activityType }) {
                     'Điểm danh cho ' + response.data[0].studentId + ' - ' + response.data[0].name + ' thành công',
                     {
                         variant: 'success',
+                        preventDuplicate: true,
                     },
                 );
+                audioPlayer.current.play();
+
                 // setAttendanceList([...response.data[0], ...attendanceList]);
             }
             console.log('data', localData);
@@ -249,8 +254,6 @@ function QRScanner({ activityData, activityType }) {
 
     const onQrSuccess = (result, error) => {
         if (!!result) {
-            audioPlayer.current.play();
-
             try {
                 let JSONResult = JSON.parse(result?.text);
                 let attendancedLocal = JSON.parse(localStorage.getItem('attendanced')) || [];
@@ -267,6 +270,7 @@ function QRScanner({ activityData, activityType }) {
                                 variant: 'warning',
                                 preventDuplicate: true,
                             });
+                            audioPlayerError.current.play();
                         }
                     });
 
@@ -277,12 +281,15 @@ function QRScanner({ activityData, activityType }) {
                     enqueueSnackbar('Mã QR không hợp hệ', {
                         variant: 'error',
                     });
+                    audioPlayerError.current.play();
                 }
             } catch (error) {
                 enqueueSnackbar('Mã QR không hợp lệ', {
                     variant: 'warning',
                 });
+                audioPlayerError.current.play();
                 console.log(error);
+
                 // setAttendanceMessages('Mã QR không hợp lệ');
                 // setQrStatus(false);
             }
@@ -351,6 +358,7 @@ function QRScanner({ activityData, activityType }) {
             {/* <button onClick={handleClickVariant('hehehe', 'success')}>hien len di dmm</button> */}
 
             <audio ref={audioPlayer} src={qrSuccessSound} />
+            <audio ref={audioPlayerError} src={qrErrorSound} />
             {isSessionTime ? (
                 tabHasFocus ? (
                     <QrReader
