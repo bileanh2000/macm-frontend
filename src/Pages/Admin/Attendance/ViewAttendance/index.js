@@ -197,7 +197,7 @@ function ViewAttendance({ data }) {
                 variant="body1"
                 sx={{
                     position: 'absolute',
-                    right: '50px',
+                    right: '85px',
                     top: '227px',
                     zIndex: 2,
                 }}
