@@ -159,10 +159,7 @@ function DetailTournament() {
 
     const checkUpdate = () => {
         const nowDate = new Date();
-        if (
-            new Date(tournament.registrationOrganizingCommitteeDeadline) <= nowDate ||
-            new Date(tournament.registrationPlayerDeadline) <= nowDate
-        ) {
+        if (new Date(scheduleList[0].date) <= nowDate) {
             return true;
         } else {
             return false;
@@ -178,7 +175,7 @@ function DetailTournament() {
         }
     };
     const isFinish = scheduleList.length > 0 && checkFinish();
-    const isUpdate = tournament && checkUpdate();
+    const isUpdate = scheduleList.length > 0 && checkUpdate();
 
     const handleDelete = useCallback(
         (id) => () => {
