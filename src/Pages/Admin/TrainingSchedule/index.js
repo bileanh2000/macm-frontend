@@ -98,7 +98,7 @@ function TrainingSchedule() {
     const [monthAndYear, setMonthAndYear] = useState({ month: nowDate.getMonth() + 1, year: nowDate.getFullYear() });
     const [scheduleList, setScheduleList] = useState([]);
     const [scheduleId, setScheduleId] = useState();
-    const [semester, setSemester] = useState(1);
+    const [semester, setSemester] = useState(2);
     const [semesterList, setSemesterList] = useState([]);
     const [startDateOfSemester, setStartDateOfSemester] = useState();
     const [commonList, setCommonList] = useState([]);
@@ -120,6 +120,17 @@ function TrainingSchedule() {
         const currentMonth = temp.getMonth() + 1;
         const currentYear = temp.getFullYear();
         setMonthAndYear({ month: currentMonth, year: currentYear });
+    };
+
+    const fetchCurrentSemester = async () => {
+        try {
+            const response = await semesterApi.getCurrentSemester();
+            console.log('Thanh cong roi: ', response);
+            // setCommonList(response.data);
+            setSemester(response.data[0].id);
+        } catch (error) {
+            console.log('That bai roi huhu ', error);
+        }
     };
 
     const fetchCommonScheduleBySemester = async () => {
@@ -176,6 +187,7 @@ function TrainingSchedule() {
     useEffect(() => {
         fetchSemester();
         // getCurrentSemester();
+        fetchCurrentSemester();
     }, []);
     useEffect(() => {
         fetchCommonScheduleBySemester();
