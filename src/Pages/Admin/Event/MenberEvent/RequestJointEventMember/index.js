@@ -166,7 +166,7 @@ function RequestJointEventMember({ value, index, total, active, onChange }) {
                     <GridToolbarQuickFilter />
                 </Box>
                 <Typography variant="body1" gutterBottom component="div" sx={{ fontWeight: 500, marginBottom: 2 }}>
-                    Số lượng thành viên : {_active}/{total}
+                    Số lượng thành viên : {_active}
                 </Typography>
             </GridToolbarContainer>
         );

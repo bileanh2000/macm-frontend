@@ -549,9 +549,9 @@ function MembershipFee() {
                     sx={{
                         height: '70vh',
                         width: '100%',
-                        '& .status-rows': {
-                            justifyContent: 'center !important',
-                        },
+                        // '& .status-rows': {
+                        //     justifyContent: 'center !important',
+                        // },
                         '& .status-rows.active .MuiDataGrid-cellContent': {
                             backgroundColor: '#56f000',
                             color: '#fff',

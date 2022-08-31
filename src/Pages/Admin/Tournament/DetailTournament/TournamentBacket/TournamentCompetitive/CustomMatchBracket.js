@@ -351,7 +351,7 @@ function CustomMatchBracket(params) {
                 // )
                 ''
             )}
-            <Paper sx={{ overflow: 'auto', maxHeight: '80vh', mt: 2 }}>
+            <Paper sx={{ overflow: 'auto', maxHeight: '80vh', minHeight: '50vh', mt: 2 }}>
                 <Box className={cx('tournament-bracket', 'tournament-bracket--rounded')} sx={{ mt: 2, mb: 2 }}>
                     {matches.map((matchs, index) => (
                         <div className={cx('tournament-bracket__round')} key={index}>
@@ -461,7 +461,7 @@ function CustomMatchBracket(params) {
                                                                 <small>{match.firstPlayer?.studentName}</small>
                                                             </Box>
                                                             <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                                <small>{match.firstPlayer?.point}</small>
+                                                                <small><strong>{match.firstPlayer?.point}</strong></small>
                                                             </Box>
                                                         </div>
                                                     </Tooltip>
@@ -517,7 +517,7 @@ function CustomMatchBracket(params) {
                                                                 <small>{match.secondPlayer?.studentName}</small>
                                                             </Box>
                                                             <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                                <small>{match.secondPlayer?.point}</small>
+                                                                <small><strong>{match.secondPlayer?.point}</strong></small>
                                                             </Box>
                                                         </div>
                                                     </Tooltip>
@@ -599,7 +599,7 @@ function CustomMatchBracket(params) {
                                                                 <small>{match.firstPlayer?.studentName}</small>
                                                             </Box>
                                                             <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                                <small>{match.firstPlayer?.point}</small>
+                                                                <small><strong>{match.firstPlayer?.point}</strong></small>
                                                             </Box>
                                                         </div>
                                                     </Tooltip>
@@ -633,7 +633,7 @@ function CustomMatchBracket(params) {
                                                                 <small>{match.secondPlayer?.studentName}</small>
                                                             </Box>
                                                             <Box sx={{ m: '0.5em' }} className={cx('score')}>
-                                                                <small>{match.secondPlayer?.point}</small>
+                                                                <small><strong>{match.secondPlayer?.point}</strong></small>
                                                             </Box>
                                                         </div>
                                                     </Tooltip>
